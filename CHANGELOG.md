@@ -16,6 +16,11 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## Added
+
+- Script helpers for block invalidations, checks and getting blocks in editor
+- Check core heading block to prevent publishing with an H1 in the content
+
 ## [0.1.0]
 
 ### Added

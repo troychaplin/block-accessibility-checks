@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name:       Block Accessibility Checks
  * Description:       This plugin helps ensures your content meets WCAG (Web Content Accessibility Guidelines) requirements.
@@ -12,3 +13,20 @@
  *
  * @package           block-accessibility-checks
  */
+
+add_action('enqueue_block_editor_assets', 'enqueue_block_checks');
+
+function enqueue_block_checks()
+{
+    $script_path = 'build/index.js';
+
+    wp_register_script(
+        'block-check-script',
+        plugins_url($script_path, __FILE__),
+        array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor'),
+        filemtime(plugin_dir_path(__FILE__) . $script_path),
+        true
+    );
+
+    wp_enqueue_script('block-check-script');
+}
