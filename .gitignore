@@ -1,3 +1,6 @@
+# Dirty dirty mac files
+.DS_Store
+
 # Logs
 logs
 *.log
