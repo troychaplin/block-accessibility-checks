@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data'
-import { blockChecksArray } from './blockChecksArray'
+import { blockChecksArray } from '../registerPlugin'
 
 export function getInvalidBlocks() {
   const allBlocks = useSelect((select) => select('core/block-editor').getBlocks(), [])

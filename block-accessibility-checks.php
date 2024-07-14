@@ -18,7 +18,7 @@ add_action('enqueue_block_editor_assets', 'enqueue_block_checks');
 
 function enqueue_block_checks()
 {
-    $script_path = 'build/index.js';
+    $script_path = 'build/block-check-script.js';
 
     wp_register_script(
         'block-check-script',

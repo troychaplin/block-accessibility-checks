@@ -6,7 +6,7 @@
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
-		"env" : "wp-env start",
+		"env": "wp-env start",
 		"build": "wp-scripts build",
 		"start": "wp-scripts start",
 		"format": "wp-scripts format",
@@ -16,7 +16,12 @@
 		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^28.3.0",
-		"@wordpress/env": "^10.3.0"
+		"@wordpress/compose": "^7.3.0",
+		"@wordpress/data": "^10.3.0",
+		"@wordpress/element": "^6.3.0",
+		"@wordpress/env": "^10.3.0",
+		"@wordpress/hooks": "^4.3.0",
+		"@wordpress/plugins": "^7.3.0",
+		"@wordpress/scripts": "^28.3.0"
 	}
 }
