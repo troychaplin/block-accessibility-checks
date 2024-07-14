@@ -6,14 +6,14 @@
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
+		"env" : "wp-env start",
 		"build": "wp-scripts build",
+		"start": "wp-scripts start",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip",
-		"start": "wp-scripts start",
-		"env" : "wp-env start"
+		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^28.3.0",
