@@ -18,6 +18,7 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 
 Open a terminal window and navigate to where you intend to setup the repo and do the following:
 
+- Install wp-env: `npm -g i @wordpress/env`
 - Clone the repo: `git clone https://github.com/troychaplin/block-accessibility-checks.git`
 - Navigate into the repo: `cd block-accessibility-checks`
 - Install dependencies: `npm install`
@@ -27,8 +28,13 @@ Open a terminal window and navigate to where you intend to setup the repo and do
 This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme) that setups up a local WordPress environment using Docker.
 
 - Make sure `Docker Desktop` is running
-- Start WordPress Env: `npm run wp:up`
+- Start WordPress: `wp-env start`
+
+#### Other Commands
+
+- Stop WordPress: `wp-env stop`
 - Start watch task: `npm run start`
+- Build assets: `npm run build`
 
 ### Local Site Details
 

@@ -6,8 +6,6 @@
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
-		"wp:up": "wp-env start",
-		"wp:down": "wp-env stop",
 		"build": "wp-scripts build",
 		"start": "wp-scripts start",
 		"format": "wp-scripts format",
