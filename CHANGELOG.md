@@ -26,6 +26,7 @@ Prefix the change with one of these keywords:
 - Instructions on setting up to run and build the plugin
 - Getting involved instructions in the README
 - Husky pre-commit check
+- Commit lint and rules
 - Git action to run build on PR to develop
 - Git issue templates to log features and tasks
 
