@@ -6,17 +6,11 @@ npm run format
 
 # Check if there are any changes in the working directory
 if [ -n "$(git status --porcelain)" ]; then
-  echo ""
+  git add -u
   echo ""
   echo "\033[0;31mChecking and updating file formatting...\033[0m"
-  echo ""
-  
-  # Stage the changes
-  git add -u
-
   echo "\033[0;32mFiles are properly formatted. You can now commit your changes.\033[0m"
   echo ""
-  # exit 1
 fi
 
 # If no changes, continue with the other tasks
