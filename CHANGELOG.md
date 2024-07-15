@@ -22,8 +22,13 @@ Prefix the change with one of these keywords:
 - Higher order component to wrap invalid blocks
 - Styles for invalid block wrapper
 - Check core heading block to prevent publishing with an H1 in the content
+- Check core table block to prevent publishing when a header row is not being used
 - Instructions on setting up to run and build the plugin
 - Getting involved instructions in the README
+- Husky pre-commit check
+- Commit lint and rules
+- Git action to run build on PR to develop
+- Git issue templates to log features and tasks
 
 ## [0.1.0]
 

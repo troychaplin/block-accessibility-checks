@@ -9,7 +9,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build folder
-build
+# build
 
 # Dependency directories
 node_modules/

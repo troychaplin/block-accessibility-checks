@@ -12,28 +12,30 @@
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip"
+		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip",
+		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.14.6",
-		"@babel/preset-env": "^7.14.7",
-		"@babel/preset-react": "^7.14.5",
+		"@babel/core": "^7.24.9",
+		"@babel/preset-env": "^7.24.8",
+		"@babel/preset-react": "^7.24.7",
+		"@commitlint/cli": "^19.3.0",
+		"@commitlint/config-conventional": "^19.2.2",
 		"@wordpress/compose": "^7.3.0",
 		"@wordpress/data": "^10.3.0",
 		"@wordpress/element": "^6.3.0",
 		"@wordpress/env": "^10.3.0",
 		"@wordpress/hooks": "^4.3.0",
+		"@wordpress/i18n": "^5.3.0",
 		"@wordpress/plugins": "^7.3.0",
 		"@wordpress/prettier-config": "^4.3.0",
-		"@wordpress/scripts": "^28.3.0"
+		"@wordpress/scripts": "^28.3.0",
+		"husky": "^9.0.11"
 	},
 	"babel": {
 		"presets": [
 			"@babel/preset-env",
 			"@babel/preset-react"
 		]
-	},
-	"dependencies": {
-		"@wordpress/i18n": "^5.3.0"
 	}
 }

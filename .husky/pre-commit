@@ -1,0 +1,18 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run the format command
+npm run format
+
+# Check if there are any changes in the working directory
+if [ -n "$(git status --porcelain)" ]; then
+  git add -u
+  echo ""
+  echo "\033[0;31mChecking and updating file formatting...\033[0m"
+  echo ""
+  echo "\033[0;32mFiles are properly formatted. You can now commit your changes.\033[0m"
+  echo ""
+fi
+
+# If no changes, continue with the other tasks
+npm run lint:js && npm run build
