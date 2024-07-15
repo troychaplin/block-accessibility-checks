@@ -1,2 +1,2 @@
-import './styles/error.css'
-import './scripts/registerPlugin'
+import './styles/error.css';
+import './scripts/registerPlugin';
