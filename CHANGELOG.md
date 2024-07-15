@@ -22,6 +22,8 @@ Prefix the change with one of these keywords:
 - Higher order component to wrap invalid blocks
 - Styles for invalid block wrapper
 - Check core heading block to prevent publishing with an H1 in the content
+- Instructions on setting up to run and build the plugin
+- Getting involved instructions in the README
 
 ## [0.1.0]
 
