@@ -4,6 +4,8 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 
 ## Features
 
+- POOP
+
 - **Real-time Accessibility Checks:** Automatically checks core block configurations as you edit content in the Gutenberg editor.
 - **Prevents Non-Compliant Publishing:** Blocks the publishing of content that fails to meet WCAG requirements.
 - **User-Friendly Notifications:** Provides clear and actionable feedback to help users fix accessibility issues.
