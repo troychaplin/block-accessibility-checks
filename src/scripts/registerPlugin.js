@@ -1,11 +1,13 @@
 import { registerPlugin } from '@wordpress/plugins';
-import { __ } from '@wordpress/i18n';
 import { blockInvalidation } from './helpers/blockInvalidation';
 import './helpers/blockErrorComponent';
+
+// Import block check functions
 import { checkHeadingLevel } from './blockChecks/checkHeading';
+import { checkTableHeaderRow } from './blockChecks/checkTable';
 
 // Import all block check script and pass into blockChecksArray
-export const blockChecksArray = [ checkHeadingLevel ];
+export const blockChecksArray = [ checkHeadingLevel, checkTableHeaderRow ];
 
 registerPlugin( 'block-validation', {
 	render: blockInvalidation,

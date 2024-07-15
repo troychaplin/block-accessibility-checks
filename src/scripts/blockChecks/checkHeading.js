@@ -5,7 +5,7 @@ export function checkHeadingLevel( block ) {
 		return {
 			isValid: false,
 			message: __(
-				'Level 1 headings are not allowed in your content area.',
+				'Accessibility Error: Level 1 headings are not allowed in your content area.',
 				'block-accessibility-checks'
 			),
 			clientId: block.clientId,
