@@ -18,15 +18,20 @@ add_action('enqueue_block_editor_assets', 'enqueue_block_checks');
 
 function enqueue_block_checks()
 {
-    $script_path = 'build/block-check-script.js';
+    $script_path = 'build/block-checks.js';
+    $style_path = 'build/block-checks.css';
 
-    wp_register_script(
-        'block-check-script',
+    wp_enqueue_script(
+        'block-checks-script',
         plugins_url($script_path, __FILE__),
         array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor'),
         filemtime(plugin_dir_path(__FILE__) . $script_path),
         true
     );
 
-    wp_enqueue_script('block-check-script');
+    wp_enqueue_style(
+        'block-checks-style',
+        plugins_url($style_path, __FILE__),
+        [],
+    );
 }

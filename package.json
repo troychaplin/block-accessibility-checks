@@ -32,5 +32,8 @@
       "@babel/preset-env",
       "@babel/preset-react"
     ]
+  },
+  "dependencies": {
+    "styled-components": "^6.1.11"
   }
 }

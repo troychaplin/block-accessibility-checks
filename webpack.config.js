@@ -4,7 +4,7 @@ const path = require('path')
 module.exports = {
   ...defaultConfig,
   entry: {
-    'block-check-script': [path.resolve(__dirname, 'src/script.js')],
+    'block-checks': [path.resolve(__dirname, 'src/script.js')],
   },
   output: {
     path: path.resolve(__dirname, 'build'),
