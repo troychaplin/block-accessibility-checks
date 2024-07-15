@@ -1,9 +1,9 @@
 import { useDispatch } from '@wordpress/data';
-import { getInvalidBlocks } from './getInvalidBlocks';
+import { GetInvalidBlocks } from './getInvalidBlocks';
 import { useEffect } from '@wordpress/element';
 
-export function blockInvalidation() {
-	const invalidBlocks = getInvalidBlocks();
+export function BlockInvalidation() {
+	const invalidBlocks = GetInvalidBlocks();
 
 	const {
 		lockPostSaving,
@@ -12,10 +12,10 @@ export function blockInvalidation() {
 		unlockPostAutosaving,
 		disablePublishSidebar,
 		enablePublishSidebar,
-	} = useDispatch( 'core/editor' );
+	} = useDispatch('core/editor');
 
-	useEffect( () => {
-		if ( invalidBlocks.length > 0 ) {
+	useEffect(() => {
+		if (invalidBlocks.length > 0) {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();
@@ -24,7 +24,15 @@ export function blockInvalidation() {
 			unlockPostAutosaving();
 			enablePublishSidebar();
 		}
-	}, [ invalidBlocks ] );
+	}, [
+		invalidBlocks,
+		disablePublishSidebar,
+		enablePublishSidebar,
+		lockPostAutosaving,
+		lockPostSaving,
+		unlockPostAutosaving,
+		unlockPostSaving,
+	]);
 
 	return null;
 }
