@@ -8,13 +8,13 @@ npm run format
 if [ -n "$(git status --porcelain)" ]; then
   echo ""
   echo ""
-  echo "\033[0;31mFormatting changes detected. Staging formatted files...\033[0m"
+  echo "\033[0;31mChecking and updating file formatting...\033[0m"
   echo ""
   
   # Stage the changes
   git add -u
 
-  echo "\033[0;32mFormatted files have been staged. You can now commit your changes.\033[0m"
+  echo "\033[0;32mFiles are properly formatted. You can now commit your changes.\033[0m"
   echo ""
   # exit 1
 fi
