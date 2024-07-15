@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
-export function checkHeadingLevel( block ) {
-	if ( block.name === 'core/heading' && block.attributes.level === 1 ) {
+export function checkHeadingLevel(block) {
+	if (block.name === 'core/heading' && block.attributes.level === 1) {
 		return {
 			isValid: false,
 			message: __(

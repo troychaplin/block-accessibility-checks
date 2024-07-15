@@ -7,8 +7,8 @@ import { checkHeadingLevel } from './blockChecks/checkHeading';
 import { checkTableHeaderRow } from './blockChecks/checkTable';
 
 // Import all block check script and pass into blockChecksArray
-export const blockChecksArray = [ checkHeadingLevel, checkTableHeaderRow ];
+export const blockChecksArray = [checkHeadingLevel, checkTableHeaderRow];
 
-registerPlugin( 'block-validation', {
+registerPlugin('block-validation', {
 	render: BlockInvalidation,
-} );
+});
