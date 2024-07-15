@@ -1,22 +1,39 @@
 {
-	"name": "block-accessibility-checks",
-	"version": "0.1.0",
-	"description": "Add block checks in the editor to support publishing accessible content",
-	"author": "Troy Chaplin",
-	"license": "GPL-2.0-or-later",
-	"main": "build/index.js",
-	"scripts": {
-		"env" : "wp-env start",
-		"build": "wp-scripts build",
-		"start": "wp-scripts start",
-		"format": "wp-scripts format",
-		"lint:css": "wp-scripts lint-style",
-		"lint:js": "wp-scripts lint-js",
-		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip"
-	},
-	"devDependencies": {
-		"@wordpress/scripts": "^28.3.0",
-		"@wordpress/env": "^10.3.0"
-	}
+  "name": "block-accessibility-checks",
+  "version": "0.1.0",
+  "description": "Add block checks in the editor to support publishing accessible content",
+  "author": "Troy Chaplin",
+  "license": "GPL-2.0-or-later",
+  "main": "build/index.js",
+  "scripts": {
+    "env": "wp-env start",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-zip": "wp-scripts build && wp-scripts plugin-zip"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-react": "^7.14.5",
+    "@wordpress/compose": "^7.3.0",
+    "@wordpress/data": "^10.3.0",
+    "@wordpress/element": "^6.3.0",
+    "@wordpress/env": "^10.3.0",
+    "@wordpress/hooks": "^4.3.0",
+    "@wordpress/plugins": "^7.3.0",
+    "@wordpress/scripts": "^28.3.0"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  },
+  "dependencies": {
+    "styled-components": "^6.1.11"
+  }
 }

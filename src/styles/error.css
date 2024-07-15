@@ -1,0 +1,36 @@
+.a11y-block-error {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  padding: 24px 28px;
+  margin-left: -28px;
+  background-color:#F7EDEC;
+  border: 4px dashed #AE2C1C;
+}
+
+.a11y-error-msg {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: #8B3122;
+}
+
+/* Remove top spacing from block being wrapped */
+.a11y-error-msg + * {
+  margin-top: 0;
+}
+
+/* Remove bottom spacing from block being wrapped */
+.a11y-block-error > *:last-child {
+  margin-bottom: 0;
+}
+
+/* TODO: it's a mystery */
+.a11y-block-error.wp-block-heading {
+  padding-top: 0;
+  padding-bottom: 0;
+}
