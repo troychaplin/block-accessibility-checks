@@ -1,0 +1,33 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+labels: ['enhancement']
+body:
+    - type: checkboxes
+      id: existing
+      attributes:
+          label: Please confirm that you have searched and could not find similar issues in the repo.
+          description: You can do this by searching https://github.com/troychaplin/block-accessibility-checks/issues and making sure the bug is not related to another plugin.
+          options:
+              - label: 'Yes'
+                required: true
+
+    - type: textarea
+      attributes:
+          label: Description
+          description: Provide a more detailed explanation of what the feature should do and why it would be useful. Include any specific requirements or criteria that should be met.
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Benefits
+          description: Please explain the benefits that this new feature will provide to different users (such as content creator, site admins, visitors, etc).
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Acceptance Criteria
+          description: What conditions must be met for the feature to be considered complete? This can include specific behaviors, outputs, or performance standards.
+      validations:
+          required: true
