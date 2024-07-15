@@ -12,10 +12,10 @@ export function BlockInvalidation() {
 		unlockPostAutosaving,
 		disablePublishSidebar,
 		enablePublishSidebar,
-	} = useDispatch('core/editor');
+	} = useDispatch( 'core/editor' );
 
-	useEffect(() => {
-		if (invalidBlocks.length > 0) {
+	useEffect( () => {
+		if ( invalidBlocks.length > 0 ) {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();
@@ -32,7 +32,7 @@ export function BlockInvalidation() {
 		lockPostSaving,
 		unlockPostAutosaving,
 		unlockPostSaving,
-	]);
+	] );
 
 	return null;
 }

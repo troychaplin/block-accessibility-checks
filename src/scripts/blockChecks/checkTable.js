@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
-export function checkTableHeaderRow(block) {
+export function checkTableHeaderRow( block ) {
 	if (
 		block.name === 'core/table' &&
 		block.attributes.body.length !== 0 &&

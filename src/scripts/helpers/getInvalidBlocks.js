@@ -3,10 +3,12 @@ import { blockChecksArray } from '../registerPlugin';
 
 export function GetInvalidBlocks() {
 	const allBlocks = useSelect(
-		(select) => select('core/block-editor').getBlocks(),
+		( select ) => select( 'core/block-editor' ).getBlocks(),
 		[]
 	);
 	return allBlocks
-		.flatMap((block) => blockChecksArray.map((check) => check(block)))
-		.filter((result) => !result.isValid);
+		.flatMap( ( block ) =>
+			blockChecksArray.map( ( check ) => check( block ) )
+		)
+		.filter( ( result ) => ! result.isValid );
 }
