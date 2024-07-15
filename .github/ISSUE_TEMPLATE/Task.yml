@@ -1,0 +1,17 @@
+name: Task
+description: Log a new task for work that needs to be done
+labels: ['task']
+body:
+    - type: textarea
+      attributes:
+          label: Description
+          description: Provide a more detailed explanation of what work needs to be done.
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Acceptance Criteria
+          description: What conditions must be met for the task to be considered complete?
+      validations:
+          required: true
