@@ -14,6 +14,40 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 - Activate the plugin through the `Plugins` screen in WordPress
 - Start editing your content in the Gutenberg editor
 
+## Getting Involved
+
+Open a terminal window and navigate to where you intend to setup the repo and do the following:
+
+- Clone the repo: `git clone https://github.com/troychaplin/block-accessibility-checks.git`
+- Navigate into the repo: `cd block-accessibility-checks`
+- Install dependencies: `npm install`
+
+### Start Developing
+
+This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme) that setups up a local WordPress environment using Docker.
+
+- Make sure `Docker Desktop` is running
+- Start WordPress Env: `npm run wp:up`
+- Start watch task: `npm run start`
+
+### Local Site Details
+
+- http://localhost:8888
+- User: `admin`
+- Password: `password`
+
+**Important:** when you're done working don't forget to stop the WordPress docker environment by running `npm run wp:down`
+
+## Report an Issue or Bug
+
+TODO: add git issue templates
+
+---
+
 ## Block Checks
 
-More information about what is being checked in each block to follow.
+The following is a list of checks that are happening on core blocks:
+
+### Heading
+
+- `Prevent using an H1 in the content area` - Best practices show that there should only be one unique H1 used per page, which is typically used for the page title
