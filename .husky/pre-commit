@@ -9,6 +9,7 @@ if [ -n "$(git status --porcelain)" ]; then
   git add -u
   echo ""
   echo "\033[0;31mChecking and updating file formatting...\033[0m"
+  echo ""
   echo "\033[0;32mFiles are properly formatted. You can now commit your changes.\033[0m"
   echo ""
 fi
