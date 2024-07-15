@@ -1,0 +1,29 @@
+name: Build Test
+
+on:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build:
+    name: Install dependencies and test build
+    timeout-minutes: 10
+    runs-on: 'ubuntu-latest'
+
+    env:
+      CI_JOB_NUMBER: 1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21.x'
+
+      - name: 📦 Install
+        run: npm install
+
+      - name: 🔧 Build
+        run: npm run build
