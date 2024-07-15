@@ -19,6 +19,8 @@ Prefix the change with one of these keywords:
 ## Added
 
 - Script helpers for block invalidations, checks and getting blocks in editor
+- Higher order component to wrap invalid blocks
+- Styles for invalid block wrapper
 - Check core heading block to prevent publishing with an H1 in the content
 
 ## [0.1.0]
