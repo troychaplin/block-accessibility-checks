@@ -16,9 +16,9 @@ export function BlockInvalidation() {
 
 	useEffect(() => {
 		if (invalidBlocks.length > 0) {
-			lockPostSaving();
-			lockPostAutosaving();
-			disablePublishSidebar();
+			// lockPostSaving();
+			// lockPostAutosaving();
+			// disablePublishSidebar();
 		} else {
 			unlockPostSaving();
 			unlockPostAutosaving();
