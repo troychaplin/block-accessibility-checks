@@ -21,6 +21,7 @@
 		"@babel/preset-react": "^7.24.7",
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
+		"@wordpress/components": "^28.3.0",
 		"@wordpress/compose": "^7.3.0",
 		"@wordpress/data": "^10.3.0",
 		"@wordpress/element": "^6.3.0",

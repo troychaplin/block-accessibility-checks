@@ -9,7 +9,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Build folder
-# build
+build/block-checks.css.map
+build/block-checks.js.map
 
 # Dependency directories
 node_modules/
