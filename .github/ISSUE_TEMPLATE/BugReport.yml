@@ -39,15 +39,15 @@ body:
     - type: checkboxes
       attributes:
           label: Have you tested by deactivating all other active plugins?
-          description: If not, please deactivate other plugins to make sure there's no conflict
+          description: Confirm that you have tested with all other plugins deactivated to ensure there is no conflict.
           options:
-              - label: 'Yes'
+              - label: 'Yes, I have deactivated all other plugins.'
                 required: true
 
     - type: checkboxes
       attributes:
           label: Have you checked the existing issues to make sure this has not already been reported?
-          description: You can do this by searching https://github.com/troychaplin/block-accessibility-checks/issues.
+          description: Confirm that you have searched the existing issues.
           options:
-              - label: 'Yes'
+              - label: 'Yes, I have checked the existing issues.'
                 required: true
