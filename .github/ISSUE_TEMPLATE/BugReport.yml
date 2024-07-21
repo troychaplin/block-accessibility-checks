@@ -1,6 +1,6 @@
 name: Bug and Error Report
 description: Report a bug or error with the Block Accessibility Checks plugin.
-labels: ['[Type] Bug']
+labels: ['bug']
 body:
     - type: textarea
       attributes:
