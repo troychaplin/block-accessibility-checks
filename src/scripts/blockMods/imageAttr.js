@@ -19,13 +19,14 @@ const addImageAttribute = (settings) => {
 
 	return settings;
 };
+
 addFilter(
 	'blocks.registerBlockType',
 	'block-accessibility-checks/add-image-attribute',
 	addImageAttribute
 );
 
-// Create a new inspector control for the attribute
+// Create a new block control for the attribute
 const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
 	return (props) => {
 		if (props.name !== 'core/image') {
@@ -37,7 +38,6 @@ const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
 
 		return (
 			<>
-				<BlockEdit {...props} />
 				<InspectorControls>
 					<PanelBody
 						title={__(
@@ -58,12 +58,14 @@ const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
 						/>
 					</PanelBody>
 				</InspectorControls>
+				<BlockEdit {...props} />
 			</>
 		);
 	};
 }, 'addImageInspectorControls');
+
 addFilter(
 	'editor.BlockEdit',
-	'block-accessibility-checks/add-toggle-control',
+	'block-accessibility-checks/add-inspector-control',
 	addImageInspectorControls
 );
