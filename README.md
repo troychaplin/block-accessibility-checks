@@ -48,12 +48,14 @@ This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD
 
 TODO: add git issue templates
 
----
+# Block Checks and Modifications
 
-## Block Checks
+The following is a list of checks that are happening on core blocks.
 
-The following is a list of checks that are happening on core blocks:
-
-### Heading
-
-- `Prevent using an H1 in the content area` - Best practices show that there should only be one unique H1 used per page, which is typically used for the page title
+| Block | Description |
+| ----- | ----------- |
+| core/button | Checks for text and link on each individual button |
+| core/heading | Prevents the usage of an level one heading in the content |
+| core/image | Checks for alternative text on an image |
+| core/image | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
+| core/table | Checks for a table header row on each individual table block  |
