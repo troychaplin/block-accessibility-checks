@@ -1,0 +1,53 @@
+name: Bug and Error Report
+description: Report a bug or error with the Block Accessibility Checks plugin.
+labels: ['[Type] Bug']
+body:
+    - type: textarea
+      attributes:
+          label: Description
+          description: Provide a more detailed explanation of what work needs to be done.
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Steps to recreate
+          description: Please explain step-by-step how to reproduce this bug
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Screenshot or Recording
+          description: Providing a screenshot or recording of the error is not required but can be helpful.
+      validations:
+          required: false
+
+    - type: textarea
+      attributes:
+          label: Environment Details
+          description: |
+              Please provide information about your environment
+          placeholder: |
+              - What version of WordPress are you running?
+              - What is your active theme?
+              - Are you using a Mac or PC?
+              - What browser and version are you using?
+      validations:
+          required: false
+
+    - type: checkboxes
+      attributes:
+          label: Have you tested by deactivating all other active plugins?
+          description: If not, please deactivate other plugins to make sure there's no conflict
+          options:
+              - label: 'Yes'
+                required: true
+
+    - type: checkboxes
+      attributes:
+          label: Have you checked the existing issues to make sure this has not already been reported?
+          description: You can do this by searching https://github.com/troychaplin/block-accessibility-checks/issues.
+          options:
+              - label: 'Yes'
+                required: true
