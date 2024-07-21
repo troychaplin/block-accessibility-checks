@@ -41,6 +41,6 @@ const blockErrorComponent = createHigherOrderComponent((BlockListBlock) => {
 
 addFilter(
 	'editor.BlockListBlock',
-	'block-a11y-checks/with-client-id-class-name',
+	'block-accessibilty-checks/with-client-id-class-name',
 	blockErrorComponent
 );
