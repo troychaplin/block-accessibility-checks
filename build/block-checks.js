@@ -277,7 +277,7 @@ function BlockInvalidation() {
     disablePublishSidebar = _useDispatch.disablePublishSidebar,
     enablePublishSidebar = _useDispatch.enablePublishSidebar;
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
-    if (invalidBlocks.length > 0) {
+    if (invalidBlocks.length > 0 && blockAccessibilitySettings.mode === 'DENY') {
       lockPostSaving();
       lockPostAutosaving();
       disablePublishSidebar();
@@ -353,13 +353,6 @@ var blockChecksArray = [_blockChecks_checkButton__WEBPACK_IMPORTED_MODULE_3__.ch
 (0,_wordpress_plugins__WEBPACK_IMPORTED_MODULE_0__.registerPlugin)('block-validation', {
   render: _helpers_blockInvalidation__WEBPACK_IMPORTED_MODULE_1__.BlockInvalidation
 });
-
-// TODO: is this the right place?
-if (blockAccessibilitySettings.mode === 'WARN') {
-  console.log('Warning: Accessibility issues detected!');
-} else if (blockAccessibilitySettings.mode === 'DENY') {
-  console.log('DENY!: Accessibility issues detected!');
-}
 
 /***/ }),
 

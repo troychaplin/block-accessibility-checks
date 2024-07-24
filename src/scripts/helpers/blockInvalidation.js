@@ -15,7 +15,10 @@ export function BlockInvalidation() {
 	} = useDispatch('core/editor');
 
 	useEffect(() => {
-		if (invalidBlocks.length > 0) {
+		if (
+			invalidBlocks.length > 0 &&
+			blockAccessibilitySettings.mode === 'DENY'
+		) {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();

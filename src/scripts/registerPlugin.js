@@ -15,13 +15,6 @@ export const blockChecksArray = [
 	checkTableHeaderRow,
 ];
 
-registerPlugin( 'block-validation', {
+registerPlugin('block-validation', {
 	render: BlockInvalidation,
-} );
-
-// TODO: is this the right place?
-if ( blockAccessibilitySettings.mode === 'WARN' ) {
-	console.log( 'Warning: Accessibility issues detected!' );
-} else if ( blockAccessibilitySettings.mode === 'DENY' ) {
-	console.log( 'DENY!: Accessibility issues detected!' );
-}
+});
