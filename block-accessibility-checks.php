@@ -16,9 +16,16 @@
 // Setup autoloading
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Set Constant
+if (!defined('BLOCK_ACCESSIBILITY_MODE')) {
+    define('BLOCK_ACCESSIBILITY_MODE', 'DENY'); // Default value
+}
+
 // Include dependencies
 use BlockAccessibility\AssetEnqueuer;
 
 // Enqueue block editor assets
 $assetEnqueuer = new AssetEnqueuer(__FILE__);
+
+// WordPress Hooks
 add_action('enqueue_block_editor_assets', [$assetEnqueuer, 'enqueueAssets']);

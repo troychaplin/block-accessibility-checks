@@ -12,9 +12,8 @@ class AssetEnqueuer
     }
 
     public function enqueueAssets() {
-        $script_path = 'build/block-checks.js';
-        $style_path = 'build/block-checks.css';
-    
+        $script_path   = 'build/block-checks.js';
+        $style_path    = 'build/block-checks.css';
         $script_handle = 'block-accessibility-script';
     
         wp_enqueue_script(
@@ -30,6 +29,13 @@ class AssetEnqueuer
             plugins_url($style_path, $this->pluginFile),
             [],
             filemtime(plugin_dir_path($this->pluginFile) . $style_path)
+        );
+
+        // Localize script with data from PHP
+        wp_localize_script(
+            $script_handle,
+            'blockAccessibilitySettings',
+            ['mode' => BLOCK_ACCESSIBILITY_MODE]
         );
     
         // Load the text domain for the script
