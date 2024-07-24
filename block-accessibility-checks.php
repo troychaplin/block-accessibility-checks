@@ -26,7 +26,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Define constants
 if (!defined('BLOCK_ACCESSIBILITY_MODE')) {
-    define('BLOCK_ACCESSIBILITY_MODE', 'DENY'); // Default value, can be overridden in wp-config.php
+    define('BLOCK_ACCESSIBILITY_MODE', 'DENY'); // Default value, can be overridden with WARN in wp-config.php
 }
 
 // Include dependencies
