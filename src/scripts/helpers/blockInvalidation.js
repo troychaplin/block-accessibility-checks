@@ -17,6 +17,7 @@ export function BlockInvalidation() {
 	useEffect(() => {
 		if (
 			invalidBlocks.length > 0 &&
+			// eslint-disable-next-line no-undef -- blockAccessibilitySettings is defined in PHP
 			blockAccessibilitySettings.mode === 'DENY'
 		) {
 			lockPostSaving();
