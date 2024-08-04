@@ -34,11 +34,5 @@
 		"@wordpress/prettier-config": "^4.4.0",
 		"@wordpress/scripts": "^28.4.0",
 		"husky": "^9.1.4"
-	},
-	"babel": {
-		"presets": [
-			"@babel/preset-env",
-			"@babel/preset-react"
-		]
 	}
 }
