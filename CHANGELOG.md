@@ -16,10 +16,21 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
-## Added
+### Added
 
 - Script helpers for block invalidations, checks and getting blocks in editor
+- Higher order component to wrap invalid blocks
+- Styles for invalid block wrapper
 - Check core heading block to prevent publishing with an H1 in the content
+- Check core table block to prevent publishing when a header row is not being used
+- Check core image for alternative text
+- Add attritbute to image block to confirm decorative image to bypass a11y error
+- Instructions on setting up to run and build the plugin
+- Getting involved instructions in the README
+- Husky pre-commit check
+- Commit lint and rules
+- Git action to run build on PR to develop
+- Git issue and PR templates to log features and tasks
 
 ## [0.1.0]
 

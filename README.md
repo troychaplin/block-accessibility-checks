@@ -14,6 +14,48 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 - Activate the plugin through the `Plugins` screen in WordPress
 - Start editing your content in the Gutenberg editor
 
-## Block Checks
+## Getting Involved
 
-More information about what is being checked in each block to follow.
+Open a terminal window and navigate to where you intend to setup the repo and do the following:
+
+- Install wp-env: `npm -g i @wordpress/env`
+- Clone the repo: `git clone https://github.com/troychaplin/block-accessibility-checks.git`
+- Navigate into the repo: `cd block-accessibility-checks`
+- Install dependencies: `npm install`
+
+### Start Developing
+
+This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme) that setups up a local WordPress environment using Docker.
+
+- Make sure `Docker Desktop` is running
+- Start WordPress: `wp-env start`
+
+#### Other Commands
+
+- Stop WordPress: `wp-env stop`
+- Start watch task: `npm run start`
+- Build assets: `npm run build`
+
+### Local Site Details
+
+- http://localhost:8888
+- User: `admin`
+- Password: `password`
+
+**Important:** when you're done working don't forget to stop the WordPress docker environment by running `npm run wp:down`
+
+## Report an Issue or Bug
+
+TODO: add git issue templates
+
+# Block Checks and Modifications
+
+The following is a list of checks that are happening on core blocks.
+
+| Block | Description |
+| ----- | ----------- |
+| core/button | Checks for text and link on each individual button |
+| core/heading | Prevents the usage of an level one heading in the content |
+| core/image | Checks for alternative text on an image |
+| core/image | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
+| core/table | Checks for a table header row on each individual table block  |
