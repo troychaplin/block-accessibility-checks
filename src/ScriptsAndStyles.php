@@ -7,7 +7,8 @@ class ScriptsAndStyles
     private $pluginFile;
     private $translations;
 
-    public function __construct($pluginFile, Translations $translations) {
+    public function __construct($pluginFile, Translations $translations)
+    {
         $this->pluginFile = $pluginFile;
         $this->translations = $translations;
     }

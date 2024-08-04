@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name:       Block Accessibility Checks
  * Plugin URI:        https://example.com/block-accessibility-checks

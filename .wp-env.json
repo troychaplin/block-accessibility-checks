@@ -1,6 +1,10 @@
 {
 	"core": null,
-	"plugins": [".", "https://downloads.wordpress.org/plugin/gutenberg.zip"],
+	"plugins": [
+		".",
+		"https://downloads.wordpress.org/plugin/gutenberg.zip",
+		"https://downloads.wordpress.org/plugin/plugin-check.zip"
+	],
 	"themes": ["https://downloads.wordpress.org/theme/twentytwentyfour.zip"],
 	"config": {
 		"WP_DEBUG": true,
