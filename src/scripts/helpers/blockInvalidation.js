@@ -1,6 +1,8 @@
+import { VALIDATION_MODES } from './validationModes'; // Adjust the path according to your file structure
+
 /* global blockAccessibilitySettings */
 import { useDispatch } from '@wordpress/data';
-import { GetInvalidBlocks } from './getInvalidBlocks';
+import { GetInvalidBlocks } from './getInvalidBlocks'; // Assuming this is the function that retrieves invalid blocks
 import { useEffect } from '@wordpress/element';
 
 export function BlockInvalidation() {
@@ -16,10 +18,12 @@ export function BlockInvalidation() {
 	} = useDispatch('core/editor');
 
 	useEffect(() => {
-		if (
-			invalidBlocks.length > 0 &&
-			blockAccessibilitySettings.mode === 'DENY'
-		) {
+		// Check if any block has an ERROR validation mode
+		const hasErrors = invalidBlocks.some(
+			(block) => block.mode === VALIDATION_MODES.ERROR
+		);
+
+		if (hasErrors && blockAccessibilitySettings.mode === 'DENY') {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();
