@@ -33,5 +33,5 @@ export function checkHeadingLevel(block) {
 
 		return response;
 	}
-	return { isValid: true };
+	return { isValid: true, mode: VALIDATION_MODES.NONE };
 }
