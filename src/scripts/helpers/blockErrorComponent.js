@@ -1,45 +1,78 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { VALIDATION_MODES } from './validationModes'; // Assuming you have this in the same file
+import { VALIDATION_MODES, DEFAULT_VALIDATION_MODE } from './validationModes'; // Ensure correct path
 import { __ } from '@wordpress/i18n';
 
-// Your HOC that wraps the block
+// Import your specific block check functions
+import { checkHeadingLevel } from '../blockChecks/checkHeading';
+import { checkImageAlt } from '../blockChecks/checkImage';
+
 const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 	return (props) => {
-		const { name, attributes } = props;
-		let validationMode = VALIDATION_MODES.NONE; // Default mode
+		const { name, attributes, clientId } = props;
 
-		// Apply validation to the core/heading block
-		if (name === 'core/heading' && attributes.level === 1) {
-			validationMode = VALIDATION_MODES.ERROR; // Set to WARNING or ERROR as needed
+		let validationResult = {
+			isValid: true,
+			mode: DEFAULT_VALIDATION_MODE,
+			message: '',
+		};
+
+		// Apply validation using the appropriate check function
+		switch (name) {
+			case 'core/heading':
+				validationResult = checkHeadingLevel({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
+			case 'core/image':
+				validationResult = checkImageAlt({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
+			// Add more cases for other blocks as needed
+			default:
+				validationResult = {
+					isValid: true,
+					mode: DEFAULT_VALIDATION_MODE,
+					message: '',
+				};
 		}
 
-		// If validation mode is NONE, return the block as is
-		if (validationMode === VALIDATION_MODES.NONE) {
+		// If validation mode is NONE or the block is valid, return the block as is
+		if (
+			validationResult.mode === VALIDATION_MODES.NONE ||
+			validationResult.isValid
+		) {
 			return <BlockEdit {...props} />;
 		}
 
 		// Wrap the block with error/warning messages based on validation mode
 		const wrapperClass =
-			validationMode === VALIDATION_MODES.ERROR
+			validationResult.mode === VALIDATION_MODES.ERROR
 				? 'a11y-block-error'
 				: 'a11y-block-warning';
 
+		// Use the message from the validation result or fall back to a generic message
 		const message =
-			validationMode === VALIDATION_MODES.ERROR
+			validationResult.message ||
+			(validationResult.mode === VALIDATION_MODES.ERROR
 				? __(
-						'Accessibility Error: This heading level is not allowed.',
+						'Accessibility Error: This block does not meet accessibility standards.',
 						'block-accessibility-checks'
 					)
 				: __(
-						'Warning: This heading level is discouraged.',
+						'Accessibility Warning: This block may have accessibility issues.',
 						'block-accessibility-checks'
-					);
+					));
 
 		return (
 			<div className={wrapperClass}>
 				<p
 					className={
-						validationMode === VALIDATION_MODES.ERROR
+						validationResult.mode === VALIDATION_MODES.ERROR
 							? 'a11y-error-msg'
 							: 'a11y-warning-msg'
 					}

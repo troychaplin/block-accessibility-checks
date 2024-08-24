@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { VALIDATION_MODES } from '../helpers/validationModes'; // Adjust the path accordingly
-
-const headingValidationMode = VALIDATION_MODES.ERROR; // Set default validation mode to WARNING
+const validationMode = VALIDATION_MODES.WARNING;
 
 export function checkHeadingLevel(block) {
 	if (block.name === 'core/heading' && block.attributes.level === 1) {
@@ -9,10 +8,10 @@ export function checkHeadingLevel(block) {
 			isValid: true,
 			message: '',
 			clientId: block.clientId,
-			mode: headingValidationMode, // Use the default mode here
+			mode: validationMode, // Use the default mode here
 		};
 
-		switch (headingValidationMode) {
+		switch (validationMode) {
 			case VALIDATION_MODES.WARNING:
 				response.isValid = false;
 				response.message = __(
