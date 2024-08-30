@@ -2,7 +2,7 @@
 
 namespace BlockAccessibility;
 
-class ScriptsAndStyles
+class ScriptsStyles
 {
     private $pluginFile;
     private $translations;
