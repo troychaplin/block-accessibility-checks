@@ -13,16 +13,24 @@ class ScriptsAndStyles
         $this->translations = $translations;
     }
 
-    public function enqueueAssets()
+    public function enqueueBlockAssets()
     {
         $script_handle = 'block-accessibility-script';
         $this->translations->setupScriptTranslations($script_handle);
 
-        $this->enqueueScripts();
-        $this->enqueueStyles();
+        $this->enqueueBlockScripts();
+        $this->enqueueBlockStyles();
     }
 
-    private function enqueueScripts()
+    public function enqueueAdminAssets()
+    {
+        $script_handle = 'block-accessibility-script';
+        $this->translations->setupScriptTranslations($script_handle);
+
+        $this->enqueueAdminStyles();
+    }
+
+    private function enqueueBlockScripts()
     {
         $script_path = 'build/block-checks.js';
         $script_handle = 'block-accessibility-script';
@@ -47,7 +55,7 @@ class ScriptsAndStyles
         );
     }
 
-    private function enqueueStyles()
+    private function enqueueBlockStyles()
     {
         $style_path = 'build/block-checks.css';
         wp_enqueue_style(
@@ -56,5 +64,11 @@ class ScriptsAndStyles
             [],
             filemtime(plugin_dir_path($this->pluginFile) . $style_path)
         );
+    }
+
+    private function enqueueAdminStyles()
+    {
+        $style_path = 'build/block-admin.css';
+        wp_enqueue_style('block-checks-admin', plugins_url($style_path, $this->pluginFile), []);
     }
 }

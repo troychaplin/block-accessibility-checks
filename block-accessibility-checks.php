@@ -45,7 +45,8 @@ add_action('plugins_loaded', [$translations, 'loadTextDomain']);
 
 // Enqueue block editor assets
 $scriptsStyles = new ScriptsAndStyles($pluginFile, $translations);
-add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueAssets']);
+add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueBlockAssets']);
+add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
 
 // Settings page
 $settingsPage = new SettingsPage($pluginFile, $translations);
