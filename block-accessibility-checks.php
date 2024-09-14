@@ -31,8 +31,8 @@ if (!defined('BLOCK_ACCESSIBILITY_MODE')) {
 }
 
 // Include dependencies
+use BlockAccessibility\ScriptsAndStyles;
 use BlockAccessibility\SettingsPage;
-use BlockAccessibility\ScriptsStyles;
 use BlockAccessibility\Translations;
 
 // Define plugin file and Text Domain
@@ -44,9 +44,9 @@ $translations = new Translations($pluginFile, $textDomain);
 add_action('plugins_loaded', [$translations, 'loadTextDomain']);
 
 // Enqueue block editor assets
-$scriptsStyles = new ScriptsStyles($pluginFile, $translations);
-add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueAssets']);
+$scriptsStyles = new ScriptsAndStyles($pluginFile, $translations);
+add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueBlockAssets']);
+add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
 
-// Plugin settings page
-$settingsPage = new SettingsPage($pluginFile, $textDomain);
-add_action('admin_menu', [$settingsPage, 'settingsPage']);
+// Settings page
+$settingsPage = new SettingsPage($pluginFile, $translations);

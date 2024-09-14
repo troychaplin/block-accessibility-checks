@@ -4,103 +4,156 @@ namespace BlockAccessibility;
 
 class SettingsPage
 {
+
     public function __construct()
     {
-        add_action('admin_menu', [$this, 'settingsPage']);
-        add_action('admin_init', [$this, 'registerSettings']);
+
+        add_action('admin_menu', array($this, 'blockCheckAdminMenu'));
+        add_action('admin_init', array($this, 'initSettings'));
     }
 
-    public function settingsPage()
-    {
-        $this->blockCheckSettingsPage();
-    }
-
-    public function blockCheckSettingsPage()
+    public function blockCheckAdminMenu()
     {
         add_options_page(
-            __('Block Checks', 'block-accessibility-checks'),
-            __('Block Checks', 'block-accessibility-checks'),
+            esc_html__('Block Accessibility Checks', 'block-accessibility-checks'),
+            esc_html__('Block Checks', 'block-accessibility-checks'),
             'manage_options',
             'block-checks',
-            [$this, 'renderBlockOptionsPage']
+            array($this, 'settingsPageLayout')
         );
     }
 
-    public function registerSettings()
+    public function initSettings()
     {
-        // Debugging output to ensure this is only called once
-        error_log('registerSettings called');
+        register_setting(
+            'block_checks_settings_group',
+            'block_checks_options'
+        );
 
-        // Register settings for header and image block checks
-        register_setting('block-checks-settings-group', 'header_block_check');
-        register_setting('block-checks-settings-group', 'image_block_check');
-
-        // Add settings section
         add_settings_section(
-            'block-checks-settings-section',
-            __('Block Accessibility Check Options', 'block-accessibility-checks'),
-            null, // No callback needed for this simple section
-            'block-checks'
-        );
-
-        // Add settings fields
-        add_settings_field(
-            'header_block_check',
-            __('Header Block Check', 'block-accessibility-checks'),
-            [$this, 'renderHeaderBlockCheckField'],
-            'block-checks',
-            'block-checks-settings-section'
+            'block_checks_options_section',
+            '',
+            false,
+            'block_checks_options'
         );
 
         add_settings_field(
-            'image_block_check',
-            __('Image Block Check', 'block-accessibility-checks'),
-            [$this, 'renderImageBlockCheckField'],
-            'block-checks',
-            'block-checks-settings-section'
+            'coreHeadingBlockCheck',
+            esc_html__('Heading', 'block-accessibility-checks'),
+            array($this, 'renderCoreHeadingOptions'),
+            'block_checks_options',
+            'block_checks_options_section'
+        );
+
+        add_settings_field(
+            'coreButtonBlockCheck',
+            esc_html__('Button', 'block-accessibility-checks'),
+            array($this, 'renderCoreButtonOptions'),
+            'block_checks_options',
+            'block_checks_options_section'
+        );
+
+        add_settings_field(
+            'coreImageBlockCheck',
+            esc_html__('Image', 'block-accessibility-checks'),
+            array($this, 'renderCoreImageOptions'),
+            'block_checks_options',
+            'block_checks_options_section'
+        );
+
+        add_settings_field(
+            'coreTableBlockCheck',
+            esc_html__('Table', 'block-accessibility-checks'),
+            array($this, 'renderCoreTableOptions'),
+            'block_checks_options',
+            'block_checks_options_section'
         );
     }
 
-    public function renderBlockOptionsPage()
+    public function settingsPageLayout()
     {
-        // Debugging output to ensure this is only called once
-        error_log('renderBlockOptionsPage called');
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'block-accessibility-checks'));
+        }
 
-?>
-        <div class="wrap">
-            <h1><?php _e('Block Accessibility Checks', 'block-accessibility-checks'); ?></h1>
-            <p><?php _e('Manage your settings for block accessibility checks below.', 'block-accessibility-checks'); ?></p>
-            <form method="post" action="options.php">
-                <?php
-                settings_fields('block-checks-settings-group'); // Output security fields for the registered setting
-                do_settings_sections('block-checks'); // Output the settings section and fields for the page slug 'block-checks'
-                submit_button(); // Output the save settings button
-                ?>
-            </form>
-        </div>
-    <?php
+        // Admin Page Layout
+        echo '<div class="block-a11y-checks-settings">' . "\n";
+        echo '<h1>' . esc_html(get_admin_page_title()) . '</h1>' . "\n";
+        echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
+
+        echo '<div class="block-a11y-checks-settings-options">';
+        settings_fields('block_checks_settings_group');
+        do_settings_sections('block_checks_options');
+        submit_button();
+        echo '</div>';
+
+        echo '<div class="block-a11y-checks-settings-info">';
+        echo '<h2>' . esc_html__('About', 'block-accessibility-checks') . '</h2>';
+        echo '<p>' . esc_html__('This plugin checks the accessibility of the core blocks in the WordPress block editor. You can set the level of strictness for each block type.', 'block-accessibility-checks') . '</p>';
+        echo '</div>';
+
+        echo '</form>' . "\n";
+        echo '</div>' . "\n";
     }
 
-    public function renderHeaderBlockCheckField()
+    function renderCoreHeadingOptions()
     {
-        $value = get_option('header_block_check', 'error'); // Default to 'error' if not set
-    ?>
-        <label><input type="radio" name="header_block_check" value="error" <?php checked($value, 'error'); ?>> <?php _e('Error', 'block-accessibility-checks'); ?></label><br>
-        <label><input type="radio" name="header_block_check" value="warning" <?php checked($value, 'warning'); ?>> <?php _e('Warning', 'block-accessibility-checks'); ?></label><br>
-        <label><input type="radio" name="header_block_check" value="none" <?php checked($value, 'none'); ?>> <?php _e('None', 'block-accessibility-checks'); ?></label>
-    <?php
+        // Retrieve data from the database and set 'error' as the default value.
+        $options = get_option('block_checks_options');
+        $value = isset($options['coreHeadingBlockCheck']) ? $options['coreHeadingBlockCheck'] : 'error';
+
+        // Field output.
+        echo '<p class="description">' . esc_html__('How strict do you want to be with the core/heading block?', 'block-accessibility-checks') . '</p>';
+        echo '<ul class="block-check-radio-options">';
+        echo '<li><input type="radio" name="block_checks_options[coreHeadingBlockCheck]" class="coreHeadingBlockCheck_field" value="' . esc_attr('error') . '" ' . checked($value, 'error', false) . '> ' . esc_html__('Error', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreHeadingBlockCheck]" class="coreHeadingBlockCheck_field" value="' . esc_attr('warning') . '" ' . checked($value, 'warning', false) . '> ' . esc_html__('Warning', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreHeadingBlockCheck]" class="coreHeadingBlockCheck_field" value="' . esc_attr('none') . '" ' . checked($value, 'none', false) . '> ' . esc_html__('None', 'block-accessibility-checks') . '</li>';
+        echo '</ul>';
     }
 
-    public function renderImageBlockCheckField()
+
+    function renderCoreButtonOptions()
     {
-        $value = get_option('image_block_check', 'error'); // Default to 'error' if not set
-    ?>
-        <label><input type="radio" name="image_block_check" value="error" <?php checked($value, 'error'); ?>> <?php _e('Error', 'block-accessibility-checks'); ?></label><br>
-        <label><input type="radio" name="image_block_check" value="warning" <?php checked($value, 'warning'); ?>> <?php _e('Warning', 'block-accessibility-checks'); ?></label><br>
-        <label><input type="radio" name="image_block_check" value="none" <?php checked($value, 'none'); ?>> <?php _e('None', 'block-accessibility-checks'); ?></label>
-<?php
+        // Retrieve data from the database and set default value.
+        $options = get_option('block_checks_options');
+        $value = isset($options['coreButtonBlockCheck']) ? $options['coreButtonBlockCheck'] : 'error';
+
+        // Field output.
+        echo '<p class="description">' . esc_html__('How strict do you want to be with the core/button block?', 'block-accessibility-checks') . '</p>';
+        echo '<ul class="block-check-radio-options">';
+        echo '<li><input type="radio" name="block_checks_options[coreButtonBlockCheck]" class="coreButtonBlockCheck_field" value="' . esc_attr('error') . '" ' . checked($value, 'error', false) . '> ' . esc_html__('Error', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreButtonBlockCheck]" class="coreButtonBlockCheck_field" value="' . esc_attr('warning') . '" ' . checked($value, 'warning', false) . '> ' . esc_html__('Warning', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreButtonBlockCheck]" class="coreButtonBlockCheck_field" value="' . esc_attr('none') . '" ' . checked($value, 'none', false) . '> ' . esc_html__('None', 'block-accessibility-checks') . '</li>';
+        echo '</ul>';
+    }
+
+    function renderCoreImageOptions()
+    {
+        // Retrieve data from the database and set default value.
+        $options = get_option('block_checks_options');
+        $value = isset($options['coreImageBlockCheck']) ? $options['coreImageBlockCheck'] : 'error';
+
+        // Field output.
+        echo '<p class="description">' . esc_html__('How strict do you want to be with the core/image block?', 'block-accessibility-checks') . '</p>';
+        echo '<ul class="block-check-radio-options">';
+        echo '<li><input type="radio" name="block_checks_options[coreImageBlockCheck]" class="coreImageBlockCheck_field" value="' . esc_attr('error') . '" ' . checked($value, 'error', false) . '> ' . esc_html__('Error', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreImageBlockCheck]" class="coreImageBlockCheck_field" value="' . esc_attr('warning') . '" ' . checked($value, 'warning', false) . '> ' . esc_html__('Warning', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreImageBlockCheck]" class="coreImageBlockCheck_field" value="' . esc_attr('none') . '" ' . checked($value, 'none', false) . '> ' . esc_html__('None', 'block-accessibility-checks') . '</li>';
+        echo '</ul>';
+    }
+
+    function renderCoreTableOptions()
+    {
+        // Retrieve data from the database and set default value.
+        $options = get_option('block_checks_options');
+        $value = isset($options['coreTableBlockCheck']) ? $options['coreTableBlockCheck'] : 'error';
+
+        // Field output.
+        echo '<p class="description">' . esc_html__('How strict do you want to be with the core/table block?', 'block-accessibility-checks') . '</p>';
+        echo '<ul class="block-check-radio-options">';
+        echo '<li><input type="radio" name="block_checks_options[coreTableBlockCheck]" class="coreTableBlockCheck_field" value="' . esc_attr('error') . '" ' . checked($value, 'error', false) . '> ' . esc_html__('Error', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreTableBlockCheck]" class="coreTableBlockCheck_field" value="' . esc_attr('warning') . '" ' . checked($value, 'warning', false) . '> ' . esc_html__('Warning', 'block-accessibility-checks') . '</li>';
+        echo '<li><input type="radio" name="block_checks_options[coreTableBlockCheck]" class="coreTableBlockCheck_field" value="' . esc_attr('none') . '" ' . checked($value, 'none', false) . '> ' . esc_html__('None', 'block-accessibility-checks') . '</li>';
+        echo '</ul>';
     }
 }
-
-// Instantiate the class to hook everything up
-new SettingsPage();
