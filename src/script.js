@@ -1,4 +1,4 @@
-import './styles/error.css';
+import './styles.scss';
 
 // Block Modifications
 import './scripts/blockMods/imageAttr';
