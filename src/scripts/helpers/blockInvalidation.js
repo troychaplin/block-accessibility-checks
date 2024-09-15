@@ -1,4 +1,3 @@
-/* global BlockAccessibilityChecks */
 import { useDispatch } from '@wordpress/data';
 import { GetInvalidBlocks } from './getInvalidBlocks'; // Assuming this is the function that retrieves invalid blocks
 import { useEffect } from '@wordpress/element';

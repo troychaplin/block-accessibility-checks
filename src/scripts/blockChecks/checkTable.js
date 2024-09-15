@@ -1,5 +1,7 @@
+/* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
-const validationMode = BlockAccessibilityChecks.blockChecksOptions['coreTableBlockCheck'];
+const validationMode =
+	BlockAccessibilityChecks.blockChecksOptions.coreTableBlockCheck;
 
 export function checkTableHeaderRow(block) {
 	if (
@@ -35,8 +37,8 @@ export function checkTableHeaderRow(block) {
 				response.isValid = true;
 		}
 
-		console.log('table mode:', validationMode);
-		console.log('table isValid:', response.isValid);
+		// console.log('table mode:', validationMode);
+		// console.log('table isValid:', response.isValid);
 
 		return response;
 	}

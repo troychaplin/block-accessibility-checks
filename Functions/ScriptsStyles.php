@@ -50,7 +50,10 @@ class ScriptsStyles
         wp_localize_script(
             $script_handle,
             'BlockAccessibilityChecks',
-            array('blockChecksOptions' => $block_checks_options)
+            array(
+                'blockChecksOptions' => $block_checks_options,
+                'blocks' => BlockConfig::getBlockConfig(),
+            )
         );
     }
 

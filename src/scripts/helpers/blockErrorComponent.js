@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 // Import your specific block check functions
 import { checkHeadingLevel } from '../blockChecks/checkHeading';
+import { checkImageAlt } from '../blockChecks/checkImage';
 import { checkTableHeaderRow } from '../blockChecks/checkTable';
 
 const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
@@ -12,7 +13,7 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 		// Default validation result
 		let validationResult = {
 			isValid: true,
-			mode: 'none', // Default to 'none'
+			mode: 'none',
 			message: '',
 		};
 
@@ -25,6 +26,13 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 					clientId,
 				});
 				break;
+			case 'core/image':
+				validationResult = checkImageAlt({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
 			case 'core/table':
 				validationResult = checkTableHeaderRow({
 					name,
@@ -32,7 +40,6 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 					clientId,
 				});
 				break;
-			// Add more cases for other blocks as needed
 			default:
 				validationResult = {
 					isValid: true,
@@ -42,10 +49,7 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 		}
 
 		// If validation mode is 'none' or the block is valid, return the block as is
-		if (
-			validationResult.mode === 'none' ||
-			validationResult.isValid
-		) {
+		if (validationResult.mode === 'none' || validationResult.isValid) {
 			return <BlockEdit {...props} />;
 		}
 
@@ -60,13 +64,13 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 			validationResult.message ||
 			(validationResult.mode === 'error'
 				? __(
-					'Accessibility Error: This block does not meet accessibility standards.',
-					'block-accessibility-checks'
-				)
+						'Accessibility Error: This block does not meet accessibility standards.',
+						'block-accessibility-checks'
+					)
 				: __(
-					'Accessibility Warning: This block may have accessibility issues.',
-					'block-accessibility-checks'
-				));
+						'Accessibility Warning: This block may have accessibility issues.',
+						'block-accessibility-checks'
+					));
 
 		return (
 			<div className={wrapperClass}>

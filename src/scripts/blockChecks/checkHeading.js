@@ -1,6 +1,7 @@
+/* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
 const validationMode =
-	BlockAccessibilityChecks.blockChecksOptions['coreHeadingBlockCheck'];
+	BlockAccessibilityChecks.blockChecksOptions.coreHeadingBlockCheck;
 
 export function checkHeadingLevel(block) {
 	if (block.name === 'core/heading' && block.attributes.level === 1) {
