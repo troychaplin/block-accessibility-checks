@@ -3,22 +3,22 @@
 	flex-direction: column;
 	gap: 18px;
 	width: 100%;
-	padding: 20px 24px;
-	margin-left: -24px;
+	padding: 50px 50px 30px 50px;
+	margin-left: -50px;
 	background-color: #f7f6ec;
-	border: 3px dashed #d2b35f;
+	border-radius: 5px;
+	overflow: hidden;
 }
 
 .a11y-warning-msg {
-	/* display: flex;
-  gap: 6px;
-  align-items: center; */
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 600;
-	color: white;
-	background-color: #8b6d22;
-	padding: 5px 10px;
+	text-align: center;
+	color: #8b6d22;
+	padding: 10px 10px 20px 10px;
+	border-bottom: 2px solid #ffffff;
+	margin: -40px -50px 10px -50px;
 }
 
 /* Remove top spacing from block being wrapped */
