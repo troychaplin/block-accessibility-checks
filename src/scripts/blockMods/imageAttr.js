@@ -4,7 +4,12 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 
-// Add image attribute to confirm decorative to bypass a11y block
+/**
+ * Adds an image attribute to the settings object.
+ *
+ * @param {Object} settings - The settings object.
+ * @return {Object} - The modified settings object.
+ */
 const addImageAttribute = (settings) => {
 	if (settings.name !== 'core/image') {
 		return settings;
@@ -26,7 +31,12 @@ addFilter(
 	addImageAttribute
 );
 
-// Create a new block control for the attribute
+/**
+ * Higher-order component that adds accessibility settings to the image block editor.
+ *
+ * @param {Function} BlockEdit - The original block editor component.
+ * @return {Function} - The modified block editor component.
+ */
 const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
 	return (props) => {
 		if (props.name !== 'core/image') {
