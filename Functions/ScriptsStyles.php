@@ -43,15 +43,14 @@ class ScriptsStyles
             true
         );
 
-        $this->localizeScript($script_handle);
-    }
+        // Get the block check options from the database
+        $block_checks_options = get_option('block_checks_options', []);
 
-    private function localizeScript($handle)
-    {
+        // Localize the block check options array to use in JavaScript
         wp_localize_script(
-            $handle,
-            'blockAccessibilitySettings',
-            ['mode' => BLOCK_ACCESSIBILITY_MODE]
+            $script_handle,
+            'BlockAccessibilityChecks',
+            array('blockChecksOptions' => $block_checks_options)
         );
     }
 

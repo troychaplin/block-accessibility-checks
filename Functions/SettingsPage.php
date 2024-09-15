@@ -74,6 +74,12 @@ class SettingsPage
 
         echo '</form>' . "\n";
         echo '</div>' . "\n";
+
+        // Use print_r to output the array
+        $blockChecksOptions = get_option('block_checks_options', []);
+        echo '<pre>';
+        print_r($blockChecksOptions);
+        echo '</pre>';
     }
 
     private function renderBlockOptions($blockOptionName, $description)

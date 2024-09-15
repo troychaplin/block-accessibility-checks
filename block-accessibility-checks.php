@@ -30,11 +30,6 @@ if (!defined('ABSPATH')) {
 // Setup autoloading
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Define constants
-if (!defined('BLOCK_ACCESSIBILITY_MODE')) {
-    define('BLOCK_ACCESSIBILITY_MODE', 'DENY'); // Default value, can be overridden with WARN in wp-config.php
-}
-
 // Define plugin file and Text Domain
 $pluginFile = __FILE__;
 $textDomain = 'block-accessibility-checks';
@@ -52,7 +47,7 @@ add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
 $settingsPage = new SettingsPage($pluginFile, $translations);
 
 // // Get the block config array from the BlockConfig class
-$blockConfig = BlockConfig::getBlockConfig();
+// $blockConfig = BlockConfig::getBlockConfig();
 
 // // Dynamic processing based on array
 // foreach ($blockConfig as $config) {
