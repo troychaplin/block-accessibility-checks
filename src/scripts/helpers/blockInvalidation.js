@@ -1,6 +1,5 @@
-/* global blockAccessibilitySettings */
 import { useDispatch } from '@wordpress/data';
-import { GetInvalidBlocks } from './getInvalidBlocks';
+import { GetInvalidBlocks } from './getInvalidBlocks'; // Assuming this is the function that retrieves invalid blocks
 import { useEffect } from '@wordpress/element';
 
 export function BlockInvalidation() {
@@ -16,10 +15,10 @@ export function BlockInvalidation() {
 	} = useDispatch('core/editor');
 
 	useEffect(() => {
-		if (
-			invalidBlocks.length > 0 &&
-			blockAccessibilitySettings.mode === 'DENY'
-		) {
+		// Check if any block has a mode set to 'error'
+		const hasErrors = invalidBlocks.some((block) => block.mode === 'error');
+
+		if (hasErrors) {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();

@@ -1,46 +1,97 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { addFilter } from '@wordpress/hooks';
-import { GetInvalidBlocks } from './getInvalidBlocks';
+import { __ } from '@wordpress/i18n';
 
-const blockErrorComponent = createHigherOrderComponent((BlockListBlock) => {
-	const WrappedBlock = (props) => {
-		const invalidBlock = GetInvalidBlocks().find(
-			(obj) => obj.clientId === props.clientId
-		);
-		const messages = invalidBlock ? invalidBlock.message : '';
+// Import your specific block check functions
+// import { checkButtonAttributes } from '../blockChecks/checkButton';
+import { checkHeadingLevel } from '../blockChecks/checkHeading';
+import { checkImageAlt } from '../blockChecks/checkImage';
+import { checkTableHeaderRow } from '../blockChecks/checkTable';
+
+const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
+	return (props) => {
+		const { name, attributes, clientId } = props;
+
+		// Default validation result
+		let validationResult = {
+			isValid: true,
+			mode: 'none',
+			message: '',
+		};
+
+		// Apply validation using the appropriate check function
+		switch (name) {
+			case 'core/heading':
+				validationResult = checkHeadingLevel({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
+			case 'core/image':
+				validationResult = checkImageAlt({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
+			case 'core/table':
+				validationResult = checkTableHeaderRow({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
+			default:
+				validationResult = {
+					isValid: true,
+					mode: 'none', // Default to 'none'
+					message: '',
+				};
+		}
+
+		// If validation mode is 'none' or the block is valid, return the block as is
+		if (validationResult.mode === 'none' || validationResult.isValid) {
+			return <BlockEdit {...props} />;
+		}
+
+		// Wrap the block with error/warning messages based on validation mode
+		const wrapperClass =
+			validationResult.mode === 'error'
+				? 'a11y-block-error'
+				: 'a11y-block-warning';
+
+		// Use the message from the validation result or fall back to a generic message
+		const message =
+			validationResult.message ||
+			(validationResult.mode === 'error'
+				? __(
+						'Accessibility Error: This block does not meet accessibility standards.',
+						'block-accessibility-checks'
+					)
+				: __(
+						'Accessibility Warning: This block may have accessibility issues.',
+						'block-accessibility-checks'
+					));
 
 		return (
-			<>
-				{invalidBlock ? (
-					<div>
-						<div className="a11y-block-error">
-							<div className="a11y-error-msg">{messages}</div>
-							<BlockListBlock
-								{...props}
-								className={`${props.className}`}
-							/>
-						</div>
-					</div>
-				) : (
-					<BlockListBlock
-						{...props}
-						className={`${props.className}`}
-					/>
-				)}
-			</>
+			<div className={wrapperClass}>
+				<p
+					className={
+						validationResult.mode === 'error'
+							? 'a11y-error-msg'
+							: 'a11y-warning-msg'
+					}
+				>
+					{message}
+				</p>
+				<BlockEdit {...props} />
+			</div>
 		);
 	};
+}, 'withErrorHandling');
 
-	// Set the displayName for debugging purposes
-	WrappedBlock.displayName = `a11yCheck(${
-		BlockListBlock.displayName || BlockListBlock.name || 'Component'
-	})`;
-
-	return WrappedBlock;
-}, 'blockErrorComponent');
-
-addFilter(
-	'editor.BlockListBlock',
-	'block-accessibilty-checks/with-client-id-class-name',
-	blockErrorComponent
+wp.hooks.addFilter(
+	'editor.BlockEdit',
+	'block-accessibility-checks/with-error-handling',
+	withErrorHandling
 );
