@@ -46,18 +46,5 @@ add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
 // Settings page
 $settingsPage = new SettingsPage($pluginFile, $translations);
 
-// // Get the block config array from the BlockConfig class
+// Get the block config array from the BlockConfig class
 // $blockConfig = BlockConfig::getBlockConfig();
-
-// // Dynamic processing based on array
-// foreach ($blockConfig as $config) {
-//     add_action('some_custom_hook', function () use ($config) {
-//         // Dynamically render options for each block
-//         call_user_func($config['function_name']);
-
-//         // Use option name dynamically
-//         $option_value = get_option($config['option_name']);
-
-//         // Custom logic based on block, function, or option names
-//     });
-// }

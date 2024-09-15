@@ -1,5 +1,12 @@
 <?php
 
+/**
+ *
+ * The ScriptsStyles class is responsible for enqueueing block assets and admin assets.
+ *
+ * @package BlockAccessibility
+ */
+
 namespace BlockAccessibility;
 
 class ScriptsStyles
@@ -7,12 +14,26 @@ class ScriptsStyles
     private $pluginFile;
     private $translations;
 
+    /**
+     * Constructs a new instance of the ScriptsStyles class.
+     *
+     * @param string $pluginFile The path to the plugin file.
+     * @param Translations $translations The translations object.
+     */
     public function __construct($pluginFile, Translations $translations)
     {
         $this->pluginFile = $pluginFile;
         $this->translations = $translations;
     }
 
+    /**
+     * Enqueues the assets for the block.
+     *
+     * This method is responsible for enqueueing the necessary scripts and styles for the block.
+     * It sets up script translations and then calls the methods to enqueue the block scripts and styles.
+     *
+     * @return void
+     */
     public function enqueueBlockAssets()
     {
         $script_handle = 'block-accessibility-script';
@@ -22,6 +43,14 @@ class ScriptsStyles
         $this->enqueueBlockStyles();
     }
 
+    /**
+     * Enqueues the admin assets.
+     *
+     * This method is responsible for enqueueing the necessary scripts and styles for the admin area.
+     * It sets up script translations and enqueues admin styles.
+     *
+     * @return void
+     */
     public function enqueueAdminAssets()
     {
         $script_handle = 'block-accessibility-script';
@@ -30,6 +59,15 @@ class ScriptsStyles
         $this->enqueueAdminStyles();
     }
 
+    /**
+     * Enqueues the block scripts for the plugin.
+     *
+     * This function is responsible for enqueueing the necessary JavaScript scripts for the plugin's blocks.
+     * It registers the script handle, script path, dependencies, version, and localization data.
+     *
+     * @access private
+     * @return void
+     */
     private function enqueueBlockScripts()
     {
         $script_path = 'build/block-checks.js';
@@ -43,10 +81,13 @@ class ScriptsStyles
             true
         );
 
-        // Get the block check options from the database
+        /**
+         * Retrieves the block checks options from the database.
+         *
+         * @return array The block checks options.
+         */
         $block_checks_options = get_option('block_checks_options', []);
 
-        // Localize the block check options array to use in JavaScript
         wp_localize_script(
             $script_handle,
             'BlockAccessibilityChecks',
@@ -57,6 +98,15 @@ class ScriptsStyles
         );
     }
 
+    /**
+     * Enqueues the block styles.
+     *
+     * This function is responsible for enqueueing the block styles for the plugin.
+     * It uses the `wp_enqueue_style` function to enqueue the styles.
+     *
+     * @access private
+     * @return void
+     */
     private function enqueueBlockStyles()
     {
         $style_path = 'build/block-checks.css';
@@ -68,6 +118,14 @@ class ScriptsStyles
         );
     }
 
+    /**
+     * Enqueues the admin styles for the block accessibility checks.
+     *
+     * This function is responsible for enqueueing the admin styles for the block accessibility checks.
+     * It uses the `wp_enqueue_style` function to enqueue the 'block-checks-admin' style.
+     *
+     * @access private
+     */
     private function enqueueAdminStyles()
     {
         $style_path = 'build/block-admin.css';

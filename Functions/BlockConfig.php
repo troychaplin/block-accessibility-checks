@@ -1,9 +1,24 @@
 <?php
 
+/**
+ * Class BlockConfig
+ *
+ * This class represents the configuration for the block accessibility checks.
+ *
+ * @package BlockAccessibility
+ */
+
 namespace BlockAccessibility;
 
 class BlockConfig
 {
+  /**
+   * Retrieves the block configuration.
+   *
+   * This function returns an array of block configurations, each containing the function name, option name, and block label.
+   *
+   * @return array The block configuration.
+   */
   public static function getBlockConfig()
   {
     return [
