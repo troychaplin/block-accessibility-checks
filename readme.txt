@@ -1,55 +1,42 @@
-=== A11y Block Checks ===
-Contributors:      The WordPress Contributors
-Tags:              block
-Tested up to:      6.6.2
-Stable tag:        0.1.0
-License:           GPL-2.0-or-later
-License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+=== Block Accessibility Checks ===
 
-Example block scaffolded with Create Block tool.
+Contributors: areziaal
+Tags: block, accessibility, a11y, content, tools
+Requires at least: 6.3
+Tested up to: 6.6.2
+Stable tag: 1.0.3
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+Configure a series of block checks to prevent WCAG Accessbility errors in content.
 
 == Description ==
 
-This is the long description. No limit, and you can use Markdown (as well as in the following sections).
+Accessibility is a crucial aspect of web content creation. Many organizations must adhere to strict WCAG (Web Content Accessibility Guidelines) requirements. While the Gutenberg block editor significantly enhances content management, it still allows the publication of content that may not meet basic accessibility standards. This plugin offers site owners and content editors configurable block checks. These checks can either enforce strict accessibility error notices to prevent publishing or provide warnings in the editor while still allowing publication.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+The following is a list of checks that are configurable for core blocks. Each check can be set to error (default), warning or none.
+
+* core/button: Checks for text and a link on each individual button
+* core/heading: Prevents the usage of an level one heading in the content
+* core/image: Checks for alternative text on an image
+* core/image: Adds a toggle to confirm image use as decorative allowing for bypass accessibility check
+* core/table: Checks for a table header row on each individual table block
 
 == Installation ==
-
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload the plugin files to the `/wp-content/plugins/block-accessibility-checks` directory, or install the plugin through the WordPress plugins screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
-
+ 
+1. Upload the plugin folder to your /wp-content/plugins/ folder.
+2. Go to the **Plugins** page and activate the plugin.
 
 == Frequently Asked Questions ==
+ 
+= How do I use this plugin? =
+ 
+1. Once activated head to the "Block Checks" page under the "Settings" menu
+2. Configure the checks to you liking
+4. Click "Save Changes"
 
-= A question that someone might have =
-
-An answer to that question.
-
-= What about foo bar? =
-
-Answer to foo bar dilemma.
-
-== Screenshots ==
-
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
-
-== Changelog ==
-
-= 0.1.0 =
-* Release
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above. This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation." Arbitrary sections will be shown below the built-in sections outlined above.
+These options will be automatically applied to existing blocks throughout your site and are active as you build new content.
+ 
+= How to uninstall the plugin? =
+ 
+Simply deactivate and delete the plugin. 
