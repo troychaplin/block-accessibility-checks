@@ -1,24 +1,28 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
-// Import your specific block check functions
 // import { checkButtonAttributes } from '../blockChecks/checkButton';
 import { checkHeadingLevel } from '../blockChecks/checkHeading';
 import { checkImageAlt } from '../blockChecks/checkImage';
 import { checkTableHeaderRow } from '../blockChecks/checkTable';
 
+/**
+ * A higher-order component that adds error handling and accessibility checks to a block component.
+ *
+ * @param {Function} BlockEdit - The block component to wrap with error handling.
+ * @return {Function} - The wrapped block component with error handling.
+ */
 const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 	return (props) => {
 		const { name, attributes, clientId } = props;
 
-		// Default validation result
 		let validationResult = {
 			isValid: true,
 			mode: 'none',
 			message: '',
 		};
 
-		// Apply validation using the appropriate check function
 		switch (name) {
 			case 'core/heading':
 				validationResult = checkHeadingLevel({
@@ -44,7 +48,7 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 			default:
 				validationResult = {
 					isValid: true,
-					mode: 'none', // Default to 'none'
+					mode: 'none',
 					message: '',
 				};
 		}
@@ -90,7 +94,7 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 	};
 }, 'withErrorHandling');
 
-wp.hooks.addFilter(
+addFilter(
 	'editor.BlockEdit',
 	'block-accessibility-checks/with-error-handling',
 	withErrorHandling

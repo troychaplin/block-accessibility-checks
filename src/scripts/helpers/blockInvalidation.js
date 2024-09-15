@@ -1,7 +1,12 @@
 import { useDispatch } from '@wordpress/data';
-import { GetInvalidBlocks } from './getInvalidBlocks'; // Assuming this is the function that retrieves invalid blocks
+import { GetInvalidBlocks } from './getInvalidBlocks';
 import { useEffect } from '@wordpress/element';
 
+/**
+ * Function that handles block invalidation.
+ *
+ * @return {null} Returns null.
+ */
 export function BlockInvalidation() {
 	const invalidBlocks = GetInvalidBlocks();
 
@@ -15,7 +20,6 @@ export function BlockInvalidation() {
 	} = useDispatch('core/editor');
 
 	useEffect(() => {
-		// Check if any block has a mode set to 'error'
 		const hasErrors = invalidBlocks.some((block) => block.mode === 'error');
 
 		if (hasErrors) {

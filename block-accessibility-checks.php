@@ -2,13 +2,11 @@
 
 /**
  * Plugin Name:       Block Accessibility Checks
- * Plugin URI:        https://example.com/block-accessibility-checks
- * Description:       This plugin helps ensure your content meets WCAG (Web Content Accessibility Guidelines) requirements.
- * Version:           0.1.0
- * Requires at least: WordPress 6.3
+ * Description:       Customize warnings and errors for your blocks to ensure they meet WCAG (Web Content Accessibility Guidelines) requirements.
+ * Requires at least: 6.3
  * Requires PHP:      7.0
+ * Version:           0.1.0
  * Author:            Troy Chaplin
- * Author URI:        https://example.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       block-accessibility-checks
