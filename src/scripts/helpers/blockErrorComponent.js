@@ -2,6 +2,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 // Import your specific block check functions
+// import { checkButtonAttributes } from '../blockChecks/checkButton';
 import { checkHeadingLevel } from '../blockChecks/checkHeading';
 import { checkImageAlt } from '../blockChecks/checkImage';
 import { checkTableHeaderRow } from '../blockChecks/checkTable';
