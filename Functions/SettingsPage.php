@@ -106,17 +106,29 @@ class SettingsPage
         echo '<h1>' . esc_html(get_admin_page_title()) . '</h1>' . "\n";
         echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
 
-        echo '<div class="block-a11y-checks-settings-options">';
+        echo '<div class="block-a11y-checks-settings-grid">';
+
+        // Output the settings fields manually to avoid the table layout
         settings_fields('block_checks_settings_group');
-        do_settings_sections('block_checks_options');
+
+        // Retrieve all the fields added dynamically in initSettings()
+        $blockConfig = BlockConfig::getInstance()->getBlockConfig();
+        $options = get_option('block_checks_options');
+
+        // Loop through each field and wrap in a custom div
+        foreach ($blockConfig as $block) {
+            $value = isset($options[$block['option_name']]) ? $options[$block['option_name']] : 'error';
+            $dynamicClass = esc_attr($value);
+
+            echo '<div class="block-a11y-checks-settings-field block-a11y-checks-settings-field--' . $dynamicClass . '">';
+            echo '<h2>' . esc_html($block['block_label']) . '</h2>';
+            call_user_func(array($this, $block['function_name']));
+            echo '</div>';
+        }
+
+        echo '</div>';
+
         submit_button();
-        echo '</div>';
-
-        echo '<div class="block-a11y-checks-settings-info">';
-        echo '<h2>' . esc_html__('About', 'block-accessibility-checks') . '</h2>';
-        echo '<p>' . esc_html__('This plugin checks the accessibility of the core blocks in the WordPress block editor. You can set the level of strictness for each block type.', 'block-accessibility-checks') . '</p>';
-        echo '</div>';
-
         echo '</form>' . "\n";
         echo '</div>' . "\n";
     }
