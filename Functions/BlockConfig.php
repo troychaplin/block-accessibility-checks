@@ -1,27 +1,30 @@
 <?php
 
-/**
- * Class BlockConfig
- *
- * This class represents the configuration for the block accessibility checks.
- *
- * @package BlockAccessibility
- */
-
 namespace BlockAccessibility;
 
 class BlockConfig
 {
   /**
-   * Retrieves the block configuration.
+   * Holds the singleton instance of BlockConfig.
    *
-   * This function returns an array of block configurations, each containing the function name, option name, and block label.
-   *
-   * @return array The block configuration.
+   * @var BlockConfig|null
    */
-  public static function getBlockConfig()
+  private static $instance = null;
+
+  /**
+   * Holds the block configuration array.
+   *
+   * @var array|null
+   */
+  private $blockConfig = null;
+
+  /**
+   * Private constructor to prevent multiple instances.
+   */
+  private function __construct()
   {
-    return [
+    // Initialize the block configuration once
+    $this->blockConfig = [
       [
         'function_name' => 'renderCoreHeadingOptions',
         'option_name'   => 'coreHeadingBlockCheck',
@@ -43,5 +46,31 @@ class BlockConfig
         'block_label'   => esc_html__('Table', 'block-accessibility-checks'),
       ],
     ];
+  }
+
+  /**
+   * Retrieves the singleton instance of the BlockConfig class.
+   *
+   * @return BlockConfig The singleton instance.
+   */
+  public static function getInstance()
+  {
+    if (self::$instance === null) {
+      self::$instance = new self();
+    }
+
+    return self::$instance;
+  }
+
+  /**
+   * Retrieves the block configuration.
+   *
+   * This method returns the cached block configuration array.
+   *
+   * @return array The block configuration.
+   */
+  public function getBlockConfig()
+  {
+    return $this->blockConfig;
   }
 }

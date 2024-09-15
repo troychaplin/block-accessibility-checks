@@ -70,7 +70,7 @@ class SettingsPage
          *
          * @return BlockConfig The block configuration object.
          */
-        $blockConfig = BlockConfig::getBlockConfig();
+        $blockConfig = BlockConfig::getInstance()->getBlockConfig();
 
         /**
          * Adds settings fields for each block in the block configuration.

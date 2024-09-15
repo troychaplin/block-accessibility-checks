@@ -93,7 +93,7 @@ class ScriptsStyles
             'BlockAccessibilityChecks',
             array(
                 'blockChecksOptions' => $block_checks_options,
-                'blocks' => BlockConfig::getBlockConfig(),
+                'blocks' => BlockConfig::getInstance()->getBlockConfig(),
             )
         );
     }
