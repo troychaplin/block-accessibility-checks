@@ -31,8 +31,8 @@ export function checkHeadingLevel(block) {
 				response.isValid = true;
 		}
 
-		console.log('heading mode:', validationMode);
-		console.log('heading isValid:', response.isValid);
+		// console.log('heading mode:', validationMode);
+		// console.log('heading isValid:', response.isValid);
 
 		return response;
 	}

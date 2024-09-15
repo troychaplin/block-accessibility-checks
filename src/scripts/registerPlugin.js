@@ -6,13 +6,13 @@ import './helpers/blockErrorComponent';
 // import { checkButtonAttributes } from './blockChecks/checkButton';
 import { checkHeadingLevel } from './blockChecks/checkHeading';
 // import { checkImageAlt } from './blockChecks/checkImage';
-// import { checkTableHeaderRow } from './blockChecks/checkTable';
+import { checkTableHeaderRow } from './blockChecks/checkTable';
 
 export const blockChecksArray = [
 	// checkButtonAttributes,
 	checkHeadingLevel,
 	// checkImageAlt,
-	// checkTableHeaderRow,
+	checkTableHeaderRow,
 ];
 
 registerPlugin('block-validation', {

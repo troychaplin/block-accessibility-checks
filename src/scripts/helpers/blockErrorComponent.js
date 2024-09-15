@@ -1,18 +1,18 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { VALIDATION_MODES, DEFAULT_VALIDATION_MODE } from './validationModes'; // Ensure correct path
 import { __ } from '@wordpress/i18n';
 
 // Import your specific block check functions
 import { checkHeadingLevel } from '../blockChecks/checkHeading';
-import { checkImageAlt } from '../blockChecks/checkImage';
+import { checkTableHeaderRow } from '../blockChecks/checkTable';
 
 const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 	return (props) => {
 		const { name, attributes, clientId } = props;
 
+		// Default validation result
 		let validationResult = {
 			isValid: true,
-			mode: DEFAULT_VALIDATION_MODE,
+			mode: 'none', // Default to 'none'
 			message: '',
 		};
 
@@ -25,8 +25,8 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 					clientId,
 				});
 				break;
-			case 'core/image':
-				validationResult = checkImageAlt({
+			case 'core/table':
+				validationResult = checkTableHeaderRow({
 					name,
 					attributes,
 					clientId,
@@ -36,14 +36,14 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 			default:
 				validationResult = {
 					isValid: true,
-					mode: DEFAULT_VALIDATION_MODE,
+					mode: 'none', // Default to 'none'
 					message: '',
 				};
 		}
 
-		// If validation mode is NONE or the block is valid, return the block as is
+		// If validation mode is 'none' or the block is valid, return the block as is
 		if (
-			validationResult.mode === VALIDATION_MODES.NONE ||
+			validationResult.mode === 'none' ||
 			validationResult.isValid
 		) {
 			return <BlockEdit {...props} />;
@@ -51,28 +51,28 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 
 		// Wrap the block with error/warning messages based on validation mode
 		const wrapperClass =
-			validationResult.mode === VALIDATION_MODES.ERROR
+			validationResult.mode === 'error'
 				? 'a11y-block-error'
 				: 'a11y-block-warning';
 
 		// Use the message from the validation result or fall back to a generic message
 		const message =
 			validationResult.message ||
-			(validationResult.mode === VALIDATION_MODES.ERROR
+			(validationResult.mode === 'error'
 				? __(
-						'Accessibility Error: This block does not meet accessibility standards.',
-						'block-accessibility-checks'
-					)
+					'Accessibility Error: This block does not meet accessibility standards.',
+					'block-accessibility-checks'
+				)
 				: __(
-						'Accessibility Warning: This block may have accessibility issues.',
-						'block-accessibility-checks'
-					));
+					'Accessibility Warning: This block may have accessibility issues.',
+					'block-accessibility-checks'
+				));
 
 		return (
 			<div className={wrapperClass}>
 				<p
 					className={
-						validationResult.mode === VALIDATION_MODES.ERROR
+						validationResult.mode === 'error'
 							? 'a11y-error-msg'
 							: 'a11y-warning-msg'
 					}
