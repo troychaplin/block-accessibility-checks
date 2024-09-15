@@ -3,11 +3,17 @@ import { __ } from '@wordpress/i18n';
 const validationMode =
 	BlockAccessibilityChecks.blockChecksOptions.coreImageBlockCheck;
 
+/**
+ * Checks if an image block has an alt attribute and is not decorative.
+ *
+ * @param {Object} block - The image block to be checked.
+ * @return {Object} - The validation response object.
+ */
 export function checkImageAlt(block) {
 	if (
 		block.name === 'core/image' &&
-		!block.attributes.alt && // Image has no alt attribute
-		!block.attributes.isDecorative // Image is not decorative
+		!block.attributes.alt &&
+		!block.attributes.isDecorative
 	) {
 		const response = {
 			isValid: true,
@@ -16,7 +22,6 @@ export function checkImageAlt(block) {
 			mode: validationMode,
 		};
 
-		// Switch based on the validation mode
 		switch (validationMode) {
 			case 'error':
 				response.isValid = false;
@@ -37,12 +42,8 @@ export function checkImageAlt(block) {
 				response.isValid = true;
 		}
 
-		// console.log('image mode:', validationMode);
-		// console.log('image isValid:', response.isValid);
-
 		return response;
 	}
 
-	// If the block does not meet the conditions, return valid by default
 	return { isValid: true, mode: 'none' };
 }

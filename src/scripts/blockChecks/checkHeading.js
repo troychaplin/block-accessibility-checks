@@ -3,6 +3,12 @@ import { __ } from '@wordpress/i18n';
 const validationMode =
 	BlockAccessibilityChecks.blockChecksOptions.coreHeadingBlockCheck;
 
+/**
+ * Checks the heading level of a block.
+ *
+ * @param {Object} block - The block object to be checked.
+ * @return {Object} - The response object containing the validation result.
+ */
 export function checkHeadingLevel(block) {
 	if (block.name === 'core/heading' && block.attributes.level === 1) {
 		const response = {
@@ -32,10 +38,8 @@ export function checkHeadingLevel(block) {
 				response.isValid = true;
 		}
 
-		// console.log('heading mode:', validationMode);
-		// console.log('heading isValid:', response.isValid);
-
 		return response;
 	}
+
 	return { isValid: true, mode: 'none' };
 }

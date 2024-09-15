@@ -3,6 +3,12 @@ import { __ } from '@wordpress/i18n';
 const validationMode =
 	BlockAccessibilityChecks.blockChecksOptions.coreTableBlockCheck;
 
+/**
+ * Checks if a table block has a header row.
+ *
+ * @param {Object} block - The table block to be checked.
+ * @return {Object} - The validation response object.
+ */
 export function checkTableHeaderRow(block) {
 	if (
 		block.name === 'core/table' &&
@@ -16,7 +22,6 @@ export function checkTableHeaderRow(block) {
 			mode: validationMode,
 		};
 
-		// Switch based on the validation mode
 		switch (validationMode) {
 			case 'error':
 				response.isValid = false;
@@ -37,11 +42,8 @@ export function checkTableHeaderRow(block) {
 				response.isValid = true;
 		}
 
-		// console.log('table mode:', validationMode);
-		// console.log('table isValid:', response.isValid);
-
 		return response;
 	}
-	// Return valid if block doesn't match table conditions
+
 	return { isValid: true, mode: 'none' };
 }

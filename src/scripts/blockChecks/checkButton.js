@@ -3,14 +3,18 @@ import { __ } from '@wordpress/i18n';
 const validationMode =
 	BlockAccessibilityChecks.blockChecksOptions.coreButtonBlockCheck;
 
+/**
+ * Checks the attributes of a button block for accessibility.
+ *
+ * @param {Object} block - The button block to check.
+ * @return {Object} - The validation result object.
+ */
 export function checkButtonAttributes(block) {
-	// Safeguard: Ensure innerBlocks is an array before attempting to iterate over it
 	const checkButton = (innerBlocks = [], parentClientId) => {
 		for (const innerBlock of innerBlocks) {
 			if (innerBlock.name === 'core/button') {
 				const { text, url } = innerBlock.attributes;
 
-				// Check if the button has text and URL
 				if (!text || !url) {
 					const response = {
 						isValid: true,
@@ -46,7 +50,6 @@ export function checkButtonAttributes(block) {
 				}
 			}
 
-			// Recursively check nested inner blocks, ensure innerBlocks is always an array
 			if (
 				Array.isArray(innerBlock.innerBlocks) &&
 				innerBlock.innerBlocks.length > 0
@@ -63,6 +66,5 @@ export function checkButtonAttributes(block) {
 		return { isValid: true, mode: 'none' };
 	};
 
-	// Start checking for buttons in the inner blocks of the current block
 	return checkButton(block.innerBlocks, block.clientId);
 }
