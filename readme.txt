@@ -16,7 +16,6 @@ Accessibility is a crucial aspect of web content creation. Many organizations mu
 
 The following is a list of checks that are configurable for core blocks. Each check can be set to error (default), warning or none.
 
-* core/button: Checks for text and a link on each individual button
 * core/heading: Prevents the usage of an level one heading in the content
 * core/image: Checks for alternative text on an image
 * core/image: Adds a toggle to confirm image use as decorative allowing for bypass accessibility check
@@ -32,7 +31,7 @@ The following is a list of checks that are configurable for core blocks. Each ch
 = How do I use this plugin? =
  
 1. Once activated head to the "Block Checks" page under the "Settings" menu
-2. Configure the checks to you liking
+2. Configure the checks to your liking
 4. Click "Save Changes"
 
 These options will be automatically applied to existing blocks throughout your site and are active as you build new content.
