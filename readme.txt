@@ -4,7 +4,7 @@ Contributors: areziaal
 Tags: block, accessibility, a11y, content, tools
 Requires at least: 6.3
 Tested up to: 6.6.2
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,3 +39,14 @@ These options will be automatically applied to existing blocks throughout your s
 = How to uninstall the plugin? =
  
 Simply deactivate and delete the plugin. 
+
+== Screenshots ==
+1. Heading block not meeting accessibility requirements for publishing
+2. Heading block providing an warning that the block may not be accessibility 
+3. A simple set of block options
+ 
+== Changelog ==
+
+= 1.0 =
+
+* Plugin released.
