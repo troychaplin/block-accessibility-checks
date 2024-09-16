@@ -165,19 +165,6 @@ class SettingsPage
     }
 
     /**
-     * Renders the core button options on the settings page.
-     *
-     * This method is responsible for rendering the core button options on the settings page.
-     * It calls the `renderBlockOptions` method with the appropriate parameters to display the options.
-     *
-     * @return void
-     */
-    public function renderCoreButtonOptions()
-    {
-        $this->renderBlockOptions('coreButtonBlockCheck', 'How strict do you want to be with the core/button block?');
-    }
-
-    /**
      * Renders the core image options on the settings page.
      *
      * This method is responsible for rendering the core image options on the settings page.
