@@ -118,9 +118,8 @@ class SettingsPage
         // Loop through each field and wrap in a custom div
         foreach ($blockConfig as $block) {
             $value = isset($options[$block['option_name']]) ? $options[$block['option_name']] : 'error';
-            $dynamicClass = esc_attr($value);
 
-            echo '<div class="block-a11y-checks-settings-field block-a11y-checks-settings-field--' . $dynamicClass . '">';
+            echo '<div class="block-a11y-checks-settings-field">';
             echo '<h2>' . esc_html($block['block_label']) . '</h2>';
             call_user_func(array($this, $block['function_name']));
             echo '</div>';

@@ -77,7 +77,7 @@ class ScriptsStyles
             $script_handle,
             plugins_url($script_path, $this->pluginFile),
             ['wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor'],
-            filemtime(plugin_dir_path($this->pluginFile) . $script_path),
+            BLOCK_ACCESSIBILITY_VERSION, // Use the constant here
             true
         );
 
@@ -114,7 +114,7 @@ class ScriptsStyles
             'block-checks-style',
             plugins_url($style_path, $this->pluginFile),
             [],
-            filemtime(plugin_dir_path($this->pluginFile) . $style_path)
+            BLOCK_ACCESSIBILITY_VERSION
         );
     }
 
@@ -129,6 +129,11 @@ class ScriptsStyles
     private function enqueueAdminStyles()
     {
         $style_path = 'build/block-admin.css';
-        wp_enqueue_style('block-checks-admin', plugins_url($style_path, $this->pluginFile), []);
+        wp_enqueue_style(
+            'block-checks-admin',
+            plugins_url($style_path, $this->pluginFile),
+            [],
+            BLOCK_ACCESSIBILITY_VERSION
+        );
     }
 }

@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name:       Block Accessibility Checks
- * Description:       Customize warnings and errors for your blocks to ensure they meet WCAG (Web Content Accessibility Guidelines) requirements.
+ * Description:       Add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
  * Requires at least: 6.3
  * Requires PHP:      7.0
  * Version:           0.1.0
@@ -15,11 +15,6 @@
  * @package           block-accessibility-checks
  */
 
-use BlockAccessibility\BlockConfig;
-use BlockAccessibility\ScriptsStyles;
-use BlockAccessibility\SettingsPage;
-use BlockAccessibility\Translations;
-
 /**
  * Checks if the constant ABSPATH is defined and terminates the script if not.
  *
@@ -30,9 +25,21 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Defines the version of the block-accessibility-checks plugin.
+ *
+ * @var string BLOCK_ACCESSIBILITY_VERSION
+ */
+define('BLOCK_ACCESSIBILITY_VERSION', '0.1.0');
+
+/**
  * This file is responsible for including the necessary autoload file.
  */
 require_once __DIR__ . '/vendor/autoload.php';
+
+use BlockAccessibility\BlockConfig;
+use BlockAccessibility\ScriptsStyles;
+use BlockAccessibility\SettingsPage;
+use BlockAccessibility\Translations;
 
 /**
  * This file is located at /Users/troychaplin/Develop/wp-contribute/block-accessibility-checks/block-accessibility-checks.php.
