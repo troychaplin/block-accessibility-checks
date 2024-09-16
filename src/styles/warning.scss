@@ -1,0 +1,38 @@
+.a11y-block-warning {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	width: 100%;
+	padding: 50px 50px 30px 50px;
+	margin-left: -50px;
+	background-color: #f7f6ec;
+	border-radius: 5px;
+	overflow: hidden;
+}
+
+.a11y-warning-msg {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 600;
+	text-align: center;
+	color: #8b6d22;
+	padding: 10px 10px 20px 10px;
+	border-bottom: 2px solid #ffffff;
+	margin: -40px -50px 10px -50px;
+}
+
+/* Remove top spacing from block being wrapped */
+.a11y-warning-msg + * {
+	margin-top: 0;
+}
+
+/* Remove bottom spacing from block being wrapped */
+.a11y-block-warning > *:last-child {
+	margin-bottom: 0;
+}
+
+/* TODO: it's a mystery */
+.a11y-block-warning.wp-block-heading {
+	padding-top: 0;
+	padding-bottom: 0;
+}

@@ -1,7 +1,3 @@
-import './styles/error.css';
-
-// Block Modifications
+import './styles.scss';
 import './scripts/blockMods/imageAttr';
-
-// Block Checks
 import './scripts/registerPlugin';

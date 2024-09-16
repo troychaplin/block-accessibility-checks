@@ -2,13 +2,11 @@
 
 /**
  * Plugin Name:       Block Accessibility Checks
- * Plugin URI:        https://example.com/block-accessibility-checks
- * Description:       This plugin helps ensure your content meets WCAG (Web Content Accessibility Guidelines) requirements.
- * Version:           0.1.0
- * Requires at least: WordPress 6.3
+ * Description:       Add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
+ * Requires at least: 6.3
  * Requires PHP:      7.0
+ * Version:           1.0.0
  * Author:            Troy Chaplin
- * Author URI:        https://example.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       block-accessibility-checks
@@ -17,31 +15,75 @@
  * @package           block-accessibility-checks
  */
 
-// If this file is called directly, abort.
+/**
+ * Checks if the constant ABSPATH is defined and terminates the script if not.
+ *
+ * @return void
+ */
 if (!defined('ABSPATH')) {
     die;
 }
 
-// Setup autoloading
+/**
+ * Defines the version of the block-accessibility-checks plugin.
+ *
+ * @var string BLOCK_ACCESSIBILITY_VERSION
+ */
+define('BLOCK_ACCESSIBILITY_VERSION', '1.0.0');
+
+/**
+ * This file is responsible for including the necessary autoload file.
+ */
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Define constants
-if (!defined('BLOCK_ACCESSIBILITY_MODE')) {
-    define('BLOCK_ACCESSIBILITY_MODE', 'DENY'); // Default value, can be overridden with WARN in wp-config.php
-}
-
-// Include dependencies
-use BlockAccessibility\ScriptsAndStyles;
+use BlockAccessibility\BlockConfig;
+use BlockAccessibility\ScriptsStyles;
+use BlockAccessibility\SettingsPage;
 use BlockAccessibility\Translations;
 
-// Define plugin file and Text Domain
+/**
+ * This file is located at /Users/troychaplin/Develop/wp-contribute/block-accessibility-checks/block-accessibility-checks.php.
+ * It defines the variables $pluginFile and $textDomain.
+ *
+ * @var string $pluginFile The path of the current plugin file.
+ * @var string $textDomain The text domain for translation.
+ */
 $pluginFile = __FILE__;
 $textDomain = 'block-accessibility-checks';
 
-// Translation setup
+/**
+ * Initializes the translations for the plugin.
+ *
+ * @param string $pluginFile The path to the main plugin file.
+ * @param string $textDomain The text domain for the translations.
+ * @return void
+ */
 $translations = new Translations($pluginFile, $textDomain);
 add_action('plugins_loaded', [$translations, 'loadTextDomain']);
 
-// Enqueue block editor assets
-$scriptsStyles = new ScriptsAndStyles($pluginFile, $translations);
-add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueAssets']);
+/**
+ * Enqueues block and admin assets for the accessibility checks plugin.
+ *
+ * @param string $pluginFile The path to the main plugin file.
+ * @param array $translations An array of translations for the plugin.
+ * @return void
+ */
+$scriptsStyles = new ScriptsStyles($pluginFile, $translations);
+add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueBlockAssets']);
+add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
+
+/**
+ * Creates a new instance of the SettingsPage class.
+ *
+ * @param string $pluginFile The file path of the plugin.
+ * @param array $translations An array of translations for the plugin.
+ * @return SettingsPage The newly created SettingsPage object.
+ */
+$settingsPage = new SettingsPage($pluginFile, $translations);
+
+/**
+ * Retrieves the block configuration instance and gets the block configuration.
+ *
+ * @return BlockConfig The block configuration instance.
+ */
+$blockConfig = BlockConfig::getInstance()->getBlockConfig();

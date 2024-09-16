@@ -4,43 +4,43 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 
 ## Features
 
-- **Real-time Accessibility Checks:** Automatically checks core block configurations as you edit content in the Gutenberg editor.
-- **Prevents Non-Compliant Publishing:** Blocks the publishing of content that fails to meet WCAG requirements.
-- **User-Friendly Notifications:** Provides clear and actionable feedback to help users fix accessibility issues.
+-   **Real-time Accessibility Checks:** Automatically checks core block configurations as you edit content in the Gutenberg editor.
+-   **Prevents Non-Compliant Publishing:** Blocks the publishing of content that fails to meet WCAG requirements.
+-   **User-Friendly Notifications:** Provides clear and actionable feedback to help users fix accessibility issues.
 
 ## Installation
 
-- Upload the plugin files to the `/wp-content/plugins/`
-- Activate the plugin through the `Plugins` screen in WordPress
-- Start editing your content in the Gutenberg editor
+-   Upload the plugin files to the `/wp-content/plugins/`
+-   Activate the plugin through the `Plugins` screen in WordPress
+-   Start editing your content in the Gutenberg editor
 
 ## Getting Involved
 
 Open a terminal window and navigate to where you intend to setup the repo and do the following:
 
-- Install wp-env: `npm -g i @wordpress/env`
-- Clone the repo: `git clone https://github.com/troychaplin/block-accessibility-checks.git`
-- Navigate into the repo: `cd block-accessibility-checks`
-- Install dependencies: `npm install`
+-   Install wp-env: `npm -g i @wordpress/env`
+-   Clone the repo: `git clone https://github.com/troychaplin/block-accessibility-checks.git`
+-   Navigate into the repo: `cd block-accessibility-checks`
+-   Install dependencies: `npm install`
 
 ### Start Developing
 
 This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme) that setups up a local WordPress environment using Docker.
 
-- Make sure `Docker Desktop` is running
-- Start WordPress: `wp-env start`
+-   Make sure `Docker Desktop` is running
+-   Start WordPress: `wp-env start`
 
 #### Other Commands
 
-- Stop WordPress: `wp-env stop`
-- Start watch task: `npm run start`
-- Build assets: `npm run build`
+-   Stop WordPress: `wp-env stop`
+-   Start watch task: `npm run start`
+-   Build assets: `npm run build`
 
 ### Local Site Details
 
-- http://localhost:8888
-- User: `admin`
-- Password: `password`
+-   http://localhost:8888
+-   User: `admin`
+-   Password: `password`
 
 **Important:** when you're done working don't forget to stop the WordPress docker environment by running `npm run wp:down`
 
@@ -52,10 +52,9 @@ TODO: add git issue templates
 
 The following is a list of checks that are happening on core blocks.
 
-| Block | Description |
-| ----- | ----------- |
-| core/button | Checks for text and link on each individual button |
-| core/heading | Prevents the usage of an level one heading in the content |
-| core/image | Checks for alternative text on an image |
-| core/image | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
-| core/table | Checks for a table header row on each individual table block  |
+| Block        | Description                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| core/heading | Prevents the usage of an level one heading in the content                       |
+| core/image   | Checks for alternative text on an image                                         |
+| core/image   | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
+| core/table   | Checks for a table header row on each individual table block                    |

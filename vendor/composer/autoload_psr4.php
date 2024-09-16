@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'BlockAccessibility\\' => array($baseDir . '/src'),
+    'BlockAccessibility\\' => array($baseDir . '/Functions'),
 );
