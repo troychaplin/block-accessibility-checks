@@ -26,6 +26,11 @@ class BlockConfig
     // Initialize the block configuration once
     $this->blockConfig = [
       [
+        'function_name' => 'renderCoreButtonOptions',
+        'option_name'   => 'coreButtonBlockCheck',
+        'block_label'   => esc_html__('Button', 'block-accessibility-checks'),
+      ],
+      [
         'function_name' => 'renderCoreHeadingOptions',
         'option_name'   => 'coreHeadingBlockCheck',
         'block_label'   => esc_html__('Heading', 'block-accessibility-checks'),

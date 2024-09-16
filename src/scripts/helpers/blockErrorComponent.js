@@ -2,6 +2,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
+import { checkButtonAttributes } from '../blockChecks/checkButton';
 import { checkHeadingLevel } from '../blockChecks/checkHeading';
 import { checkImageAlt } from '../blockChecks/checkImage';
 import { checkTableHeaderRow } from '../blockChecks/checkTable';
@@ -23,6 +24,13 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 		};
 
 		switch (name) {
+			case 'core/button':
+				validationResult = checkButtonAttributes({
+					name,
+					attributes,
+					clientId,
+				});
+				break;
 			case 'core/heading':
 				validationResult = checkHeadingLevel({
 					name,
