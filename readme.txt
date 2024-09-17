@@ -16,6 +16,7 @@ Accessibility is a crucial aspect of web content creation. Many organizations mu
 
 The following is a list of checks that are configurable for core blocks. Each check can be set to error (default), warning or none.
 
+* core/button: Checks for text and link on each button
 * core/heading: Prevents the usage of an level one heading in the content
 * core/image: Checks for alternative text on an image
 * core/image: Adds a toggle to confirm image use as decorative allowing for bypass accessibility check
