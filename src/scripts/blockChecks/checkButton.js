@@ -26,14 +26,14 @@ export function checkButtonAttributes(block) {
 			case 'error':
 				response.isValid = false;
 				response.message = __(
-					'Accessibility Error: Button error.',
+					'Error: Buttons must have text and a link',
 					'block-accessibility-checks'
 				);
 				break;
 			case 'warning':
 				response.isValid = false;
 				response.message = __(
-					'Warning: Button warning.',
+					'Warning: Buttons must have text and a link',
 					'block-accessibility-checks'
 				);
 				break;

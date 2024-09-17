@@ -22,14 +22,14 @@ export function checkHeadingLevel(block) {
 			case 'error':
 				response.isValid = false;
 				response.message = __(
-					'Accessibility Error: Level 1 headings are not allowed in your content area.',
+					'Error: Level 1 headings should only be used for page titles',
 					'block-accessibility-checks'
 				);
 				break;
 			case 'warning':
 				response.isValid = false;
 				response.message = __(
-					'Warning: Level 1 headings are discouraged in your content area.',
+					'Warning: Level 1 headings should only be used for page titles',
 					'block-accessibility-checks'
 				);
 				break;

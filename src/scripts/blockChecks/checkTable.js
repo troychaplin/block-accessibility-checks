@@ -26,14 +26,14 @@ export function checkTableHeaderRow(block) {
 			case 'error':
 				response.isValid = false;
 				response.message = __(
-					'Accessibility Error: Tables are required to have a header row.',
+					'Error: Tables are required to have a header row',
 					'block-accessibility-checks'
 				);
 				break;
 			case 'warning':
 				response.isValid = false;
 				response.message = __(
-					'Warning: It is recommended that tables have a header row.',
+					'Warning: Tables are required to have a header row',
 					'block-accessibility-checks'
 				);
 				break;
