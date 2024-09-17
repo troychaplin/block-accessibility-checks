@@ -56,6 +56,7 @@ The following is a list of checks that are happening on core blocks.
 | ------------ | ------------------------------------------------------------------------------- |
 | core/button  | Checks for text and link on each button                                         |
 | core/heading | Prevents the usage of an level one heading in the content                       |
+| core/gallery | Checks for alternative text on an image                                         |
 | core/image   | Checks for alternative text on an image                                         |
 | core/image   | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
 | core/table   | Checks for a table header row on each individual table block                    |
