@@ -26,14 +26,14 @@ export function checkImageAlt(block) {
 			case 'error':
 				response.isValid = false;
 				response.message = __(
-					'Accessibility Error: Images are required to have alternative text.',
+					'Error: Images are required to have alternative text',
 					'block-accessibility-checks'
 				);
 				break;
 			case 'warning':
 				response.isValid = false;
 				response.message = __(
-					'Accessibility Warning: Images without alternative text are discouraged in your content area.',
+					'Warning: Images are required to have alternative text',
 					'block-accessibility-checks'
 				);
 				break;

@@ -1,7 +1,7 @@
 /* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
 const validationMode =
-	BlockAccessibilityChecks.blockChecksOptions.coreHeadingBlockCheck;
+	BlockAccessibilityChecks.blockChecksOptions.coreButtonBlockCheck;
 
 /**
  * Checks the heading level of a block.
@@ -9,8 +9,12 @@ const validationMode =
  * @param {Object} block - The block object to be checked.
  * @return {Object} - The response object containing the validation result.
  */
-export function checkHeadingLevel(block) {
-	if (block.name === 'core/heading' && block.attributes.level === 1) {
+export function checkButtonAttributes(block) {
+	if (
+		block.name === 'core/button' &&
+		!block.attributes.url &&
+		!block.attributes.text.originalHTML
+	) {
 		const response = {
 			isValid: true,
 			message: '',
@@ -22,14 +26,14 @@ export function checkHeadingLevel(block) {
 			case 'error':
 				response.isValid = false;
 				response.message = __(
-					'Error: Level 1 headings should only be used for page titles',
+					'Error: Buttons must have text and a link',
 					'block-accessibility-checks'
 				);
 				break;
 			case 'warning':
 				response.isValid = false;
 				response.message = __(
-					'Warning: Level 1 headings should only be used for page titles',
+					'Warning: Buttons must have text and a link',
 					'block-accessibility-checks'
 				);
 				break;

@@ -1,28 +1,18 @@
 /* ERROR STYLES */
 
 .a11y-block-error {
-	display: flex;
-	flex-direction: column;
-	gap: 18px;
-	width: 100%;
-	padding: 50px;
-	margin-left: -50px;
+	padding: 15px;
 	background-color: #f7edec;
 	border: 1px dashed #8b3122;
 	border-radius: 5px;
-	overflow: hidden;
 }
 
 .a11y-error-msg {
-	font-size: 16px;
-	line-height: 24px;
-	font-weight: 600;
-	text-align: center;
+	margin-top: 0;
 	color: white;
 	background-color: #8b3122;
 	border-radius: 5px;
-	padding: 15px 20px;
-	margin: -40px -40px 30px -40px;
+	padding: 5px 12px;
 }
 
 /* Remove top spacing from block being wrapped */
