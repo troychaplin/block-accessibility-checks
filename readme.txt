@@ -18,6 +18,7 @@ The following is a list of checks that are configurable for core blocks. Each ch
 
 * core/button: Checks for text and link on each button
 * core/heading: Prevents the usage of an level one heading in the content
+* core/gallery: Checks for alternative text on an image
 * core/image: Checks for alternative text on an image
 * core/image: Adds a toggle to confirm image use as decorative allowing for bypass accessibility check
 * core/table: Checks for a table header row on each individual table block
@@ -26,6 +27,10 @@ The following is a list of checks that are configurable for core blocks. Each ch
  
 1. Upload the plugin folder to your /wp-content/plugins/ folder.
 2. Go to the **Plugins** page and activate the plugin.
+
+== Getting Involved ==
+
+If you would like to get involved and contribute to the development of this plugin or view it's source code you can find more information in the <a href="https://github.com/troychaplin/block-accessibility-checks">plugins GitHub repo</a>.
 
 == Frequently Asked Questions ==
  

@@ -16,11 +16,17 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.0.1]
+
 ### Added
 
 -   Add check for core/button text and link
 
-## [0.1.0]
+### Changed
+
+-   Updated both readme files
+
+## [1.0.0]
 
 ### Added
 

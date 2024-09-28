@@ -16,12 +16,18 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 
 ## Getting Involved
 
-Open a terminal window and navigate to where you intend to setup the repo and do the following:
+If you would like to get involved and help make this plugin better that would be awesome! We all win with more accessible content.
 
--   Install wp-env: `npm -g i @wordpress/env`
--   Clone the repo: `git clone https://github.com/troychaplin/block-accessibility-checks.git`
--   Navigate into the repo: `cd block-accessibility-checks`
--   Install dependencies: `npm install`
+### Get Started
+
+To get started do the following:
+
+-   Fork this repo
+-   Create a branch off of `main`
+-   Open a terminal window and clone your fork
+-   Using a terminal run the following inside the forked repo
+    -   `npm -g i @wordpress/env` -- installs wp-env if you don't already have it
+    -   `npm install` -- installs dependencies for this project
 
 ### Start Developing
 
@@ -35,6 +41,13 @@ This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD
 -   Stop WordPress: `wp-env stop`
 -   Start watch task: `npm run start`
 -   Build assets: `npm run build`
+
+## Finishing a Branch
+
+When you are done developing a feature or a fix:
+
+-   Create a PR from your branch into the primary repo
+-   Fill out relevant info in as much detail as possible in the PR template
 
 ### Local Site Details
 
@@ -56,6 +69,7 @@ The following is a list of checks that are happening on core blocks.
 | ------------ | ------------------------------------------------------------------------------- |
 | core/button  | Checks for text and link on each button                                         |
 | core/heading | Prevents the usage of an level one heading in the content                       |
+| core/gallery | Checks for alternative text on an image                                         |
 | core/image   | Checks for alternative text on an image                                         |
 | core/image   | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
 | core/table   | Checks for a table header row on each individual table block                    |

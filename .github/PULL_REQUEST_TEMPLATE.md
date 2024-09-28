@@ -1,10 +1,10 @@
 ## Description
 
-Provide a detailed description of the changes made in this pull request.
+Provide a detailed description of the feature you are adding or changes that are being made in this pull request.
 
 ## Related Issue
 
-Link to the issue that this pull request addresses.
+If applicable, link to the issue that this pull request addresses.
 
 ## Testing Instructions
 
@@ -16,6 +16,6 @@ Provide any relevant screenshots or recordings to help understand the changes.
 
 ## Checklist
 
-- [ ] Have you added a note to the changelog?
-- [ ] Have you ensured the code passes all tests?
-- [ ] Have you checked for code style and linting errors?
+-   [ ] Have you added a note to the changelog?
+-   [ ] Have you ensured the code passes all tests using the included plugin-check?
+-   [ ] Have you checked for code style and linting errors?
