@@ -5,7 +5,7 @@
  * Description:       Add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
  * Requires at least: 6.3
  * Requires PHP:      7.0
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Troy Chaplin
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -29,7 +29,7 @@ if (!defined('ABSPATH')) {
  *
  * @var string BLOCK_ACCESSIBILITY_VERSION
  */
-define('BLOCK_ACCESSIBILITY_VERSION', '1.0.0');
+define('BLOCK_ACCESSIBILITY_VERSION', '1.0.1');
 
 /**
  * This file is responsible for including the necessary autoload file.
