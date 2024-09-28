@@ -46,7 +46,8 @@ This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD
 
 When you are done developing a feature or a fix:
 
--   Create a PR from your branch into the primary repo.
+-   Create a PR from your branch into the primary repo
+-   Fill out relevant info in as much detail as possible in the PR template
 
 ### Local Site Details
 
