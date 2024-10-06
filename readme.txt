@@ -1,6 +1,6 @@
 === Block Accessibility Checks ===
 
-Contributors: areziaal
+Contributors: areziaal, mikecorkum
 Tags: block, accessibility, a11y, content, tools
 Requires at least: 6.3
 Tested up to: 6.6.2
