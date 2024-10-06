@@ -16,6 +16,12 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.0.2]
+
+### Added
+
+-   Icon and banner image for public release
+
 ## [1.0.1]
 
 ### Added
