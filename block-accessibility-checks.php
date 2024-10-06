@@ -29,7 +29,7 @@ if (!defined('ABSPATH')) {
  *
  * @var string BLOCK_ACCESSIBILITY_VERSION
  */
-define('BLOCK_ACCESSIBILITY_VERSION', '1.0.1');
+define('BLOCK_ACCESSIBILITY_VERSION', '1.0.2');
 
 /**
  * This file is responsible for including the necessary autoload file.
