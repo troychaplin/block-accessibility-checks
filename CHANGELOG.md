@@ -21,6 +21,7 @@ Prefix the change with one of these keywords:
 ### Added
 
 -   Icon and banner image for public release
+-   Mike Corkum as contributor
 
 ## [1.0.1]
 
