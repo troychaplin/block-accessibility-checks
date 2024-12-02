@@ -13,7 +13,7 @@ class SettingsPage
         [
             'option_name' => 'coreButtonBlockCheck',
             'block_label' => 'Core Button Block',
-            'description' => 'Each block should have text and a link. How strict do you want to be with the core/button block?',
+            'description' => 'Buttons should have text and a link, this check will ensure that the button block has both.',
             'function_name' => 'renderCoreButtonOptions',
         ],
         [
@@ -25,13 +25,13 @@ class SettingsPage
         [
             'option_name' => 'coreImageBlockCheck',
             'block_label' => 'Core Image Block',
-            'description' => 'How strict do you want to be with the core/image block?',
+            'description' => 'Image alt text should be descriptive and not empty, this option will check for alternative text on images.',
             'function_name' => 'renderCoreImageOptions',
         ],
         [
             'option_name' => 'coreTableBlockCheck',
             'block_label' => 'Core Table Block',
-            'description' => 'How strict do you want to be with the core/table block?',
+            'description' => 'Tables are required to have a header row, this option will check for a header row in tables.',
             'function_name' => 'renderCoreTableOptions',
         ],
     ];
