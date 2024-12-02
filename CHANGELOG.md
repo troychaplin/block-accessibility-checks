@@ -18,6 +18,12 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+-   Updated readme changelogs
+
+## [1.0.3]
+
+### Changed
+
 -   Updated dependencies
 
 ## [1.0.2]
