@@ -20,9 +20,7 @@
  *
  * @return void
  */
-if (!defined('ABSPATH')) {
-    die;
-}
+if (! defined('ABSPATH')) exit;
 
 /**
  * Defines the version of the block-accessibility-checks plugin.

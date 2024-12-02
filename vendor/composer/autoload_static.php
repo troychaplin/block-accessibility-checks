@@ -4,32 +4,33 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd751713988987e9331980363e24189ce
+class ComposerStaticInitBlockAccessibility
 {
-    public static $prefixLengthsPsr4 = array(
-        'B' =>
-        array(
+    public static $prefixLengthsPsr4 = array (
+        'B' => 
+        array (
             'BlockAccessibility\\' => 19,
         ),
     );
 
-    public static $prefixDirsPsr4 = array(
-        'BlockAccessibility\\' =>
-        array(
+    public static $prefixDirsPsr4 = array (
+        'BlockAccessibility\\' => 
+        array (
             0 => __DIR__ . '/../..' . '/Functions',
         ),
     );
 
-    public static $classMap = array(
+    public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd751713988987e9331980363e24189ce::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd751713988987e9331980363e24189ce::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitd751713988987e9331980363e24189ce::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitBlockAccessibility::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitBlockAccessibility::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitBlockAccessibility::$classMap;
+
         }, null, ClassLoader::class);
     }
 }
