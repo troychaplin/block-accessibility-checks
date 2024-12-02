@@ -105,7 +105,6 @@ class SettingsPage
         echo '<div class="block-a11y-checks-settings">' . "\n";
         echo '<h1>' . esc_html(get_admin_page_title()) . '</h1>' . "\n";
         echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
-
         echo '<div class="block-a11y-checks-settings-grid">';
 
         // Output the settings fields manually to avoid the table layout
@@ -113,20 +112,17 @@ class SettingsPage
 
         // Retrieve all the fields added dynamically in initSettings()
         $blockConfig = BlockConfig::getInstance()->getBlockConfig();
-        $options = get_option('block_checks_options');
 
         // Loop through each field and wrap in a custom div
         foreach ($blockConfig as $block) {
-            $value = isset($options[$block['option_name']]) ? $options[$block['option_name']] : 'error';
-
             echo '<div class="block-a11y-checks-settings-field">';
             echo '<h2>' . esc_html($block['block_label']) . '</h2>';
+            echo '<p>This would be a brief description of the a11y concerns and what is being checked in this core block.</p>';
             call_user_func(array($this, $block['function_name']));
             echo '</div>';
         }
 
         echo '</div>';
-
         submit_button();
         echo '</form>' . "\n";
         echo '</div>' . "\n";

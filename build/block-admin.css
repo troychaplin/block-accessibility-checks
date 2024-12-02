@@ -1,1 +1,57 @@
-.block-a11y-checks-settings{background-color:#fff;border-radius:10px;box-shadow:0 1px 2px 0 rgba(0,0,0,.05);color:#1f1f1f;margin:30px 30px 30px 10px;overflow:hidden}.block-a11y-checks-settings h1{background:#2271b1;color:#fff;margin:0;padding:25px 23px}.block-a11y-checks-settings-form p.submit{margin:0;padding:0 25px 25px}.block-a11y-checks-settings-grid{display:grid;gap:20px;grid-template-columns:repeat(4,minmax(0,1fr));padding:25px}@media(max-width:1536px){.block-a11y-checks-settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:1200px){.block-a11y-checks-settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:960px){.block-a11y-checks-settings-grid{grid-template-columns:repeat(1,minmax(0,1fr))}}.block-a11y-checks-settings-field{background-color:hsla(0,0%,90%,.1);border:1px solid #e6e6e6;border-radius:5px;display:flex;flex-direction:column;gap:15px;padding:20px}.block-a11y-checks-settings-field h2{font-size:18px}.block-a11y-checks-settings-field h2,.block-a11y-checks-settings-field ul{margin:0}.block-check-radio-options{align-items:center;display:flex;font-size:16px;gap:20px}
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/admin.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+.block-a11y-checks-settings {
+  max-width: 1024px;
+  background-color: white;
+  margin: 30px 30px 30px 10px;
+  border-radius: 8px;
+  padding: 14px 32px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.block-a11y-checks-settings h1 {
+  color: #2f2f2f;
+  padding-left: 1px;
+  margin-bottom: 32px;
+}
+
+.block-a11y-checks-settings-grid {
+  display: grid;
+  gap: 25px;
+}
+
+@media (min-width: 768px) {
+  .block-a11y-checks-settings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.block-a11y-checks-settings-field {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e6e6e6;
+  background-color: rgba(230, 230, 230, 0.1);
+  border-radius: 5px;
+  padding: 20px 22px;
+}
+.block-a11y-checks-settings-field h2 {
+  color: #2f2f2f;
+  margin: 0;
+}
+.block-a11y-checks-settings-field ul {
+  margin: 0;
+}
+
+.block-check-radio-options {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.block-a11y-checks-settings-form p.submit {
+  padding: 10px 0;
+}
+.block-a11y-checks-settings-form #submit {
+  padding: 6px 16px;
+}
+
+/*# sourceMappingURL=block-admin.css.map*/
