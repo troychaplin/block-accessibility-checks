@@ -52,6 +52,28 @@ Simply deactivate and delete the plugin.
 3. A simple set of block options
  
 == Changelog ==
+= 1.0.3 =
+
+#### Changed
+
+* Updated dependencies
+
+= 1.0.2 =
+
+#### Added
+
+* Icon and banner image for public release
+* Mike Corkum as contributor
+
+= 1.0.1 =
+
+#### Added
+
+* Add check for core/button text and link
+
+#### Changed
+
+* Updated both readme files
 
 = 1.0 =
 

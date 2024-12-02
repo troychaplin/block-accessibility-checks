@@ -15,25 +15,16 @@
  * @package           block-accessibility-checks
  */
 
-/**
- * Checks if the constant ABSPATH is defined and terminates the script if not.
- *
- * @return void
- */
+// Prevent direct access to the file.
 if (! defined('ABSPATH')) exit;
 
-/**
- * Defines the version of the block-accessibility-checks plugin.
- *
- * @var string BLOCK_ACCESSIBILITY_VERSION
- */
+// Defines the version of the Block Accessibility Checks plugin.
 define('BLOCK_ACCESSIBILITY_VERSION', '1.0.3');
 
-/**
- * This file is responsible for including the necessary autoload file.
- */
+// This file is responsible for including the necessary autoload file.
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Imports the necessary classes for the plugin.
 use BlockAccessibility\BlockConfig;
 use BlockAccessibility\ScriptsStyles;
 use BlockAccessibility\SettingsPage;
