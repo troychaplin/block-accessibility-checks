@@ -18,7 +18,7 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
-- Made editor notice be less obtrusive
+- Redesigned editor notice be less obtrusive, added icon
 - Moved error message to InspectorControls
 - Removed individual SCSS files
 - Updated README and Changelog
