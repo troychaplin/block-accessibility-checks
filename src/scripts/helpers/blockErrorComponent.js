@@ -1,6 +1,8 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
+import { InspectorControls } from '@wordpress/block-editor';
+import { PanelBody, PanelRow } from '@wordpress/components';
 
 import { checkButtonAttributes } from '../blockChecks/checkButton';
 import { checkHeadingLevel } from '../blockChecks/checkHeading';
@@ -60,43 +62,60 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 				};
 		}
 
-		// If validation mode is 'none' or the block is valid, return the block as is
-		if (validationResult.mode === 'none' || validationResult.isValid) {
-			return <BlockEdit {...props} />;
+		// Determine the message based on the validation result
+		let message = '';
+		if (validationResult.message) {
+			message = validationResult.message;
+		} else if (validationResult.mode === 'error') {
+			message = __(
+				'Accessibility Error: This block does not meet accessibility standards.',
+				'block-accessibility-checks'
+			);
+		} else if (validationResult.mode === 'warning') {
+			message = __(
+				'Accessibility Warning: This block may have accessibility issues.',
+				'block-accessibility-checks'
+			);
 		}
 
-		// Wrap the block with error/warning messages based on validation mode
-		const wrapperClass =
-			validationResult.mode === 'error'
-				? 'a11y-block-error'
-				: 'a11y-block-warning';
-
-		// Use the message from the validation result or fall back to a generic message
-		const message =
-			validationResult.message ||
-			(validationResult.mode === 'error'
-				? __(
-						'Accessibility Error: This block does not meet accessibility standards.',
-						'block-accessibility-checks'
-					)
-				: __(
-						'Accessibility Warning: This block may have accessibility issues.',
-						'block-accessibility-checks'
-					));
-
 		return (
-			<div className={wrapperClass}>
-				<p
-					className={
-						validationResult.mode === 'error'
-							? 'a11y-error-msg'
-							: 'a11y-warning-msg'
-					}
-				>
-					{message}
-				</p>
-				<BlockEdit {...props} />
-			</div>
+			<>
+				{validationResult.mode !== 'none' && (
+					<div
+						className={
+							validationResult.mode === 'error'
+								? 'a11y-block-error'
+								: 'a11y-block-warning'
+						}
+					>
+						<BlockEdit {...props} />
+					</div>
+				)}
+				{validationResult.mode === 'none' && <BlockEdit {...props} />}
+				{validationResult.mode !== 'none' && (
+					<InspectorControls>
+						<PanelBody
+							title={__(
+								'Accessibility Check',
+								'block-accessibility-checks'
+							)}
+							initialOpen={true}
+						>
+							<PanelRow>
+								<p
+									className={
+										validationResult.mode === 'error'
+											? 'a11y-error-msg'
+											: 'a11y-warning-msg'
+									}
+								>
+									{message}
+								</p>
+							</PanelRow>
+						</PanelBody>
+					</InspectorControls>
+				)}
+			</>
 		);
 	};
 }, 'withErrorHandling');

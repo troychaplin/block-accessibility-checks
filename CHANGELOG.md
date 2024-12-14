@@ -18,7 +18,10 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
-- Updated readme changelogs
+- Made editor notice be less obtrusive
+- Moved error message to InspectorControls
+- Removed individual SCSS files
+- Updated README and Changelog
 - Updated dependencies
 
 ## [1.0.3]
@@ -42,7 +45,7 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
-- Updated both readme files
+- Updated both README files
 
 ## [1.0.0]
 

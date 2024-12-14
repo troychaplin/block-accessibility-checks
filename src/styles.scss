@@ -1,2 +1,60 @@
-@import "./styles/error.scss";
-@import "./styles/warning.scss";
+.a11y-block-warning,
+.a11y-block-error {
+	position: relative;
+}
+
+.a11y-block-warning:after,
+.a11y-block-error:after {
+	content: "";
+	position: absolute;
+	top: -5px;
+	bottom: -5px;
+	left: -50px;
+	width: 25px;
+}
+
+.a11y-block-warning:after {
+	background-color: #fff15320;
+	border-left: 3px solid #fff153;
+}
+
+.a11y-block-error:after {
+	background-color: #e8230010;
+	border-left: 3px solid #e82300;
+}
+
+.a11y-warning-msg,
+.a11y-error-msg {
+	color: #000000;
+	margin-top: 0;
+	padding: 10px 10px 10px 12px;
+}
+
+.a11y-warning-msg {
+	background-color: #fff47f20;
+	border-left: 3px solid #fff47f;
+}
+
+.a11y-error-msg {
+	background-color: #e8230015;
+	border-left: 3px solid #e82300;
+}
+
+/* Remove bottom spacing from block being wrapped */
+.a11y-block-warning > *:first-child,
+.a11y-block-error > *:first-child {
+	margin-top: 0;
+}
+
+/* Remove bottom spacing from block being wrapped */
+.a11y-block-warning > *:last-child,
+.a11y-block-error > *:last-child {
+	margin-bottom: 0;
+}
+
+// Mystery, remove this and no styles work??
+
+.a11y-block-error .wp-block-heading {
+	padding-top: 0;
+	padding-bottom: 0;
+}
