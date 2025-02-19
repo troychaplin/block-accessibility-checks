@@ -17,9 +17,9 @@ class SettingsPage
             'function_name' => 'renderCoreButtonOptions',
         ],
         [
-            'option_name' => 'coreHeadingBlockCheck',
+            'option_name' => 'coreHeadingLevels',
             'block_label' => 'Core Heading Block',
-            'description' => 'How strict do you want to be with the core/heading block?',
+            'description' => 'Select which heading levels you want to remove from the editor. Checked levels will not be available.',
             'function_name' => 'renderCoreHeadingOptions',
         ],
         [
@@ -136,7 +136,22 @@ class SettingsPage
 
     public function renderCoreHeadingOptions()
     {
-        $this->renderBlockOptionsFromConfig('coreHeadingBlockCheck');
+        $options = get_option('block_checks_options');
+        $heading_levels = isset($options['coreHeadingLevels']) ? $options['coreHeadingLevels'] : ['h1']; // Default to h1 checked
+
+        echo '<ul class="block-check-checkbox-options">';
+        for ($i = 1; $i <= 6; $i++) {
+            $checked = in_array("h{$i}", $heading_levels) ? 'checked' : '';
+            echo '<li>';
+            echo '<input type="checkbox" 
+                         id="heading-level-' . $i . '" 
+                         name="block_checks_options[coreHeadingLevels][]" 
+                         value="h' . $i . '" 
+                         ' . $checked . '>';
+            echo '<label for="heading-level-' . $i . '">H' . $i . '</label>';
+            echo '</li>';
+        }
+        echo '</ul>';
     }
 
     public function renderCoreImageOptions()

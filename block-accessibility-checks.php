@@ -26,6 +26,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Imports the necessary classes for the plugin.
 use BlockAccessibility\BlockConfig;
+use BlockAccessibility\HeadingLevels;
 use BlockAccessibility\ScriptsStyles;
 use BlockAccessibility\SettingsPage;
 use BlockAccessibility\Translations;
@@ -41,38 +42,29 @@ $pluginFile = __FILE__;
 $textDomain = 'block-accessibility-checks';
 
 /**
- * Initializes the translations for the plugin.
- *
- * @param string $pluginFile The path to the main plugin file.
- * @param string $textDomain The text domain for the translations.
- * @return void
+ * Initialize translations first since other classes might need it
  */
 $translations = new Translations($pluginFile, $textDomain);
 add_action('plugins_loaded', [$translations, 'loadTextDomain']);
 
 /**
+ * Retrieves the block configuration instance and gets the block configuration.
+ */
+$blockConfig = BlockConfig::getInstance()->getBlockConfig();
+
+/**
+ * Initialize heading levels restrictions
+ */
+$headingLevels = new HeadingLevels();
+
+/**
  * Enqueues block and admin assets for the accessibility checks plugin.
- *
- * @param string $pluginFile The path to the main plugin file.
- * @param array $translations An array of translations for the plugin.
- * @return void
  */
 $scriptsStyles = new ScriptsStyles($pluginFile, $translations);
 add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueBlockAssets']);
 add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
 
 /**
- * Creates a new instance of the SettingsPage class.
- *
- * @param string $pluginFile The file path of the plugin.
- * @param array $translations An array of translations for the plugin.
- * @return SettingsPage The newly created SettingsPage object.
+ * Initialize settings page
  */
-$settingsPage = new SettingsPage($pluginFile, $translations);
-
-/**
- * Retrieves the block configuration instance and gets the block configuration.
- *
- * @return BlockConfig The block configuration instance.
- */
-$blockConfig = BlockConfig::getInstance()->getBlockConfig();
+$settingsPage = new SettingsPage();

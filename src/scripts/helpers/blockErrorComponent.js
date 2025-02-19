@@ -6,7 +6,6 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
 
 import { checkButtonAttributes } from '../blockChecks/checkButton';
-import { checkHeadingLevel } from '../blockChecks/checkHeading';
 import { checkImageAlt } from '../blockChecks/checkImage';
 import { checkTableHeaderRow } from '../blockChecks/checkTable';
 
@@ -62,15 +61,12 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 							clientId,
 						});
 						break;
-					case 'core/heading':
-						result = checkHeadingLevel({
+					case 'core/image':
+						result = checkImageAlt({
 							name,
 							attributes,
 							clientId,
 						});
-						break;
-					case 'core/image':
-						result = checkImageAlt({ name, attributes, clientId });
 						break;
 					case 'core/table':
 						result = checkTableHeaderRow({

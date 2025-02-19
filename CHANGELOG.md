@@ -23,6 +23,8 @@ Prefix the change with one of these keywords:
 - Removed individual SCSS files
 - Updated README and Changelog
 - Updated dependencies
+- Replaced heading level validation with direct heading level restrictions in the editor
+- Updated settings page to allow selection of which heading levels to remove from the editor
 
 ### Fixed
 
