@@ -32,7 +32,7 @@ class BlockConfig
       ],
       [
         'function_name' => 'renderCoreHeadingOptions',
-        'option_name'   => 'coreHeadingBlockCheck',
+        'option_name'   => 'coreHeadingLevels',
         'block_label'   => esc_html__('Heading', 'block-accessibility-checks'),
       ],
       [
