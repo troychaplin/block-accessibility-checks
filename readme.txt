@@ -47,11 +47,27 @@ These options will be automatically applied to existing blocks throughout your s
 Simply deactivate and delete the plugin. 
 
 == Screenshots ==
-1. Heading block not meeting accessibility requirements for publishing
-2. Heading block providing an warning that the block may not be accessibility 
-3. A simple set of block options
+1. Core table block not meeting accessibility requirements for publishing
+2. Image block providing a warning that the block may not meet accessibility requirements
+3. A customized set of heading levels removed from the editor
+4. Plugin options page with various block accessibility options
  
 == Changelog ==
+= 1.0.4 =
+#### Changed
+
+* Redesigned editor notice be less obtrusive, added icon to left of block
+* Moved error message to InspectorControls
+* Removed individual SCSS files
+* Updated README and Changelog
+* Updated dependencies
+* Replaced heading level validation with direct heading level restrictions in the editor
+* Updated settings page to allow selection of which heading levels to remove from the editor
+
+#### Fixed
+
+* Added timeout to image alt check to prevent change of focus
+
 = 1.0.3 =
 
 #### Changed
