@@ -24,6 +24,10 @@ Prefix the change with one of these keywords:
 - Updated README and Changelog
 - Updated dependencies
 
+### Fixed
+
+- Added timeout to image alt check to prevent change of focus
+
 ## [1.0.3]
 
 ### Changed
