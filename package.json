@@ -1,6 +1,6 @@
 {
 	"name": "block-accessibility-checks",
-	"version": "1.0.3",
+	"version": "1.1.0",
 	"description": "Add block checks in the editor to support publishing accessible content",
 	"author": "Troy Chaplin",
 	"license": "GPL-2.0-or-later",

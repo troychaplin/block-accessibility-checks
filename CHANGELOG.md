@@ -16,6 +16,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.1.0]
+
 ### Changed
 
 - Redesigned editor notice be less obtrusive, added icon
