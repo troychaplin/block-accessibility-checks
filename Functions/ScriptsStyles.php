@@ -73,7 +73,7 @@ class ScriptsStyles {
 			$script_handle,
 			plugins_url( $script_path, $this->pluginFile ),
 			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ),
-			BLOCK_ACCESSIBILITY_VERSION, // Use the constant here
+			BLOCK_ACCESSIBILITY_VERSION,
 			true
 		);
 
@@ -105,12 +105,28 @@ class ScriptsStyles {
 	 */
 	private function enqueueBlockStyles() {
 		$style_path = 'build/block-checks.css';
+
+		// Enqueue the main stylesheet
 		wp_enqueue_style(
 			'block-checks-style',
 			plugins_url( $style_path, $this->pluginFile ),
 			array(),
 			BLOCK_ACCESSIBILITY_VERSION
 		);
+
+		// Dynamically generate the SVG URLs
+		$warning_icon_url = plugins_url( 'src/assets/universal-access-warning.svg', $this->pluginFile );
+		$error_icon_url   = plugins_url( 'src/assets/universal-access-error.svg', $this->pluginFile );
+
+		// Add the SVG URLs as CSS variables for warning and error icons
+		$inline_css = "
+			:root {
+				--a11y-warning-icon: url('{$warning_icon_url}');
+				--a11y-error-icon: url('{$error_icon_url}');
+			}
+		";
+
+		wp_add_inline_style( 'block-checks-style', $inline_css );
 	}
 
 	/**
