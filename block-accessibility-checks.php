@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Defines the version of the Block Accessibility Checks plugin.
-define( 'BLOCK_ACCESSIBILITY_VERSION', '1.1.0' );
+define( 'BLOCK_ACCESSIBILITY_CHECKS_VERSION', '1.1.0' );
 
 // This file is responsible for including the necessary autoload file.
 require_once __DIR__ . '/vendor/autoload.php';
@@ -35,41 +35,41 @@ use BlockAccessibility\Translations;
 
 /**
  * This file is located at /Users/troychaplin/Develop/wp-contribute/block-accessibility-checks/block-accessibility-checks.php.
- * It defines the variables $pluginFile and $textDomain.
+ * It defines the variables $plugin_file and $text_domain.
  *
- * @var string $pluginFile The path of the current plugin file.
- * @var string $textDomain The text domain for translation.
+ * @var string $plugin_file The path of the current plugin file.
+ * @var string $text_domain The text domain for translation.
  */
-$pluginFile = __FILE__;
-$textDomain = 'block-accessibility-checks';
+$plugin_file = __FILE__;
+$text_domain = 'block-accessibility-checks';
 
 /**
  * Initialize translations first since other classes might need it
  */
-$translations = new Translations( $pluginFile, $textDomain );
+$translations = new Translations( $plugin_file, $text_domain );
 add_action(
 	'plugins_loaded',
-	array( $translations, 'loadTextDomain' )
+	array( $translations, 'load_text_domain' )
 );
 
 /**
  * Retrieves the block configuration instance and gets the block configuration.
  */
-$blockConfig = BlockConfig::getInstance()->getBlockConfig();
+$block_config = BlockConfig::get_instance()->get_block_config();
 
 /**
  * Initialize heading levels restrictions
  */
-$headingLevels = new HeadingLevels();
+$heading_levels = new HeadingLevels();
 
 /**
  * Enqueues block and admin assets for the accessibility checks plugin.
  */
-$scriptsStyles = new ScriptsStyles( $pluginFile, $translations );
-add_action( 'enqueue_block_editor_assets', array( $scriptsStyles, 'enqueueBlockAssets' ) );
-add_action( 'admin_enqueue_scripts', array( $scriptsStyles, 'enqueueAdminAssets' ) );
+$scripts_styles = new ScriptsStyles( $plugin_file, $translations );
+add_action( 'enqueue_block_editor_assets', array( $scripts_styles, 'enqueue_block_assets' ) );
+add_action( 'admin_enqueue_scripts', array( $scripts_styles, 'enqueue_admin_assets' ) );
 
 /**
  * Initialize settings page
  */
-$settingsPage = new SettingsPage();
+$settings_page = new SettingsPage();

@@ -19,7 +19,7 @@
 
     <!-- Rules: WordPress Coding Standards -->
     <config name="minimum_supported_wp_version" value="6.6"/>
-    <config name="text_domain" value="multi-block-mayhem"/>
+    <config name="text_domain" value="block-accessibility-checks"/>
     
     <rule ref="WordPress">
         <exclude name="WordPress.Files.FileName"/>
@@ -41,7 +41,7 @@
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
             <property name="prefixes" type="array">
-                <element value="Multi_Block_Mayhem"/>
+                <element value="BlockAccessibility"/>
             </property>
         </properties>
     </rule>

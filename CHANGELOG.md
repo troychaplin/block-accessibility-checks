@@ -16,6 +16,14 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Changed
+
+- Lint and format tools to handle WPCS for PHP, JS and CSS
+
+### Fixed
+
+- Lint errors related to PHP, JS and CSS
+
 ## [1.1.0]
 
 ### Changed

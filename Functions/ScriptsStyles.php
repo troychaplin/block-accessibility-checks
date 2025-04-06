@@ -1,27 +1,47 @@
 <?php
-
 /**
+ * Namespace declaration for the BlockAccessibility plugin.
  *
- * The ScriptsStyles class is responsible for enqueueing block assets and admin assets.
+ * This namespace is used to encapsulate all functionality related to
+ * the Block Accessibility Checks plugin, ensuring that classes, functions,
+ * and constants do not conflict with other plugins or themes.
  *
  * @package BlockAccessibility
  */
 
 namespace BlockAccessibility;
 
+/**
+ * Class ScriptsStyles
+ *
+ * This class is responsible for managing the registration and enqueueing
+ * of scripts and styles within the Block Accessibility Checks plugin.
+ *
+ * @package BlockAccessibilityChecks
+ */
 class ScriptsStyles {
+	/**
+	 * The path to the plugin file.
+	 *
+	 * @var string
+	 */
+	private $plugin_file;
 
-	private $pluginFile;
+	/**
+	 * The translations object.
+	 *
+	 * @var Translations
+	 */
 	private $translations;
 
 	/**
 	 * Constructs a new instance of the ScriptsStyles class.
 	 *
-	 * @param string       $pluginFile The path to the plugin file.
+	 * @param string       $plugin_file The path to the plugin file.
 	 * @param Translations $translations The translations object.
 	 */
-	public function __construct( $pluginFile, Translations $translations ) {
-		$this->pluginFile   = $pluginFile;
+	public function __construct( $plugin_file, Translations $translations ) {
+		$this->plugin_file  = $plugin_file;
 		$this->translations = $translations;
 	}
 
@@ -33,12 +53,12 @@ class ScriptsStyles {
 	 *
 	 * @return void
 	 */
-	public function enqueueBlockAssets() {
+	public function enqueue_block_assets() {
 		$script_handle = 'block-accessibility-script';
-		$this->translations->setupScriptTranslations( $script_handle );
+		$this->translations->setup_script_translations( $script_handle );
 
-		$this->enqueueBlockScripts();
-		$this->enqueueBlockStyles();
+		$this->enqueue_block_scripts();
+		$this->enqueue_block_styles();
 	}
 
 	/**
@@ -49,11 +69,11 @@ class ScriptsStyles {
 	 *
 	 * @return void
 	 */
-	public function enqueueAdminAssets() {
+	public function enqueue_admin_assets() {
 		$script_handle = 'block-accessibility-script';
-		$this->translations->setupScriptTranslations( $script_handle );
+		$this->translations->setup_script_translations( $script_handle );
 
-		$this->enqueueAdminStyles();
+		$this->enqueue_admin_styles();
 	}
 
 	/**
@@ -65,15 +85,15 @@ class ScriptsStyles {
 	 * @access private
 	 * @return void
 	 */
-	private function enqueueBlockScripts() {
+	private function enqueue_block_scripts() {
 		$script_path   = 'build/block-checks.js';
 		$script_handle = 'block-accessibility-script';
 
 		wp_enqueue_script(
 			$script_handle,
-			plugins_url( $script_path, $this->pluginFile ),
+			plugins_url( $script_path, $this->plugin_file ),
 			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ),
-			BLOCK_ACCESSIBILITY_VERSION,
+			BLOCK_ACCESSIBILITY_CHECKS_VERSION,
 			true
 		);
 
@@ -89,7 +109,7 @@ class ScriptsStyles {
 			'BlockAccessibilityChecks',
 			array(
 				'blockChecksOptions' => $block_checks_options,
-				'blocks'             => BlockConfig::getInstance()->getBlockConfig(),
+				'blocks'             => BlockConfig::get_instance()->get_block_config(),
 			)
 		);
 	}
@@ -103,22 +123,22 @@ class ScriptsStyles {
 	 * @access private
 	 * @return void
 	 */
-	private function enqueueBlockStyles() {
+	private function enqueue_block_styles() {
 		$style_path = 'build/block-checks.css';
 
-		// Enqueue the main stylesheet
+		// Enqueue the main stylesheet.
 		wp_enqueue_style(
 			'block-checks-style',
-			plugins_url( $style_path, $this->pluginFile ),
+			plugins_url( $style_path, $this->plugin_file ),
 			array(),
-			BLOCK_ACCESSIBILITY_VERSION
+			BLOCK_ACCESSIBILITY_CHECKS_VERSION
 		);
 
-		// Dynamically generate the SVG URLs
-		$warning_icon_url = plugins_url( 'src/assets/universal-access-warning.svg', $this->pluginFile );
-		$error_icon_url   = plugins_url( 'src/assets/universal-access-error.svg', $this->pluginFile );
+		// Dynamically generate the SVG URLs.
+		$warning_icon_url = plugins_url( 'src/assets/universal-access-warning.svg', $this->plugin_file );
+		$error_icon_url   = plugins_url( 'src/assets/universal-access-error.svg', $this->plugin_file );
 
-		// Add the SVG URLs as CSS variables for warning and error icons
+		// Add the SVG URLs as CSS variables for warning and error icons.
 		$inline_css = "
 			:root {
 				--a11y-warning-icon: url('{$warning_icon_url}');
@@ -137,13 +157,13 @@ class ScriptsStyles {
 	 *
 	 * @access private
 	 */
-	private function enqueueAdminStyles() {
+	private function enqueue_admin_styles() {
 		$style_path = 'build/block-admin.css';
 		wp_enqueue_style(
 			'block-checks-admin',
-			plugins_url( $style_path, $this->pluginFile ),
+			plugins_url( $style_path, $this->plugin_file ),
 			array(),
-			BLOCK_ACCESSIBILITY_VERSION
+			BLOCK_ACCESSIBILITY_CHECKS_VERSION
 		);
 	}
 }
