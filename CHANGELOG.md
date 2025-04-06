@@ -19,6 +19,7 @@ Prefix the change with one of these keywords:
 ### Changed
 
 - Lint and format tools to handle WPCS for PHP, JS and CSS
+- Added proper escaping in PHP templates
 
 ### Fixed
 
