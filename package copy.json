@@ -1,0 +1,38 @@
+{
+	"name": "block-accessibility-checks",
+	"version": "1.1.0",
+	"description": "Add block checks in the editor to support publishing accessible content",
+	"author": "Troy Chaplin",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"clean": "rm -rf node_modules ; rm package-lock.json ; npm install",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts build && wp-scripts plugin-zip",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.26.9",
+		"@babel/preset-env": "^7.26.9",
+		"@babel/preset-react": "^7.26.3",
+		"@commitlint/cli": "^19.7.1",
+		"@commitlint/config-conventional": "^19.7.1",
+		"@wordpress/block-editor": "^14.13.0",
+		"@wordpress/components": "^29.4.0",
+		"@wordpress/compose": "^7.18.0",
+		"@wordpress/data": "^10.18.0",
+		"@wordpress/element": "^6.18.0",
+		"@wordpress/env": "^10.18.0",
+		"@wordpress/hooks": "^4.18.0",
+		"@wordpress/i18n": "^5.18.0",
+		"@wordpress/plugins": "^7.18.0",
+		"@wordpress/prettier-config": "^4.18.0",
+		"@wordpress/scripts": "^30.11.0",
+		"husky": "^9.1.7"
+	}
+}

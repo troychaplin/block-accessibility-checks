@@ -1,18 +1,31 @@
-#!/bin/sh
-# . "$(dirname "$0")/_/husky.sh"
+# Exit immediately if a command exits with a non-zero status
+set -e
 
 # Run the format command
+echo ""
+echo "\033[0;31mRunning format command...\033[0m"
 npm run format
+
+# Run the lint command
+echo ""
+echo "\033[0;31mRunning lint:js command...\033[0m"
+npm run lint:js
+
+# Run the build command
+echo ""
+echo "\033[0;31mRunning build command...\033[0m"
+npm run build
 
 # Check if there are any changes in the working directory
 if [ -n "$(git status --porcelain)" ]; then
+  echo ""
+  echo "\033[0;31mStaging changes...\033[0m"
   git add -u
   echo ""
-  echo "\033[0;31mChecking and updating file formatting...\033[0m"
+  echo "\033[0;34mFiles are formatted, linted and clean build files have been generated.\033[0m"
   echo ""
-  echo "\033[0;32mFiles are properly formatted. You can now commit your changes.\033[0m"
+  echo "\033[0;32mYou can now push your changes.\033[0m"
   echo ""
+else
+  echo "\033[0;32mNo changes detected. Everything is up to date.\033[0m"
 fi
-
-# If no changes, continue with the other tasks
-npm run lint:js && npm run build

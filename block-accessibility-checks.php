@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name:       Block Accessibility Checks
- * Description:       Add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
+ * Description:       Add plugin that add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
  * Requires at least: 6.3
  * Requires PHP:      7.0
  * Version:           1.1.0
@@ -16,10 +16,12 @@
  */
 
 // Prevent direct access to the file.
-if (! defined('ABSPATH')) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // Defines the version of the Block Accessibility Checks plugin.
-define('BLOCK_ACCESSIBILITY_VERSION', '1.1.0');
+define( 'BLOCK_ACCESSIBILITY_VERSION', '1.1.0' );
 
 // This file is responsible for including the necessary autoload file.
 require_once __DIR__ . '/vendor/autoload.php';
@@ -44,8 +46,11 @@ $textDomain = 'block-accessibility-checks';
 /**
  * Initialize translations first since other classes might need it
  */
-$translations = new Translations($pluginFile, $textDomain);
-add_action('plugins_loaded', [$translations, 'loadTextDomain']);
+$translations = new Translations( $pluginFile, $textDomain );
+add_action(
+	'plugins_loaded',
+	array( $translations, 'loadTextDomain' )
+);
 
 /**
  * Retrieves the block configuration instance and gets the block configuration.
@@ -60,9 +65,9 @@ $headingLevels = new HeadingLevels();
 /**
  * Enqueues block and admin assets for the accessibility checks plugin.
  */
-$scriptsStyles = new ScriptsStyles($pluginFile, $translations);
-add_action('enqueue_block_editor_assets', [$scriptsStyles, 'enqueueBlockAssets']);
-add_action('admin_enqueue_scripts', [$scriptsStyles, 'enqueueAdminAssets']);
+$scriptsStyles = new ScriptsStyles( $pluginFile, $translations );
+add_action( 'enqueue_block_editor_assets', array( $scriptsStyles, 'enqueueBlockAssets' ) );
+add_action( 'admin_enqueue_scripts', array( $scriptsStyles, 'enqueueAdminAssets' ) );
 
 /**
  * Initialize settings page

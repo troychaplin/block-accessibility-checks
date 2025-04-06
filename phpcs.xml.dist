@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress Plugin Coding Standards">
+    <description>A custom set of rules to check for a WordPress plugin</description>
+
+    <!-- What to scan -->
+    <file>.</file>
+    <exclude-pattern>/build/</exclude-pattern>
+    <exclude-pattern>/node_modules/</exclude-pattern>
+    <exclude-pattern>/vendor/</exclude-pattern>
+	<exclude-pattern>src/blocks-manifest.php</exclude-pattern>
+	<exclude-pattern>src/blocks/examples/</exclude-pattern>
+
+    <!-- How to scan -->
+    <arg value="sp"/>
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+
+    <!-- Rules: WordPress Coding Standards -->
+    <config name="minimum_supported_wp_version" value="6.6"/>
+    <config name="text_domain" value="multi-block-mayhem"/>
+    
+    <rule ref="WordPress">
+        <exclude name="WordPress.Files.FileName"/>
+    </rule>
+
+    <rule ref="WordPress-Core">
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="WordPress.Files.FileName" />
+	</rule>
+	
+    <rule ref="WordPress-Docs"/>
+
+	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
+        <properties>
+            <property name="maxColumn" value="80"/>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="Multi_Block_Mayhem"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="multi-block-mayhem"/>
+            </property>
+        </properties>
+    </rule>
+    
+	<rule ref="Generic.Commenting">
+        <exclude name="Generic.Commenting.DocComment.MissingShort" />
+    </rule>
+</ruleset> 

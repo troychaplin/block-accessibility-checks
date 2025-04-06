@@ -1,0 +1,10 @@
+{
+	"autoload": {
+		"psr-4": {
+			"BlockAccessibility\\": "Functions/"
+		}
+	},
+	"config": {
+		"autoloader-suffix": "BlockAccessibility"
+	}
+}

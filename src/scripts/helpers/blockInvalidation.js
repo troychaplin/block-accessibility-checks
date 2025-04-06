@@ -20,7 +20,7 @@ export function BlockInvalidation() {
 	} = useDispatch('core/editor');
 
 	useEffect(() => {
-		const hasErrors = invalidBlocks.some((block) => block.mode === 'error');
+		const hasErrors = invalidBlocks.some(block => block.mode === 'error');
 
 		if (hasErrors) {
 			lockPostSaving();
