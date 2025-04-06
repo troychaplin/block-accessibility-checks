@@ -42,6 +42,7 @@
         <properties>
             <property name="prefixes" type="array">
                 <element value="BlockAccessibility"/>
+                <element value="ba11yc"/>
             </property>
         </properties>
     </rule>
@@ -49,7 +50,7 @@
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" type="array">
-                <element value="multi-block-mayhem"/>
+                <element value="block-accessibility-checks"/>
             </property>
         </properties>
     </rule>

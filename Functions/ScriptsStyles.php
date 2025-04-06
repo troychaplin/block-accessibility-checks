@@ -93,7 +93,7 @@ class ScriptsStyles {
 			$script_handle,
 			plugins_url( $script_path, $this->plugin_file ),
 			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ),
-			BLOCK_ACCESSIBILITY_CHECKS_VERSION,
+			BA11YC_VERSION,
 			true
 		);
 
@@ -131,7 +131,7 @@ class ScriptsStyles {
 			'block-checks-style',
 			plugins_url( $style_path, $this->plugin_file ),
 			array(),
-			BLOCK_ACCESSIBILITY_CHECKS_VERSION
+			BA11YC_VERSION
 		);
 
 		// Dynamically generate the SVG URLs.
@@ -163,7 +163,7 @@ class ScriptsStyles {
 			'block-checks-admin',
 			plugins_url( $style_path, $this->plugin_file ),
 			array(),
-			BLOCK_ACCESSIBILITY_CHECKS_VERSION
+			BA11YC_VERSION
 		);
 	}
 }
