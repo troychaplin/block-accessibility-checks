@@ -7,11 +7,7 @@ import { checkButtonAttributes } from './blockChecks/checkButton';
 import { checkImageAlt } from './blockChecks/checkImage';
 import { checkTableHeaderRow } from './blockChecks/checkTable';
 
-export const blockChecksArray = [
-	checkButtonAttributes,
-	checkImageAlt,
-	checkTableHeaderRow,
-];
+export const blockChecksArray = [checkButtonAttributes, checkImageAlt, checkTableHeaderRow];
 
 registerPlugin('block-validation', {
 	render: BlockInvalidation,

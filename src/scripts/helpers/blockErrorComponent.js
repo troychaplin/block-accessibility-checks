@@ -15,8 +15,8 @@ import { checkTableHeaderRow } from '../blockChecks/checkTable';
  * @param {Function} BlockEdit - The block component to wrap with error handling.
  * @return {Function} - The wrapped block component with error handling.
  */
-const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
-	return (props) => {
+const withErrorHandling = createHigherOrderComponent(BlockEdit => {
+	return props => {
 		const { name, attributes, clientId } = props;
 		const [validationResult, setValidationResult] = useState({
 			isValid: true,
@@ -30,10 +30,7 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 			let result;
 
 			// If this is an image block and the alt text changed
-			if (
-				name === 'core/image' &&
-				prevAltRef.current !== attributes.alt
-			) {
+			if (name === 'core/image' && prevAltRef.current !== attributes.alt) {
 				// Clear any existing timeout
 				if (timeoutRef.current) {
 					clearTimeout(timeoutRef.current);
@@ -121,10 +118,7 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 				{validationResult.mode !== 'none' && (
 					<InspectorControls>
 						<PanelBody
-							title={__(
-								'Accessibility Check',
-								'block-accessibility-checks'
-							)}
+							title={__('Accessibility Check', 'block-accessibility-checks')}
 							initialOpen={true}
 						>
 							<PanelRow>
@@ -146,8 +140,4 @@ const withErrorHandling = createHigherOrderComponent((BlockEdit) => {
 	};
 }, 'withErrorHandling');
 
-addFilter(
-	'editor.BlockEdit',
-	'block-accessibility-checks/with-error-handling',
-	withErrorHandling
-);
+addFilter('editor.BlockEdit', 'block-accessibility-checks/with-error-handling', withErrorHandling);

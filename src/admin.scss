@@ -1,6 +1,6 @@
 .block-a11y-checks-settings {
 	max-width: 1024px;
-	background-color: white;
+	background-color: #fff;
 	margin: 30px 30px 30px 10px;
 	border-radius: 8px;
 	padding: 14px 32px;
@@ -19,6 +19,7 @@
 }
 
 @media (min-width: 768px) {
+
 	.block-a11y-checks-settings-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -49,6 +50,7 @@
 }
 
 .block-a11y-checks-settings-form {
+
 	p.submit {
 		padding: 10px 0;
 	}

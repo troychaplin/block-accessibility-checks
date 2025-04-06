@@ -10,7 +10,7 @@ import { ToggleControl, PanelBody } from '@wordpress/components';
  * @param {Object} settings - The settings object.
  * @return {Object} - The modified settings object.
  */
-const addImageAttribute = (settings) => {
+const addImageAttribute = settings => {
 	if (settings.name !== 'core/image') {
 		return settings;
 	}
@@ -37,8 +37,8 @@ addFilter(
  * @param {Function} BlockEdit - The original block editor component.
  * @return {Function} - The modified block editor component.
  */
-const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
-	return (props) => {
+const addImageInspectorControls = createHigherOrderComponent(BlockEdit => {
+	return props => {
 		if (props.name !== 'core/image') {
 			return <BlockEdit {...props} />;
 		}
@@ -50,10 +50,7 @@ const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
 			<>
 				<InspectorControls>
 					<PanelBody
-						title={__(
-							'Accessibility Settings',
-							'block-accessibility-checks'
-						)}
+						title={__('Accessibility Settings', 'block-accessibility-checks')}
 						initialOpen={true}
 					>
 						<ToggleControl
@@ -62,9 +59,7 @@ const addImageInspectorControls = createHigherOrderComponent((BlockEdit) => {
 								'block-accessibility-checks'
 							)}
 							checked={isDecorative}
-							onChange={(value) =>
-								setAttributes({ isDecorative: value })
-							}
+							onChange={value => setAttributes({ isDecorative: value })}
 						/>
 					</PanelBody>
 				</InspectorControls>

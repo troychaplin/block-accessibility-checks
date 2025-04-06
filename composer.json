@@ -1,10 +1,26 @@
 {
+	"name": "troychaplin/block-accessibility-checks",
+	"description": "Add plugin that add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
 	"autoload": {
 		"psr-4": {
 			"BlockAccessibility\\": "Functions/"
 		}
 	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"squizlabs/php_codesniffer": "^3.11",
+		"wp-coding-standards/wpcs": "^3.1"
+	},
 	"config": {
-		"autoloader-suffix": "BlockAccessibility"
+		"autoloader-suffix": "BlockAccessibility",
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"format": "./vendor/bin/phpcbf --standard=phpcs.xml.dist --report-summary --report-source || true",
+		"lint": "phpcs --standard=phpcs.xml.dist"
 	}
 }
