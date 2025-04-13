@@ -104,18 +104,6 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		return (
 			<>
 				{validationResult.mode !== 'none' && (
-					<div
-						className={
-							validationResult.mode === 'error'
-								? 'a11y-block-error'
-								: 'a11y-block-warning'
-						}
-					>
-						<BlockEdit {...props} />
-					</div>
-				)}
-				{validationResult.mode === 'none' && <BlockEdit {...props} />}
-				{validationResult.mode !== 'none' && (
 					<InspectorControls>
 						<PanelBody
 							title={__('Accessibility Check', 'block-accessibility-checks')}
@@ -135,6 +123,18 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 						</PanelBody>
 					</InspectorControls>
 				)}
+				{validationResult.mode !== 'none' && (
+					<div
+						className={
+							validationResult.mode === 'error'
+								? 'a11y-block-error'
+								: 'a11y-block-warning'
+						}
+					>
+						<BlockEdit {...props} />
+					</div>
+				)}
+				{validationResult.mode === 'none' && <BlockEdit {...props} />}
 			</>
 		);
 	};
