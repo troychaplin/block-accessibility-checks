@@ -18,14 +18,14 @@
 }
 
 .a11y-block-warning::after {
-	background-color: #dbc90010;
+	background-color: #fffde2;
 	border-left: 3px solid #dbc900;
 	background-image: var(--a11y-warning-icon);
 
 }
 
 .a11y-block-error::after {
-	background-color: #d8200010;
+	background-color: #ffe4e0;
 	border-left: 3px solid #d82000;
 	background-image: var(--a11y-error-icon);
 }
@@ -39,12 +39,12 @@
 }
 
 .a11y-warning-msg {
-	background-color: #dbc90010;
+	background-color: #fffde2;
 	border-left: 3px solid #dbc900;
 }
 
 .a11y-error-msg {
-	background-color: #d8200010;
+	background-color: #ffe4e0;
 	border-left: 3px solid #d82000;
 }
 
