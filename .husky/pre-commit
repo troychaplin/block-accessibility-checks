@@ -1,4 +1,1 @@
-# Run the lint command
-echo ""
-echo "\033[0;31mRunning lint:js command...\033[0m"
 npm run lint:js
