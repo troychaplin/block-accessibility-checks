@@ -21,6 +21,7 @@ Prefix the change with one of these keywords:
 - Lint and format tools to handle WPCS for PHP, JS and CSS
 - Added proper escaping in PHP templates
 - Translation load order and plugin initialization
+- Tested and bumped compatibility to WordPress 6.8
 
 ### Fixed
 
