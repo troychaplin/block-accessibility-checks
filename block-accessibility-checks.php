@@ -45,28 +45,51 @@ $ba11yc_text_domain = 'block-accessibility-checks';
 /**
  * Initialize translations first since other classes might need it
  */
-$ba11yc_translations = new Translations( $ba11yc_plugin_file, $ba11yc_text_domain );
-add_action(
-	'plugins_loaded',
-	array( $ba11yc_translations, 'load_text_domain' )
-);
+$ba11yc_translations   = null;
+$ba11yc_scripts_styles = null;
+$ba11yc_heading_levels = null;
+$ba11yc_block_config   = null;
 
-/**
- * Retrieves the block configuration instance and gets the block configuration.
- */
-$ba11yc_block_config = BlockConfig::get_instance()->get_block_config();
+function ba11yc_init_plugin() {
+	global $ba11yc_translations, $ba11yc_scripts_styles, $ba11yc_heading_levels, $ba11yc_block_config, $ba11yc_plugin_file, $ba11yc_text_domain;
 
-/**
- * Initialize heading levels restrictions
- */
-$ba11yc_heading_levels = new HeadingLevels();
+	// Initialize translations
+	$ba11yc_translations = new Translations( $ba11yc_plugin_file, $ba11yc_text_domain );
+	$ba11yc_translations->load_text_domain();
+
+	// Initialize scripts and styles
+	$ba11yc_scripts_styles = new ScriptsStyles( $ba11yc_plugin_file, $ba11yc_translations );
+
+	// Initialize block configuration
+	$ba11yc_block_config = BlockConfig::get_instance()->get_block_config();
+
+	// Initialize heading levels
+	$ba11yc_heading_levels = new HeadingLevels();
+}
+add_action( 'init', 'ba11yc_init_plugin' );
 
 /**
  * Enqueues block and admin assets for the accessibility checks plugin.
  */
-$ba11yc_scripts_styles = new ScriptsStyles( $ba11yc_plugin_file, $ba11yc_translations );
-add_action( 'enqueue_block_editor_assets', array( $ba11yc_scripts_styles, 'enqueue_block_assets' ) );
-add_action( 'admin_enqueue_scripts', array( $ba11yc_scripts_styles, 'enqueue_admin_assets' ) );
+add_action(
+	'enqueue_block_editor_assets',
+	function () {
+		global $ba11yc_scripts_styles;
+		if ( $ba11yc_scripts_styles ) {
+			$ba11yc_scripts_styles->enqueue_block_assets();
+		}
+	}
+);
+
+add_action(
+	'admin_enqueue_scripts',
+	function () {
+		global $ba11yc_scripts_styles;
+		if ( $ba11yc_scripts_styles ) {
+			$ba11yc_scripts_styles->enqueue_admin_assets();
+		}
+	}
+);
 
 /**
  * Initialize settings page

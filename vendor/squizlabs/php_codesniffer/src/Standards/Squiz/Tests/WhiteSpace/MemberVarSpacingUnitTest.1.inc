@@ -415,3 +415,32 @@ final class BlankLinesBetweenVsAttributesWithoutCommentIssueSquiz3594
 
     public $property2;
 }
+
+class PHP84FinalProperties {
+    final int $finalA;
+
+    /**
+     * Docblock
+     */
+    public final string $publicfinal;
+    #[AnAttribute]
+    final bool $finalB;
+
+    final private bool $finalPrivate;
+}
+
+class MultilineCommentShouldNotBeSplitUp {
+    // This is the first line
+    // of a multi-line comment
+    // which should be recognized as belonging
+    // with the property.
+    public $prop;
+
+
+    /* This is the first line
+       of a multi-line comment
+       which should be recognized as belonging
+       with the property.
+     */
+    public $prop;
+}

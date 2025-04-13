@@ -20,12 +20,15 @@
 			"git add"
 		]
 	},
+	"files": [
+		"[^.]*"
+	],
 	"scripts": {
 		"build": "wp-scripts build",
 		"start": "wp-scripts start",
 		"format": "npm run format:js && npm run format:php && npm run format:css",
 		"format:js": "wp-scripts lint-js --fix",
-		"format:php": "./vendor/bin/phpcbf --standard=phpcs.xml.dist -v",
+		"format:php": "composer run format",
 		"format:css": "stylelint \"**/*.scss\" --fix",
 		"lint": "npm run lint:js && npm run lint:php && npm run lint:css",
 		"lint:js": "wp-scripts lint-js",
@@ -36,24 +39,21 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"prepare": "husky"
 	},
-	"files": [
-		"[^.]*"
-	],
 	"devDependencies": {
-		"@commitlint/cli": "^19.8.0",
-		"@commitlint/config-conventional": "^19.8.0",
-		"@wordpress/data": "^10.21.0",
-		"@wordpress/element": "^6.21.0",
-		"@wordpress/env": "^10.21.0",
-		"@wordpress/eslint-plugin": "^22.7.0",
-		"@wordpress/i18n": "^5.21.0",
-		"@wordpress/plugins": "^7.18.0",
-		"@wordpress/prettier-config": "^4.21.0",
-		"@wordpress/scripts": "^30.14.0",
-		"@wordpress/stylelint-config": "^23.13.0",
+		"@commitlint/cli": "19.8.0",
+		"@commitlint/config-conventional": "19.8.0",
+		"@wordpress/data": "10.22.0",
+		"@wordpress/element": "6.22.0",
+		"@wordpress/env": "10.22.0",
+		"@wordpress/eslint-plugin": "22.8.0",
+		"@wordpress/i18n": "5.22.0",
+		"@wordpress/plugins": "7.22.0",
+		"@wordpress/prettier-config": "4.22.0",
+		"@wordpress/scripts": "30.15.0",
+		"@wordpress/stylelint-config": "23.14.0",
 		"eslint-config-prettier": "10.1.1",
-		"husky": "^9.1.7",
-		"stylelint": "^16.17.0",
-		"stylelint-scss": "^6.11.1"
+		"husky": "9.1.7",
+		"stylelint": "16.18.0",
+		"stylelint-scss": "6.11.1"
 	}
 }

@@ -55,7 +55,9 @@ class ScriptsStyles {
 	 */
 	public function enqueue_block_assets() {
 		$script_handle = 'block-accessibility-script';
-		$this->translations->setup_script_translations( $script_handle );
+		if ( $this->translations ) {
+			$this->translations->setup_script_translations( $script_handle );
+		}
 
 		$this->enqueue_block_scripts();
 		$this->enqueue_block_styles();
@@ -71,7 +73,9 @@ class ScriptsStyles {
 	 */
 	public function enqueue_admin_assets() {
 		$script_handle = 'block-accessibility-script';
-		$this->translations->setup_script_translations( $script_handle );
+		if ( $this->translations ) {
+			$this->translations->setup_script_translations( $script_handle );
+		}
 
 		$this->enqueue_admin_styles();
 	}
