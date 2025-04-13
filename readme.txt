@@ -3,7 +3,7 @@
 Contributors: areziaal, mikecorkum
 Tags: block, accessibility, a11y, content, tools
 Requires at least: 6.3
-Tested up to: 6.7.1
+Tested up to: 6.8
 Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

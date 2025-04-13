@@ -1,6 +1,6 @@
 /* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
-const validationMode = BlockAccessibilityChecks.blockChecksOptions.coreTableBlockCheck;
+const validationMode = BlockAccessibilityChecks.blockChecksOptions.core_table_block_check;
 
 /**
  * Checks if a table block has a header row.

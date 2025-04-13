@@ -1,6 +1,6 @@
 /* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
-const validationMode = BlockAccessibilityChecks.blockChecksOptions.coreImageBlockCheck;
+const validationMode = BlockAccessibilityChecks.blockChecksOptions.core_image_block_check;
 
 /**
  * Checks if an image block has an alt attribute and is not decorative.

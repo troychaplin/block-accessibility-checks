@@ -7,8 +7,6 @@
     <exclude-pattern>/build/</exclude-pattern>
     <exclude-pattern>/node_modules/</exclude-pattern>
     <exclude-pattern>/vendor/</exclude-pattern>
-	<exclude-pattern>src/blocks-manifest.php</exclude-pattern>
-	<exclude-pattern>src/blocks/examples/</exclude-pattern>
 
     <!-- How to scan -->
     <arg value="sp"/>
@@ -24,6 +22,9 @@
     <rule ref="WordPress">
         <exclude name="WordPress.Files.FileName"/>
     </rule>
+
+    <!-- WordPress Functions -->
+    <rule ref="WordPress.WP.DeprecatedFunctions"/>
 
     <rule ref="WordPress-Core">
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
@@ -54,8 +55,11 @@
             </property>
         </properties>
     </rule>
-    
-	<rule ref="Generic.Commenting">
+
+    <!-- Additional rules -->
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+    <rule ref="Generic.Commenting">
         <exclude name="Generic.Commenting.DocComment.MissingShort" />
     </rule>
 </ruleset> 

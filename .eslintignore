@@ -1,6 +1,3 @@
 /build/
 /vendor/
 /node_modules/
-/src/blocks/examples/
-*.css
-*.scss
