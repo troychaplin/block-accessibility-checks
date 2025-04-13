@@ -1,6 +1,6 @@
 /* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
-const validationMode = BlockAccessibilityChecks.blockChecksOptions.coreButtonBlockCheck;
+const validationMode = BlockAccessibilityChecks.blockChecksOptions.core_button_block_check;
 
 /**
  * Checks the heading level of a block.
