@@ -23,6 +23,7 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+- Moved message location above block options
 - Lint and format tools to handle WPCS for PHP, JS and CSS
 - Added proper escaping in PHP templates
 - Translation load order and plugin initialization
