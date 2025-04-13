@@ -3,7 +3,7 @@
         'name' => 'troychaplin/block-accessibility-checks',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '0a7265335da512b6af41999ba8ecb7da9ef04cce',
+        'reference' => 'c5a361e46bd9b4a86f3c85b6a87085396566787f',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -49,7 +49,7 @@
         'troychaplin/block-accessibility-checks' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '0a7265335da512b6af41999ba8ecb7da9ef04cce',
+            'reference' => 'c5a361e46bd9b4a86f3c85b6a87085396566787f',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
