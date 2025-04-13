@@ -65,11 +65,13 @@ TODO: add git issue templates
 
 The following is a list of checks that are happening on core blocks.
 
-| Block        | Description                                                                     |
-| ------------ | ------------------------------------------------------------------------------- |
-| core/button  | Checks for text and link on each button                                         |
-| core/heading | Prevents the usage of an level one heading in the content                       |
-| core/gallery | Checks for alternative text on an image                                         |
-| core/image   | Checks for alternative text on an image                                         |
-| core/image   | Adds a toggle to confirm image use as decorative allowing for bypass a11y check |
-| core/table   | Checks for a table header row on each individual table block                    |
+| Block        | Description                                                              |
+| ------------ | ------------------------------------------------------------------------ |
+| core/button  | Checks for text and link on each button                                  |
+| core/heading | Configurable option allows removal of any heading level                  |
+| core/gallery | Leverages all core/image block checks                                    |
+| core/image   | Checks for alternative text on an image                                  |
+| core/image   | Adds option to confirm image as decorative element and bypass a11y check |
+| core/image   | Checks if alternative text on an image exceeds 125 characters            |
+| core/image   | Checks if alternative text on an image matches the caption text          |
+| core/table   | Checks for a table header row on each individual table block             |

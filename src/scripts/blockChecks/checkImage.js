@@ -62,11 +62,13 @@ export function checkImageAlt(block) {
 			switch (validationMode) {
 				case 'error':
 					response.isValid = false;
-					response.message = __('Error:', 'block-accessibility-checks') + errorMessage;
+					response.message =
+						__('Error:', 'block-accessibility-checks') + ' ' + errorMessage;
 					break;
 				case 'warning':
 					response.isValid = false;
-					response.message = __('Warning:', 'block-accessibility-checks') + errorMessage;
+					response.message =
+						__('Warning:', 'block-accessibility-checks') + ' ' + errorMessage;
 					break;
 				case 'none':
 				default:

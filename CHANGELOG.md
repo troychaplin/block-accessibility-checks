@@ -16,6 +16,11 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- Condition on image block to check if more than 125 characters are used
+- Condition on image block to check if alt text matches caption text
+
 ### Changed
 
 - Lint and format tools to handle WPCS for PHP, JS and CSS
