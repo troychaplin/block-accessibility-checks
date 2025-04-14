@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: block, accessibility, a11y, content, tools
 Requires at least: 6.3
 Tested up to: 6.8
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,10 +17,12 @@ Accessibility is a crucial aspect of web content creation. Many organizations mu
 The following is a list of checks that are configurable for core blocks. Each check can be set to error (default), warning or none.
 
 * core/button: Checks for text and link on each button
-* core/heading: Prevents the usage of an level one heading in the content
-* core/gallery: Checks for alternative text on an image
+* core/heading: Configurable option allows removal of any heading level
+* core/gallery: Leverages all core/image block checks
 * core/image: Checks for alternative text on an image
-* core/image: Adds a toggle to confirm image use as decorative allowing for bypass accessibility check
+* core/image: Adds option to confirm image as decorative element and bypass a11y check
+* core/image: Checks if alternative text on an image exceeds 125 characters
+* core/image: Checks if alternative text on an image matches the caption text
 * core/table: Checks for a table header row on each individual table block
 
 == Installation ==
@@ -53,6 +55,12 @@ Simply deactivate and delete the plugin.
 4. Plugin options page with various block accessibility options
  
 == Changelog ==
+= 1.2.1 =
+
+#### Fied
+
+* Issue where heading level one was a fallback in settings
+
 = 1.2.0 =
 
 #### Added

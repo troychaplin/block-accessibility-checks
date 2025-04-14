@@ -16,6 +16,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Fied
+
+- Issue where heading level one was a fallback in settings
+
 ## [1.2.0]
 
 ### Added
