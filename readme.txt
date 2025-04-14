@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: block, accessibility, a11y, content, tools
 Requires at least: 6.3
 Tested up to: 6.8
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,25 @@ Simply deactivate and delete the plugin.
 4. Plugin options page with various block accessibility options
  
 == Changelog ==
+= 1.2.0 =
+
+#### Added
+
+* Condition on image block to check if more than 125 characters are used
+* Condition on image block to check if alt text matches caption text
+
+#### Changed
+
+* Moved message location above block options
+* Lint and format tools to handle WPCS for PHP, JS and CSS
+* Added proper escaping in PHP templates
+* Translation load order and plugin initialization
+* Tested and bumped compatibility to WordPress 6.8
+
+#### Fixed
+
+* Lint errors related to PHP, JS and CSS
+
 = 1.1.0 =
 #### Changed
 
