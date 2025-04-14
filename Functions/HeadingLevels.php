@@ -48,7 +48,7 @@ class HeadingLevels {
 		}
 
 		$options           = get_option( 'block_checks_options' );
-		$restricted_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array( 'h1' );
+		$restricted_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
 
 		// Create array of available levels (1-6).
 		$available_levels = range( 1, 6 );

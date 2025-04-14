@@ -215,7 +215,7 @@ class SettingsPage {
 	 */
 	public function render_core_heading_options() {
 		$options        = get_option( 'block_checks_options' );
-		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array( 'h1' );
+		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
 
 		echo '<ul class="block-check-checkbox-options">';
 		for ( $i = 1; $i <= 6; $i++ ) {
