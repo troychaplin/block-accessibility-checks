@@ -16,6 +16,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [1.2.0]
+
 ### Added
 
 - Condition on image block to check if more than 125 characters are used
