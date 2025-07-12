@@ -16,9 +16,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
-### Fied
+### Fixed
 
 - Issue where heading level one was a fallback in settings
+- Heading levels can now be properly removed in the plugin options
 
 ## [1.2.0]
 

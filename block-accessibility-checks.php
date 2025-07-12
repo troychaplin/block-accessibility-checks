@@ -32,6 +32,9 @@ use BlockAccessibility\ScriptsStyles;
 use BlockAccessibility\SettingsPage;
 use BlockAccessibility\Translations;
 
+// Initialize heading levels immediately - before init hook.
+$ba11yc_heading_levels_early = new HeadingLevels();
+
 // Global variables for the plugin.
 $ba11yc_plugin_file    = __FILE__;
 $ba11yc_text_domain    = 'block-accessibility-checks';
@@ -63,9 +66,6 @@ function ba11yc_init_plugin() {
 
 	// Initialize block configuration.
 	$ba11yc_block_config = BlockConfig::get_instance()->get_block_config();
-
-	// Initialize heading levels.
-	$ba11yc_heading_levels = new HeadingLevels();
 }
 add_action( 'init', 'ba11yc_init_plugin' );
 
