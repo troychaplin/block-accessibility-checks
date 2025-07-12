@@ -21,6 +21,13 @@ namespace BlockAccessibility;
 class HeadingLevels {
 
 	/**
+	 * Cached options to avoid repeated database calls.
+	 *
+	 * @var array|null
+	 */
+	private $cached_options = null;
+
+	/**
 	 * Constructor for the HeadingLevels class.
 	 *
 	 * Initializes the class and sets up any necessary properties or functionality.
@@ -28,6 +35,18 @@ class HeadingLevels {
 	public function __construct() {
 		// Add the filter immediately - don't wait for any hooks.
 		add_filter( 'register_block_type_args', array( $this, 'modify_heading_levels_globally' ), 10, 2 );
+	}
+
+	/**
+	 * Get the cached options or retrieve them from database.
+	 *
+	 * @return array The plugin options.
+	 */
+	private function get_options() {
+		if ( null === $this->cached_options ) {
+			$this->cached_options = get_option( 'block_checks_options', array() );
+		}
+		return $this->cached_options;
 	}
 
 	/**
@@ -49,7 +68,7 @@ class HeadingLevels {
 			return $args;
 		}
 
-		$options           = get_option( 'block_checks_options' );
+		$options           = $this->get_options();
 		$restricted_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
 
 		// If no restrictions, return original args.
@@ -62,6 +81,11 @@ class HeadingLevels {
 
 		// Remove restricted levels.
 		foreach ( $restricted_levels as $level ) {
+			// Validate that the level is in the expected format (h1, h2, etc.).
+			if ( ! is_string( $level ) || ! preg_match( '/^h[1-6]$/', $level ) ) {
+				continue; // Skip invalid levels.
+			}
+
 			$level_num = intval( substr( $level, 1 ) );
 			$key       = array_search( $level_num, $available_levels, true );
 			if ( false !== $key ) {

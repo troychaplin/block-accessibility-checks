@@ -97,7 +97,10 @@ class SettingsPage {
 	public function init_settings() {
 		register_setting(
 			'block_checks_settings_group',
-			'block_checks_options'
+			'block_checks_options',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_options' ),
+			)
 		);
 
 		add_settings_section(
@@ -255,5 +258,47 @@ class SettingsPage {
 	 */
 	public function render_core_table_options() {
 		$this->render_block_options_from_config( 'core_table_block_check' );
+	}
+
+	/**
+	 * Sanitizes the plugin options before saving to the database.
+	 *
+	 * This method validates and sanitizes all incoming option data to prevent
+	 * XSS attacks and ensure data integrity.
+	 *
+	 * @param array $input The input array from the settings form.
+	 *
+	 * @return array The sanitized options array.
+	 */
+	public function sanitize_options( $input ) {
+		$sanitized = array();
+
+		if ( ! is_array( $input ) ) {
+			return $sanitized;
+		}
+
+		// Sanitize block check options (error, warning, none).
+		$valid_check_values = array( 'error', 'warning', 'none' );
+		$check_options      = array( 'core_button_block_check', 'core_image_block_check', 'core_table_block_check' );
+
+		foreach ( $check_options as $option ) {
+			if ( isset( $input[ $option ] ) && in_array( $input[ $option ], $valid_check_values, true ) ) {
+				$sanitized[ $option ] = sanitize_text_field( $input[ $option ] );
+			}
+		}
+
+		// Sanitize heading levels array.
+		if ( isset( $input['core_heading_levels'] ) && is_array( $input['core_heading_levels'] ) ) {
+			$sanitized['core_heading_levels'] = array();
+			$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+
+			foreach ( $input['core_heading_levels'] as $level ) {
+				if ( in_array( $level, $valid_levels, true ) ) {
+					$sanitized['core_heading_levels'][] = sanitize_text_field( $level );
+				}
+			}
+		}
+
+		return $sanitized;
 	}
 }

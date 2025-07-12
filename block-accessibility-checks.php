@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Block Accessibility Checks
  * Description:       Add plugin that add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
- * Requires at least: 6.3
+ * Requires at least: 6.7
  * Requires PHP:      7.0
  * Version:           1.2.1
  * Author:            Troy Chaplin

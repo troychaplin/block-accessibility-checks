@@ -16,10 +16,26 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- Input validation for heading level data to prevent invalid configurations
+- Option caching in HeadingLevels class for improved performance
+- Comprehensive settings sanitization to validate all user input
+
+### Changed
+
+- Minimum WordPress version requirement to 6.7 for latest security and performance features
+- HeadingLevels class instantiation timing to ensure proper filter registration before core blocks
+
 ### Fixed
 
 - Issue where heading level one was a fallback in settings
 - Heading levels can now be properly removed in the plugin options
+- Heading level restrictions not working due to incorrect filter timing
+
+### Security
+
+- Enhanced input sanitization for all plugin settings to prevent malicious data injection
 
 ## [1.2.0]
 
