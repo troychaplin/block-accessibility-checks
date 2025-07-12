@@ -40,20 +40,18 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "19.8.0",
-		"@commitlint/config-conventional": "19.8.0",
-		"@wordpress/data": "10.22.0",
-		"@wordpress/element": "6.22.0",
-		"@wordpress/env": "10.22.0",
-		"@wordpress/eslint-plugin": "22.8.0",
-		"@wordpress/i18n": "5.22.0",
-		"@wordpress/plugins": "7.22.0",
-		"@wordpress/prettier-config": "4.22.0",
-		"@wordpress/scripts": "30.15.0",
-		"@wordpress/stylelint-config": "23.14.0",
-		"eslint-config-prettier": "10.1.1",
+		"@wordpress/data": "10.26.0",
+		"@wordpress/element": "6.26.0",
+		"@wordpress/env": "10.26.0",
+		"@wordpress/eslint-plugin": "22.12.0",
+		"@wordpress/i18n": "5.26.0",
+		"@wordpress/plugins": "7.26.0",
+		"@wordpress/prettier-config": "4.26.0",
+		"@wordpress/scripts": "30.19.0",
+		"@wordpress/stylelint-config": "23.18.0",
+		"eslint-config-prettier": "10.1.5",
 		"husky": "9.1.7",
-		"stylelint": "16.18.0",
-		"stylelint-scss": "6.11.1"
+		"stylelint": "16.21.1",
+		"stylelint-scss": "6.12.1"
 	}
 }
