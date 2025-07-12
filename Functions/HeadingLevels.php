@@ -26,7 +26,8 @@ class HeadingLevels {
 	 * Initializes the class and sets up any necessary properties or functionality.
 	 */
 	public function __construct() {
-		add_filter( 'register_block_type_args', array( $this, 'modify_core_heading_levels' ), 10, 2 );
+		// Add the filter immediately - don't wait for any hooks.
+		add_filter( 'register_block_type_args', array( $this, 'modify_heading_levels_globally' ), 10, 2 );
 	}
 
 	/**
@@ -38,17 +39,23 @@ class HeadingLevels {
 	 * levels dynamically.
 	 *
 	 * @param array  $args       The arguments for the block, including attributes.
-	 * @param object $block_type The block type object being processed.
+	 * @param string $block_type The block type being processed.
 	 *
 	 * @return array Modified arguments for the block.
 	 */
-	public function modify_core_heading_levels( $args, $block_type ) {
+	public function modify_heading_levels_globally( $args, $block_type ) {
+		// Only proceed if the current block is a Heading block.
 		if ( 'core/heading' !== $block_type ) {
 			return $args;
 		}
 
 		$options           = get_option( 'block_checks_options' );
 		$restricted_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+
+		// If no restrictions, return original args.
+		if ( empty( $restricted_levels ) ) {
+			return $args;
+		}
 
 		// Create array of available levels (1-6).
 		$available_levels = range( 1, 6 );
@@ -62,12 +69,14 @@ class HeadingLevels {
 			}
 		}
 
-		// Return the available levels as an array of strings (h1-h6).
+		// Reindex the array and ensure we have at least one level.
 		$available_levels = array_values( $available_levels );
+		if ( empty( $available_levels ) ) {
+			$available_levels = array( 2 ); // Default to H2 if all levels are restricted.
+		}
 
-		// Set the available levels.
-		$args['attributes']['level']['default'] = reset( $available_levels ) ? reset( $available_levels ) : 2;
-		$args['attributes']['levelOptions']     = array( 'default' => $available_levels );
+		// Set the available levels using the levelOptions attribute - exactly as per WordPress docs.
+		$args['attributes']['levelOptions']['default'] = $available_levels;
 
 		return $args;
 	}
