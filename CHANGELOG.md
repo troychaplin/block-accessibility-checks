@@ -21,11 +21,13 @@ Prefix the change with one of these keywords:
 - Input validation for heading level data to prevent invalid configurations
 - Option caching in HeadingLevels class for improved performance
 - Comprehensive settings sanitization to validate all user input
+- PluginInitializer class for organized plugin startup and simple service location
 
 ### Changed
 
 - Minimum WordPress version requirement to 6.7 for latest security and performance features
 - HeadingLevels class instantiation timing to ensure proper filter registration before core blocks
+- Plugin initialization refactored to use PluginInitializer class for better organization
 
 ### Fixed
 
