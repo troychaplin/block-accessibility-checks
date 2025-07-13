@@ -53,6 +53,21 @@ Prefix the change with one of these keywords:
 - Proper @throws annotations for methods that can throw exceptions
 - Consistent void return type declarations for methods that don't return values
 - Improved nullable type hints (e.g., ?object, ?BlockChecksRegistry) for better type safety
+- PHP-JavaScript unified validation system:
+    - BlockChecksRegistry now serves as single source of truth for all validation rules and messages
+    - JavaScript validation functions now consume PHP registry data via `wp_localize_script()`
+    - Eliminates code duplication between PHP and JavaScript validation logic
+    - Ensures consistent validation behavior across all contexts
+- Enhanced BlockChecksRegistry with additional check methods:
+    - `check_image_alt_required()` for verifying images have alt text (unless decorative)
+    - `check_button_required_content()` for ensuring buttons have both text and links
+    - All checks now include complete metadata for JavaScript consumption
+- Real-time editor validation now powered by PHP registry rules:
+    - Image blocks: alt text required, length validation, caption matching
+    - Button blocks: required content validation, text quality checks
+    - Table blocks: header or caption requirement validation
+- PHP validation rules automatically exposed to JavaScript via `BlockAccessibilityChecks.validationRules`
+- Developer extensibility for custom checks works seamlessly in both PHP and JavaScript contexts
 
 ### Changed
 

@@ -293,13 +293,75 @@ function my_plugin_init( $registry, $plugin_initializer ) {
 }
 ```
 
-## Examples
+## PHP-JavaScript Integration
 
-See `examples/developer-api-usage.php` for comprehensive usage examples covering:
+The plugin uses a unified architecture where PHP serves as the single source of truth for all validation rules and messages. This ensures consistency between server-side and client-side validation while maintaining extensibility.
 
-- Registering custom checks
-- Disabling default checks
-- Filtering check results
-- Context-specific checks
-- Logging and debugging
-- Advanced integrations
+### How It Works
+
+1. **PHP Registry**: The `BlockChecksRegistry` class manages all accessibility checks, including built-in and custom ones
+2. **Data Bridge**: The `ScriptsStyles` class exposes registry data to JavaScript via `wp_localize_script()`
+3. **JavaScript Validation**: Client-side validation functions mirror PHP logic using the exposed rules and messages
+
+### Accessing Rules in JavaScript
+
+The PHP registry data is available in JavaScript as:
+
+```javascript
+// Access validation rules
+const validationRules = BlockAccessibilityChecks.validationRules;
+
+// Get rules for a specific block type
+const imageRules = validationRules['core/image'] || {};
+
+// Iterate through all checks for a block type
+Object.entries(imageRules).forEach(([checkName, config]) => {
+	if (config.enabled) {
+		console.log(`Check: ${checkName}, Message: ${config.message}`);
+	}
+});
+```
+
+### Custom Check Implementation
+
+When registering custom checks, you need to:
+
+1. **Register the PHP check** with the registry (as shown in Quick Start)
+2. **Add JavaScript logic** if you want real-time editor validation
+
+```javascript
+// Example: Add JavaScript validation for custom check
+function runCustomChecks(block, rules) {
+	const failures = [];
+
+	Object.entries(rules).forEach(([checkName, config]) => {
+		if (!config.enabled) return;
+
+		let checkFailed = false;
+
+		switch (checkName) {
+			case 'my_custom_check':
+				checkFailed = myCustomValidationLogic(block.attributes);
+				break;
+		}
+
+		if (checkFailed) {
+			failures.push({
+				checkName,
+				message: config.message,
+				type: config.type,
+				priority: config.priority,
+			});
+		}
+	});
+
+	return failures;
+}
+```
+
+### Benefits
+
+- **Consistency**: Same validation logic and messages everywhere
+- **Extensibility**: Developers can add checks that work in both PHP and JavaScript
+- **Maintainability**: Single source of truth reduces duplication
+- **Performance**: Client-side validation provides immediate feedback

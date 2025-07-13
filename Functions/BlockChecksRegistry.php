@@ -68,10 +68,22 @@ class BlockChecksRegistry {
 		// Image block checks.
 		$this->register_check(
 			'core/image',
+			'alt_text_required',
+			array(
+				'callback'    => array( $this, 'check_image_alt_required' ),
+				'message'     => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
+				'type'        => 'error',
+				'priority'    => 5,
+				'description' => \__( 'Alternative text is essential for screen reader users to understand image content', 'block-accessibility-checks' ),
+			)
+		);
+
+		$this->register_check(
+			'core/image',
 			'alt_text_length',
 			array(
 				'callback'    => array( $this, 'check_image_alt_length' ),
-				'message'     => \__( 'Alternative text should be less than 125 characters', 'block-accessibility-checks' ),
+				'message'     => \__( 'Image alternative text cannot be longer than 125 characters', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
 				'description' => \__( 'Screen readers may truncate very long alt text', 'block-accessibility-checks' ),
@@ -83,7 +95,7 @@ class BlockChecksRegistry {
 			'alt_caption_match',
 			array(
 				'callback'    => array( $this, 'check_image_alt_caption_match' ),
-				'message'     => \__( 'Alternative text should not be the same as the caption', 'block-accessibility-checks' ),
+				'message'     => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
 				'description' => \__( 'Duplicate content provides no additional value to screen reader users', 'block-accessibility-checks' ),
@@ -91,6 +103,18 @@ class BlockChecksRegistry {
 		);
 
 		// Button block checks.
+		$this->register_check(
+			'core/button',
+			'button_required_content',
+			array(
+				'callback'    => array( $this, 'check_button_required_content' ),
+				'message'     => \__( 'Blah Buttons must have text and a link', 'block-accessibility-checks' ),
+				'type'        => 'error',
+				'priority'    => 5,
+				'description' => \__( 'Buttons without text or links are not accessible to screen reader users', 'block-accessibility-checks' ),
+			)
+		);
+
 		$this->register_check(
 			'core/button',
 			'button_text_quality',
@@ -508,6 +532,55 @@ class BlockChecksRegistry {
 
 		// Table should have either headers or caption for accessibility.
 		return ! ( $has_header || $has_caption );
+	}
+
+	/**
+	 * Check if image has required alt text
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content Block content (unused but required by interface).
+	 * @param array  $config Check configuration (unused but required by interface).
+	 * @return bool True if check fails.
+	 */
+	public function check_image_alt_required( array $attributes, string $content, array $config ): bool {
+		// Silence the unused parameter warnings.
+		unset( $content, $config );
+
+		// Check if image is marked as decorative.
+		$is_decorative = isset( $attributes['isDecorative'] ) && true === $attributes['isDecorative'];
+
+		// If marked as decorative, alt text is not required.
+		if ( $is_decorative ) {
+			return false;
+		}
+
+		// Check if alt text exists and is not empty.
+		$has_alt_text = isset( $attributes['alt'] ) && ! empty( trim( $attributes['alt'] ) );
+
+		// Return true if check fails (no alt text when required).
+		return ! $has_alt_text;
+	}
+
+	/**
+	 * Check if button has required content (text and link)
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content Block content (unused but required by interface).
+	 * @param array  $config Check configuration (unused but required by interface).
+	 * @return bool True if check fails.
+	 */
+	public function check_button_required_content( array $attributes, string $content, array $config ): bool {
+		// Silence the unused parameter warnings.
+		unset( $content, $config );
+
+		// Check if button has text.
+		$has_text = isset( $attributes['text'] ) && ! empty( trim( \wp_strip_all_tags( $attributes['text'] ) ) );
+
+		// Check if button has URL.
+		$has_url = isset( $attributes['url'] ) && ! empty( trim( $attributes['url'] ) );
+
+		// Button must have both text and URL for accessibility.
+		return ! ( $has_text && $has_url );
 	}
 
 	/**
