@@ -4,15 +4,38 @@ Block Accessibility Checks is a WordPress plugin that helps ensures your content
 
 ## Features
 
--   **Real-time Accessibility Checks:** Automatically checks core block configurations as you edit content in the Gutenberg editor.
--   **Prevents Non-Compliant Publishing:** Blocks the publishing of content that fails to meet WCAG requirements.
--   **User-Friendly Notifications:** Provides clear and actionable feedback to help users fix accessibility issues.
+- **Real-time Accessibility Checks:** Automatically checks core block configurations as you edit content in the Gutenberg editor.
+- **Prevents Non-Compliant Publishing:** Blocks the publishing of content that fails to meet WCAG requirements.
+- **User-Friendly Notifications:** Provides clear and actionable feedback to help users fix accessibility issues.
+- **Developer API:** Comprehensive hooks and filters for extending functionality with custom accessibility checks.
+
+## Developer API
+
+The plugin provides a rich API for developers to add custom accessibility checks or modify existing ones. See the [Developer API Documentation](docs/developer-api.md) for complete details.
+
+Quick example:
+
+```php
+add_action( 'ba11yc_register_checks', 'my_custom_checks' );
+
+function my_custom_checks( $registry ) {
+    $registry->register_check(
+        'core/paragraph',
+        'paragraph_length',
+        array(
+            'callback' => 'check_paragraph_length',
+            'message'  => 'Paragraph is too long for optimal readability',
+            'type'     => 'warning',
+        )
+    );
+}
+```
 
 ## Installation
 
--   Upload the plugin files to the `/wp-content/plugins/`
--   Activate the plugin through the `Plugins` screen in WordPress
--   Start editing your content in the Gutenberg editor
+- Upload the plugin files to the `/wp-content/plugins/`
+- Activate the plugin through the `Plugins` screen in WordPress
+- Start editing your content in the Gutenberg editor
 
 ## Getting Involved
 
@@ -22,38 +45,38 @@ If you would like to get involved and help make this plugin better that would be
 
 To get started do the following:
 
--   Fork this repo
--   Create a branch off of `main`
--   Open a terminal window and clone your fork
--   Using a terminal run the following inside the forked repo
-    -   `npm -g i @wordpress/env` -- installs wp-env if you don't already have it
-    -   `npm install` -- installs dependencies for this project
+- Fork this repo
+- Create a branch off of `main`
+- Open a terminal window and clone your fork
+- Using a terminal run the following inside the forked repo
+    - `npm -g i @wordpress/env` -- installs wp-env if you don't already have it
+    - `npm install` -- installs dependencies for this project
 
 ### Start Developing
 
 This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme) that setups up a local WordPress environment using Docker.
 
--   Make sure `Docker Desktop` is running
--   Start WordPress: `wp-env start`
+- Make sure `Docker Desktop` is running
+- Start WordPress: `wp-env start`
 
 #### Other Commands
 
--   Stop WordPress: `wp-env stop`
--   Start watch task: `npm run start`
--   Build assets: `npm run build`
+- Stop WordPress: `wp-env stop`
+- Start watch task: `npm run start`
+- Build assets: `npm run build`
 
 ## Finishing a Branch
 
 When you are done developing a feature or a fix:
 
--   Create a PR from your branch into the primary repo
--   Fill out relevant info in as much detail as possible in the PR template
+- Create a PR from your branch into the primary repo
+- Fill out relevant info in as much detail as possible in the PR template
 
 ### Local Site Details
 
--   http://localhost:8888
--   User: `admin`
--   Password: `password`
+- http://localhost:8888
+- User: `admin`
+- Password: `password`
 
 **Important:** when you're done working don't forget to stop the WordPress docker environment by running `npm run wp:down`
 

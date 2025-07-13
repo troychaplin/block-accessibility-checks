@@ -22,6 +22,24 @@ Prefix the change with one of these keywords:
 - Option caching in HeadingLevels class for improved performance
 - Comprehensive settings sanitization to validate all user input
 - PluginInitializer class for organized plugin startup and simple service location
+- BlockChecksRegistry class for centralized management of accessibility checks
+- Developer API with extensive hooks and filters for extensibility:
+    - `ba11yc_register_checks` action for registering custom accessibility checks
+    - `ba11yc_ready` action providing access to registry and plugin initializer
+    - `ba11yc_check_registered`, `ba11yc_check_unregistered`, `ba11yc_check_toggled` actions for check lifecycle events
+    - `ba11yc_register_default_checks` filter to prevent default checks from loading
+    - `ba11yc_should_register_check` filter to control individual check registration
+    - `ba11yc_check_args` filter to modify check configuration before registration
+    - `ba11yc_block_checks` filter to control which checks run for specific blocks
+    - `ba11yc_block_attributes` filter to modify block attributes before checks run
+    - `ba11yc_before_check`, `ba11yc_check_result`, `ba11yc_final_check_result` filters for check execution pipeline
+    - `ba11yc_block_check_results` filter for modifying all results for a block
+- Registry API methods for programmatic check management:
+    - `register_check()`, `unregister_check()` for check registration
+    - `set_check_enabled()` for enabling/disabling checks dynamically
+    - `is_check_registered()`, `get_check_config()` for check introspection
+    - `get_registered_block_types()` for discovering available block types
+- Example file demonstrating developer API usage patterns
 
 ### Changed
 

@@ -58,12 +58,16 @@ class PluginInitializer {
 		$this->init_scripts_styles();
 		$this->init_settings_page();
 		$this->init_block_config();
+		$this->init_block_checks_registry();
 
 		// Setup hooks.
 		$this->setup_hooks();
 
 		// Allow other plugins to hook into our initialization.
 		do_action( 'ba11yc_plugin_initialized', $this );
+
+		// Allow developers to access the registry and add custom checks.
+		do_action( 'ba11yc_ready', $this->get_service( 'block_checks_registry' ), $this );
 	}
 
 	/**
@@ -98,6 +102,14 @@ class PluginInitializer {
 	private function init_block_config() {
 		$block_config                   = BlockConfig::get_instance();
 		$this->services['block_config'] = $block_config;
+	}
+
+	/**
+	 * Initialize block checks registry
+	 */
+	private function init_block_checks_registry() {
+		$block_checks_registry                   = BlockChecksRegistry::get_instance();
+		$this->services['block_checks_registry'] = $block_checks_registry;
 	}
 
 	/**
@@ -147,5 +159,39 @@ class PluginInitializer {
 	 */
 	public function get_text_domain() {
 		return $this->text_domain;
+	}
+
+	/**
+	 * Get the block checks registry
+	 *
+	 * @return BlockChecksRegistry|null The registry instance or null if not initialized.
+	 */
+	public function get_block_checks_registry() {
+		return $this->get_service( 'block_checks_registry' );
+	}
+
+	/**
+	 * Register a new accessibility check (convenience method)
+	 *
+	 * @param string $block_type Block type (e.g., 'core/image').
+	 * @param string $check_name Unique check name.
+	 * @param array  $check_args Check configuration.
+	 * @return bool True on success, false on failure.
+	 */
+	public function register_check( $block_type, $check_name, $check_args ) {
+		$registry = $this->get_block_checks_registry();
+		return $registry ? $registry->register_check( $block_type, $check_name, $check_args ) : false;
+	}
+
+	/**
+	 * Unregister an accessibility check (convenience method)
+	 *
+	 * @param string $block_type Block type.
+	 * @param string $check_name Check name.
+	 * @return bool True on success, false if check not found.
+	 */
+	public function unregister_check( $block_type, $check_name ) {
+		$registry = $this->get_block_checks_registry();
+		return $registry ? $registry->unregister_check( $block_type, $check_name ) : false;
 	}
 }
