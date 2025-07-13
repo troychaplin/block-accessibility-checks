@@ -40,7 +40,7 @@ class ScriptsStyles {
 	 * @param string       $plugin_file The path to the plugin file.
 	 * @param Translations $translations The translations object.
 	 */
-	public function __construct( $plugin_file, Translations $translations ) {
+	public function __construct( string $plugin_file, Translations $translations ) {
 		$this->plugin_file  = $plugin_file;
 		$this->translations = $translations;
 	}

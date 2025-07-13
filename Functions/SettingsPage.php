@@ -76,7 +76,7 @@ class SettingsPage {
 	 *
 	 * @return void
 	 */
-	public function block_check_admin_menu() {
+	public function block_check_admin_menu(): void {
 		add_options_page(
 			esc_html__( 'Block Accessibility Checks', 'block-accessibility-checks' ),
 			esc_html__( 'Block Checks', 'block-accessibility-checks' ),
@@ -94,7 +94,7 @@ class SettingsPage {
 	 *
 	 * @return void
 	 */
-	public function init_settings() {
+	public function init_settings(): void {
 		register_setting(
 			'block_checks_settings_group',
 			'block_checks_options',
@@ -266,39 +266,89 @@ class SettingsPage {
 	 * This method validates and sanitizes all incoming option data to prevent
 	 * XSS attacks and ensure data integrity.
 	 *
-	 * @param array $input The input array from the settings form.
+	 * @param mixed $input The input array from the settings form.
 	 *
 	 * @return array The sanitized options array.
 	 */
-	public function sanitize_options( $input ) {
-		$sanitized = array();
+	public function sanitize_options( $input ): array {
+		try {
+			$sanitized = array();
 
-		if ( ! is_array( $input ) ) {
-			return $sanitized;
-		}
-
-		// Sanitize block check options (error, warning, none).
-		$valid_check_values = array( 'error', 'warning', 'none' );
-		$check_options      = array( 'core_button_block_check', 'core_image_block_check', 'core_table_block_check' );
-
-		foreach ( $check_options as $option ) {
-			if ( isset( $input[ $option ] ) && in_array( $input[ $option ], $valid_check_values, true ) ) {
-				$sanitized[ $option ] = sanitize_text_field( $input[ $option ] );
+			if ( ! is_array( $input ) ) {
+				$this->log_error( 'Settings input is not an array. Returning empty array.' );
+				return $sanitized;
 			}
-		}
 
-		// Sanitize heading levels array.
-		if ( isset( $input['core_heading_levels'] ) && is_array( $input['core_heading_levels'] ) ) {
-			$sanitized['core_heading_levels'] = array();
-			$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+			$this->log_debug( 'Starting sanitization of plugin options.' );
 
-			foreach ( $input['core_heading_levels'] as $level ) {
-				if ( in_array( $level, $valid_levels, true ) ) {
-					$sanitized['core_heading_levels'][] = sanitize_text_field( $level );
+			// Sanitize block check options (error, warning, none).
+			$valid_check_values = array( 'error', 'warning', 'none' );
+			$check_options      = array( 'core_button_block_check', 'core_image_block_check', 'core_table_block_check' );
+
+			foreach ( $check_options as $option ) {
+				if ( isset( $input[ $option ] ) ) {
+					if ( in_array( $input[ $option ], $valid_check_values, true ) ) {
+						$sanitized[ $option ] = \sanitize_text_field( $input[ $option ] );
+						$this->log_debug( "Sanitized {$option}: {$sanitized[ $option ]}" );
+					} else {
+						$this->log_error( "Invalid value for {$option}: {$input[ $option ]}. Skipping." );
+					}
 				}
 			}
-		}
 
-		return $sanitized;
+			// Sanitize heading levels array.
+			if ( isset( $input['core_heading_levels'] ) ) {
+				if ( is_array( $input['core_heading_levels'] ) ) {
+					$sanitized['core_heading_levels'] = array();
+					$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+
+					foreach ( $input['core_heading_levels'] as $level ) {
+						if ( in_array( $level, $valid_levels, true ) ) {
+							$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
+							$this->log_debug( "Added heading level: {$level}" );
+						} else {
+							$this->log_error( "Invalid heading level: {$level}. Skipping." );
+						}
+					}
+
+					$this->log_debug( 'Completed heading levels sanitization.' );
+				} else {
+					$this->log_error( 'Heading levels input is not an array. Skipping.' );
+				}
+			}
+
+			$this->log_debug( 'Settings sanitization completed successfully.' );
+			return $sanitized;
+
+		} catch ( \Exception $e ) {
+			$this->log_error( 'Error during settings sanitization: ' . $e->getMessage() );
+			return array();
+		}
+	}
+
+	/**
+	 * Log error messages when WP_DEBUG is enabled
+	 *
+	 * @param string $message Error message to log.
+	 * @return void
+	 */
+	private function log_error( string $message ): void {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\error_log( 'Block Accessibility Checks - SettingsPage: ' . $message );
+		}
+	}
+
+	/**
+	 * Log debug messages when WP_DEBUG is enabled
+	 *
+	 * @param string $message Debug message to log.
+	 * @return void
+	 */
+	private function log_debug( string $message ): void {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\error_log( 'Block Accessibility Checks - SettingsPage DEBUG: ' . $message );
+		}
 	}
 }

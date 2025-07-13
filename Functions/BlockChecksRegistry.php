@@ -34,9 +34,9 @@ class BlockChecksRegistry {
 	/**
 	 * Get registry instance
 	 *
-	 * @return BlockChecksRegistry
+	 * @return BlockChecksRegistry The registry singleton instance.
 	 */
-	public static function get_instance() {
+	public static function get_instance(): BlockChecksRegistry {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
@@ -53,8 +53,13 @@ class BlockChecksRegistry {
 
 	/**
 	 * Register default accessibility checks
+	 *
+	 * Sets up the default accessibility checks for various core blocks
+	 * including image alt text validation and button text quality checks.
+	 *
+	 * @return void
 	 */
-	private function register_default_checks() {
+	private function register_default_checks(): void {
 		// Allow developers to prevent default checks from being registered.
 		if ( ! \apply_filters( 'ba11yc_register_default_checks', true ) ) {
 			return;
@@ -123,46 +128,94 @@ class BlockChecksRegistry {
 	 * @param array  $check_args Check configuration.
 	 * @return bool True on success, false on failure.
 	 */
-	public function register_check( $block_type, $check_name, $check_args ) {
-		$defaults = array(
-			'callback'    => null,
-			'message'     => '',
-			'type'        => 'warning',
-			'priority'    => 10,
-			'enabled'     => true,
-			'description' => '',
-		);
+	public function register_check( string $block_type, string $check_name, array $check_args ): bool {
+		try {
+			// Validate input parameters.
+			if ( empty( $block_type ) || ! is_string( $block_type ) ) {
+				$this->log_error( "Invalid block type provided: {$block_type}" );
+				return false;
+			}
 
-		$check_args = \wp_parse_args( $check_args, $defaults );
+			if ( empty( $check_name ) || ! is_string( $check_name ) ) {
+				$this->log_error( "Invalid check name provided: {$check_name}" );
+				return false;
+			}
 
-		// Validate required parameters.
-		if ( empty( $block_type ) || empty( $check_name ) || ! \is_callable( $check_args['callback'] ) ) {
+			if ( ! is_array( $check_args ) ) {
+				$this->log_error( "Check arguments must be an array for {$block_type}/{$check_name}" );
+				return false;
+			}
+
+			$defaults = array(
+				'callback'    => null,
+				'message'     => '',
+				'type'        => 'warning',
+				'priority'    => 10,
+				'enabled'     => true,
+				'description' => '',
+			);
+
+			$check_args = \wp_parse_args( $check_args, $defaults );
+
+			// Validate required parameters.
+			if ( ! \is_callable( $check_args['callback'] ) ) {
+				$this->log_error( "Invalid callback provided for {$block_type}/{$check_name}" );
+				return false;
+			}
+
+			if ( empty( $check_args['message'] ) ) {
+				$this->log_error( "Message is required for {$block_type}/{$check_name}" );
+				return false;
+			}
+
+			// Validate type parameter.
+			$valid_types = array( 'error', 'warning', 'info' );
+			if ( ! in_array( $check_args['type'], $valid_types, true ) ) {
+				$this->log_error( "Invalid type '{$check_args['type']}' for {$block_type}/{$check_name}. Using 'warning'." );
+				$check_args['type'] = 'warning';
+			}
+
+			// Validate priority parameter.
+			if ( ! is_numeric( $check_args['priority'] ) ) {
+				$this->log_error( "Invalid priority '{$check_args['priority']}' for {$block_type}/{$check_name}. Using 10." );
+				$check_args['priority'] = 10;
+			}
+
+			// Allow developers to filter check arguments before registration.
+			$check_args = \apply_filters( 'ba11yc_check_args', $check_args, $block_type, $check_name );
+
+			// Allow developers to prevent specific checks from being registered.
+			if ( ! \apply_filters( 'ba11yc_should_register_check', true, $block_type, $check_name, $check_args ) ) {
+				$this->log_debug( "Check registration prevented by filter: {$block_type}/{$check_name}" );
+				return false;
+			}
+
+			// Check if check already exists.
+			if ( isset( $this->checks[ $block_type ][ $check_name ] ) ) {
+				$this->log_debug( "Overriding existing check: {$block_type}/{$check_name}" );
+			}
+
+			// Initialize block type array if needed.
+			if ( ! isset( $this->checks[ $block_type ] ) ) {
+				$this->checks[ $block_type ] = array();
+			}
+
+			// Store the check.
+			$this->checks[ $block_type ][ $check_name ] = $check_args;
+
+			// Sort checks by priority.
+			\uasort( $this->checks[ $block_type ], array( $this, 'sort_checks_by_priority' ) );
+
+			// Action hook for developers to know when a check is registered.
+			\do_action( 'ba11yc_check_registered', $block_type, $check_name, $check_args );
+
+			$this->log_debug( "Successfully registered check: {$block_type}/{$check_name}" );
+			return true;
+
+		} catch ( \Exception $e ) {
+			$this->log_error( "Error registering check {$block_type}/{$check_name}: " . $e->getMessage() );
 			return false;
 		}
-
-		// Allow developers to filter check arguments before registration.
-		$check_args = \apply_filters( 'ba11yc_check_args', $check_args, $block_type, $check_name );
-
-		// Allow developers to prevent specific checks from being registered.
-		if ( ! \apply_filters( 'ba11yc_should_register_check', true, $block_type, $check_name, $check_args ) ) {
-			return false;
-		}
-
-		// Initialize block type array if needed.
-		if ( ! isset( $this->checks[ $block_type ] ) ) {
-			$this->checks[ $block_type ] = array();
-		}
-
-		// Store the check.
-		$this->checks[ $block_type ][ $check_name ] = $check_args;
-
-		// Sort checks by priority.
-		\uasort( $this->checks[ $block_type ], array( $this, 'sort_checks_by_priority' ) );
-
-		// Action hook for developers to know when a check is registered.
-		\do_action( 'ba11yc_check_registered', $block_type, $check_name, $check_args );
-
-		return true;
 	}
 
 	/**
@@ -172,7 +225,7 @@ class BlockChecksRegistry {
 	 * @param string $check_name Check name.
 	 * @return bool True on success, false if check not found.
 	 */
-	public function unregister_check( $block_type, $check_name ) {
+	public function unregister_check( string $block_type, string $check_name ): bool {
 		if ( ! isset( $this->checks[ $block_type ][ $check_name ] ) ) {
 			return false;
 		}
@@ -193,7 +246,7 @@ class BlockChecksRegistry {
 	 * @param bool   $enabled Whether to enable or disable the check.
 	 * @return bool True on success, false if check not found.
 	 */
-	public function set_check_enabled( $block_type, $check_name, $enabled ) {
+	public function set_check_enabled( string $block_type, string $check_name, bool $enabled ): bool {
 		if ( ! isset( $this->checks[ $block_type ][ $check_name ] ) ) {
 			return false;
 		}
@@ -212,7 +265,7 @@ class BlockChecksRegistry {
 	 * @param string $block_type Block type.
 	 * @return array Array of checks for the block type.
 	 */
-	public function get_checks( $block_type ) {
+	public function get_checks( string $block_type ): array {
 		return isset( $this->checks[ $block_type ] ) ? $this->checks[ $block_type ] : array();
 	}
 
@@ -221,7 +274,7 @@ class BlockChecksRegistry {
 	 *
 	 * @return array All registered checks.
 	 */
-	public function get_all_checks() {
+	public function get_all_checks(): array {
 		return $this->checks;
 	}
 
@@ -269,57 +322,94 @@ class BlockChecksRegistry {
 	 * @return array Array of check results.
 	 */
 	public function run_checks( $block_type, $attributes, $content = '' ) {
-		$results = array();
-		$checks  = $this->get_checks( $block_type );
-
-		// Allow developers to filter which checks run for a block.
-		$checks = \apply_filters( 'ba11yc_block_checks', $checks, $block_type, $attributes, $content );
-
-		// Allow developers to completely filter the attributes before checks run.
-		$attributes = \apply_filters( 'ba11yc_block_attributes', $attributes, $block_type, $content );
-
-		foreach ( $checks as $check_name => $check_config ) {
-			if ( ! $check_config['enabled'] || ! \is_callable( $check_config['callback'] ) ) {
-				continue;
+		try {
+			// Validate input parameters.
+			if ( empty( $block_type ) || ! is_string( $block_type ) ) {
+				$this->log_error( "Invalid block type provided to run_checks: {$block_type}" );
+				return array();
 			}
 
-			// Allow developers to filter each check config before it runs.
-			$check_config = \apply_filters( 'ba11yc_before_check', $check_config, $check_name, $block_type, $attributes, $content );
+			if ( ! is_array( $attributes ) ) {
+				$this->log_error( "Invalid attributes provided to run_checks for {$block_type}" );
+				return array();
+			}
 
-			$check_result = \call_user_func(
-				$check_config['callback'],
-				$attributes,
-				$content,
-				$check_config
-			);
+			$results = array();
+			$checks  = $this->get_checks( $block_type );
 
-			// Allow developers to filter the check result.
-			$check_result = \apply_filters( 'ba11yc_check_result', $check_result, $check_name, $block_type, $attributes, $content, $check_config );
+			if ( empty( $checks ) ) {
+				$this->log_debug( "No checks registered for block type: {$block_type}" );
+				return array();
+			}
 
-			if ( ! empty( $check_result ) ) {
-				$result = array(
-					'check_name'  => $check_name,
-					'block_type'  => $block_type,
-					'message'     => $check_config['message'],
-					'type'        => $check_config['type'],
-					'priority'    => $check_config['priority'],
-					'description' => $check_config['description'],
-					'result'      => $check_result,
-				);
+			// Allow developers to filter which checks run for a block.
+			$checks = \apply_filters( 'ba11yc_block_checks', $checks, $block_type, $attributes, $content );
 
-				// Allow developers to filter the final result object.
-				$result = \apply_filters( 'ba11yc_final_check_result', $result, $check_name, $block_type, $attributes, $content, $check_config );
+			// Allow developers to completely filter the attributes before checks run.
+			$attributes = \apply_filters( 'ba11yc_block_attributes', $attributes, $block_type, $content );
 
-				if ( ! empty( $result ) ) {
-					$results[] = $result;
+			foreach ( $checks as $check_name => $check_config ) {
+				try {
+					if ( ! $check_config['enabled'] ) {
+						$this->log_debug( "Check disabled, skipping: {$block_type}/{$check_name}" );
+						continue;
+					}
+
+					if ( ! \is_callable( $check_config['callback'] ) ) {
+						$this->log_error( "Invalid callback for check: {$block_type}/{$check_name}" );
+						continue;
+					}
+
+					// Allow developers to filter each check config before it runs.
+					$check_config = \apply_filters( 'ba11yc_before_check', $check_config, $check_name, $block_type, $attributes, $content );
+
+					$check_result = \call_user_func(
+						$check_config['callback'],
+						$attributes,
+						$content,
+						$check_config
+					);
+
+					// Allow developers to filter the check result.
+					$check_result = \apply_filters( 'ba11yc_check_result', $check_result, $check_name, $block_type, $attributes, $content, $check_config );
+
+					if ( ! empty( $check_result ) ) {
+						$result = array(
+							'check_name'  => $check_name,
+							'block_type'  => $block_type,
+							'message'     => $check_config['message'],
+							'type'        => $check_config['type'],
+							'priority'    => $check_config['priority'],
+							'description' => $check_config['description'],
+							'result'      => $check_result,
+						);
+
+						// Allow developers to filter the final result object.
+						$result = \apply_filters( 'ba11yc_final_check_result', $result, $check_name, $block_type, $attributes, $content, $check_config );
+
+						if ( ! empty( $result ) ) {
+							$results[] = $result;
+							$this->log_debug( "Check failed: {$block_type}/{$check_name}" );
+						}
+					} else {
+						$this->log_debug( "Check passed: {$block_type}/{$check_name}" );
+					}
+				} catch ( \Exception $e ) {
+					$this->log_error( "Error running check {$block_type}/{$check_name}: " . $e->getMessage() );
+					// Continue with other checks even if one fails.
+					continue;
 				}
 			}
+
+			// Allow developers to filter all results for a block.
+			$results = \apply_filters( 'ba11yc_block_check_results', $results, $block_type, $attributes, $content );
+
+			return $results;
+
+		} catch ( \Exception $e ) {
+			$this->log_error( "Error in run_checks for {$block_type}: " . $e->getMessage() );
+			return array();
 		}
-
-		// Allow developers to filter all results for a block.
-		$results = \apply_filters( 'ba11yc_block_check_results', $results, $block_type, $attributes, $content );
-
-		return $results;
 	}
 
 	/**
@@ -337,11 +427,14 @@ class BlockChecksRegistry {
 	 * Check image alt text length
 	 *
 	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content.
-	 * @param array  $config Check configuration.
+	 * @param string $content Block content (unused but required by interface).
+	 * @param array  $config Check configuration (unused but required by interface).
 	 * @return bool True if check fails.
 	 */
-	public function check_image_alt_length( $attributes, $content, $config ) {
+	public function check_image_alt_length( array $attributes, string $content, array $config ): bool {
+		// Silence the unused parameter warnings.
+		unset( $content, $config );
+
 		if ( ! isset( $attributes['alt'] ) || empty( $attributes['alt'] ) ) {
 			return false;
 		}
@@ -353,11 +446,14 @@ class BlockChecksRegistry {
 	 * Check if image alt text matches caption
 	 *
 	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content.
-	 * @param array  $config Check configuration.
+	 * @param string $content Block content (unused but required by interface).
+	 * @param array  $config Check configuration (unused but required by interface).
 	 * @return bool True if check fails.
 	 */
-	public function check_image_alt_caption_match( $attributes, $content, $config ) {
+	public function check_image_alt_caption_match( array $attributes, string $content, array $config ): bool {
+		// Silence the unused parameter warnings.
+		unset( $content, $config );
+
 		if ( ! isset( $attributes['alt'] ) || ! isset( $attributes['caption'] ) ) {
 			return false;
 		}
@@ -372,11 +468,14 @@ class BlockChecksRegistry {
 	 * Check button text quality
 	 *
 	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content.
-	 * @param array  $config Check configuration.
+	 * @param string $content Block content (unused but required by interface).
+	 * @param array  $config Check configuration (unused but required by interface).
 	 * @return bool True if check fails.
 	 */
-	public function check_button_text( $attributes, $content, $config ) {
+	public function check_button_text( array $attributes, string $content, array $config ): bool {
+		// Silence the unused parameter warnings.
+		unset( $content, $config );
+
 		if ( ! isset( $attributes['text'] ) ) {
 			return false;
 		}
@@ -393,11 +492,14 @@ class BlockChecksRegistry {
 	 * Check table headers
 	 *
 	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content.
-	 * @param array  $config Check configuration.
+	 * @param string $content Block content (unused but required by interface).
+	 * @param array  $config Check configuration (unused but required by interface).
 	 * @return bool True if check fails.
 	 */
-	public function check_table_headers( $attributes, $content, $config ) {
+	public function check_table_headers( array $attributes, string $content, array $config ): bool {
+		// Silence the unused parameter warnings.
+		unset( $content, $config );
+
 		// Check if table has header section defined.
 		$has_header = isset( $attributes['head'] ) && ! empty( $attributes['head'] );
 
@@ -406,5 +508,31 @@ class BlockChecksRegistry {
 
 		// Table should have either headers or caption for accessibility.
 		return ! ( $has_header || $has_caption );
+	}
+
+	/**
+	 * Log error messages when WP_DEBUG is enabled
+	 *
+	 * @param string $message Error message to log.
+	 * @return void
+	 */
+	private function log_error( string $message ): void {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\error_log( 'Block Accessibility Checks - BlockChecksRegistry: ' . $message );
+		}
+	}
+
+	/**
+	 * Log debug messages when WP_DEBUG is enabled
+	 *
+	 * @param string $message Debug message to log.
+	 * @return void
+	 */
+	private function log_debug( string $message ): void {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\error_log( 'Block Accessibility Checks - BlockChecksRegistry DEBUG: ' . $message );
+		}
 	}
 }
