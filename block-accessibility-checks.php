@@ -26,12 +26,8 @@ define( 'BA11YC_VERSION', '1.2.1' );
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Imports the necessary classes for the plugin.
-use BlockAccessibility\BlockConfig;
 use BlockAccessibility\HeadingLevels;
 use BlockAccessibility\PluginInitializer;
-use BlockAccessibility\ScriptsStyles;
-use BlockAccessibility\SettingsPage;
-use BlockAccessibility\Translations;
 
 // Initialize heading levels immediately - before init hook.
 $ba11yc_heading_levels_early = new HeadingLevels();
