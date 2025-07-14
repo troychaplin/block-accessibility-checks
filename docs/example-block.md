@@ -34,7 +34,7 @@ The following integration instructions assume your testimonial block has these a
         "type": "string",
         "default": ""
     },
-    "heading": {
+    "headingText": {
         "type": "string",
         "default": ""
     },
@@ -98,8 +98,8 @@ function check_testimonial_content_required($attributes) {
 
 function check_testimonial_heading_structure($attributes) {
     // Simple check - if heading exists, it should have content
-    if (isset($attributes['heading'])) {
-        return !empty($attributes['heading']);
+    if (isset($attributes['headingText'])) {
+        return !empty($attributes['headingText']);
     }
     return true; // No heading is fine
 }
@@ -214,7 +214,7 @@ function enqueue_testimonial_editor_assets() {
     wp_enqueue_script(
         'my-testimonial-accessibility-checks',
         plugins_url('build/accessibility-checks.js', __FILE__),
-        ['wp-hooks', 'wp-i18n', 'block-accessibility-checks-script'],
+        ['wp-hooks', 'wp-i18n'],
         '1.0.0',
         true
     );
