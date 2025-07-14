@@ -55,16 +55,10 @@ Add these accessibility checks to your main plugin file (after your existing blo
 
 ```php
 // Hook into Block Accessibility Checks after it initializes
-add_action('init', 'register_testimonial_accessibility_checks', 20);
+add_action('ba11yc_ready', 'register_testimonial_accessibility_checks');
 
-function register_testimonial_accessibility_checks() {
-    // Only proceed if Block Accessibility Checks is active
-    if (!class_exists('BlockAccessibilityChecks\BlockChecksRegistry')) {
-        return;
-    }
-
-    $registry = \BlockAccessibilityChecks\BlockChecksRegistry::get_instance();
-
+function register_testimonial_accessibility_checks($registry) {
+    // Registry is passed as parameter from the hook
     // Register check for required author name
     $registry->register_check('my-testimonial-block/testimonial', 'author_required', [
         'message' => __('Author name is required for testimonials.', 'my-testimonial-block'),
@@ -114,20 +108,22 @@ import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 // Get validation rules from PHP (exposed via wp_localize_script)
-const validationRules = window.blockAccessibilityChecks?.validationRules || {};
+const validationRules = window.BlockAccessibilityChecks?.validationRules || {};
 
 /**
- * Validate testimonial block attributes
+ * Validate testimonial block function that follows the same pattern as core checks
  */
-function validateTestimonial(attributes) {
-	const errors = [];
-	const warnings = [];
+function checkTestimonialBlock(block) {
+	// Only validate our block type
+	if (block.name !== 'my-testimonial-block/testimonial') {
+		return { isValid: true };
+	}
 
-	// Get rules for our block
+	const attributes = block.attributes;
 	const blockRules = validationRules['my-testimonial-block/testimonial'] || {};
 
 	// Check each registered rule
-	Object.entries(blockRules).forEach(([checkId, rule]) => {
+	for (const [checkId, rule] of Object.entries(blockRules)) {
 		let isValid = true;
 
 		// Run the validation logic (mirrors PHP logic)
@@ -139,47 +135,36 @@ function validateTestimonial(attributes) {
 				isValid = !!(attributes.content && attributes.content.trim());
 				break;
 			case 'heading_structure':
-				if (attributes.heading) {
-					isValid = !!attributes.heading.trim();
+				if (attributes.headingText) {
+					isValid = !!attributes.headingText.trim();
 				}
 				break;
 		}
 
-		// Add to appropriate array if validation fails
+		// If any check fails, return invalid
 		if (!isValid) {
-			const issue = {
-				id: checkId,
+			return {
+				isValid: false,
+				mode: rule.type, // 'error' or 'warning'
+				clientId: block.clientId,
+				name: block.name,
 				message: rule.message,
-				type: rule.type,
 			};
-
-			if (rule.type === 'error') {
-				errors.push(issue);
-			} else {
-				warnings.push(issue);
-			}
 		}
-	});
+	}
 
-	return { errors, warnings };
+	return { isValid: true };
 }
 
 /**
- * Add validation to block validation filter
+ * Add our validation check to the Block Accessibility Checks system
  */
 addFilter(
-	'blocks.validation.validateBlock',
-	'my-testimonial-block/accessibility-validation',
-	(result, blockType, attributes) => {
-		if (blockType.name === 'my-testimonial-block/testimonial') {
-			const validation = validateTestimonial(attributes);
-			return {
-				...result,
-				accessibilityErrors: validation.errors,
-				accessibilityWarnings: validation.warnings,
-			};
-		}
-		return result;
+	'blockAccessibilityChecks.blockChecksArray',
+	'my-testimonial-block/add-validation',
+	checksArray => {
+		checksArray.push(checkTestimonialBlock);
+		return checksArray;
 	}
 );
 ```
@@ -227,9 +212,11 @@ function enqueue_testimonial_editor_assets() {
 
 2. **PHP-to-JS Bridge**: The Block Accessibility Checks plugin automatically exposes your registered validation rules to JavaScript via `wp_localize_script`.
 
-3. **Real-time Validation**: Your JavaScript code hooks into the validation system to provide immediate feedback in the editor.
+3. **Real-time Validation**: Your JavaScript code hooks into the validation system using the `blockAccessibilityChecks.blockChecksArray` filter to provide immediate feedback in the editor and prevent publishing when there are errors.
 
 4. **Unified System**: Both PHP and JavaScript use the same validation rules and messages, ensuring consistency.
+
+5. **Publish Prevention**: When validation errors are found, the system automatically disables the publish button and prevents saving until the issues are resolved.
 
 ## Advanced Features
 
