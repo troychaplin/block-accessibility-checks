@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { blockChecksArray } from '../registerPlugin';
+import { getBlockChecksArray } from '../registerPlugin';
 
 /**
  * Recursively retrieves invalid blocks from a list of blocks.
@@ -10,6 +10,9 @@ import { blockChecksArray } from '../registerPlugin';
 function getInvalidBlocksRecursive(blocks) {
 	// Recursive function to check each block and its inner blocks
 	return blocks.flatMap(block => {
+		// Get current checks array (including external plugin checks)
+		const blockChecksArray = getBlockChecksArray();
+
 		// Run checks on the current block
 		const results = blockChecksArray.map(check => check(block));
 

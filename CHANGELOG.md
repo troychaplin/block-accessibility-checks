@@ -16,10 +16,89 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- Input validation for heading level data to prevent invalid configurations
+- Option caching in HeadingLevels class for improved performance
+- Comprehensive settings sanitization to validate all user input
+- PluginInitializer class for organized plugin startup and simple service location
+- BlockChecksRegistry class for centralized management of accessibility checks
+- Developer API with extensive hooks and filters for extensibility:
+    - `ba11yc_register_checks` action for registering custom accessibility checks
+    - `ba11yc_ready` action providing access to registry and plugin initializer
+    - `ba11yc_check_registered`, `ba11yc_check_unregistered`, `ba11yc_check_toggled` actions for check lifecycle events
+    - `ba11yc_register_default_checks` filter to prevent default checks from loading
+    - `ba11yc_should_register_check` filter to control individual check registration
+    - `ba11yc_check_args` filter to modify check configuration before registration
+    - `ba11yc_block_checks` filter to control which checks run for specific blocks
+    - `ba11yc_block_attributes` filter to modify block attributes before checks run
+    - `ba11yc_before_check`, `ba11yc_check_result`, `ba11yc_final_check_result` filters for check execution pipeline
+    - `ba11yc_block_check_results` filter for modifying all results for a block
+- Registry API methods for programmatic check management:
+    - `register_check()`, `unregister_check()` for check registration
+    - `set_check_enabled()` for enabling/disabling checks dynamically
+    - `is_check_registered()`, `get_check_config()` for check introspection
+    - `get_registered_block_types()` for discovering available block types
+- Example file demonstrating developer API usage patterns
+- Comprehensive error handling and debug logging system:
+    - Try-catch blocks around all critical operations to prevent plugin crashes
+    - Input validation for all user data and API parameters
+    - Graceful degradation when services fail to initialize
+    - Admin notices for initialization failures
+    - Debug logging for troubleshooting when WP_DEBUG is enabled
+    - Error logging for production issue tracking
+    - Robust fallbacks to maintain plugin functionality during errors
+- Comprehensive type hints for improved code quality and IDE support
+- Enhanced PHPDoc comments with detailed parameter and return type documentation
+- Proper @throws annotations for methods that can throw exceptions
+- Consistent void return type declarations for methods that don't return values
+- Improved nullable type hints (e.g., ?object, ?BlockChecksRegistry) for better type safety
+- PHP-JavaScript unified validation system:
+    - BlockChecksRegistry now serves as single source of truth for all validation rules and messages
+    - JavaScript validation functions now consume PHP registry data via `wp_localize_script()`
+    - Eliminates code duplication between PHP and JavaScript validation logic
+    - Ensures consistent validation behavior across all contexts
+- Enhanced BlockChecksRegistry with additional check methods:
+    - `check_image_alt_required()` for verifying images have alt text (unless decorative)
+    - `check_button_required_content()` for ensuring buttons have both text and links
+    - All checks now include complete metadata for JavaScript consumption
+- Real-time editor validation now powered by PHP registry rules:
+    - Image blocks: alt text required, length validation, caption matching
+    - Button blocks: required content validation, text quality checks
+    - Table blocks: header or caption requirement validation
+- PHP validation rules automatically exposed to JavaScript via `BlockAccessibilityChecks.validationRules`
+- Developer extensibility for custom checks works seamlessly in both PHP and JavaScript contexts
+- Dynamic JavaScript validation system using `blockAccessibilityChecks.blockChecksArray` filter
+- External plugin integration support with proper dependency management and load order
+- Visual error indicators (red borders, inspector panel messages) for invalid blocks in editor
+- Complete integration documentation with working examples for external plugin developers
+
+### Changed
+
+- Higher-order component system updated to use dynamic check registry instead of hardcoded block types
+- JavaScript validation system now supports external plugin checks through filter integration
+- Block error component enhanced to show visual feedback for any registered block type
+- Improved caching system for filtered checks array to prevent repeated filter applications
+- Enhanced developer API documentation with complete integration examples and troubleshooting guide
+- Minimum WordPress version requirement updated to 6.7
+- HeadingLevels class now instantiated early for correct filter timing
+- Improved plugin architecture with centralized service management
+
 ### Fixed
 
+- Visual accessibility indicators not showing for external plugin blocks due to hardcoded block type checks
+- JavaScript validation system not recognizing custom block types from external plugins
+- Higher-order component applying only to core WordPress blocks instead of all registered block types
+- Block error messages and visual styling not appearing for dynamically registered checks
+- Cache invalidation issues with filtered checks array causing stale validation results
+- Debug console logging in production builds removed for cleaner output
 - Issue where heading level one was a fallback in settings
 - Heading levels can now be properly removed in the plugin options
+- Heading level restrictions not working due to incorrect filter timing
+
+### Security
+
+- Enhanced input sanitization for all plugin settings to prevent malicious data injection
 
 ## [1.2.0]
 

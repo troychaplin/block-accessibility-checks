@@ -4,8 +4,12 @@ import { __ } from '@wordpress/i18n';
 // Get validation mode from plugin settings
 const validationMode = BlockAccessibilityChecks.blockChecksOptions.core_image_block_check;
 
+// Get validation rules from PHP registry
+const validationRules = BlockAccessibilityChecks.validationRules || {};
+const imageRules = validationRules['core/image'] || {};
+
 /**
- * Checks if an image block meets accessibility requirements.
+ * Checks if an image block meets accessibility requirements using PHP registry rules.
  *
  * @param {Object} block - The image block to be checked.
  * @return {Object} - The validation response object.
@@ -16,102 +20,134 @@ export function checkImageAlt(block) {
 		return { isValid: true, mode: 'none' };
 	}
 
-	// Check all validation conditions
-	const validationResult = validateImageAccessibility(block);
+	// Run all registered checks for the image block
+	const failures = runImageChecks(block, imageRules);
 
 	// Create response object based on validation result
 	const response = {
-		isValid: validationResult.isValid,
+		isValid: failures.length === 0,
 		message: '',
 		clientId: block.clientId,
-		mode: validationResult.isValid ? 'none' : validationMode,
+		mode: failures.length === 0 ? 'none' : validationMode,
 	};
 
-	// If validation fails, set appropriate error message
-	if (!validationResult.isValid) {
-		response.message = getValidationMessage(validationResult.failureReason, validationMode);
+	// If validation fails, set appropriate error message using the highest priority failure
+	if (failures.length > 0) {
+		const highestPriorityFailure = failures.sort((a, b) => a.priority - b.priority)[0];
+		response.message = formatValidationMessage(highestPriorityFailure.message, validationMode);
 	}
 
 	return response;
 }
 
 /**
- * Validates an image block against accessibility requirements.
+ * Runs all enabled accessibility checks for an image block using PHP registry rules.
  *
  * @param {Object} block - The image block to validate.
- * @return {Object} - Object containing validation result and failure reason if any.
+ * @param {Object} rules - The validation rules from PHP registry.
+ * @return {Array} - Array of validation failures.
  */
-function validateImageAccessibility(block) {
-	const result = {
-		isValid: true,
-		failureReason: null,
-	};
+function runImageChecks(block, rules) {
+	const failures = [];
 
-	// Check if image is marked as decorative
-	const isDecorative = block.attributes.isDecorative === true;
+	// Check each registered rule
+	Object.entries(rules).forEach(([checkName, config]) => {
+		if (!config.enabled) {
+			return;
+		}
 
-	// Check if alt text exists and is not empty
-	const hasAltText = block.attributes.alt && block.attributes.alt.trim() !== '';
+		let checkFailed = false;
 
-	// Check if alt text is not too long
-	const altTextLength = hasAltText ? block.attributes.alt.length : 0;
-	const isAltTextLengthValid = altTextLength <= 125;
+		// Run the appropriate check based on the check name
+		switch (checkName) {
+			case 'alt_text_required':
+				checkFailed = checkAltTextRequired(block.attributes);
+				break;
+			case 'alt_text_length':
+				checkFailed = checkAltTextLength(block.attributes);
+				break;
+			case 'alt_caption_match':
+				checkFailed = checkAltCaptionMatch(block.attributes);
+				break;
+			default:
+				// Unknown check, skip
+				break;
+		}
 
-	// Check if caption doesn't match alt text
-	const hasCaption = block.attributes.caption && block.attributes.caption.trim() !== '';
-	const captionMatchesAlt =
-		hasCaption && hasAltText && block.attributes.caption.trim() === block.attributes.alt.trim();
+		if (checkFailed) {
+			failures.push({
+				checkName,
+				message: config.message,
+				type: config.type,
+				priority: config.priority,
+			});
+		}
+	});
 
-	// Determine which validation fails (if any)
-	if (!hasAltText && !isDecorative) {
-		result.isValid = false;
-		result.failureReason = 'missing_alt';
-	} else if (!isAltTextLengthValid) {
-		result.isValid = false;
-		result.failureReason = 'alt_too_long';
-	} else if (captionMatchesAlt) {
-		result.isValid = false;
-		result.failureReason = 'caption_matches_alt';
-	}
-
-	return result;
+	return failures;
 }
 
 /**
- * Gets the appropriate validation message based on the failure reason and validation mode.
+ * Check if image has required alt text (mirrors PHP logic).
  *
- * @param {string} failureReason - The reason for validation failure.
- * @param {string} mode          - The validation mode (error, warning, none).
- * @return {string} - The formatted validation message.
+ * @param {Object} attributes - Block attributes.
+ * @return {boolean} - True if check fails.
  */
-function getValidationMessage(failureReason, mode) {
-	// Get the base message based on the failure reason
-	let baseMessage = '';
+function checkAltTextRequired(attributes) {
+	// Check if image is marked as decorative
+	const isDecorative = attributes.isDecorative === true;
 
-	switch (failureReason) {
-		case 'missing_alt':
-			baseMessage = __(
-				'Images are required to have alternative text',
-				'block-accessibility-checks'
-			);
-			break;
-		case 'alt_too_long':
-			baseMessage = __(
-				'Image alternative text cannot be longer than 125 characters',
-				'block-accessibility-checks'
-			);
-			break;
-		case 'caption_matches_alt':
-			baseMessage = __(
-				'Image caption cannot be the same as the alternative text',
-				'block-accessibility-checks'
-			);
-			break;
-		default:
-			return '';
+	// If marked as decorative, alt text is not required
+	if (isDecorative) {
+		return false;
 	}
 
-	// Add the appropriate prefix based on the validation mode
+	// Check if alt text exists and is not empty
+	const hasAltText = attributes.alt && attributes.alt.trim() !== '';
+
+	// Return true if check fails (no alt text when required)
+	return !hasAltText;
+}
+
+/**
+ * Check alt text length (mirrors PHP logic).
+ *
+ * @param {Object} attributes - Block attributes.
+ * @return {boolean} - True if check fails.
+ */
+function checkAltTextLength(attributes) {
+	if (!attributes.alt || attributes.alt.trim() === '') {
+		return false;
+	}
+
+	return attributes.alt.length > 125;
+}
+
+/**
+ * Check if alt text matches caption (mirrors PHP logic).
+ *
+ * @param {Object} attributes - Block attributes.
+ * @return {boolean} - True if check fails.
+ */
+function checkAltCaptionMatch(attributes) {
+	if (!attributes.alt || !attributes.caption) {
+		return false;
+	}
+
+	const altText = attributes.alt.trim();
+	const caption = attributes.caption.trim().replace(/<[^>]*>/g, ''); // Strip HTML tags
+
+	return altText !== '' && caption !== '' && altText === caption;
+}
+
+/**
+ * Formats validation message with appropriate prefix based on validation mode.
+ *
+ * @param {string} baseMessage - The base message from PHP registry.
+ * @param {string} mode        - The validation mode (error, warning, none).
+ * @return {string} - The formatted validation message.
+ */
+function formatValidationMessage(baseMessage, mode) {
 	switch (mode) {
 		case 'error':
 			return __('Error:', 'block-accessibility-checks') + ' ' + baseMessage;

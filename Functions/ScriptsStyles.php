@@ -40,7 +40,7 @@ class ScriptsStyles {
 	 * @param string       $plugin_file The path to the plugin file.
 	 * @param Translations $translations The translations object.
 	 */
-	public function __construct( $plugin_file, Translations $translations ) {
+	public function __construct( string $plugin_file, Translations $translations ) {
 		$this->plugin_file  = $plugin_file;
 		$this->translations = $translations;
 	}
@@ -104,12 +104,17 @@ class ScriptsStyles {
 		 */
 		$block_checks_options = get_option( 'block_checks_options', array() );
 
-		wp_localize_script(
+		// Get the block checks registry to expose validation rules to JavaScript.
+		$registry         = \BlockAccessibility\BlockChecksRegistry::get_instance();
+		$validation_rules = $this->prepare_validation_rules_for_js( $registry );
+
+		\wp_localize_script(
 			$script_handle,
 			'BlockAccessibilityChecks',
 			array(
 				'blockChecksOptions' => $block_checks_options,
 				'blocks'             => BlockConfig::get_instance()->get_block_config(),
+				'validationRules'    => $validation_rules,
 			)
 		);
 	}
@@ -165,5 +170,36 @@ class ScriptsStyles {
 			array(),
 			BA11YC_VERSION
 		);
+	}
+
+	/**
+	 * Prepare validation rules from PHP registry for JavaScript consumption
+	 *
+	 * Converts the PHP BlockChecksRegistry data into a format that JavaScript
+	 * can use for client-side validation, excluding server-side callbacks.
+	 *
+	 * @param BlockChecksRegistry $registry The block checks registry instance.
+	 * @return array Prepared validation rules for JavaScript.
+	 */
+	private function prepare_validation_rules_for_js( BlockChecksRegistry $registry ): array {
+		$all_checks = $registry->get_all_checks();
+		$js_rules   = array();
+
+		foreach ( $all_checks as $block_type => $checks ) {
+			$js_rules[ $block_type ] = array();
+
+			foreach ( $checks as $check_name => $check_config ) {
+				// Only include configuration that JavaScript needs.
+				$js_rules[ $block_type ][ $check_name ] = array(
+					'message'     => $check_config['message'],
+					'type'        => $check_config['type'],
+					'priority'    => $check_config['priority'],
+					'enabled'     => $check_config['enabled'],
+					'description' => $check_config['description'],
+				);
+			}
+		}
+
+		return $js_rules;
 	}
 }
