@@ -34,12 +34,6 @@ export function getBlockChecksArray() {
 	if (cacheInvalidated || !cachedChecksArray) {
 		cachedChecksArray = applyFilters('blockAccessibilityChecks.blockChecksArray', coreChecks);
 		cacheInvalidated = false;
-		// eslint-disable-next-line no-console
-		console.log(
-			'Block Accessibility Checks: getBlockChecksArray refreshed cache, returning',
-			cachedChecksArray.length,
-			'checks'
-		);
 	}
 	return cachedChecksArray;
 }

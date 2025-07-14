@@ -4,10 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
-
-import { checkButtonAttributes } from '../blockChecks/checkButton';
-import { checkImageAlt } from '../blockChecks/checkImage';
-import { checkTableHeaderRow } from '../blockChecks/checkTable';
+import { getBlockChecksArray } from '../registerPlugin';
 
 /**
  * A higher-order component that adds error handling and accessibility checks to a block component.
@@ -27,55 +24,37 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		const prevAltRef = useRef(attributes.alt);
 
 		useEffect(() => {
-			let result;
+			// Get current checks array (including external plugin checks)
+			const blockChecksArray = getBlockChecksArray();
 
-			// If this is an image block and the alt text changed
+			// Clear any existing timeout
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+
+			// For image blocks with alt text changes, add a delay
 			if (name === 'core/image' && prevAltRef.current !== attributes.alt) {
-				// Clear any existing timeout
-				if (timeoutRef.current) {
-					clearTimeout(timeoutRef.current);
-				}
-
-				// Set a new timeout only for alt text changes
 				timeoutRef.current = setTimeout(() => {
-					const imageResult = checkImageAlt({
-						name,
-						attributes,
-						clientId,
-					});
-					setValidationResult(imageResult);
+					// Run all applicable checks for this block
+					const results = blockChecksArray.map(check =>
+						check({ name, attributes, clientId })
+					);
+					const firstInvalid = results.find(result => !result.isValid);
+
+					setValidationResult(
+						firstInvalid || { isValid: true, mode: 'none', message: '' }
+					);
 				}, 1500);
 
-				// Update previous alt value
 				prevAltRef.current = attributes.alt;
 			} else {
 				// Immediate validation for other cases
-				switch (name) {
-					case 'core/button':
-						result = checkButtonAttributes({
-							name,
-							attributes,
-							clientId,
-						});
-						break;
-					case 'core/image':
-						result = checkImageAlt({
-							name,
-							attributes,
-							clientId,
-						});
-						break;
-					case 'core/table':
-						result = checkTableHeaderRow({
-							name,
-							attributes,
-							clientId,
-						});
-						break;
-					default:
-						result = { isValid: true, mode: 'none', message: '' };
-				}
-				setValidationResult(result);
+				const results = blockChecksArray.map(check =>
+					check({ name, attributes, clientId })
+				);
+				const firstInvalid = results.find(result => !result.isValid);
+
+				setValidationResult(firstInvalid || { isValid: true, mode: 'none', message: '' });
 			}
 
 			return () => {

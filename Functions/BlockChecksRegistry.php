@@ -108,7 +108,7 @@ class BlockChecksRegistry {
 			'button_required_content',
 			array(
 				'callback'    => array( $this, 'check_button_required_content' ),
-				'message'     => \__( 'Blah Buttons must have text and a link', 'block-accessibility-checks' ),
+				'message'     => \__( 'Buttons must have text and a link', 'block-accessibility-checks' ),
 				'type'        => 'error',
 				'priority'    => 5,
 				'description' => \__( 'Buttons without text or links are not accessible to screen reader users', 'block-accessibility-checks' ),
