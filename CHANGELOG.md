@@ -68,15 +68,30 @@ Prefix the change with one of these keywords:
     - Table blocks: header or caption requirement validation
 - PHP validation rules automatically exposed to JavaScript via `BlockAccessibilityChecks.validationRules`
 - Developer extensibility for custom checks works seamlessly in both PHP and JavaScript contexts
+- Dynamic JavaScript validation system using `blockAccessibilityChecks.blockChecksArray` filter
+- External plugin integration support with proper dependency management and load order
+- Visual error indicators (red borders, inspector panel messages) for invalid blocks in editor
+- Complete integration documentation with working examples for external plugin developers
 
 ### Changed
 
+- Higher-order component system updated to use dynamic check registry instead of hardcoded block types
+- JavaScript validation system now supports external plugin checks through filter integration
+- Block error component enhanced to show visual feedback for any registered block type
+- Improved caching system for filtered checks array to prevent repeated filter applications
+- Enhanced developer API documentation with complete integration examples and troubleshooting guide
 - Minimum WordPress version requirement updated to 6.7
 - HeadingLevels class now instantiated early for correct filter timing
 - Improved plugin architecture with centralized service management
 
 ### Fixed
 
+- Visual accessibility indicators not showing for external plugin blocks due to hardcoded block type checks
+- JavaScript validation system not recognizing custom block types from external plugins
+- Higher-order component applying only to core WordPress blocks instead of all registered block types
+- Block error messages and visual styling not appearing for dynamically registered checks
+- Cache invalidation issues with filtered checks array causing stale validation results
+- Debug console logging in production builds removed for cleaner output
 - Issue where heading level one was a fallback in settings
 - Heading levels can now be properly removed in the plugin options
 - Heading level restrictions not working due to incorrect filter timing
