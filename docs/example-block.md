@@ -1,545 +1,273 @@
 # Block Accessibility Checks - External Plugin Integration Example
 
-This example demonstrates how to create a standalone block plugin that integrates with the Block Accessibility Checks plugin to add custom accessibility validation.
+This example demonstrates how to integrate your existing block plugin with the Block Accessibility Checks plugin to add custom accessibility validation.
 
 ## Overview
 
-We'll create a "testimonial" block plugin that includes accessibility checks for:
+We'll show how to add accessibility checks to a "testimonial" block for:
 
 - Required author name
 - Required testimonial content
 - Proper heading structure if a heading is included
 
-## Complete Integration Example
+## Getting Started
 
-### 1. Plugin Structure
+If you're creating a new block plugin, start with [@wordpress/create-block](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) to scaffold your basic block structure:
 
-```
-my-testimonial-block/
-├── my-testimonial-block.php          # Main plugin file
-├── src/
-│   ├── block.json                    # Block registration
-│   ├── edit.js                       # Block editor component
-│   ├── save.js                       # Block save function
-│   ├── style.scss                    # Block styles
-│   └── accessibility-checks.js       # Custom accessibility validation
-├── build/                            # Compiled assets
-└── package.json                      # Build configuration
+```bash
+npx @wordpress/create-block my-testimonial-block
 ```
 
-### 2. Main Plugin File (my-testimonial-block.php)
+This will create the basic plugin structure with all the necessary files for a WordPress block.
 
-```php
-<?php
-/**
- * Plugin Name: My Testimonial Block
- * Description: A testimonial block with accessibility checks
- * Version: 1.0.0
- * Text Domain: my-testimonial-block
- */
+## Required Block Attributes
 
-// Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-class MyTestimonialBlock {
-
-    public function __construct() {
-        add_action('init', array($this, 'register_block'));
-        add_action('ba11yc_register_checks', array($this, 'register_accessibility_checks'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_block_assets'));
-        add_action('enqueue_block_editor_assets', array($this, 'enqueue_editor_assets'));
-    }
-
-    /**
-     * Register the testimonial block
-     */
-    public function register_block() {
-        register_block_type(__DIR__ . '/src');
-    }
-
-    /**
-     * Register custom accessibility checks with Block Accessibility Checks plugin
-     */
-    public function register_accessibility_checks($registry) {
-        // Only register if the registry exists (plugin is active)
-        if (!$registry) {
-            return;
-        }
-
-        // Check for required author name
-        $registry->register_check(
-            'my-testimonial-block/testimonial',
-            'author_required',
-            array(
-                'callback'    => array($this, 'check_author_required'),
-                'message'     => __('Testimonials must include an author name for credibility and accessibility', 'my-testimonial-block'),
-                'type'        => 'error',
-                'priority'    => 5,
-                'description' => __('Author attribution is essential for testimonial credibility and screen reader context', 'my-testimonial-block'),
-            )
-        );
-
-        // Check for testimonial content
-        $registry->register_check(
-            'my-testimonial-block/testimonial',
-            'content_required',
-            array(
-                'callback'    => array($this, 'check_content_required'),
-                'message'     => __('Testimonials must include content text', 'my-testimonial-block'),
-                'type'        => 'error',
-                'priority'    => 5,
-                'description' => __('Empty testimonials provide no value to users', 'my-testimonial-block'),
-            )
-        );
-
-        // Check heading level structure
-        $registry->register_check(
-            'my-testimonial-block/testimonial',
-            'heading_structure',
-            array(
-                'callback'    => array($this, 'check_heading_structure'),
-                'message'     => __('Testimonial headings should follow proper heading hierarchy', 'my-testimonial-block'),
-                'type'        => 'warning',
-                'priority'    => 10,
-                'description' => __('Proper heading structure helps screen readers navigate content', 'my-testimonial-block'),
-            )
-        );
-    }
-
-    /**
-     * Check if testimonial has required author name
-     */
-    public function check_author_required($attributes, $content, $config) {
-        if (!isset($attributes['author']) || empty(trim($attributes['author']))) {
-            return true; // Check fails
-        }
-        return false; // Check passes
-    }
-
-    /**
-     * Check if testimonial has required content
-     */
-    public function check_content_required($attributes, $content, $config) {
-        if (!isset($attributes['content']) || empty(trim(wp_strip_all_tags($attributes['content'])))) {
-            return true; // Check fails
-        }
-        return false; // Check passes
-    }
-
-    /**
-     * Check testimonial heading structure
-     */
-    public function check_heading_structure($attributes, $content, $config) {
-        // If no heading is used, check passes
-        if (!isset($attributes['headingLevel']) || !isset($attributes['heading'])) {
-            return false;
-        }
-
-        $heading_level = (int) $attributes['headingLevel'];
-        $heading_text = trim(wp_strip_all_tags($attributes['heading']));
-
-        // Check if heading is too low level (beyond H4 for testimonials)
-        if ($heading_level > 4) {
-            return true; // Check fails
-        }
-
-        // Check if heading text is too short
-        if (!empty($heading_text) && strlen($heading_text) < 3) {
-            return true; // Check fails
-        }
-
-        return false; // Check passes
-    }
-
-    /**
-     * Enqueue block assets for frontend
-     */
-    public function enqueue_block_assets() {
-        wp_enqueue_style(
-            'my-testimonial-block-style',
-            plugins_url('build/style.css', __FILE__),
-            array(),
-            '1.0.0'
-        );
-    }
-
-    /**
-     * Enqueue assets for block editor
-     */
-    public function enqueue_editor_assets() {
-        wp_enqueue_script(
-            'my-testimonial-block-editor',
-            plugins_url('build/index.js', __FILE__),
-            array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-block-editor'),
-            '1.0.0',
-            true
-        );
-
-        // Enqueue our accessibility checks for real-time validation
-        wp_enqueue_script(
-            'my-testimonial-accessibility-checks',
-            plugins_url('build/accessibility-checks.js', __FILE__),
-            array('wp-hooks', 'wp-i18n'),
-            '1.0.0',
-            true
-        );
-    }
-}
-
-// Initialize the plugin
-new MyTestimonialBlock();
-```
-
-### 3. Block Definition (src/block.json)
+The following integration instructions assume your testimonial block has these attributes defined in your `block.json`. If your block doesn't have these yet, add them to your existing attributes:
 
 ```json
-{
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "my-testimonial-block/testimonial",
-	"version": "1.0.0",
-	"title": "Testimonial",
-	"category": "text",
-	"icon": "format-quote",
-	"description": "Display customer testimonials with accessibility checks.",
-	"example": {},
-	"supports": {
-		"html": false,
-		"anchor": true
-	},
-	"attributes": {
-		"content": {
-			"type": "string",
-			"default": ""
-		},
-		"author": {
-			"type": "string",
-			"default": ""
-		},
-		"heading": {
-			"type": "string",
-			"default": ""
-		},
-		"headingLevel": {
-			"type": "number",
-			"default": 3
-		},
-		"company": {
-			"type": "string",
-			"default": ""
-		}
-	},
-	"textdomain": "my-testimonial-block",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+"attributes": {
+    "content": {
+        "type": "string",
+        "default": ""
+    },
+    "author": {
+        "type": "string",
+        "default": ""
+    },
+    "heading": {
+        "type": "string",
+        "default": ""
+    },
+    "headingLevel": {
+        "type": "number",
+        "default": 3
+    }
 }
 ```
 
-### 4. JavaScript Accessibility Checks (src/accessibility-checks.js)
+## Integration Points
 
-```javascript
-/**
- * Accessibility checks for testimonial block that integrate with Block Accessibility Checks plugin
- */
-
-import { __ } from '@wordpress/i18n';
-import { addFilter } from '@wordpress/hooks';
-
-// Check if Block Accessibility Checks plugin is available
-const isA11yChecksAvailable =
-	window.BlockAccessibilityChecks && window.BlockAccessibilityChecks.validationRules;
-
-if (isA11yChecksAvailable) {
-	/**
-	 * Add our custom block to the validation system
-	 */
-	addFilter(
-		'blockAccessibilityChecks.getBlockChecks',
-		'my-testimonial-block/add-testimonial-checks',
-		function (checks) {
-			// Add our testimonial check function to the existing checks array
-			checks.push(checkTestimonialAccessibility);
-			return checks;
-		}
-	);
-
-	/**
-	 * Main testimonial accessibility check function
-	 * This mirrors the structure used by the core plugin
-	 */
-	function checkTestimonialAccessibility(block) {
-		// Only process our testimonial blocks
-		if (block.name !== 'my-testimonial-block/testimonial') {
-			return { isValid: true, mode: 'none' };
-		}
-
-		// Get validation rules for our block from PHP registry
-		const validationRules = window.BlockAccessibilityChecks.validationRules || {};
-		const testimonialRules = validationRules['my-testimonial-block/testimonial'] || {};
-
-		// Run all registered checks for our block
-		const failures = runTestimonialChecks(block, testimonialRules);
-
-		// Determine validation mode based on plugin settings
-		// You might want to add your own setting for this, or use a default
-		const validationMode = getValidationMode(failures);
-
-		// Create response object
-		const response = {
-			isValid: failures.length === 0,
-			message: '',
-			clientId: block.clientId,
-			mode: failures.length === 0 ? 'none' : validationMode,
-		};
-
-		// If validation fails, set appropriate error message using highest priority failure
-		if (failures.length > 0) {
-			const highestPriorityFailure = failures.sort((a, b) => a.priority - b.priority)[0];
-			response.message = formatValidationMessage(
-				highestPriorityFailure.message,
-				validationMode
-			);
-		}
-
-		return response;
-	}
-
-	/**
-	 * Run all enabled accessibility checks for testimonial block using PHP registry rules
-	 */
-	function runTestimonialChecks(block, rules) {
-		const failures = [];
-
-		// Check each registered rule
-		Object.entries(rules).forEach(([checkName, config]) => {
-			if (!config.enabled) {
-				return;
-			}
-
-			let checkFailed = false;
-
-			// Run the appropriate check based on the check name
-			// These mirror the PHP check logic
-			switch (checkName) {
-				case 'author_required':
-					checkFailed = checkAuthorRequired(block.attributes);
-					break;
-				case 'content_required':
-					checkFailed = checkContentRequired(block.attributes);
-					break;
-				case 'heading_structure':
-					checkFailed = checkHeadingStructure(block.attributes);
-					break;
-				default:
-					// Unknown check, skip
-					break;
-			}
-
-			if (checkFailed) {
-				failures.push({
-					checkName,
-					message: config.message,
-					type: config.type,
-					priority: config.priority,
-				});
-			}
-		});
-
-		return failures;
-	}
-
-	/**
-	 * Check if testimonial has required author (mirrors PHP logic)
-	 */
-	function checkAuthorRequired(attributes) {
-		if (!attributes.author || attributes.author.trim() === '') {
-			return true; // Check fails
-		}
-		return false; // Check passes
-	}
-
-	/**
-	 * Check if testimonial has required content (mirrors PHP logic)
-	 */
-	function checkContentRequired(attributes) {
-		if (!attributes.content) {
-			return true; // Check fails
-		}
-
-		// Strip HTML tags and check if content exists
-		const textContent = attributes.content.replace(/<[^>]*>/g, '').trim();
-		if (textContent === '') {
-			return true; // Check fails
-		}
-
-		return false; // Check passes
-	}
-
-	/**
-	 * Check testimonial heading structure (mirrors PHP logic)
-	 */
-	function checkHeadingStructure(attributes) {
-		// If no heading is used, check passes
-		if (!attributes.headingLevel || !attributes.heading) {
-			return false;
-		}
-
-		const headingLevel = parseInt(attributes.headingLevel);
-		const headingText = attributes.heading.replace(/<[^>]*>/g, '').trim();
-
-		// Check if heading is too low level (beyond H4 for testimonials)
-		if (headingLevel > 4) {
-			return true; // Check fails
-		}
-
-		// Check if heading text is too short
-		if (headingText !== '' && headingText.length < 3) {
-			return true; // Check fails
-		}
-
-		return false; // Check passes
-	}
-
-	/**
-	 * Determine validation mode - you can customize this based on your needs
-	 */
-	function getValidationMode(failures) {
-		// Check if any failures are errors
-		const hasErrors = failures.some(failure => failure.type === 'error');
-		return hasErrors ? 'error' : 'warning';
-	}
-
-	/**
-	 * Format validation message with appropriate prefix
-	 */
-	function formatValidationMessage(baseMessage, mode) {
-		switch (mode) {
-			case 'error':
-				return __('Error:', 'my-testimonial-block') + ' ' + baseMessage;
-			case 'warning':
-				return __('Warning:', 'my-testimonial-block') + ' ' + baseMessage;
-			case 'none':
-			default:
-				return baseMessage;
-		}
-	}
-}
-```
-
-### 5. Block Editor Component (src/edit.js)
-
-```javascript
-import { __ } from '@wordpress/i18n';
-import { useBlockProps, RichText, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, SelectControl } from '@wordpress/components';
-
-export default function Edit({ attributes, setAttributes }) {
-	const { content, author, heading, headingLevel, company } = attributes;
-
-	const blockProps = useBlockProps();
-
-	const HeadingTag = `h${headingLevel}`;
-
-	return (
-		<>
-			<InspectorControls>
-				<PanelBody title={__('Heading Settings', 'my-testimonial-block')}>
-					<SelectControl
-						label={__('Heading Level', 'my-testimonial-block')}
-						value={headingLevel}
-						options={[
-							{ label: 'H2', value: 2 },
-							{ label: 'H3', value: 3 },
-							{ label: 'H4', value: 4 },
-							{ label: 'H5', value: 5 },
-							{ label: 'H6', value: 6 },
-						]}
-						onChange={value => setAttributes({ headingLevel: parseInt(value) })}
-					/>
-				</PanelBody>
-			</InspectorControls>
-
-			<div {...blockProps}>
-				<blockquote className="testimonial">
-					{heading && (
-						<HeadingTag className="testimonial__heading">
-							<RichText
-								tagName="span"
-								value={heading}
-								onChange={value => setAttributes({ heading: value })}
-								placeholder={__(
-									'Optional testimonial heading...',
-									'my-testimonial-block'
-								)}
-							/>
-						</HeadingTag>
-					)}
-
-					<RichText
-						tagName="p"
-						className="testimonial__content"
-						value={content}
-						onChange={value => setAttributes({ content: value })}
-						placeholder={__('Enter testimonial content...', 'my-testimonial-block')}
-					/>
-
-					<footer className="testimonial__attribution">
-						<RichText
-							tagName="cite"
-							className="testimonial__author"
-							value={author}
-							onChange={value => setAttributes({ author: value })}
-							placeholder={__('Author name...', 'my-testimonial-block')}
-						/>
-						{company && (
-							<RichText
-								tagName="span"
-								className="testimonial__company"
-								value={company}
-								onChange={value => setAttributes({ company: value })}
-								placeholder={__('Company name...', 'my-testimonial-block')}
-							/>
-						)}
-					</footer>
-				</blockquote>
-			</div>
-		</>
-	);
-}
-```
-
-## Key Integration Points
+The following sections show only the **additional code** you need to add to integrate with Block Accessibility Checks:
 
 ### 1. PHP Integration
 
-- **Hook into `ba11yc_register_checks`**: This is the main entry point for registering your custom checks
-- **Mirror PHP logic in JavaScript**: The validation logic should be identical in both PHP and JavaScript
-- **Use the registry pattern**: Follow the same structure as the core plugin for consistency
+Add these accessibility checks to your main plugin file (after your existing block registration):
 
-### 2. JavaScript Integration
+```php
+// Hook into Block Accessibility Checks after it initializes
+add_action('init', 'register_testimonial_accessibility_checks', 20);
 
-- **Check for plugin availability**: Always verify that Block Accessibility Checks is active before registering JS checks
-- **Access validation rules**: Use `window.BlockAccessibilityChecks.validationRules` to get your PHP-registered rules
-- **Follow the validation pattern**: Use the same structure as core blocks for consistency
-- **Add to the checks system**: Use WordPress hooks to integrate with the existing validation system
+function register_testimonial_accessibility_checks() {
+    // Only proceed if Block Accessibility Checks is active
+    if (!class_exists('BlockAccessibilityChecks\BlockChecksRegistry')) {
+        return;
+    }
 
-### 3. Benefits of This Approach
+    $registry = \BlockAccessibilityChecks\BlockChecksRegistry::get_instance();
 
-- **Automatic integration**: Your checks appear in the Block Accessibility Checks settings page
-- **Consistent messaging**: Same validation messages in editor and on save
-- **Extensible**: Other developers can modify your checks using the same filter system
-- **Performance**: Real-time validation in the editor with server-side verification
-- **Maintainable**: Single source of truth for validation logic
+    // Register check for required author name
+    $registry->register_check('my-testimonial-block/testimonial', 'author_required', [
+        'message' => __('Author name is required for testimonials.', 'my-testimonial-block'),
+        'type' => 'error',
+        'callback' => 'check_testimonial_author_required'
+    ]);
 
-### 4. Testing Your Integration
+    // Register check for required content
+    $registry->register_check('my-testimonial-block/testimonial', 'content_required', [
+        'message' => __('Testimonial content cannot be empty.', 'my-testimonial-block'),
+        'type' => 'error',
+        'callback' => 'check_testimonial_content_required'
+    ]);
 
-1. Activate both plugins
-2. Create a testimonial block in the editor
-3. Try leaving required fields empty - you should see validation errors
-4. Check the Block Accessibility Checks settings page - your checks should appear there
-5. Disable your checks in settings - they should stop validating
+    // Register check for heading structure
+    $registry->register_check('my-testimonial-block/testimonial', 'heading_structure', [
+        'message' => __('If using a heading, ensure it follows proper heading hierarchy.', 'my-testimonial-block'),
+        'type' => 'warning',
+        'callback' => 'check_testimonial_heading_structure'
+    ]);
+}
 
-This example demonstrates the complete integration pattern that allows external block plugins to seamlessly work with the Block Accessibility Checks plugin's unified validation system.
+// Validation callback functions
+function check_testimonial_author_required($attributes) {
+    return !empty($attributes['author']);
+}
+
+function check_testimonial_content_required($attributes) {
+    return !empty($attributes['content']);
+}
+
+function check_testimonial_heading_structure($attributes) {
+    // Simple check - if heading exists, it should have content
+    if (isset($attributes['heading'])) {
+        return !empty($attributes['heading']);
+    }
+    return true; // No heading is fine
+}
+```
+
+### 2. JavaScript Integration - Create accessibility-checks.js
+
+Create a new file `src/accessibility-checks.js` for real-time validation in the editor:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
+
+// Get validation rules from PHP (exposed via wp_localize_script)
+const validationRules = window.blockAccessibilityChecks?.validationRules || {};
+
+/**
+ * Validate testimonial block attributes
+ */
+function validateTestimonial(attributes) {
+	const errors = [];
+	const warnings = [];
+
+	// Get rules for our block
+	const blockRules = validationRules['my-testimonial-block/testimonial'] || {};
+
+	// Check each registered rule
+	Object.entries(blockRules).forEach(([checkId, rule]) => {
+		let isValid = true;
+
+		// Run the validation logic (mirrors PHP logic)
+		switch (checkId) {
+			case 'author_required':
+				isValid = !!(attributes.author && attributes.author.trim());
+				break;
+			case 'content_required':
+				isValid = !!(attributes.content && attributes.content.trim());
+				break;
+			case 'heading_structure':
+				if (attributes.heading) {
+					isValid = !!attributes.heading.trim();
+				}
+				break;
+		}
+
+		// Add to appropriate array if validation fails
+		if (!isValid) {
+			const issue = {
+				id: checkId,
+				message: rule.message,
+				type: rule.type,
+			};
+
+			if (rule.type === 'error') {
+				errors.push(issue);
+			} else {
+				warnings.push(issue);
+			}
+		}
+	});
+
+	return { errors, warnings };
+}
+
+/**
+ * Add validation to block validation filter
+ */
+addFilter(
+	'blocks.validation.validateBlock',
+	'my-testimonial-block/accessibility-validation',
+	(result, blockType, attributes) => {
+		if (blockType.name === 'my-testimonial-block/testimonial') {
+			const validation = validateTestimonial(attributes);
+			return {
+				...result,
+				accessibilityErrors: validation.errors,
+				accessibilityWarnings: validation.warnings,
+			};
+		}
+		return result;
+	}
+);
+```
+
+### 3. Build Configuration - Update webpack.config.js
+
+Add the accessibility checks to your build process by creating a `webpack.config.js` file:
+
+```javascript
+const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+const path = require('path');
+
+module.exports = {
+	...defaultConfig,
+	entry: {
+		...defaultConfig.entry(),
+		'accessibility-checks': path.resolve(__dirname, 'src/accessibility-checks.js'),
+	},
+};
+```
+
+### 4. Script Enqueuing - Add to Main Plugin File
+
+Add this to your existing enqueue function:
+
+```php
+// Add to your existing enqueue_block_editor_assets function
+function enqueue_testimonial_editor_assets() {
+    // ...your existing editor scripts...
+
+    // Add accessibility checks script
+    wp_enqueue_script(
+        'my-testimonial-accessibility-checks',
+        plugins_url('build/accessibility-checks.js', __FILE__),
+        ['wp-hooks', 'wp-i18n', 'block-accessibility-checks-script'],
+        '1.0.0',
+        true
+    );
+}
+```
+
+## How It Works
+
+1. **PHP Registration**: Your plugin registers accessibility checks with the Block Accessibility Checks registry during WordPress initialization.
+
+2. **PHP-to-JS Bridge**: The Block Accessibility Checks plugin automatically exposes your registered validation rules to JavaScript via `wp_localize_script`.
+
+3. **Real-time Validation**: Your JavaScript code hooks into the validation system to provide immediate feedback in the editor.
+
+4. **Unified System**: Both PHP and JavaScript use the same validation rules and messages, ensuring consistency.
+
+## Advanced Features
+
+### Custom Rule Types
+
+You can register different types of checks:
+
+```php
+$registry->register_check('my-block/name', 'check_id', [
+    'message' => 'Error message',
+    'type' => 'error',        // 'error', 'warning', or 'info'
+    'priority' => 10,         // Lower runs first
+    'callback' => 'callback_function',
+    'description' => 'Detailed explanation for developers'
+]);
+```
+
+### Conditional Checks
+
+Make checks conditional based on other attributes:
+
+```php
+function check_conditional_rule($attributes) {
+    // Only validate if certain conditions are met
+    if (!isset($attributes['enableFeature']) || !$attributes['enableFeature']) {
+        return true; // Skip validation
+    }
+
+    return !empty($attributes['requiredWhenEnabled']);
+}
+```
+
+## Testing Your Integration
+
+1. Install both plugins
+2. Create a new testimonial block
+3. Leave required fields empty - you should see validation errors
+4. Fill in the fields - errors should disappear
+5. Check that both editor and PHP validation work consistently
+
+For more details on the validation system architecture, see [developer-api.md](developer-api.md).
