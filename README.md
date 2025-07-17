@@ -32,6 +32,8 @@ The plugin provides a powerful API for developers to extend functionality with c
 
 ### Quick Start Example
 
+**PHP Registration (for settings and metadata):**
+
 ```php
 add_action( 'ba11yc_register_checks', 'my_custom_checks' );
 
@@ -40,21 +42,40 @@ function my_custom_checks( $registry ) {
         'my-plugin/custom-block',
         'required_content',
         array(
-            'callback' => 'check_required_content',
-            'message'  => 'This field is required for accessibility compliance',
-            'type'     => 'error', // 'error', 'warning', or 'info'
+            'message'     => 'This field is required for accessibility compliance',
+            'type'        => 'error', // 'error', 'warning', 'settings', or 'none'
+            'priority'    => 10,
+            'description' => 'Content validation for accessibility compliance',
         )
     );
 }
+```
 
-function check_required_content( $attributes, $content, $config ) {
-    return empty( trim( $attributes['requiredField'] ?? '' ) );
-}
+**JavaScript Validation Implementation:**
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'ba11yc.validateBlock',
+	'my-plugin/validation',
+	(isValid, blockType, attributes, checkName, rule) => {
+		if (blockType !== 'my-plugin/custom-block') {
+			return isValid;
+		}
+
+		if (checkName === 'required_content') {
+			return attributes.content && attributes.content.trim().length > 0;
+		}
+
+		return isValid;
+	}
+);
 ```
 
 ### Key Features for Developers
 
-- **Unified PHP-JavaScript Architecture:** Write validation logic once in PHP, automatically available in JavaScript
+- **JavaScript-only Validation:** All validation logic runs in JavaScript for real-time editor feedback
 - **Visual Integration:** Custom checks automatically show error indicators and messages in the block editor
 - **Publishing Control:** Error-level checks prevent publishing, warnings allow with notification
 - **Flexible Registration:** Support for multiple check types with priority control

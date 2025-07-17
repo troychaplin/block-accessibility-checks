@@ -5,11 +5,9 @@
  * with the WordPress block editor.
  */
 
-import { addFilter } from '@wordpress/hooks';
-
-// Get validation rules from PHP
+// Get block check configuration from PHP
 const blockAccessibilityChecks = window.BlockAccessibilityChecks || {};
-const validationRules = blockAccessibilityChecks.validationRules || {};
+const blockChecksConfig = blockAccessibilityChecks.validationRules || {};
 
 /**
  * Universal block validation function
@@ -22,12 +20,12 @@ const validationRules = blockAccessibilityChecks.validationRules || {};
  */
 export function validateBlock(block) {
 	// Only validate blocks that have registered checks
-	if (!validationRules[block.name]) {
+	if (!blockChecksConfig[block.name]) {
 		return { isValid: true };
 	}
 
 	const attributes = block.attributes;
-	const blockRules = validationRules[block.name];
+	const blockRules = blockChecksConfig[block.name];
 
 	// Check each registered rule
 	for (const [checkName, rule] of Object.entries(blockRules)) {
@@ -36,7 +34,7 @@ export function validateBlock(block) {
 			continue;
 		}
 
-		// Allow external plugins to provide validation logic
+		// Use the new JavaScript-only validation system
 		const isValid = wp.hooks.applyFilters(
 			'ba11yc.validateBlock',
 			true, // Default: validation passes
@@ -61,27 +59,3 @@ export function validateBlock(block) {
 
 	return { isValid: true };
 }
-
-/**
- * Integration with existing block validation system
- *
- * This hooks into the existing block checks infrastructure to provide
- * the new unified validation system.
- */
-addFilter(
-	'ba11yc.blockValidation',
-	'ba11yc/unified-validation',
-	(originalResult, block) => {
-		// Try the new validation system first
-		const newResult = validateBlock(block);
-
-		// If new system finds an issue, use it
-		if (!newResult.isValid) {
-			return newResult;
-		}
-
-		// Otherwise, fall back to original result
-		return originalResult;
-	},
-	5 // High priority to run early
-);
