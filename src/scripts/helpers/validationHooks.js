@@ -16,16 +16,17 @@ const blockChecksConfig = blockAccessibilityChecks.validationRules || {};
  * External plugins can hook into this via wp.hooks.addFilter().
  *
  * @param {Object} block - The block object to validate
- * @return {Object} Validation result
+ * @return {Object} Validation result with all issues
  */
 export function validateBlock(block) {
 	// Only validate blocks that have registered checks
 	if (!blockChecksConfig[block.name]) {
-		return { isValid: true };
+		return { isValid: true, issues: [] };
 	}
 
 	const attributes = block.attributes;
 	const blockRules = blockChecksConfig[block.name];
+	const issues = [];
 
 	// Check each registered rule
 	for (const [checkName, rule] of Object.entries(blockRules)) {
@@ -44,18 +45,43 @@ export function validateBlock(block) {
 			rule
 		);
 
-		// If any check fails, return invalid
+		// If check fails, add to issues array
 		if (!isValid) {
-			return {
-				isValid: false,
-				mode: rule.type,
-				clientId: block.clientId,
-				name: block.name,
-				message: rule.message,
+			let priority = 3; // Default priority
+			if (rule.type === 'error') {
+				priority = 1;
+			} else if (rule.type === 'warning') {
+				priority = 2;
+			}
+
+			issues.push({
 				checkName,
-			};
+				type: rule.type,
+				message: rule.message,
+				priority,
+			});
 		}
 	}
 
-	return { isValid: true };
+	// Sort issues by priority (errors first, then warnings, then others)
+	issues.sort((a, b) => a.priority - b.priority);
+
+	// Determine overall validation status and primary mode
+	const hasErrors = issues.some(issue => issue.type === 'error');
+	const hasWarnings = issues.some(issue => issue.type === 'warning');
+
+	let primaryMode = 'none';
+	if (hasErrors) {
+		primaryMode = 'error';
+	} else if (hasWarnings) {
+		primaryMode = 'warning';
+	}
+
+	return {
+		isValid: issues.length === 0,
+		issues,
+		mode: primaryMode,
+		clientId: block.clientId,
+		name: block.name,
+	};
 }

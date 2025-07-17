@@ -703,14 +703,25 @@ wp_enqueue_script(
 
 Once your JavaScript check is properly integrated, the Block Accessibility Checks system will automatically:
 
-1. **Show error indicators** - Red borders around invalid blocks
-2. **Display error messages** - In the block inspector sidebar panel
-3. **Control publishing** - Prevent publishing when errors are present (based on check type)
-4. **Provide real-time feedback** - As users edit block content
+1. **Show error indicators** - Red borders around invalid blocks (for errors) or yellow borders (for warnings)
+2. **Display all issues simultaneously** - Multiple validation messages appear in the block inspector sidebar panel, with errors shown first, then warnings
+3. **Control publishing** - Prevent publishing when errors are present (warnings allow publishing but show notifications)
+4. **Provide real-time feedback** - As users edit block content, all validation issues update instantly
+5. **Prioritize issue display** - Block border color reflects the highest severity issue (error overrides warning)
+
+### Multiple Issues Support
+
+The validation system displays all accessibility issues at once, eliminating the frustrating "fix one, see another" cycle:
+
+- **Error Priority**: Blocks with both errors and warnings show red borders until all errors are resolved
+- **Comprehensive Feedback**: All failing checks are listed in the inspector panel simultaneously
+- **Organized Display**: Issues are grouped by severity (errors first, then warnings) in the sidebar
+- **Individual Messages**: Each validation issue shows its specific error message and type
 
 ### Benefits of This Architecture
 
 - **Consistency**: Same validation logic and messages everywhere
+- **Comprehensive Feedback**: Users see all issues at once, not one at a time
 - **Extensibility**: Developers can add checks that work in both PHP and JavaScript
 - **Maintainability**: Single source of truth reduces duplication
 - **Performance**: Client-side validation provides immediate feedback
@@ -897,16 +908,16 @@ addFilter(
   return isValid;
   }
 
-            if (checkName === 'required_content') {
-                return attributes.content && attributes.content.trim().length > 0;
-            }
+              if (checkName === 'required_content') {
+                  return attributes.content && attributes.content.trim().length > 0;
+              }
 
-            if (checkName === 'author_name') {
-                return attributes.authorName && attributes.authorName.trim().length > 0;
-            }
+              if (checkName === 'author_name') {
+                  return attributes.authorName && attributes.authorName.trim().length > 0;
+              }
 
-            return isValid;
-        }
+              return isValid;
+          }
 
     );
 

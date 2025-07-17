@@ -18,7 +18,7 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		const [validationResult, setValidationResult] = useState({
 			isValid: true,
 			mode: 'none',
-			message: '',
+			issues: [],
 		});
 		const timeoutRef = useRef(null);
 		const prevAltRef = useRef(attributes.alt);
@@ -44,7 +44,7 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 				// Immediate validation for other cases using unified system
 				const result = validateBlock({ name, attributes, clientId });
 				setValidationResult(
-					result.isValid ? { isValid: true, mode: 'none', message: '' } : result
+					result.isValid ? { isValid: true, mode: 'none', issues: [] } : result
 				);
 			}
 
@@ -55,21 +55,8 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 			};
 		}, [name, attributes, clientId]);
 
-		// Determine the message based on the validation result
-		let message = '';
-		if (validationResult.message) {
-			message = validationResult.message;
-		} else if (validationResult.mode === 'error') {
-			message = __(
-				'Accessibility Error: This block does not meet accessibility standards.',
-				'block-accessibility-checks'
-			);
-		} else if (validationResult.mode === 'warning') {
-			message = __(
-				'Accessibility Warning: This block may have accessibility issues.',
-				'block-accessibility-checks'
-			);
-		}
+		// Generate messages for all issues
+		const issues = validationResult.issues || [];
 
 		return (
 			<>
@@ -79,17 +66,25 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 							title={__('Accessibility Check', 'block-accessibility-checks')}
 							initialOpen={true}
 						>
-							<PanelRow>
-								<p
-									className={
-										validationResult.mode === 'error'
-											? 'a11y-error-msg'
-											: 'a11y-warning-msg'
-									}
-								>
-									{message}
-								</p>
-							</PanelRow>
+							{issues.map((issue, index) => (
+								<PanelRow key={`${issue.checkName}-${index}`}>
+									<p
+										className={
+											issue.type === 'error'
+												? 'a11y-error-msg'
+												: 'a11y-warning-msg'
+										}
+									>
+										<strong>
+											{issue.type === 'error'
+												? __('Error', 'block-accessibility-checks')
+												: __('Warning', 'block-accessibility-checks')}
+											:
+										</strong>{' '}
+										{issue.message}
+									</p>
+								</PanelRow>
+							))}
 						</PanelBody>
 					</InspectorControls>
 				)}

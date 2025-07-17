@@ -5,12 +5,13 @@ Block Accessibility Checks is a WordPress plugin that helps ensure your content 
 ## Features
 
 - **Real-time Accessibility Checks:** Automatically validates block configurations as you edit content in the Gutenberg editor
-- **Visual Error Indicators:** Shows clear visual feedback with red borders and error messages for blocks with accessibility issues
+- **Comprehensive Issue Display:** Shows all accessibility problems at once, eliminating the frustrating "fix one, see another" cycle
+- **Visual Error Indicators:** Shows clear visual feedback with red borders (errors) or yellow borders (warnings) for blocks with accessibility issues
 - **Publishing Prevention:** Blocks the publishing of content that fails critical accessibility requirements
 - **User-Friendly Notifications:** Provides clear and actionable feedback in the block inspector panel to help users fix issues
 - **Extensible Architecture:** Comprehensive developer API with hooks and filters for adding custom accessibility checks
 - **External Plugin Support:** Works seamlessly with custom blocks from third-party plugins and themes
-- **Unified Validation:** PHP-JavaScript integrated system ensures consistent validation across all contexts
+- **Unified Validation:** JavaScript-only validation system ensures consistent real-time feedback across all contexts
 
 ## Core Block Checks
 
