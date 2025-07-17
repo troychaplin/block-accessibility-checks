@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { getBlockChecksArray } from '../registerPlugin';
+import { validateBlock } from './validationHooks';
 
 /**
  * Recursively retrieves invalid blocks from a list of blocks.
@@ -10,11 +10,13 @@ import { getBlockChecksArray } from '../registerPlugin';
 function getInvalidBlocksRecursive(blocks) {
 	// Recursive function to check each block and its inner blocks
 	return blocks.flatMap(block => {
-		// Get current checks array (including external plugin checks)
-		const blockChecksArray = getBlockChecksArray();
+		// Use unified validation system
+		const result = validateBlock(block);
+		const results = [];
 
-		// Run checks on the current block
-		const results = blockChecksArray.map(check => check(block));
+		if (!result.isValid) {
+			results.push(result);
+		}
 
 		// If the block has inner blocks, recursively check them
 		if (block.innerBlocks && block.innerBlocks.length > 0) {

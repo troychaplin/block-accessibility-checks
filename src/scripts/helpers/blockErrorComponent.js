@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { getBlockChecksArray } from '../registerPlugin';
+import { validateBlock } from './validationHooks';
 
 /**
  * A higher-order component that adds error handling and accessibility checks to a block component.
@@ -24,9 +24,6 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		const prevAltRef = useRef(attributes.alt);
 
 		useEffect(() => {
-			// Get current checks array (including external plugin checks)
-			const blockChecksArray = getBlockChecksArray();
-
 			// Clear any existing timeout
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
@@ -35,26 +32,20 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 			// For image blocks with alt text changes, add a delay
 			if (name === 'core/image' && prevAltRef.current !== attributes.alt) {
 				timeoutRef.current = setTimeout(() => {
-					// Run all applicable checks for this block
-					const results = blockChecksArray.map(check =>
-						check({ name, attributes, clientId })
-					);
-					const firstInvalid = results.find(result => !result.isValid);
-
+					// Use unified validation system
+					const result = validateBlock({ name, attributes, clientId });
 					setValidationResult(
-						firstInvalid || { isValid: true, mode: 'none', message: '' }
+						result.isValid ? { isValid: true, mode: 'none', message: '' } : result
 					);
 				}, 1500);
 
 				prevAltRef.current = attributes.alt;
 			} else {
-				// Immediate validation for other cases
-				const results = blockChecksArray.map(check =>
-					check({ name, attributes, clientId })
+				// Immediate validation for other cases using unified system
+				const result = validateBlock({ name, attributes, clientId });
+				setValidationResult(
+					result.isValid ? { isValid: true, mode: 'none', message: '' } : result
 				);
-				const firstInvalid = results.find(result => !result.isValid);
-
-				setValidationResult(firstInvalid || { isValid: true, mode: 'none', message: '' });
 			}
 
 			return () => {

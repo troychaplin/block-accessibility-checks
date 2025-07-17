@@ -70,9 +70,8 @@ class BlockChecksRegistry {
 			'core/image',
 			'alt_text_required',
 			array(
-				'callback'    => array( $this, 'check_image_alt_required' ),
 				'message'     => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
-				'type'        => 'error',
+				'type'        => 'settings',
 				'priority'    => 5,
 				'description' => \__( 'Alternative text is essential for screen reader users to understand image content', 'block-accessibility-checks' ),
 			)
@@ -82,7 +81,6 @@ class BlockChecksRegistry {
 			'core/image',
 			'alt_text_length',
 			array(
-				'callback'    => array( $this, 'check_image_alt_length' ),
 				'message'     => \__( 'Image alternative text cannot be longer than 125 characters', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
@@ -94,7 +92,6 @@ class BlockChecksRegistry {
 			'core/image',
 			'alt_caption_match',
 			array(
-				'callback'    => array( $this, 'check_image_alt_caption_match' ),
 				'message'     => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
@@ -107,9 +104,8 @@ class BlockChecksRegistry {
 			'core/button',
 			'button_required_content',
 			array(
-				'callback'    => array( $this, 'check_button_required_content' ),
 				'message'     => \__( 'Buttons must have text and a link', 'block-accessibility-checks' ),
-				'type'        => 'error',
+				'type'        => 'settings',
 				'priority'    => 5,
 				'description' => \__( 'Buttons without text or links are not accessible to screen reader users', 'block-accessibility-checks' ),
 			)
@@ -119,7 +115,6 @@ class BlockChecksRegistry {
 			'core/button',
 			'button_text_quality',
 			array(
-				'callback'    => array( $this, 'check_button_text' ),
 				'message'     => \__( 'Button text should be descriptive and meaningful', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
@@ -132,9 +127,8 @@ class BlockChecksRegistry {
 			'core/table',
 			'table_headers',
 			array(
-				'callback'    => array( $this, 'check_table_headers' ),
 				'message'     => \__( 'Tables should include proper headers', 'block-accessibility-checks' ),
-				'type'        => 'warning',
+				'type'        => 'settings',
 				'priority'    => 5,
 				'description' => \__( 'Table headers help screen reader users navigate table content', 'block-accessibility-checks' ),
 			)
@@ -171,7 +165,6 @@ class BlockChecksRegistry {
 			}
 
 			$defaults = array(
-				'callback'    => null,
 				'message'     => '',
 				'type'        => 'settings',
 				'priority'    => 10,
@@ -182,11 +175,6 @@ class BlockChecksRegistry {
 			$check_args = \wp_parse_args( $check_args, $defaults );
 
 			// Validate required parameters.
-			if ( ! \is_callable( $check_args['callback'] ) ) {
-				$this->log_error( "Invalid callback provided for {$block_type}/{$check_name}" );
-				return false;
-			}
-
 			if ( empty( $check_args['message'] ) ) {
 				$this->log_error( "Message is required for {$block_type}/{$check_name}" );
 				return false;
@@ -379,56 +367,12 @@ class BlockChecksRegistry {
 						continue;
 					}
 
-					if ( ! \is_callable( $check_config['callback'] ) ) {
-						$this->log_error( "Invalid callback for check: {$block_type}/{$check_name}" );
-						continue;
-					}
+					// Skip PHP validation - all validation now handled in JavaScript.
+					$this->log_debug( "PHP validation disabled, all validation handled in JavaScript: {$block_type}/{$check_name}" );
+					continue;
 
-					// Allow developers to filter each check config before it runs.
-					$check_config = \apply_filters( 'ba11yc_before_check', $check_config, $check_name, $block_type, $attributes, $content );
-
-					// Get the effective check level (considering settings).
-					$effective_type = $this->get_effective_check_level( $block_type, $check_name );
-
-					// Skip check if set to 'none'.
-					if ( 'none' === $effective_type ) {
-						$this->log_debug( "Check set to 'none', skipping: {$block_type}/{$check_name}" );
-						continue;
-					}
-
-					$check_result = \call_user_func(
-						$check_config['callback'],
-						$attributes,
-						$content,
-						$check_config
-					);
-
-					// Allow developers to filter the check result.
-					$check_result = \apply_filters( 'ba11yc_check_result', $check_result, $check_name, $block_type, $attributes, $content, $check_config );
-
-					if ( ! empty( $check_result ) ) {
-						$result = array(
-							'check_name'  => $check_name,
-							'block_type'  => $block_type,
-							'message'     => $check_config['message'],
-							'type'        => $effective_type, // Use effective type instead of config type
-							'priority'    => $check_config['priority'],
-							'description' => $check_config['description'],
-							'result'      => $check_result,
-						);
-
-						// Allow developers to filter the final result object.
-						$result = \apply_filters( 'ba11yc_final_check_result', $result, $check_name, $block_type, $attributes, $content, $check_config );
-
-						if ( ! empty( $result ) ) {
-							$results[] = $result;
-							$this->log_debug( "Check failed: {$block_type}/{$check_name}" );
-						}
-					} else {
-						$this->log_debug( "Check passed: {$block_type}/{$check_name}" );
-					}
 				} catch ( \Exception $e ) {
-					$this->log_error( "Error running check {$block_type}/{$check_name}: " . $e->getMessage() );
+					$this->log_error( "Error processing check {$block_type}/{$check_name}: " . $e->getMessage() );
 					// Continue with other checks even if one fails.
 					continue;
 				}
@@ -463,134 +407,10 @@ class BlockChecksRegistry {
 	 * @param string $content Block content (unused but required by interface).
 	 * @param array  $config Check configuration (unused but required by interface).
 	 * @return bool True if check fails.
-	 */
-	public function check_image_alt_length( array $attributes, string $content, array $config ): bool {
-		// Silence the unused parameter warnings.
-		unset( $content, $config );
-
-		if ( ! isset( $attributes['alt'] ) || empty( $attributes['alt'] ) ) {
-			return false;
-		}
-
-		return strlen( $attributes['alt'] ) > 125;
-	}
-
 	/**
-	 * Check if image alt text matches caption
-	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content (unused but required by interface).
-	 * @param array  $config Check configuration (unused but required by interface).
-	 * @return bool True if check fails.
+	 * PHP validation callbacks removed - all validation now handled in JavaScript.
+	 * See src/scripts/blockChecks/coreBlockValidation.js for the JavaScript validation logic.
 	 */
-	public function check_image_alt_caption_match( array $attributes, string $content, array $config ): bool {
-		// Silence the unused parameter warnings.
-		unset( $content, $config );
-
-		if ( ! isset( $attributes['alt'] ) || ! isset( $attributes['caption'] ) ) {
-			return false;
-		}
-
-		$alt_text = \trim( $attributes['alt'] );
-		$caption  = \trim( \wp_strip_all_tags( $attributes['caption'] ) );
-
-		return ! empty( $alt_text ) && ! empty( $caption ) && $alt_text === $caption;
-	}
-
-	/**
-	 * Check button text quality
-	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content (unused but required by interface).
-	 * @param array  $config Check configuration (unused but required by interface).
-	 * @return bool True if check fails.
-	 */
-	public function check_button_text( array $attributes, string $content, array $config ): bool {
-		// Silence the unused parameter warnings.
-		unset( $content, $config );
-
-		if ( ! isset( $attributes['text'] ) ) {
-			return false;
-		}
-
-		$text = \trim( \wp_strip_all_tags( $attributes['text'] ) );
-
-		// Check for generic button text.
-		$generic_texts = array( 'click here', 'read more', 'learn more', 'more', 'here', 'link' );
-
-		return \in_array( \strtolower( $text ), $generic_texts, true ) || \strlen( $text ) < 3;
-	}
-
-	/**
-	 * Check table headers
-	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content (unused but required by interface).
-	 * @param array  $config Check configuration (unused but required by interface).
-	 * @return bool True if check fails.
-	 */
-	public function check_table_headers( array $attributes, string $content, array $config ): bool {
-		// Silence the unused parameter warnings.
-		unset( $content, $config );
-
-		// Check if table has header section defined.
-		$has_header = isset( $attributes['head'] ) && ! empty( $attributes['head'] );
-
-		// Check if table has caption.
-		$has_caption = isset( $attributes['caption'] ) && ! empty( trim( $attributes['caption'] ) );
-
-		// Table should have either headers or caption for accessibility.
-		return ! ( $has_header || $has_caption );
-	}
-
-	/**
-	 * Check if image has required alt text
-	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content (unused but required by interface).
-	 * @param array  $config Check configuration (unused but required by interface).
-	 * @return bool True if check fails.
-	 */
-	public function check_image_alt_required( array $attributes, string $content, array $config ): bool {
-		// Silence the unused parameter warnings.
-		unset( $content, $config );
-
-		// Check if image is marked as decorative.
-		$is_decorative = isset( $attributes['isDecorative'] ) && true === $attributes['isDecorative'];
-
-		// If marked as decorative, alt text is not required.
-		if ( $is_decorative ) {
-			return false;
-		}
-
-		// Check if alt text exists and is not empty.
-		$has_alt_text = isset( $attributes['alt'] ) && ! empty( trim( $attributes['alt'] ) );
-
-		// Return true if check fails (no alt text when required).
-		return ! $has_alt_text;
-	}
-
-	/**
-	 * Check if button has required content (text and link)
-	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content (unused but required by interface).
-	 * @param array  $config Check configuration (unused but required by interface).
-	 * @return bool True if check fails.
-	 */
-	public function check_button_required_content( array $attributes, string $content, array $config ): bool {
-		// Silence the unused parameter warnings.
-		unset( $content, $config );
-
-		// Check if button has text.
-		$has_text = isset( $attributes['text'] ) && ! empty( trim( \wp_strip_all_tags( $attributes['text'] ) ) );
-
-		// Check if button has URL.
-		$has_url = isset( $attributes['url'] ) && ! empty( trim( $attributes['url'] ) );
-
-		// Button must have both text and URL for accessibility.
-		return ! ( $has_text && $has_url );
-	}
 
 	/**
 	 * Get the effective check level for a specific check
@@ -642,10 +462,9 @@ class BlockChecksRegistry {
 	 * Get setting for core blocks
 	 *
 	 * @param string $block_type The block type.
-	 * @param string $check_name The check name.
 	 * @return string The check level.
 	 */
-	private function get_core_block_setting( string $block_type, string $check_name ): string {
+	private function get_core_block_setting( string $block_type ): string {
 		$options = \get_option( 'block_checks_options', array() );
 
 		// Map block types to option names.

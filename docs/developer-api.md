@@ -1,6 +1,6 @@
 # Block Accessibility Checks - Developer API
 
-The Block Accessibility Checks plugin provides a comprehensive API for developers to extend and customize accessibility checking functionality. This document outlines the available hooks, filters, methods, and integration patterns for extending the plugin.
+The Block Accessibility Checks plugin provides a comprehensive API for developers to extend and customize accessibility checking functionality. **All validation logic is now handled in JavaScript** for real-time feedback in the block editor. This document outlines the available hooks, filters, methods, and integration patterns for extending the plugin.
 
 ## Table of Contents
 
@@ -8,39 +8,61 @@ The Block Accessibility Checks plugin provides a comprehensive API for developer
 2. [Action Hooks](#action-hooks)
 3. [Filter Hooks](#filter-hooks)
 4. [Registry API Methods](#registry-api-methods)
-5. [Check Function Signature](#check-function-signature)
+5. [JavaScript Validation Integration](#javascript-validation-integration)
 6. [Accessing the Registry](#accessing-the-registry)
 7. [PHP-JavaScript Integration](#php-javascript-integration)
 8. [Complete Integration Example](#complete-integration-example)
 9. [Advanced Patterns](#advanced-patterns)
 10. [Troubleshooting](#troubleshooting)
-11. [Troubleshooting](#troubleshooting)
 
 ## Quick Start
 
-The easiest way to add custom accessibility checks is to hook into the `ba11yc_register_checks` action:
+The easiest way to add custom accessibility checks is to register them in PHP (for settings integration) and implement validation logic in JavaScript:
+
+### PHP Registration (for settings and metadata)
 
 ```php
 add_action( 'ba11yc_register_checks', 'my_plugin_register_checks' );
 
 function my_plugin_register_checks( $registry ) {
     $registry->register_check(
-        'core/paragraph',
-        'paragraph_length',
+        'my-plugin/custom-block',
+        'content_length',
         array(
-            'callback'    => 'my_plugin_check_paragraph_length',
-            'message'     => __( 'Paragraph is too long for optimal readability', 'my-plugin' ),
-            'type'        => 'warning',
+            'message'     => __( 'Content is too long for optimal readability', 'my-plugin' ),
+            'type'        => 'warning', // 'error', 'warning', 'settings', or 'none'
             'priority'    => 10,
-            'description' => __( 'Long paragraphs can be difficult to read', 'my-plugin' ),
+            'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
         )
     );
 }
+```
 
-function my_plugin_check_paragraph_length( $attributes, $content, $config ) {
-    $text = wp_strip_all_tags( $content );
-    return strlen( $text ) > 500; // Return true if check fails
-}
+### JavaScript Validation Implementation
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'ba11yc.validateBlock',
+	'my-plugin/validation',
+	(isValid, blockType, attributes, checkName, rule) => {
+		// Only handle our block type
+		if (blockType !== 'my-plugin/custom-block') {
+			return isValid;
+		}
+
+		// Implement validation logic
+		switch (checkName) {
+			case 'content_length':
+				const content = attributes.content || '';
+				return content.length <= 500; // Return true if valid
+
+			default:
+				return isValid;
+		}
+	}
+);
 ```
 
 > **Note:** For a complete working example including both PHP and JavaScript integration, see the [Complete Integration Example](#complete-integration-example) section.
@@ -376,57 +398,83 @@ array(
 )
 ```
 
-## Check Function Signature
+## JavaScript Validation Integration
 
-Check functions should follow this signature and return pattern:
+All validation logic is now implemented in JavaScript for real-time feedback in the block editor. Use the `ba11yc.validateBlock` filter hook to implement your validation logic.
 
-```php
-function my_check_function( $attributes, $content, $config ) {
-    // Perform the accessibility check
-    // Return true if the check fails (accessibility issue found)
-    // Return false if the check passes
-    // Return any other value to provide custom result data
-}
+### JavaScript Validation Signature
+
+Your validation function should follow this pattern:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'ba11yc.validateBlock',
+	'my-plugin/validation',
+	(isValid, blockType, attributes, checkName, rule) => {
+		// Only handle your block types
+		if (blockType !== 'my-plugin/my-block') {
+			return isValid; // Pass through for other blocks
+		}
+
+		// Implement validation logic for your checks
+		switch (checkName) {
+			case 'my_check_name':
+				// Return true if valid, false if invalid
+				return validateMyCheck(attributes);
+
+			default:
+				return isValid; // Unknown check, pass through
+		}
+	}
+);
 ```
 
 **Parameters:**
 
-- `$attributes` (array) - Block attributes from the block editor
-- `$content` (string) - Block innerHTML content
-- `$config` (array) - Check configuration array (includes 'message', 'type', etc.)
+- `isValid` (boolean) - Current validation state (default: true)
+- `blockType` (string) - Block type (e.g., 'core/image', 'my-plugin/custom-block')
+- `attributes` (object) - Block attributes from the block editor
+- `checkName` (string) - Name of the specific check being run
+- `rule` (object) - Check configuration (includes 'message', 'type', 'enabled', etc.)
 
 **Return Values:**
 
-- `true` - Check failed (accessibility issue found)
-- `false` - Check passed (no accessibility issue)
-- `array` - Custom result with additional data (advanced usage)
+- `true` - Check passed (block is valid)
+- `false` - Check failed (accessibility issue found)
 
-**Example Check Functions:**
+**Example Validation Functions:**
 
-```php
-// Simple validation check
-function check_button_has_text( $attributes, $content, $config ) {
-    return empty( trim( $attributes['text'] ?? '' ) );
+```javascript
+// Simple attribute validation
+function validateMyCheck(attributes) {
+    return !!(attributes.requiredField && attributes.requiredField.trim());
 }
 
 // Content-based validation
-function check_image_alt_text( $attributes, $content, $config ) {
-    // Check if image has alt attribute
-    if ( empty( $attributes['alt'] ) ) {
-        return true; // Fail - no alt text
+function validateImageAlt(attributes) {
+    // Check if image is decorative
+    if (attributes.isDecorative) {
+        return true; // Valid - decorative images don't need alt text
+    }
+
+    // Check if alt text exists
+    if (!attributes.alt || !attributes.alt.trim()) {
+        return false; // Invalid - missing alt text
     }
 
     // Check if alt text is meaningful (not just filename)
-    $alt = strtolower( $attributes['alt'] );
-    $filename_patterns = array( '.jpg', '.png', '.gif', '.webp', 'img_', 'image' );
+    const alt = attributes.alt.toLowerCase();
+    const filenamePatterns = ['.jpg', '.png', '.gif', '.webp', 'img_', 'image'];
 
-    foreach ( $filename_patterns as $pattern ) {
-        if ( strpos( $alt, $pattern ) !== false ) {
-            return true; // Fail - looks like filename
+    for (const pattern of filenamePatterns) {
+        if (alt.includes(pattern)) {
+            return false; // Invalid - looks like filename
         }
     }
 
-    return false; // Pass
+    return true; // Valid
 }
 
 // Advanced check with custom result
@@ -656,7 +704,7 @@ Once your JavaScript check is properly integrated, the Block Accessibility Check
 
 ## Complete Integration Example
 
-Here's a complete example showing how to integrate a custom testimonial block with the Block Accessibility Checks plugin, including both PHP and JavaScript integration:
+Here's a complete example showing how to integrate a custom testimonial block with the Block Accessibility Checks plugin using the new JavaScript-only validation approach:
 
 ### File Structure
 
@@ -673,7 +721,7 @@ my-testimonial-block/
 └── build/ (generated by build process)
 ```
 
-### PHP Integration (includes/accessibility-integration.php)
+### PHP Registration (includes/accessibility-integration.php)
 
 ```php
 <?php
@@ -688,60 +736,52 @@ if (!defined('ABSPATH')) {
 
 /**
  * Register accessibility checks for testimonial block
+ * Only metadata - all validation logic is in JavaScript
  */
 function my_testimonial_register_accessibility_checks($registry) {
     // Required author name
-    $registry->register_check('create-block/my-testimonial-block', 'author_required', [
+    $registry->register_check('external-block/my-testimonial-block', 'author_required', [
         'message' => __('Author name is required for testimonials.', 'my-testimonial-block'),
-        'type' => 'error',
-        'callback' => 'my_testimonial_check_author_required'
+        'type' => 'settings', // Uses admin settings by default
+        'description' => __('Author attribution is important for testimonial credibility.', 'my-testimonial-block'),
     ]);
 
     // Required content
-    $registry->register_check('create-block/my-testimonial-block', 'content_required', [
+    $registry->register_check('external-block/my-testimonial-block', 'content_required', [
         'message' => __('Testimonial content cannot be empty.', 'my-testimonial-block'),
-        'type' => 'error',
-        'callback' => 'my_testimonial_check_content_required'
+        'type' => 'error', // Forced as error, bypasses settings
+        'description' => __('Empty testimonials provide no value to users.', 'my-testimonial-block'),
     ]);
 
     // Heading structure
-    $registry->register_check('create-block/my-testimonial-block', 'heading_structure', [
+    $registry->register_check('external-block/my-testimonial-block', 'heading_structure', [
         'message' => __('If using a heading, ensure it follows proper heading hierarchy.', 'my-testimonial-block'),
-        'type' => 'warning',
-        'callback' => 'my_testimonial_check_heading_structure'
+        'type' => 'warning', // Forced as warning, bypasses settings
+        'description' => __('Proper heading structure improves accessibility for screen reader users.', 'my-testimonial-block'),
     ]);
 }
+
+/**
+ * Enqueue accessibility checks JavaScript
+ */
+function my_testimonial_enqueue_accessibility_assets() {
+    wp_enqueue_script(
+        'my-testimonial-accessibility-checks',
+        plugins_url('build/accessibility-checks.js', dirname(__FILE__)),
+        ['wp-hooks', 'wp-i18n', 'block-accessibility-script'],
+        '1.0.0',
+        true
+    );
+}
+
+// Hook into Block Accessibility Checks when it's ready
 add_action('ba11yc_register_checks', 'my_testimonial_register_accessibility_checks');
 
-/**
- * Check if author name is provided
- */
-function my_testimonial_check_author_required($attributes, $content, $config) {
-    return empty(trim($attributes['author'] ?? ''));
-}
-
-/**
- * Check if testimonial content is provided
- */
-function my_testimonial_check_content_required($attributes, $content, $config) {
-    return empty(trim($attributes['content'] ?? ''));
-}
-
-/**
- * Check heading structure if heading is used
- */
-function my_testimonial_check_heading_structure($attributes, $content, $config) {
-    $headingText = $attributes['headingText'] ?? '';
-
-    // If no heading text, check passes
-    if (empty(trim($headingText))) {
-        return false;
-    }
-
-    // If heading text exists, it should not be empty after trimming
-    return empty(trim($headingText));
-}
+// Enqueue our accessibility checks script in the block editor
+add_action('enqueue_block_editor_assets', 'my_testimonial_enqueue_accessibility_assets');
 ```
+
+````
 
 ### Main Plugin File Integration
 
@@ -762,89 +802,99 @@ function my_testimonial_load_accessibility_integration() {
     }
 }
 add_action('ba11yc_ready', 'my_testimonial_load_accessibility_integration');
-```
+````
 
-### JavaScript Integration (src/accessibility-checks.js)
+### JavaScript Validation Implementation (src/accessibility-checks.js)
 
 ```javascript
+/**
+ * Testimonial Block Accessibility Checks
+ *
+ * Integrates with the Block Accessibility Checks plugin validation system.
+ * All validation logic is handled in JavaScript for real-time feedback.
+ */
+
 import { addFilter } from '@wordpress/hooks';
-
-// Get validation rules from PHP
-const validationRules = window.BlockAccessibilityChecks?.validationRules || {};
-
-// Flag to prevent multiple registrations
-let isRegistered = false;
+import { __ } from '@wordpress/i18n';
 
 /**
- * Validate testimonial block
+ * Register validation logic for testimonial block using the unified hook system
  */
-function checkTestimonialBlock(block) {
-	// Only validate our block type
-	if (block.name !== 'create-block/my-testimonial-block') {
-		return { isValid: true };
-	}
+addFilter(
+	'ba11yc.validateBlock',
+	'my-testimonial-block/validation',
+	(isValid, blockType, attributes, checkName, rule) => {
+		// Only handle our block type
+		if (blockType !== 'external-block/my-testimonial-block') {
+			return isValid;
+		}
 
-	const attributes = block.attributes;
-	const blockRules = validationRules['create-block/my-testimonial-block'] || {};
-
-	// Check each registered rule
-	for (const [checkId, rule] of Object.entries(blockRules)) {
-		if (!rule.enabled) continue;
-
-		let isValid = true;
-
-		// Mirror PHP validation logic
-		switch (checkId) {
+		// Run validation based on check name
+		switch (checkName) {
 			case 'author_required':
-				isValid = !!(attributes.author && attributes.author.trim());
-				break;
-			case 'content_required':
-				isValid = !!(attributes.content && attributes.content.trim());
-				break;
-			case 'heading_structure':
-				if (attributes.headingText) {
-					isValid = !!attributes.headingText.trim();
-				}
-				break;
-		}
+				// Return true if valid, false if invalid
+				return !!(attributes.author && attributes.author.trim());
 
-		// If any check fails, return invalid
-		if (!isValid) {
-			return {
-				isValid: false,
-				mode: rule.type,
-				clientId: block.clientId,
-				name: block.name,
-				message: rule.message,
-			};
+			case 'content_required':
+				// Return true if valid, false if invalid
+				return !!(attributes.content && attributes.content.trim());
+
+			case 'heading_structure':
+				// If headingText exists, it should have content
+				if (attributes.headingText !== undefined && attributes.headingText !== null) {
+					return !!(attributes.headingText && attributes.headingText.trim());
+				}
+				// No heading is fine (valid)
+				return true;
+
+			default:
+				// Unknown check, let other filters handle it
+				return isValid;
 		}
 	}
-
-	return { isValid: true };
-}
-
-/**
- * Register with Block Accessibility Checks system
- */
-if (!isRegistered) {
-	addFilter(
-		'blockAccessibilityChecks.blockChecksArray',
-		'my-testimonial-block/add-validation',
-		checksArray => {
-			// Prevent duplicates
-			const alreadyExists = checksArray.some(check => check.name === 'checkTestimonialBlock');
-
-			if (!alreadyExists) {
-				checksArray.push(checkTestimonialBlock);
-			}
-
-			return checksArray;
-		}
-	);
-
-	isRegistered = true;
-}
+);
 ```
+
+    	if (!isValid) {
+    		return {
+    			isValid: false,
+    			mode: rule.type,
+    			clientId: block.clientId,
+    			name: block.name,
+    			message: rule.message,
+    		};
+    	}
+    }
+
+    return { isValid: true };
+
+}
+
+/\*\*
+
+- Register with Block Accessibility Checks system
+  \*/
+  if (!isRegistered) {
+  addFilter(
+  'blockAccessibilityChecks.blockChecksArray',
+  'my-testimonial-block/add-validation',
+  checksArray => {
+  // Prevent duplicates
+  const alreadyExists = checksArray.some(check => check.name === 'checkTestimonialBlock');
+
+        		if (!alreadyExists) {
+        			checksArray.push(checkTestimonialBlock);
+        		}
+
+        		return checksArray;
+        	}
+        );
+
+        isRegistered = true;
+
+    }
+
+````
 
 ### Build Configuration
 
@@ -861,7 +911,7 @@ module.exports = {
 		'accessibility-checks': './src/accessibility-checks.js', // Separate entry
 	},
 };
-```
+````
 
 ### Script Enqueuing
 
