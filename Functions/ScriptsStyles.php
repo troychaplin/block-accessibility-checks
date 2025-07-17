@@ -189,10 +189,18 @@ class ScriptsStyles {
 			$js_rules[ $block_type ] = array();
 
 			foreach ( $checks as $check_name => $check_config ) {
+				// Get the effective check level (considering settings)
+				$effective_type = $registry->get_effective_check_level( $block_type, $check_name );
+
+				// Skip checks set to 'none'
+				if ( 'none' === $effective_type ) {
+					continue;
+				}
+
 				// Only include configuration that JavaScript needs.
 				$js_rules[ $block_type ][ $check_name ] = array(
 					'message'     => $check_config['message'],
-					'type'        => $check_config['type'],
+					'type'        => $effective_type, // Use effective type instead of config type
 					'priority'    => $check_config['priority'],
 					'enabled'     => $check_config['enabled'],
 					'description' => $check_config['description'],

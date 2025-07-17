@@ -240,7 +240,7 @@ Register a new accessibility check.
 $check_args = array(
     'callback'    => 'callable_function',  // Required: Check function
     'message'     => 'Error message',      // Required: User-facing message
-    'type'        => 'error',              // Optional: 'error', 'warning', 'info' (default: 'error')
+    'type'        => 'settings',           // Optional: Check behavior type (default: 'settings')
     'priority'    => 10,                   // Optional: Execution priority (lower = earlier, default: 10)
     'enabled'     => true,                 // Optional: Whether check is enabled (default: true)
     'description' => 'Detailed info',      // Optional: Detailed description for settings
@@ -249,9 +249,43 @@ $check_args = array(
 
 **Check Types:**
 
-- `'error'` - Blocks publishing, shows red error styling
-- `'warning'` - Allows publishing, shows yellow warning styling
-- `'info'` - Informational only, shows blue info styling
+- `'settings'` - Uses admin settings page to determine level (default behavior)
+- `'error'` - Forces as error, blocks publishing, shows red error styling
+- `'warning'` - Forces as warning, allows publishing, shows yellow warning styling
+- `'none'` - Forces check to be disabled, never runs
+
+**Settings Integration:**
+
+When using `'type' => 'settings'` (the default), your external blocks will automatically:
+
+1. **Appear in Block A11Y Checks menu** - A submenu page is created using your plugin name
+2. **Have configurable check levels** - Site admins can set each check to Error, Warning, or None
+3. **Use admin preferences** - The effective check level respects user settings
+
+For external plugins, the submenu is named after your block's namespace. For example:
+
+- Block type `create-block/my-testimonial-block` creates "Create Block Checks" submenu
+- Block type `my-plugin/hero-block` creates "My Plugin Checks" submenu
+
+**Forcing Check Levels:**
+
+To bypass settings and force a specific level, use any type other than `'settings'`:
+
+```php
+// This check will always be a warning, regardless of settings
+$registry->register_check('my-plugin/block', 'forced_warning', [
+    'message' => 'This is always a warning',
+    'type' => 'warning',  // Bypasses settings
+    'callback' => 'my_check_function'
+]);
+
+// This check appears in settings and can be configured
+$registry->register_check('my-plugin/block', 'configurable', [
+    'message' => 'This can be configured in settings',
+    'type' => 'settings', // Uses admin settings (default)
+    'callback' => 'my_other_check_function'
+]);
+```
 
 ### `unregister_check( $block_type, $check_name )`
 

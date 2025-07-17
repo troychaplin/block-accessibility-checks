@@ -173,7 +173,7 @@ class BlockChecksRegistry {
 			$defaults = array(
 				'callback'    => null,
 				'message'     => '',
-				'type'        => 'warning',
+				'type'        => 'settings',
 				'priority'    => 10,
 				'enabled'     => true,
 				'description' => '',
@@ -193,10 +193,10 @@ class BlockChecksRegistry {
 			}
 
 			// Validate type parameter.
-			$valid_types = array( 'error', 'warning', 'info' );
+			$valid_types = array( 'error', 'warning', 'settings', 'none' );
 			if ( ! in_array( $check_args['type'], $valid_types, true ) ) {
-				$this->log_error( "Invalid type '{$check_args['type']}' for {$block_type}/{$check_name}. Using 'warning'." );
-				$check_args['type'] = 'warning';
+				$this->log_error( "Invalid type '{$check_args['type']}' for {$block_type}/{$check_name}. Using 'settings'." );
+				$check_args['type'] = 'settings';
 			}
 
 			// Validate priority parameter.
@@ -387,6 +387,15 @@ class BlockChecksRegistry {
 					// Allow developers to filter each check config before it runs.
 					$check_config = \apply_filters( 'ba11yc_before_check', $check_config, $check_name, $block_type, $attributes, $content );
 
+					// Get the effective check level (considering settings).
+					$effective_type = $this->get_effective_check_level( $block_type, $check_name );
+
+					// Skip check if set to 'none'.
+					if ( 'none' === $effective_type ) {
+						$this->log_debug( "Check set to 'none', skipping: {$block_type}/{$check_name}" );
+						continue;
+					}
+
 					$check_result = \call_user_func(
 						$check_config['callback'],
 						$attributes,
@@ -402,7 +411,7 @@ class BlockChecksRegistry {
 							'check_name'  => $check_name,
 							'block_type'  => $block_type,
 							'message'     => $check_config['message'],
-							'type'        => $check_config['type'],
+							'type'        => $effective_type, // Use effective type instead of config type
 							'priority'    => $check_config['priority'],
 							'description' => $check_config['description'],
 							'result'      => $check_result,
@@ -581,6 +590,120 @@ class BlockChecksRegistry {
 
 		// Button must have both text and URL for accessibility.
 		return ! ( $has_text && $has_url );
+	}
+
+	/**
+	 * Get the effective check level for a specific check
+	 *
+	 * This method determines the actual check level by considering both
+	 * the check configuration and user settings.
+	 *
+	 * @param string $block_type The block type.
+	 * @param string $check_name The check name.
+	 * @return string The effective check level ('error', 'warning', 'none').
+	 */
+	public function get_effective_check_level( string $block_type, string $check_name ): string {
+		$checks = $this->get_checks( $block_type );
+
+		if ( ! isset( $checks[ $check_name ] ) ) {
+			return 'none';
+		}
+
+		$check      = $checks[ $check_name ];
+		$check_type = $check['type'] ?? 'settings';
+
+		// If the check has a forced type (not 'settings'), use it directly.
+		if ( 'settings' !== $check_type ) {
+			return $check_type;
+		}
+
+		// For settings-based checks, get the user's preference.
+		return $this->get_check_level_from_settings( $block_type, $check_name );
+	}
+
+	/**
+	 * Get check level from user settings
+	 *
+	 * @param string $block_type The block type.
+	 * @param string $check_name The check name.
+	 * @return string The check level from settings.
+	 */
+	private function get_check_level_from_settings( string $block_type, string $check_name ): string {
+		// Handle core blocks.
+		if ( strpos( $block_type, 'core/' ) === 0 ) {
+			return $this->get_core_block_setting( $block_type, $check_name );
+		}
+
+		// Handle external blocks.
+		return $this->get_external_block_setting( $block_type, $check_name );
+	}
+
+	/**
+	 * Get setting for core blocks
+	 *
+	 * @param string $block_type The block type.
+	 * @param string $check_name The check name.
+	 * @return string The check level.
+	 */
+	private function get_core_block_setting( string $block_type, string $check_name ): string {
+		$options = \get_option( 'block_checks_options', array() );
+
+		// Map block types to option names.
+		$option_map = array(
+			'core/button' => 'core_button_block_check',
+			'core/image'  => 'core_image_block_check',
+			'core/table'  => 'core_table_block_check',
+		);
+
+		$option_name = $option_map[ $block_type ] ?? '';
+
+		if ( empty( $option_name ) ) {
+			return 'error'; // Default for unmapped core blocks.
+		}
+
+		return $options[ $option_name ] ?? 'error';
+	}
+
+	/**
+	 * Get setting for external blocks
+	 *
+	 * @param string $block_type The block type.
+	 * @param string $check_name The check name.
+	 * @return string The check level.
+	 */
+	private function get_external_block_setting( string $block_type, string $check_name ): string {
+		// Extract plugin slug from block type.
+		$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
+		$plugin_slug = $plugin_info['slug'];
+
+		$option_name = 'block_checks_external_' . $plugin_slug;
+		$options     = \get_option( $option_name, array() );
+
+		$field_name = $block_type . '_' . $check_name;
+
+		return $options[ $field_name ] ?? 'error';
+	}
+
+	/**
+	 * Extract plugin information from block type
+	 *
+	 * @param string $block_type The block type.
+	 * @return array Plugin information.
+	 */
+	private function extract_plugin_info_from_block_type( string $block_type ): array {
+		$parts     = explode( '/', $block_type );
+		$namespace = $parts[0] ?? '';
+
+		// Convert namespace to readable name.
+		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
+
+		// Create a slug for the plugin.
+		$plugin_slug = \sanitize_title( $namespace );
+
+		return array(
+			'name' => $plugin_name,
+			'slug' => $plugin_slug,
+		);
 	}
 
 	/**
