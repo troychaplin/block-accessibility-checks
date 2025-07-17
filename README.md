@@ -5,12 +5,13 @@ Block Accessibility Checks is a WordPress plugin that helps ensure your content 
 ## Features
 
 - **Real-time Accessibility Checks:** Automatically validates block configurations as you edit content in the Gutenberg editor
-- **Visual Error Indicators:** Shows clear visual feedback with red borders and error messages for blocks with accessibility issues
+- **Comprehensive Issue Display:** Shows all accessibility problems at once, eliminating the frustrating "fix one, see another" cycle
+- **Visual Error Indicators:** Shows clear visual feedback with red borders (errors) or yellow borders (warnings) for blocks with accessibility issues
 - **Publishing Prevention:** Blocks the publishing of content that fails critical accessibility requirements
 - **User-Friendly Notifications:** Provides clear and actionable feedback in the block inspector panel to help users fix issues
 - **Extensible Architecture:** Comprehensive developer API with hooks and filters for adding custom accessibility checks
 - **External Plugin Support:** Works seamlessly with custom blocks from third-party plugins and themes
-- **Unified Validation:** PHP-JavaScript integrated system ensures consistent validation across all contexts
+- **Unified Validation:** JavaScript-only validation system ensures consistent real-time feedback across all contexts
 
 ## Core Block Checks
 
@@ -32,6 +33,8 @@ The plugin provides a powerful API for developers to extend functionality with c
 
 ### Quick Start Example
 
+**PHP Registration (for settings and metadata):**
+
 ```php
 add_action( 'ba11yc_register_checks', 'my_custom_checks' );
 
@@ -40,21 +43,40 @@ function my_custom_checks( $registry ) {
         'my-plugin/custom-block',
         'required_content',
         array(
-            'callback' => 'check_required_content',
-            'message'  => 'This field is required for accessibility compliance',
-            'type'     => 'error', // 'error', 'warning', or 'info'
+            'message'     => 'This field is required for accessibility compliance',
+            'type'        => 'error', // 'error', 'warning', 'settings', or 'none'
+            'priority'    => 10,
+            'description' => 'Content validation for accessibility compliance',
         )
     );
 }
+```
 
-function check_required_content( $attributes, $content, $config ) {
-    return empty( trim( $attributes['requiredField'] ?? '' ) );
-}
+**JavaScript Validation Implementation:**
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'ba11yc.validateBlock',
+	'my-plugin/validation',
+	(isValid, blockType, attributes, checkName, rule) => {
+		if (blockType !== 'my-plugin/custom-block') {
+			return isValid;
+		}
+
+		if (checkName === 'required_content') {
+			return attributes.content && attributes.content.trim().length > 0;
+		}
+
+		return isValid;
+	}
+);
 ```
 
 ### Key Features for Developers
 
-- **Unified PHP-JavaScript Architecture:** Write validation logic once in PHP, automatically available in JavaScript
+- **JavaScript-only Validation:** All validation logic runs in JavaScript for real-time editor feedback
 - **Visual Integration:** Custom checks automatically show error indicators and messages in the block editor
 - **Publishing Control:** Error-level checks prevent publishing, warnings allow with notification
 - **Flexible Registration:** Support for multiple check types with priority control

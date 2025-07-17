@@ -225,29 +225,28 @@ function checkTestimonialBlock(block) {
 
 /**
  * Add our validation check to the Block Accessibility Checks system
- * Only register once to prevent infinite loops
  */
-if (!isRegistered) {
-	addFilter(
-		'blockAccessibilityChecks.blockChecksArray',
-		'my-testimonial-block/add-validation',
-		checksArray => {
-			// Check if our function is already in the array
-			const alreadyExists = checksArray.some(
-				check =>
-					check.name === 'checkTestimonialBlock' ||
-					check.toString().includes('create-block/my-testimonial-block')
-			);
-
-			if (!alreadyExists) {
-				checksArray.push(checkTestimonialBlock);
-			}
-
-			return checksArray;
+addFilter(
+	'ba11yc.validateBlock',
+	'my-testimonial-block/validation',
+	(isValid, blockType, attributes, checkName, rule) => {
+		if (blockType !== 'create-block/my-testimonial-block') {
+			return isValid;
 		}
-	);
 
-	isRegistered = true;
+		// Handle our specific checks
+		switch (checkName) {
+			case 'required_content':
+				return attributes.content && attributes.content.trim().length > 0;
+
+			case 'author_name':
+				return attributes.authorName && attributes.authorName.trim().length > 0;
+
+			default:
+				return isValid;
+		}
+	}
+);
 }
 ```
 
@@ -294,11 +293,11 @@ my-testimonial-block/
 
 1. **PHP Registration**: Your `accessibility-integration.php` file registers accessibility checks with the Block Accessibility Checks registry when the `ba11yc_ready` action fires.
 
-2. **PHP-to-JS Bridge**: The Block Accessibility Checks plugin automatically exposes your registered validation rules to JavaScript via `wp_localize_script`.
+2. **JavaScript Validation**: Your JavaScript code implements the validation logic using the `ba11yc.validateBlock` filter to provide immediate feedback in the editor and prevent publishing when there are errors.
 
-3. **Real-time Validation**: Your JavaScript code hooks into the validation system using the `blockAccessibilityChecks.blockChecksArray` filter to provide immediate feedback in the editor and prevent publishing when there are errors.
+3. **Real-time Feedback**: The validation system provides immediate visual feedback (red borders, inspector panel messages) as users edit content.
 
-4. **Unified System**: Both PHP and JavaScript use the same validation rules and messages, ensuring consistency.
+4. **Unified System**: PHP registration provides metadata and settings integration, while JavaScript handles all validation logic for consistency.
 
 5. **Publish Prevention**: When validation errors are found, the system automatically disables the publish button and prevents saving until the issues are resolved.
 
@@ -365,6 +364,6 @@ function check_conditional_rule($attributes) {
 2. Create a new testimonial block
 3. Leave required fields empty - you should see validation errors
 4. Fill in the fields - errors should disappear
-5. Check that both editor and PHP validation work consistently
+5. Check that editor validation provides real-time feedback
 
 For more details on the validation system architecture, see [developer-api.md](developer-api.md).

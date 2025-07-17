@@ -18,6 +18,13 @@ Prefix the change with one of these keywords:
 
 ### Added
 
+- **Multiple issues display**: Complete validation overhaul to show all accessibility problems simultaneously, eliminating the "fix one, see another" user experience
+- **Priority-based visual indicators**: Block borders now reflect highest severity issue (red for errors, yellow for warnings) with intelligent fallback behavior
+- **Comprehensive inspector panel feedback**: All validation issues are listed at once in the sidebar, organized by severity (errors first, then warnings)
+- **JavaScript-only validation system**: Complete migration from PHP to JavaScript-only validation for real-time block editor feedback
+- **Unified validation architecture**: New `ba11yc.validateBlock` filter hook system for consistent validation across all block types
+- **Enhanced external plugin support**: External blocks now display visual accessibility indicators and integrate fully with the editor UI
+- **Real-time visual feedback**: All blocks (core and external) now show instant accessibility validation with visual borders and inspector panel messages
 - Input validation for heading level data to prevent invalid configurations
 - Option caching in HeadingLevels class for improved performance
 - Comprehensive settings sanitization to validate all user input
@@ -66,9 +73,7 @@ Prefix the change with one of these keywords:
     - Image blocks: alt text required, length validation, caption matching
     - Button blocks: required content validation, text quality checks
     - Table blocks: header or caption requirement validation
-- PHP validation rules automatically exposed to JavaScript via `BlockAccessibilityChecks.validationRules`
-- Developer extensibility for custom checks works seamlessly in both PHP and JavaScript contexts
-- Dynamic JavaScript validation system using `blockAccessibilityChecks.blockChecksArray` filter
+- JavaScript-only validation system with real-time feedback using the `ba11yc.validateBlock` filter hook
 - External plugin integration support with proper dependency management and load order
 - Visual error indicators (red borders, inspector panel messages) for invalid blocks in editor
 - Complete integration documentation with working examples for external plugin developers
