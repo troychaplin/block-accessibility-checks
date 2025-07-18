@@ -100,7 +100,8 @@ addFilter(
 
 When the plugin detects accessibility issues, it provides immediate visual feedback:
 
-- **Red Border:** Blocks with critical errors are highlighted with a red border
+- **Error Icons:** Blocks with critical errors display a red accessibility icon indicator
+- **Warning Icons:** Blocks with warnings display a yellow accessibility icon indicator
 - **Inspector Panel Messages:** Detailed error messages appear in the block settings sidebar
 - **Publishing Prevention:** Posts cannot be published until all critical errors are resolved
 - **Warning Indicators:** Non-critical issues show warnings but allow publishing
