@@ -29,9 +29,9 @@ Relates to #(issue number)
 
 <!-- Provide a detailed list of changes -->
 
-- Add change
-- Add change
-- Add change
+- Add
+- Add
+- Add
 
 ## Testing
 
