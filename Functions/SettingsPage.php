@@ -539,7 +539,8 @@ class SettingsPage {
 		}
 
 		// Get current page slug to determine which plugin.
-		$current_page = \sanitize_text_field( $_GET['page'] ?? '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is an admin page callback, nonce verification not required for page parameter.
+		$current_page = \sanitize_text_field( \wp_unslash( $_GET['page'] ?? '' ) );
 		$plugin_slug  = str_replace( 'block-a11y-checks-', '', $current_page );
 
 		$external_plugins = $this->get_external_plugins_with_settings();
