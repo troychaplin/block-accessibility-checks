@@ -1,0 +1,227 @@
+name: 📚 Documentation Improvement
+description: Suggest improvements to documentation, examples, or guides
+title: '[Docs]: '
+labels: ['documentation', 'improvement']
+assignees: []
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Help us improve the documentation! Whether you found something confusing, missing, or have ideas for better examples, your feedback is valuable.
+
+    - type: dropdown
+      id: doc-type
+      attributes:
+          label: Documentation Type
+          description: Which documentation needs improvement?
+          options:
+              - Developer API Documentation
+              - Integration Examples
+              - README File
+              - Code Comments
+              - Inline Help Text
+              - Setup/Installation Guide
+              - Troubleshooting Guide
+              - Best Practices Guide
+              - Plugin Settings Help
+              - Other
+      validations:
+          required: true
+
+    - type: input
+      id: doc-location
+      attributes:
+          label: Document/File Location
+          description: Where is the documentation that needs improvement?
+          placeholder: 'e.g., docs/developer-api.md, README.md, line 45 of example.js'
+
+    - type: dropdown
+      id: issue-type
+      attributes:
+          label: Type of Issue
+          description: What kind of documentation issue is this?
+          options:
+              - Missing Information
+              - Incorrect Information
+              - Unclear Explanation
+              - Outdated Content
+              - Missing Examples
+              - Poor Code Examples
+              - Confusing Structure
+              - Typos/Grammar
+              - Missing Links or References
+              - Needs More Detail
+              - Too Much Detail
+              - Other
+      validations:
+          required: true
+
+    - type: textarea
+      id: current-problem
+      attributes:
+          label: Current Problem
+          description: What's unclear, missing, or incorrect in the current documentation?
+          placeholder: |
+              Describe the specific issue:
+              - What information is missing or unclear?
+              - What made you confused or stuck?
+              - What would you expect to find here?
+      validations:
+          required: true
+
+    - type: textarea
+      id: suggested-improvement
+      attributes:
+          label: Suggested Improvement
+          description: How would you improve this documentation?
+          placeholder: |
+              Provide specific suggestions:
+              - What information should be added?
+              - How could explanations be clearer?
+              - What examples would be helpful?
+              - How should content be reorganized?
+      validations:
+          required: true
+
+    - type: dropdown
+      id: target-audience
+      attributes:
+          label: Target Audience
+          description: Who would benefit most from this documentation improvement?
+          options:
+              - Beginner WordPress Developers
+              - Experienced WordPress Developers
+              - Block Developers
+              - Plugin Developers
+              - Theme Developers
+              - Non-technical Users
+              - All Users
+              - Accessibility Specialists
+      validations:
+          required: true
+
+    - type: textarea
+      id: use-case
+      attributes:
+          label: Use Case/Context
+          description: Describe the situation where you encountered this documentation issue
+          placeholder: |
+              Help us understand the context:
+              - What were you trying to accomplish?
+              - What brought you to this documentation?
+              - What was your experience level with the topic?
+              - How did the unclear documentation affect your work?
+      validations:
+          required: true
+
+    - type: textarea
+      id: example-content
+      attributes:
+          label: Example Content
+          description: If suggesting new content, provide a draft or example
+          placeholder: |
+              You can include:
+              - Draft text for missing sections
+              - Example code snippets
+              - Improved explanations
+              - Better example scenarios
+          render: markdown
+
+    - type: checkboxes
+      id: improvement-type
+      attributes:
+          label: Improvement Type
+          description: What type of improvements would help? (Check all that apply)
+          options:
+              - label: More detailed explanations
+              - label: Additional code examples
+              - label: Step-by-step tutorials
+              - label: Real-world use cases
+              - label: Troubleshooting section
+              - label: Visual aids (diagrams, screenshots)
+              - label: Links to related resources
+              - label: Better organization/structure
+              - label: Search/navigation improvements
+              - label: FAQ section
+
+    - type: dropdown
+      id: complexity-level
+      attributes:
+          label: Content Complexity
+          description: What level of technical detail would be most helpful?
+          options:
+              - Basic - High-level overview with simple examples
+              - Intermediate - Balanced detail with practical examples
+              - Advanced - Comprehensive detail with complex examples
+              - Multiple Levels - Different sections for different skill levels
+
+    - type: textarea
+      id: related-docs
+      attributes:
+          label: Related Documentation
+          description: Are there other documents or sections that relate to this issue?
+          placeholder: |
+              Reference any:
+              - Related documentation sections
+              - Similar examples in other parts
+              - External resources that handle this well
+              - WordPress or accessibility documentation
+
+    - type: textarea
+      id: research-attempted
+      attributes:
+          label: Research Attempted
+          description: What did you try to find the information you needed?
+          placeholder: |
+              Let us know:
+              - Where else did you look for answers?
+              - What search terms did you use?
+              - Did you find partial answers elsewhere?
+              - What external resources did you consult?
+
+    - type: checkboxes
+      id: contribution-interest
+      attributes:
+          label: Contribution Interest
+          description: Are you interested in helping improve this documentation?
+          options:
+              - label: I'd be willing to write a draft of the improved content
+              - label: I'd be happy to review proposed changes
+              - label: I can provide additional examples or use cases
+              - label: I'd like to test documentation improvements
+              - label: I'm interested in ongoing documentation contributions
+
+    - type: dropdown
+      id: urgency
+      attributes:
+          label: Priority Level
+          description: How important is this documentation improvement?
+          options:
+              - High - Blocking many users or critical functionality
+              - Medium - Would significantly improve user experience
+              - Low - Nice to have improvement
+              - Enhancement - Minor improvement for edge cases
+
+    - type: textarea
+      id: impact-description
+      attributes:
+          label: Impact Description
+          description: How would improving this documentation help users?
+          placeholder: |
+              Describe the positive impact:
+              - How many users would this help?
+              - What problems would this solve?
+              - How would this improve the overall experience?
+              - What would users be able to accomplish better?
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional Context
+          description: Any other relevant information or suggestions
+          placeholder: |
+              Include:
+              - Screenshots of confusing sections
+              - Links to good documentation examples
+              - Related feature requests
+              - Background context that might be helpful

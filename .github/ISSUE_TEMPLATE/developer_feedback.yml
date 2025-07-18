@@ -1,0 +1,240 @@
+name: 💬 Developer Feedback
+description: Provide feedback on the developer API, integration experience, or documentation
+title: '[Feedback]: '
+labels: ['feedback', 'developer-experience']
+assignees: []
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for testing Block Accessibility Checks! Your developer feedback is invaluable for improving the plugin and its integration experience.
+
+    - type: dropdown
+      id: feedback-category
+      attributes:
+          label: Feedback Category
+          description: What aspect would you like to provide feedback on?
+          options:
+              - Developer API Experience
+              - Integration Process
+              - Documentation Quality
+              - Code Examples
+              - JavaScript Validation System
+              - PHP Hook System
+              - Settings Integration
+              - Performance
+              - Overall Developer Experience
+              - Other
+      validations:
+          required: true
+
+    - type: dropdown
+      id: developer-type
+      attributes:
+          label: Developer Profile
+          description: Which best describes your development experience?
+          options:
+              - WordPress Plugin Developer
+              - WordPress Theme Developer
+              - Block Developer (Custom Blocks)
+              - Full-Stack WordPress Developer
+              - Frontend Developer
+              - Accessibility Specialist
+              - New to WordPress Development
+              - Other
+      validations:
+          required: true
+
+    - type: dropdown
+      id: integration-type
+      attributes:
+          label: Integration Type
+          description: What type of integration are you working on or testing?
+          options:
+              - Adding checks to existing custom blocks
+              - Creating new blocks with accessibility checks
+              - Extending core block validation
+              - Theme integration
+              - Multi-block plugin integration
+              - Just exploring the API
+              - Other
+      validations:
+          required: true
+
+    - type: textarea
+      id: what-worked-well
+      attributes:
+          label: What Worked Well
+          description: What aspects of the developer experience were positive?
+          placeholder: |
+              Tell us about:
+              - Parts of the API that were intuitive
+              - Documentation that was helpful
+              - Integration steps that went smoothly
+              - Features that exceeded expectations
+      validations:
+          required: true
+
+    - type: textarea
+      id: what-was-challenging
+      attributes:
+          label: What Was Challenging
+          description: What aspects were difficult, confusing, or time-consuming?
+          placeholder: |
+              Tell us about:
+              - Parts of the API that were confusing
+              - Missing documentation or examples
+              - Integration steps that were unclear
+              - Unexpected behavior or limitations
+      validations:
+          required: true
+
+    - type: textarea
+      id: specific-pain-points
+      attributes:
+          label: Specific Pain Points
+          description: Describe any specific technical issues or frustrations you encountered
+          placeholder: |
+              For example:
+              - "It wasn't clear how to handle custom block attributes"
+              - "The JavaScript validation hook didn't work as expected"
+              - "Setting up the build process was confusing"
+              - "Error messages weren't helpful for debugging"
+
+    - type: dropdown
+      id: documentation-rating
+      attributes:
+          label: Documentation Rating
+          description: How would you rate the current documentation?
+          options:
+              - Excellent - Clear, comprehensive, and helpful
+              - Good - Mostly helpful with minor gaps
+              - Average - Adequate but could be improved
+              - Poor - Difficult to understand or incomplete
+              - Very Poor - Major issues or missing content
+      validations:
+          required: true
+
+    - type: textarea
+      id: documentation-feedback
+      attributes:
+          label: Documentation Feedback
+          description: Specific feedback about the documentation
+          placeholder: |
+              What would make the documentation better?
+              - Missing examples or use cases
+              - Areas that need more detail
+              - Confusing explanations
+              - Suggestions for additional guides
+
+    - type: dropdown
+      id: api-ease-of-use
+      attributes:
+          label: API Ease of Use
+          description: How easy was the developer API to use?
+          options:
+              - Very Easy - Intuitive and straightforward
+              - Easy - Minor learning curve
+              - Moderate - Required some trial and error
+              - Difficult - Significant learning curve
+              - Very Difficult - Major obstacles
+      validations:
+          required: true
+
+    - type: textarea
+      id: api-suggestions
+      attributes:
+          label: API Improvement Suggestions
+          description: How could the developer API be improved?
+          placeholder: |
+              Consider:
+              - Additional helper functions or utilities
+              - Different hook patterns or parameters
+              - Better error handling or debugging support
+              - Simplified integration steps
+
+    - type: textarea
+      id: missing-features
+      attributes:
+          label: Missing Features or Capabilities
+          description: What features or capabilities do you wish were available?
+          placeholder: |
+              Examples:
+              - Additional validation types
+              - More granular control over behavior
+              - Better debugging tools
+              - Different integration patterns
+
+    - type: dropdown
+      id: integration-time
+      attributes:
+          label: Integration Time
+          description: How long did it take to integrate with your project?
+          options:
+              - Less than 1 hour
+              - 1-3 hours
+              - Half day (3-6 hours)
+              - Full day (6-8 hours)
+              - Multiple days
+              - Still working on it
+      validations:
+          required: true
+
+    - type: textarea
+      id: comparison-feedback
+      attributes:
+          label: Comparison with Other Tools
+          description: How does this compare to other accessibility tools or WordPress APIs you've used?
+          placeholder: |
+              If you've used other accessibility tools or similar WordPress APIs:
+              - What does this plugin do better?
+              - What do other tools do better?
+              - How does the developer experience compare?
+
+    - type: textarea
+      id: code-examples-feedback
+      attributes:
+          label: Code Examples Feedback
+          description: Feedback on the provided code examples and integration guides
+          placeholder: |
+              Were the code examples:
+              - Clear and easy to follow?
+              - Complete enough to get started?
+              - Relevant to your use case?
+              - Missing important details?
+
+    - type: checkboxes
+      id: would-recommend
+      attributes:
+          label: Recommendation
+          description: Based on your experience
+          options:
+              - label: I would recommend this plugin to other developers
+              - label: I plan to use this plugin in production projects
+              - label: I would contribute to improving this plugin
+              - label: I would like to be notified of major updates
+
+    - type: textarea
+      id: overall-experience
+      attributes:
+          label: Overall Experience Summary
+          description: Summarize your overall experience and any final thoughts
+          placeholder: |
+              Your overall impression:
+              - Would you use this plugin in a real project?
+              - What's the most important thing to improve?
+              - Any other thoughts or suggestions?
+      validations:
+          required: true
+
+    - type: textarea
+      id: environment-details
+      attributes:
+          label: Development Environment
+          description: Details about your development setup (optional)
+          placeholder: |
+              - WordPress Version:
+              - PHP Version:
+              - Build Tools Used:
+              - Local Development Environment:
+              - Block Editor Version:

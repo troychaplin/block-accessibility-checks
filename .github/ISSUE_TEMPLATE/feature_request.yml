@@ -1,0 +1,188 @@
+name: 🚀 Feature Request
+description: Suggest a new feature or enhancement for Block Accessibility Checks
+title: '[Feature]: '
+labels: ['enhancement', 'needs-discussion']
+assignees: []
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for suggesting a new feature! Your ideas help make Block Accessibility Checks better for everyone.
+
+    - type: checkboxes
+      id: prerequisites
+      attributes:
+          label: Prerequisites
+          description: Please confirm the following before submitting your feature request
+          options:
+              - label: I have searched existing issues and discussions to ensure this feature hasn't been requested already
+                required: true
+              - label: This feature request is related to accessibility improvements or block validation
+                required: true
+
+    - type: dropdown
+      id: feature-category
+      attributes:
+          label: Feature Category
+          description: What type of feature are you requesting?
+          options:
+              - New Accessibility Check
+              - Block Type Support
+              - Developer API Enhancement
+              - User Interface Improvement
+              - Settings/Configuration Option
+              - Performance Enhancement
+              - Integration Feature
+              - Documentation/Help Feature
+              - Other
+      validations:
+          required: true
+
+    - type: textarea
+      id: feature-summary
+      attributes:
+          label: Feature Summary
+          description: A clear and concise description of the feature you'd like to see
+          placeholder: Briefly describe the feature you're requesting...
+      validations:
+          required: true
+
+    - type: textarea
+      id: problem-statement
+      attributes:
+          label: Problem Statement
+          description: What accessibility problem or limitation does this feature address?
+          placeholder: |
+              Describe the current limitation or accessibility issue that this feature would solve.
+              For example: "Currently, there's no way to validate that video blocks have captions..."
+      validations:
+          required: true
+
+    - type: textarea
+      id: proposed-solution
+      attributes:
+          label: Proposed Solution
+          description: Describe your proposed solution in detail
+          placeholder: |
+              How should this feature work? Be as specific as possible.
+              Include:
+              - What should happen when the feature is used
+              - How it should integrate with existing functionality
+              - Any specific behavior or validation rules
+      validations:
+          required: true
+
+    - type: dropdown
+      id: target-blocks
+      attributes:
+          label: Target Block Types
+          description: Which blocks should this feature apply to?
+          options:
+              - Specific Core Block (specify below)
+              - Multiple Core Blocks
+              - Custom/Third-party Blocks
+              - All Blocks
+              - New Block Type
+              - Not block-specific
+      validations:
+          required: true
+
+    - type: input
+      id: specific-blocks
+      attributes:
+          label: Specific Block Names
+          description: If applicable, list the specific block types (e.g., core/video, core/audio)
+          placeholder: core/video, core/audio
+
+    - type: dropdown
+      id: wcag-relation
+      attributes:
+          label: WCAG Guidelines
+          description: Which WCAG guidelines does this feature address?
+          multiple: true
+          options:
+              - WCAG 2.1 Level A
+              - WCAG 2.1 Level AA
+              - WCAG 2.1 Level AAA
+              - WCAG 2.2 Level A
+              - WCAG 2.2 Level AA
+              - WCAG 2.2 Level AAA
+              - Not directly related to WCAG
+              - Unsure
+
+    - type: input
+      id: wcag-criteria
+      attributes:
+          label: Specific WCAG Success Criteria
+          description: If you know the specific WCAG success criteria, please list them
+          placeholder: 'e.g., 1.2.2 (Captions), 1.4.3 (Contrast), 2.4.6 (Headings and Labels)'
+
+    - type: dropdown
+      id: priority-level
+      attributes:
+          label: Priority Level
+          description: How would you rate the importance of this feature?
+          options:
+              - High - Critical accessibility issue that blocks content publishing
+              - Medium - Important accessibility improvement
+              - Low - Nice to have enhancement
+              - Enhancement - Improves user experience but not critical
+      validations:
+          required: true
+
+    - type: textarea
+      id: use-cases
+      attributes:
+          label: Use Cases
+          description: Provide specific examples of when and how this feature would be used
+          placeholder: |
+              Example scenarios:
+              1. A content editor adds a video block...
+              2. A developer creates a custom block...
+              3. A site administrator wants to...
+      validations:
+          required: true
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: Alternative Solutions
+          description: Have you considered any alternative approaches or workarounds?
+          placeholder: Describe any alternative solutions you've considered...
+
+    - type: textarea
+      id: developer-impact
+      attributes:
+          label: Developer Impact
+          description: How would this feature affect plugin developers or theme developers?
+          placeholder: |
+              Consider:
+              - Would this require changes to existing integrations?
+              - Would this provide new API capabilities?
+              - How would this affect backward compatibility?
+
+    - type: checkboxes
+      id: implementation-considerations
+      attributes:
+          label: Implementation Considerations
+          description: Check all that apply to your feature request
+          options:
+              - label: This feature should be configurable in the settings
+              - label: This feature should have different severity levels (error/warning)
+              - label: This feature should work with the developer API
+              - label: This feature should be backward compatible
+              - label: This feature may require new block attributes
+              - label: This feature should work in real-time (as user types)
+              - label: This feature should prevent publishing when validation fails
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional Context
+          description: Add any other context, mockups, examples, or references
+          placeholder: |
+              Include any:
+              - Links to relevant WCAG documentation
+              - Examples from other tools or plugins
+              - Mockups or design ideas
+              - Related accessibility resources

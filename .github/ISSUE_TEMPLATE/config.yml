@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+    - name: 🌐 WordPress.org Plugin Support
+      url: https://wordpress.org/support/plugin/block-accessibility-checks/
+      about: For general support questions and community discussion
+    - name: 📖 Developer Documentation
+      url: https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/developer-api.md
+      about: Complete developer API documentation and integration guides
+    - name: 💡 Feature Discussions
+      url: https://github.com/troychaplin/block-accessibility-checks/discussions
+      about: Discuss ideas and feature concepts with the community
+    - name: 🔗 Accessibility Guidelines (WCAG)
+      url: https://www.w3.org/WAI/WCAG21/quickref/
+      about: Reference for Web Content Accessibility Guidelines
