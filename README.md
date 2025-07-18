@@ -44,7 +44,7 @@ function my_custom_checks( $registry ) {
         'required_content',
         array(
             'message'     => 'This field is required for accessibility compliance',
-            'type'        => 'error', // 'error', 'warning', 'settings', or 'none'
+            'type'        => 'error', // 'error', 'warning', or 'settings'
             'priority'    => 10,
             'description' => 'Content validation for accessibility compliance',
         )
