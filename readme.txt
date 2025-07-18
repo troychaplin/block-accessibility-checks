@@ -114,7 +114,7 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
 5. **Developer Integration** - Custom block with integrated accessibility validation showing seamless third-party plugin support
  
 == Changelog ==
-= 2.0.0 =
+= v2.0.0-beta-1 =
 
 #### Added
 
