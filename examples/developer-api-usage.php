@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Block Accessibility Checks - Developer API Usage Examples
  *

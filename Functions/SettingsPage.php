@@ -85,7 +85,7 @@ class SettingsPage {
 	 * @return void
 	 */
 	public function block_check_admin_menu(): void {
-		// Add top-level menu
+		// Add top-level menu.
 		\add_menu_page(
 			\esc_html__( 'Block Checks', 'block-accessibility-checks' ),
 			\esc_html__( 'Block Checks', 'block-accessibility-checks' ),
@@ -93,20 +93,20 @@ class SettingsPage {
 			'block-a11y-checks',
 			array( $this, 'settings_page_layout' ),
 			'dashicons-universal-access',
-			81 // Position at bottom of menu
+			81
 		);
 
-		// Add Core Block Checks submenu
+		// Add Core Block Checks submenu.
 		\add_submenu_page(
 			'block-a11y-checks',
 			\esc_html__( 'Core Block Checks', 'block-accessibility-checks' ),
 			\esc_html__( 'Core Block Checks', 'block-accessibility-checks' ),
 			'manage_options',
-			'block-a11y-checks', // Same as parent for default page
+			'block-a11y-checks',
 			array( $this, 'settings_page_layout' )
 		);
 
-		// Add external plugin submenus
+		// Add external plugin submenus.
 		$this->add_external_plugin_menus();
 	}
 
@@ -140,15 +140,15 @@ class SettingsPage {
 		$all_checks       = $this->registry->get_all_checks();
 
 		foreach ( $all_checks as $block_type => $checks ) {
-			// Skip core blocks
+			// Skip core blocks.
 			if ( strpos( $block_type, 'core/' ) === 0 ) {
 				continue;
 			}
 
-			// Check if any checks for this block are using settings
+			// Check if any checks for this block are using settings.
 			$has_settings_checks = false;
 			foreach ( $checks as $check ) {
-				if ( ! isset( $check['type'] ) || $check['type'] === 'settings' ) {
+				if ( ! isset( $check['type'] ) || 'settings' === $check['type'] ) {
 					$has_settings_checks = true;
 					break;
 				}
@@ -158,7 +158,7 @@ class SettingsPage {
 				continue;
 			}
 
-			// Extract plugin info from block type
+			// Extract plugin info from block type.
 			$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
 			$plugin_slug = $plugin_info['slug'];
 
@@ -178,7 +178,7 @@ class SettingsPage {
 	/**
 	 * Extract plugin information from block type
 	 *
-	 * @param string $block_type The block type (e.g., 'create-block/my-testimonial-block')
+	 * @param string $block_type The block type (e.g., 'create-block/my-testimonial-block').
 	 * @return array Plugin information with name and slug
 	 */
 	private function extract_plugin_info_from_block_type( string $block_type ): array {
@@ -186,10 +186,10 @@ class SettingsPage {
 		$namespace  = $parts[0] ?? '';
 		$block_name = $parts[1] ?? '';
 
-		// Convert namespace to readable name
+		// Convert namespace to readable name.
 		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
 
-		// Create a slug for the plugin
+		// Create a slug for the plugin.
 		$plugin_slug = sanitize_title( $namespace );
 
 		return array(
@@ -207,7 +207,7 @@ class SettingsPage {
 	 * @return void
 	 */
 	public function init_settings(): void {
-		// Register core block settings
+		// Register core block settings.
 		\register_setting(
 			'block_checks_settings_group',
 			'block_checks_options',
@@ -233,7 +233,7 @@ class SettingsPage {
 			);
 		}
 
-		// Register external plugin settings
+		// Register external plugin settings.
 		$this->register_external_plugin_settings();
 	}
 
