@@ -25,16 +25,16 @@ The easiest way to add custom accessibility checks is to register them in PHP (f
 add_action( 'ba11yc_register_checks', 'my_plugin_register_checks' );
 
 function my_plugin_register_checks( $registry ) {
-    $registry->register_check(
-        'my-plugin/custom-block',
-        'content_length',
-        array(
-            'message'     => __( 'Content is too long for optimal readability', 'my-plugin' ),
-            'type'        => 'warning', // 'error', 'warning', 'settings', or 'none'
-            'priority'    => 10,
-            'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
-        )
-    );
+	$registry->register_check(
+		'my-plugin/custom-block',
+		'content_length',
+		array(
+			'message'     => __( 'Content is too long for optimal readability', 'my-plugin' ),
+			'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
+			'type'        => 'warning', // 'error', 'warning', 'settings', or 'none'
+			'priority'    => 10,
+		)
+	);
 }
 ```
 
@@ -256,17 +256,23 @@ Register a new accessibility check.
 
 **Returns:** (bool) True on success, false on failure
 
+
 **Check Configuration:**
 
 ```php
 $check_args = array(
-    'message'     => 'Error message',      // Required: User-facing message
-    'type'        => 'settings',           // Optional: Check behavior type (default: 'settings')
-    'priority'    => 10,                   // Optional: Execution priority (lower = earlier, default: 10)
-    'enabled'     => true,                 // Optional: Whether check is enabled (default: true)
-    'description' => 'Detailed info',      // Optional: Detailed description for settings
+	'message'     => 'Error or warning shown in the block editor', // Required: User-facing message for validation
+	'description' => 'Explanation shown in the settings/admin UI', // Optional: Description for settings page
+	'type'        => 'settings',           // Optional: Check behavior type (default: 'settings')
+	'priority'    => 10,                   // Optional: Execution priority (lower = earlier, default: 10)
+	'enabled'     => true,                 // Optional: Whether check is enabled (default: true)
 );
 ```
+
+**Field Usage:**
+
+- `message`: Displayed in the block editor when a check fails (error/warning).
+- `description`: Displayed in the settings/admin UI to explain the check.
 
 **Check Types:**
 
@@ -295,14 +301,16 @@ To bypass settings and force a specific level, use any type other than `'setting
 ```php
 // This check will always be a warning, regardless of settings
 $registry->register_check('my-plugin/block', 'forced_warning', [
-    'message' => 'This is always a warning',
-    'type' => 'warning'  // Bypasses settings
+	'message'    => 'This is always a warning',
+	'description'=> 'Warns if something is not right.',
+	'type'       => 'warning'  // Bypasses settings
 ]);
 
 // This check appears in settings and can be configured
 $registry->register_check('my-plugin/block', 'configurable', [
-    'message' => 'This can be configured in settings',
-    'type' => 'settings' // Uses admin settings (default)
+	'message'    => 'This can be configured in settings',
+	'description'=> 'Explains what this check does.',
+	'type'       => 'settings' // Uses admin settings (default)
 ]);
 ```
 
@@ -438,51 +446,51 @@ addFilter(
 ```javascript
 // Simple attribute validation
 function validateMyCheck(attributes) {
-    return !!(attributes.requiredField && attributes.requiredField.trim());
+	return !!(attributes.requiredField && attributes.requiredField.trim());
 }
 
 // Content-based validation
 function validateImageAlt(attributes) {
-    // Check if image is decorative
-    if (attributes.isDecorative) {
-        return true; // Valid - decorative images don't need alt text
-    }
+	// Check if image is decorative
+	if (attributes.isDecorative) {
+		return true; // Valid - decorative images don't need alt text
+	}
 
-    // Check if alt text exists
-    if (!attributes.alt || !attributes.alt.trim()) {
-        return false; // Invalid - missing alt text
-    }
+	// Check if alt text exists
+	if (!attributes.alt || !attributes.alt.trim()) {
+		return false; // Invalid - missing alt text
+	}
 
-    // Check if alt text is meaningful (not just filename)
-    const alt = attributes.alt.toLowerCase();
-    const filenamePatterns = ['.jpg', '.png', '.gif', '.webp', 'img_', 'image'];
+	// Check if alt text is meaningful (not just filename)
+	const alt = attributes.alt.toLowerCase();
+	const filenamePatterns = ['.jpg', '.png', '.gif', '.webp', 'img_', 'image'];
 
-    for (const pattern of filenamePatterns) {
-        if (alt.includes(pattern)) {
-            return false; // Invalid - looks like filename
-        }
-    }
+	for (const pattern of filenamePatterns) {
+		if (alt.includes(pattern)) {
+			return false; // Invalid - looks like filename
+		}
+	}
 
-    return true; // Valid
+	return true; // Valid
 }
 
 // Advanced check with custom result
 function check_heading_hierarchy( $attributes, $content, $config ) {
-    $level = $attributes['level'] ?? 2;
+	$level = $attributes['level'] ?? 2;
 
-    // Custom logic here...
-    $is_valid = validate_heading_hierarchy( $level );
+	// Custom logic here...
+	$is_valid = validate_heading_hierarchy( $level );
 
-    if ( $is_valid ) {
-        return false;
-    }
+	if ( $is_valid ) {
+		return false;
+	}
 
-    // Return custom result with additional context
-    return array(
-        'is_valid' => false,
-        'message'  => sprintf( 'Heading level H%d may skip hierarchy levels', $level ),
-        'data'     => array( 'current_level' => $level )
-    );
+	// Return custom result with additional context
+	return array(
+		'is_valid' => false,
+		'message'  => sprintf( 'Heading level H%d may skip hierarchy levels', $level ),
+		'data'     => array( 'current_level' => $level )
+	);
 }
 ```
 
@@ -497,19 +505,19 @@ You can access the registry through multiple methods depending on your needs:
 add_action( 'ba11yc_register_checks', 'my_plugin_register_checks' );
 
 function my_plugin_register_checks( $registry ) {
-    $registry->register_check( 'core/image', 'my_custom_check', [...] );
+	$registry->register_check( 'core/image', 'my_custom_check', [...] );
 }
 
 // Alternative: Access registry when plugin is fully ready
 add_action( 'ba11yc_ready', 'my_plugin_init' );
 
 function my_plugin_init( $registry, $plugin_initializer ) {
-    // Direct registry access
-    $registry->register_check( 'core/paragraph', 'custom_check', [...] );
+	// Direct registry access
+	$registry->register_check( 'core/paragraph', 'custom_check', [...] );
 
-    // Or through the initializer convenience methods
-    $plugin_initializer->register_check( 'core/heading', 'heading_check', [...] );
-    $plugin_initializer->unregister_check( 'core/button', 'unwanted_check' );
+	// Or through the initializer convenience methods
+	$plugin_initializer->register_check( 'core/heading', 'heading_check', [...] );
+	$plugin_initializer->unregister_check( 'core/button', 'unwanted_check' );
 }
 ```
 
@@ -521,8 +529,8 @@ $registry = \BlockAccessibility\BlockChecksRegistry::get_instance();
 
 // Check if plugin is available first
 if ( function_exists( 'BlockAccessibility\\BlockChecksRegistry::get_instance' ) ) {
-    $registry = \BlockAccessibility\BlockChecksRegistry::get_instance();
-    $registry->register_check( 'my/block', 'my_check', [...] );
+	$registry = \BlockAccessibility\BlockChecksRegistry::get_instance();
+	$registry->register_check( 'my/block', 'my_check', [...] );
 }
 ```
 
@@ -531,16 +539,16 @@ if ( function_exists( 'BlockAccessibility\\BlockChecksRegistry::get_instance' ) 
 ```php
 // Check if Block Accessibility Checks is active
 function is_block_accessibility_checks_active() {
-    return function_exists( 'BlockAccessibility\\BlockChecksRegistry::get_instance' );
+	return function_exists( 'BlockAccessibility\\BlockChecksRegistry::get_instance' );
 }
 
 // Safe registration pattern
 function safely_register_accessibility_checks() {
-    if ( ! is_block_accessibility_checks_active() ) {
-        return; // Plugin not available
-    }
+	if ( ! is_block_accessibility_checks_active() ) {
+		return; // Plugin not available
+	}
 
-    add_action( 'ba11yc_register_checks', 'my_register_checks_callback' );
+	add_action( 'ba11yc_register_checks', 'my_register_checks_callback' );
 }
 add_action( 'plugins_loaded', 'safely_register_accessibility_checks' );
 ```
@@ -622,43 +630,43 @@ addFilter(
 );
 ```
 
-    	return { isValid: true };
-    }
+		return { isValid: true };
+	}
 
-    const attributes = block.attributes;
-    const validationRules = window.BlockAccessibilityChecks?.validationRules || {};
-    const blockRules = validationRules[block.name] || {};
+	const attributes = block.attributes;
+	const validationRules = window.BlockAccessibilityChecks?.validationRules || {};
+	const blockRules = validationRules[block.name] || {};
 
-    // Check each registered rule
-    for (const [checkId, rule] of Object.entries(blockRules)) {
-    	if (!rule.enabled) continue;
+	// Check each registered rule
+	for (const [checkId, rule] of Object.entries(blockRules)) {
+		if (!rule.enabled) continue;
 
-    	let isValid = true;
+		let isValid = true;
 
-    	// Implement your validation logic
-    	switch (checkId) {
-    		case 'required_field':
-    			isValid = !!(attributes.requiredField && attributes.requiredField.trim());
-    			break;
-    		case 'content_length':
-    			isValid = (attributes.content?.length || 0) <= 500;
-    			break;
-    		// Add more checks as needed...
-    	}
+		// Implement your validation logic
+		switch (checkId) {
+			case 'required_field':
+				isValid = !!(attributes.requiredField && attributes.requiredField.trim());
+				break;
+			case 'content_length':
+				isValid = (attributes.content?.length || 0) <= 500;
+				break;
+			// Add more checks as needed...
+		}
 
-    	// If any check fails, return invalid result
-    	if (!isValid) {
-    		return {
-    			isValid: false,
-    			mode: rule.type, // 'error', 'warning', or 'info'
-    			clientId: block.clientId,
-    			name: block.name,
-    			message: rule.message,
-    		};
-    	}
-    }
+		// If any check fails, return invalid result
+		if (!isValid) {
+			return {
+				isValid: false,
+				mode: rule.type, // 'error', 'warning', or 'info'
+				clientId: block.clientId,
+				name: block.name,
+				message: rule.message,
+			};
+		}
+	}
 
-    return { isValid: true };
+	return { isValid: true };
 
 }
 
@@ -671,13 +679,13 @@ if (blockType !== 'my-plugin/custom-block') {
 return isValid;
 }
 
-    	if (checkName === 'content_validation') {
-    		// Implement your validation logic here
-    		return attributes.content && attributes.content.trim().length > 0;
-    	}
+		if (checkName === 'content_validation') {
+			// Implement your validation logic here
+			return attributes.content && attributes.content.trim().length > 0;
+		}
 
-    	return isValid;
-    }
+		return isValid;
+	}
 
 );
 }
@@ -691,11 +699,11 @@ Make sure your JavaScript runs after the Block Accessibility Checks script by se
 ```php
 // In your plugin's script enqueuing
 wp_enqueue_script(
-    'my-block-accessibility',
-    plugins_url('build/accessibility-checks.js', __FILE__),
-    array('block-accessibility-checks-script'), // Dependency on core plugin
-    '1.0.0',
-    true
+	'my-block-accessibility',
+	plugins_url('build/accessibility-checks.js', __FILE__),
+	array('block-accessibility-checks-script'), // Dependency on core plugin
+	'1.0.0',
+	true
 );
 ````
 
@@ -757,7 +765,7 @@ my-testimonial-block/
 
 // Prevent direct access
 if (!defined('ABSPATH')) {
-    exit;
+	exit;
 }
 
 /**
@@ -765,39 +773,39 @@ if (!defined('ABSPATH')) {
  * Only metadata - all validation logic is in JavaScript
  */
 function my_testimonial_register_accessibility_checks($registry) {
-    // Required author name
-    $registry->register_check('external-block/my-testimonial-block', 'author_required', [
-        'message' => __('Author name is required for testimonials.', 'my-testimonial-block'),
-        'type' => 'settings', // Uses admin settings by default
-        'description' => __('Author attribution is important for testimonial credibility.', 'my-testimonial-block'),
-    ]);
+	// Required author name
+	$registry->register_check('external-block/my-testimonial-block', 'author_required', [
+		'message' => __('Author name is required for testimonials.', 'my-testimonial-block'),
+		'type' => 'settings', // Uses admin settings by default
+		'description' => __('Author attribution is important for testimonial credibility.', 'my-testimonial-block'),
+	]);
 
-    // Required content
-    $registry->register_check('external-block/my-testimonial-block', 'content_required', [
-        'message' => __('Testimonial content cannot be empty.', 'my-testimonial-block'),
-        'type' => 'error', // Forced as error, bypasses settings
-        'description' => __('Empty testimonials provide no value to users.', 'my-testimonial-block'),
-    ]);
+	// Required content
+	$registry->register_check('external-block/my-testimonial-block', 'content_required', [
+		'message' => __('Testimonial content cannot be empty.', 'my-testimonial-block'),
+		'type' => 'error', // Forced as error, bypasses settings
+		'description' => __('Empty testimonials provide no value to users.', 'my-testimonial-block'),
+	]);
 
-    // Heading structure
-    $registry->register_check('external-block/my-testimonial-block', 'heading_structure', [
-        'message' => __('If using a heading, ensure it follows proper heading hierarchy.', 'my-testimonial-block'),
-        'type' => 'warning', // Forced as warning, bypasses settings
-        'description' => __('Proper heading structure improves accessibility for screen reader users.', 'my-testimonial-block'),
-    ]);
+	// Heading structure
+	$registry->register_check('external-block/my-testimonial-block', 'heading_structure', [
+		'message' => __('If using a heading, ensure it follows proper heading hierarchy.', 'my-testimonial-block'),
+		'type' => 'warning', // Forced as warning, bypasses settings
+		'description' => __('Proper heading structure improves accessibility for screen reader users.', 'my-testimonial-block'),
+	]);
 }
 
 /**
  * Enqueue accessibility checks JavaScript
  */
 function my_testimonial_enqueue_accessibility_assets() {
-    wp_enqueue_script(
-        'my-testimonial-accessibility-checks',
-        plugins_url('build/accessibility-checks.js', dirname(__FILE__)),
-        ['wp-hooks', 'wp-i18n', 'block-accessibility-script'],
-        '1.0.0',
-        true
-    );
+	wp_enqueue_script(
+		'my-testimonial-accessibility-checks',
+		plugins_url('build/accessibility-checks.js', dirname(__FILE__)),
+		['wp-hooks', 'wp-i18n', 'block-accessibility-script'],
+		'1.0.0',
+		true
+	);
 }
 
 // Hook into Block Accessibility Checks when it's ready
@@ -823,9 +831,9 @@ add_action('enqueue_block_editor_assets', 'my_testimonial_enqueue_accessibility_
  * Load accessibility integration when Block Accessibility Checks is ready
  */
 function my_testimonial_load_accessibility_integration() {
-    if (function_exists('BlockAccessibility\\BlockChecksRegistry::get_instance')) {
-        require_once plugin_dir_path(__FILE__) . 'includes/accessibility-integration.php';
-    }
+	if (function_exists('BlockAccessibility\\BlockChecksRegistry::get_instance')) {
+		require_once plugin_dir_path(__FILE__) . 'includes/accessibility-integration.php';
+	}
 }
 add_action('ba11yc_ready', 'my_testimonial_load_accessibility_integration');
 ````
@@ -881,18 +889,18 @@ addFilter(
 );
 ```
 
-    	if (!isValid) {
-    		return {
-    			isValid: false,
-    			mode: rule.type,
-    			clientId: block.clientId,
-    			name: block.name,
-    			message: rule.message,
-    		};
-    	}
-    }
+		if (!isValid) {
+			return {
+				isValid: false,
+				mode: rule.type,
+				clientId: block.clientId,
+				name: block.name,
+				message: rule.message,
+			};
+		}
+	}
 
-    return { isValid: true };
+	return { isValid: true };
 
 }
 
@@ -908,18 +916,18 @@ addFilter(
   return isValid;
   }
 
-              if (checkName === 'required_content') {
-                  return attributes.content && attributes.content.trim().length > 0;
-              }
+			  if (checkName === 'required_content') {
+				  return attributes.content && attributes.content.trim().length > 0;
+			  }
 
-              if (checkName === 'author_name') {
-                  return attributes.authorName && attributes.authorName.trim().length > 0;
-              }
+			  if (checkName === 'author_name') {
+				  return attributes.authorName && attributes.authorName.trim().length > 0;
+			  }
 
-              return isValid;
-          }
+			  return isValid;
+		  }
 
-    );
+	);
 
 ````
 
@@ -944,15 +952,15 @@ module.exports = {
 
 ```php
 function my_testimonial_enqueue_accessibility_scripts() {
-    $asset_file = include plugin_dir_path(__FILE__) . 'build/accessibility-checks.asset.php';
+	$asset_file = include plugin_dir_path(__FILE__) . 'build/accessibility-checks.asset.php';
 
-    wp_enqueue_script(
-        'my-testimonial-accessibility',
-        plugins_url('build/accessibility-checks.js', __FILE__),
-        array_merge($asset_file['dependencies'], ['block-accessibility-checks-script']),
-        $asset_file['version'],
-        true
-    );
+	wp_enqueue_script(
+		'my-testimonial-accessibility',
+		plugins_url('build/accessibility-checks.js', __FILE__),
+		array_merge($asset_file['dependencies'], ['block-accessibility-checks-script']),
+		$asset_file['version'],
+		true
+	);
 }
 add_action('enqueue_block_editor_assets', 'my_testimonial_enqueue_accessibility_scripts');
 ```
@@ -963,13 +971,13 @@ add_action('enqueue_block_editor_assets', 'my_testimonial_enqueue_accessibility_
 
 ```php
 function conditionally_register_checks($registry) {
-    // Only register for certain post types
-    if (get_post_type() === 'product') {
-        $registry->register_check('core/image', 'product_image_requirements', [
-            'message' => __('Product images must have descriptive alt text.', 'my-plugin'),
-            'type' => 'error'
-        ]);
-    }
+	// Only register for certain post types
+	if (get_post_type() === 'product') {
+		$registry->register_check('core/image', 'product_image_requirements', [
+			'message' => __('Product images must have descriptive alt text.', 'my-plugin'),
+			'type' => 'error'
+		]);
+	}
 }
 add_action('ba11yc_register_checks', 'conditionally_register_checks');
 ```
@@ -978,14 +986,14 @@ add_action('ba11yc_register_checks', 'conditionally_register_checks');
 
 ```php
 function modify_check_configuration($check_args, $block_type, $check_name) {
-    // Make certain checks warnings instead of errors for specific roles
-    if (!current_user_can('manage_options') && $check_args['type'] === 'error') {
-        if (in_array($check_name, ['optional_accessibility_check'])) {
-            $check_args['type'] = 'warning';
-        }
-    }
+	// Make certain checks warnings instead of errors for specific roles
+	if (!current_user_can('manage_options') && $check_args['type'] === 'error') {
+		if (in_array($check_name, ['optional_accessibility_check'])) {
+			$check_args['type'] = 'warning';
+		}
+	}
 
-    return $check_args;
+	return $check_args;
 }
 add_filter('ba11yc_check_args', 'modify_check_configuration', 10, 3);
 ```
@@ -994,17 +1002,17 @@ add_filter('ba11yc_check_args', 'modify_check_configuration', 10, 3);
 
 ```php
 function process_custom_check_results($results, $block_type, $attributes, $content) {
-    // Add contextual information to results
-    foreach ($results as &$result) {
-        if ($result['check_name'] === 'heading_hierarchy') {
-            $result['context'] = [
-                'post_type' => get_post_type(),
-                'current_user_role' => wp_get_current_user()->roles[0] ?? 'subscriber'
-            ];
-        }
-    }
+	// Add contextual information to results
+	foreach ($results as &$result) {
+		if ($result['check_name'] === 'heading_hierarchy') {
+			$result['context'] = [
+				'post_type' => get_post_type(),
+				'current_user_role' => wp_get_current_user()->roles[0] ?? 'subscriber'
+			];
+		}
+	}
 
-    return $results;
+	return $results;
 }
 add_filter('ba11yc_block_check_results', 'process_custom_check_results', 10, 4);
 ```
@@ -1013,18 +1021,18 @@ add_filter('ba11yc_block_check_results', 'process_custom_check_results', 10, 4);
 
 ```php
 function preprocess_block_attributes($attributes, $block_type, $content) {
-    // Normalize attributes before validation
-    if ($block_type === 'core/image') {
-        // Ensure alt attribute exists
-        if (!isset($attributes['alt'])) {
-            $attributes['alt'] = '';
-        }
+	// Normalize attributes before validation
+	if ($block_type === 'core/image') {
+		// Ensure alt attribute exists
+		if (!isset($attributes['alt'])) {
+			$attributes['alt'] = '';
+		}
 
-        // Clean up alt text
-        $attributes['alt'] = trim($attributes['alt']);
-    }
+		// Clean up alt text
+		$attributes['alt'] = trim($attributes['alt']);
+	}
 
-    return $attributes;
+	return $attributes;
 }
 add_filter('ba11yc_block_attributes', 'preprocess_block_attributes', 10, 3);
 ```
@@ -1183,26 +1191,26 @@ if (window.wp && window.wp.hooks) {
 ```php
 // ✅ Check if plugin is available
 function my_plugin_init() {
-    if (!function_exists('BlockAccessibility\\BlockChecksRegistry::get_instance')) {
-        error_log('Block Accessibility Checks plugin not available');
-        return;
-    }
+	if (!function_exists('BlockAccessibility\\BlockChecksRegistry::get_instance')) {
+		error_log('Block Accessibility Checks plugin not available');
+		return;
+	}
 
-    add_action('ba11yc_register_checks', 'my_register_checks');
+	add_action('ba11yc_register_checks', 'my_register_checks');
 }
 add_action('plugins_loaded', 'my_plugin_init');
 
 function my_register_checks($registry) {
-    error_log('Registering checks...'); // Debug output
+	error_log('Registering checks...'); // Debug output
 
-    $success = $registry->register_check('my/block', 'my_check', [
-        'message' => 'Error message',
-        'type' => 'error'
-    ]);
+	$success = $registry->register_check('my/block', 'my_check', [
+		'message' => 'Error message',
+		'type' => 'error'
+	]);
 
-    if (!$success) {
-        error_log('Failed to register check');
-    }
+	if (!$success) {
+		error_log('Failed to register check');
+	}
 }
 ```
 
@@ -1215,17 +1223,17 @@ function my_register_checks($registry) {
 ```php
 // Check that your script is enqueued in the block editor
 function enqueue_validation_script() {
-    // Only in block editor
-    if (!is_admin() || !function_exists('get_current_screen')) {
-        return;
-    }
+	// Only in block editor
+	if (!is_admin() || !function_exists('get_current_screen')) {
+		return;
+	}
 
-    $screen = get_current_screen();
-    if (!$screen || !$screen->is_block_editor()) {
-        return;
-    }
+	$screen = get_current_screen();
+	if (!$screen || !$screen->is_block_editor()) {
+		return;
+	}
 
-    wp_enqueue_script('my-validation-script', /* ... */);
+	wp_enqueue_script('my-validation-script', /* ... */);
 }
 add_action('admin_enqueue_scripts', 'enqueue_validation_script');
 ```
@@ -1241,17 +1249,17 @@ define('WP_DEBUG_LOG', true);
 
 // Add debug info to your checks
 function my_debug_check($attributes, $content, $config) {
-    error_log(sprintf(
-        'Checking block: %s, attributes: %s',
-        $config['block_type'] ?? 'unknown',
-        json_encode($attributes)
-    ));
+	error_log(sprintf(
+		'Checking block: %s, attributes: %s',
+		$config['block_type'] ?? 'unknown',
+		json_encode($attributes)
+	));
 
-    $result = perform_actual_check($attributes, $content, $config);
+	$result = perform_actual_check($attributes, $content, $config);
 
-    error_log(sprintf('Check result: %s', $result ? 'FAIL' : 'PASS'));
+	error_log(sprintf('Check result: %s', $result ? 'FAIL' : 'PASS'));
 
-    return $result;
+	return $result;
 }
 ```
 
@@ -1278,17 +1286,17 @@ function checkMyBlock(block) {
 ```php
 // Add this to a plugin or theme functions.php for debugging
 function inspect_accessibility_registry() {
-    if (!function_exists('BlockAccessibility\\BlockChecksRegistry::get_instance')) {
-        return;
-    }
+	if (!function_exists('BlockAccessibility\\BlockChecksRegistry::get_instance')) {
+		return;
+	}
 
-    $registry = \BlockAccessibility\BlockChecksRegistry::get_instance();
+	$registry = \BlockAccessibility\BlockChecksRegistry::get_instance();
 
-    echo '<h3>Registered Block Types:</h3>';
-    echo '<pre>' . print_r($registry->get_registered_block_types(), true) . '</pre>';
+	echo '<h3>Registered Block Types:</h3>';
+	echo '<pre>' . print_r($registry->get_registered_block_types(), true) . '</pre>';
 
-    echo '<h3>All Checks:</h3>';
-    echo '<pre>' . print_r($registry->get_all_checks(), true) . '</pre>';
+	echo '<h3>All Checks:</h3>';
+	echo '<pre>' . print_r($registry->get_all_checks(), true) . '</pre>';
 }
 
 // Add to admin page or use in wp-admin/admin.php?page=debug
@@ -1301,24 +1309,24 @@ function inspect_accessibility_registry() {
 ```php
 // ✅ Efficient check function
 function optimized_check($attributes, $content, $config) {
-    // Early returns for better performance
-    if (empty($attributes)) {
-        return false;
-    }
+	// Early returns for better performance
+	if (empty($attributes)) {
+		return false;
+	}
 
-    // Cache expensive operations
-    static $cache = array();
-    $cache_key = md5(serialize($attributes));
+	// Cache expensive operations
+	static $cache = array();
+	$cache_key = md5(serialize($attributes));
 
-    if (isset($cache[$cache_key])) {
-        return $cache[$cache_key];
-    }
+	if (isset($cache[$cache_key])) {
+		return $cache[$cache_key];
+	}
 
-    // Perform expensive validation...
-    $result = expensive_validation($attributes);
+	// Perform expensive validation...
+	$result = expensive_validation($attributes);
 
-    $cache[$cache_key] = $result;
-    return $result;
+	$cache[$cache_key] = $result;
+	return $result;
 }
 ```
 

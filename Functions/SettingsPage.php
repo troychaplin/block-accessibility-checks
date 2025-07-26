@@ -606,11 +606,11 @@ class SettingsPage {
 			$field_name = $block_type . '_' . $check_name;
 			$value      = $options[ $field_name ] ?? 'error';
 
+			// Use description if set, otherwise fallback to message.
+			$desc = ! empty( $check_config['description'] ) ? $check_config['description'] : ( $check_config['message'] ?? $check_name );
+
 			echo '<div class="block-check-item">';
-			echo '<h4>' . \esc_html( $check_config['message'] ?? $check_name ) . '</h4>';
-			if ( ! empty( $check_config['description'] ) ) {
-				echo '<p class="description">' . \esc_html( $check_config['description'] ) . '</p>';
-			}
+			echo '<p><strong>' . \esc_html( $desc ) . '</strong></p>';
 
 			echo '<ul class="block-check-radio-options">';
 			echo '<li><input type="radio" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '> ' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</li>';
