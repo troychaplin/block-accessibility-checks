@@ -199,7 +199,8 @@ class ScriptsStyles {
 
 				// Only include configuration that JavaScript needs.
 				$js_rules[ $block_type ][ $check_name ] = array(
-					'message'     => $check_config['message'],
+					'error_msg'   => $check_config['error_msg'],
+					'warning_msg' => $check_config['warning_msg'],
 					'type'        => $effective_type, // Use effective type instead of config type.
 					'priority'    => $check_config['priority'],
 					'enabled'     => $check_config['enabled'],

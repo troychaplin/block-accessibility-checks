@@ -29,7 +29,8 @@ function my_plugin_register_checks( $registry ) {
 		'my-plugin/custom-block',
 		'content_length',
 		array(
-			'message'     => __( 'Content is too long for optimal readability', 'my-plugin' ),
+			'error_msg'   => __( 'Content is too long for optimal readability', 'my-plugin' ),
+			'warning_msg' => __( 'Content is long but still allowed (warning)', 'my-plugin' ), // Optional, falls back to error_msg
 			'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
 			'type'        => 'warning', // 'error', 'warning', 'settings', or 'none'
 			'priority'    => 10,
@@ -261,8 +262,9 @@ Register a new accessibility check.
 
 ```php
 $check_args = array(
-	'message'     => 'Error or warning shown in the block editor', // Required: User-facing message for validation
-	'description' => 'Explanation shown in the settings/admin UI', // Optional: Description for settings page
+	'error_msg'   => 'Error message shown in the block editor when check fails', // Required
+	'warning_msg' => 'Warning message shown in the block editor (optional, falls back to error_msg)', // Optional
+	'description' => 'Explanation shown in the settings/admin UI', // Optional
 	'type'        => 'settings',           // Optional: Check behavior type (default: 'settings')
 	'priority'    => 10,                   // Optional: Execution priority (lower = earlier, default: 10)
 	'enabled'     => true,                 // Optional: Whether check is enabled (default: true)
@@ -271,8 +273,13 @@ $check_args = array(
 
 **Field Usage:**
 
-- `message`: Displayed in the block editor when a check fails (error/warning).
-- `description`: Displayed in the settings/admin UI to explain the check.
+* `error_msg`: Displayed in the block editor when a check fails as an error.
+* `warning_msg`: Displayed in the block editor when a check fails as a warning (falls back to `error_msg` if not set).
+* `description`: Displayed in the settings/admin UI to explain the check.
+**Fallback Logic:**
+
+If `warning_msg` is not specified, the plugin will automatically use `error_msg` for warnings.
+Legacy `message` is supported as a fallback for `error_msg` for backward compatibility.
 
 **Check Types:**
 

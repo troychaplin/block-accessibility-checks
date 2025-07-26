@@ -70,7 +70,7 @@ class BlockChecksRegistry {
 			'core/image',
 			'alt_text_required',
 			array(
-				'message'     => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
 				'type'        => 'settings',
 				'priority'    => 5,
 				'description' => \__( 'Alternative text is essential for screen reader users to understand image content', 'block-accessibility-checks' ),
@@ -81,7 +81,7 @@ class BlockChecksRegistry {
 			'core/image',
 			'alt_text_length',
 			array(
-				'message'     => \__( 'Image alternative text cannot be longer than 125 characters', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Image alternative text cannot be longer than 125 characters', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
 				'description' => \__( 'Screen readers may truncate very long alt text', 'block-accessibility-checks' ),
@@ -92,7 +92,7 @@ class BlockChecksRegistry {
 			'core/image',
 			'alt_caption_match',
 			array(
-				'message'     => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
 				'description' => \__( 'Duplicate content provides no additional value to screen reader users', 'block-accessibility-checks' ),
@@ -104,7 +104,8 @@ class BlockChecksRegistry {
 			'core/button',
 			'button_required_content',
 			array(
-				'message'     => \__( 'Buttons must have text and a link', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Buttons must have text and a link', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Buttons without text and a link are not accessible to screen reader users', 'block-accessibility-checks' ),
 				'type'        => 'settings',
 				'priority'    => 5,
 				'description' => \__( 'Buttons without text or links are not accessible to screen reader users', 'block-accessibility-checks' ),
@@ -115,7 +116,7 @@ class BlockChecksRegistry {
 			'core/button',
 			'button_text_quality',
 			array(
-				'message'     => \__( 'Button text should be descriptive and meaningful', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Button text should be descriptive and meaningful', 'block-accessibility-checks' ),
 				'type'        => 'warning',
 				'priority'    => 10,
 				'description' => \__( 'Generic button text like "click here" is not helpful for screen reader users', 'block-accessibility-checks' ),
@@ -127,7 +128,7 @@ class BlockChecksRegistry {
 			'core/table',
 			'table_headers',
 			array(
-				'message'     => \__( 'Tables should include proper headers', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Tables should include proper headers', 'block-accessibility-checks' ),
 				'type'        => 'settings',
 				'priority'    => 5,
 				'description' => \__( 'Table headers help screen reader users navigate table content', 'block-accessibility-checks' ),
@@ -165,7 +166,8 @@ class BlockChecksRegistry {
 			}
 
 			$defaults = array(
-				'message'     => '',
+				'error_msg'   => '',
+				'warning_msg' => '',
 				'type'        => 'settings',
 				'priority'    => 10,
 				'enabled'     => true,
@@ -175,9 +177,14 @@ class BlockChecksRegistry {
 			$check_args = \wp_parse_args( $check_args, $defaults );
 
 			// Validate required parameters.
-			if ( empty( $check_args['message'] ) ) {
-				$this->log_error( "Message is required for {$block_type}/{$check_name}" );
+			if ( empty( $check_args['error_msg'] ) ) {
+				$this->log_error( "error_msg is required for {$block_type}/{$check_name}" );
 				return false;
+			}
+
+			// Fallback for warning_msg to error_msg.
+			if ( empty( $check_args['warning_msg'] ) ) {
+				$check_args['warning_msg'] = $check_args['error_msg'];
 			}
 
 			// Validate type parameter.

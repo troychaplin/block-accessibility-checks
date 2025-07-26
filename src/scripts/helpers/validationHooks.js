@@ -57,7 +57,8 @@ export function validateBlock(block) {
 			issues.push({
 				checkName,
 				type: rule.type,
-				message: rule.message,
+				error_msg: rule.error_msg || rule.message || '',
+				warning_msg: rule.warning_msg || rule.error_msg || rule.message || '',
 				priority,
 			});
 		}

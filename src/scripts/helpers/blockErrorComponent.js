@@ -81,7 +81,9 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 												: __('Warning', 'block-accessibility-checks')}
 											:
 										</strong>{' '}
-										{issue.message}
+										{issue.type === 'error'
+											? issue.error_msg
+											: issue.warning_msg || issue.error_msg}
 									</p>
 								</PanelRow>
 							))}
