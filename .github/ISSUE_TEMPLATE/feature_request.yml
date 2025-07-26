@@ -93,18 +93,6 @@ body:
           description: If you know the specific WCAG success criteria, please list them
           placeholder: 'e.g., 1.2.2 (Captions), 1.4.3 (Contrast), 2.4.6 (Headings and Labels)'
 
-    - type: dropdown
-      id: priority-level
-      attributes:
-          label: Priority Level
-          description: How would you rate the importance of this feature?
-          options:
-              - High - Critical accessibility issue that blocks content publishing
-              - Medium - Important accessibility improvement
-              - Low - Nice to have enhancement
-      validations:
-          required: true
-
     - type: textarea
       id: use-cases
       attributes:
