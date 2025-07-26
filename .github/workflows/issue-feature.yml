@@ -28,6 +28,7 @@ jobs:
                 "Settings/Configuration Option": "settings-config",
                 "Performance Enhancement": "performance",
                 "Integration Feature": "integration",
+                "Automation/Workflow Improvement": "automation",
                 "Other": "needs-triage"
               };
               const label = labelMap[category];
