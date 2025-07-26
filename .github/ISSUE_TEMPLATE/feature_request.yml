@@ -17,7 +17,7 @@ body:
           options:
               - label: I have searched existing issues and discussions to ensure this feature hasn't been requested already
                 required: true
-              - label: This feature request is related to accessibility improvements, block validations or the plugin in general
+              - label: This feature request is related to accessibility improvements, block validations or the general plugin improvements
                 required: true
 
     - type: dropdown
@@ -43,29 +43,12 @@ body:
       attributes:
           label: Feature Summary
           description: A clear and concise description of the feature you'd like to see
-          placeholder: Briefly describe the feature you're requesting...
-      validations:
-          required: true
-
-    - type: textarea
-      id: problem-statement
-      attributes:
-          label: Problem Statement
-          description: What accessibility problem or limitation does this feature address?
+          placeholder: 
           placeholder: |
-              Describe the current limitation or accessibility issue that this feature would solve.
-              For example: "Currently, there's no way to validate that video blocks have captions..."
-      validations:
-          required: true
-
-    - type: textarea
-      id: proposed-solution
-      attributes:
-          label: Proposed Solution
-          description: Describe your proposed solution in detail
-          placeholder: |
-              How should this feature work? Be as specific as possible.
-              Include:
+            Briefly describe the feature you're requesting, or answer the following questions:
+            1. What accessibility problem or limitation does this feature address?
+               Describe the current limitation or accessibility issue that this feature would solve. For example: "Currently, there's no way to validate that video blocks have captions..."
+            2. How should this feature work? Be as specific as possible. Include:
               - What should happen when the feature is used
               - How it should integrate with existing functionality
               - Any specific behavior or validation rules
