@@ -33,7 +33,6 @@ body:
               - Settings/Configuration Option
               - Performance Enhancement
               - Integration Feature
-              - Documentation/Help Feature
               - Other
       validations:
           required: true

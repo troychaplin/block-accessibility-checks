@@ -1,7 +1,7 @@
 name: 📚 Documentation Improvement
 description: Suggest improvements to documentation, examples, or guides
 title: '[Docs]: '
-labels: ['documentation', 'improvement']
+labels: ['documentation', 'enhancement']
 assignees: []
 body:
     - type: markdown

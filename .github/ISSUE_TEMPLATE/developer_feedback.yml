@@ -1,7 +1,7 @@
 name: 💬 Developer Feedback
 description: Provide feedback on the developer API, integration experience, or documentation
 title: '[Feedback]: '
-labels: ['feedback', 'developer-experience']
+labels: ['feedback', 'dev-experience']
 assignees: []
 body:
     - type: markdown
