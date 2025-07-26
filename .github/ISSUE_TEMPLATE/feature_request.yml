@@ -43,15 +43,8 @@ body:
       attributes:
           label: Feature Summary
           description: A clear and concise description of the feature you'd like to see
-          placeholder: 
           placeholder: |
-            Briefly describe the feature you're requesting, or answer the following questions:
-            1. What accessibility problem or limitation does this feature address?
-               Describe the current limitation or accessibility issue that this feature would solve. For example: "Currently, there's no way to validate that video blocks have captions..."
-            2. How should this feature work? Be as specific as possible. Include:
-              - What should happen when the feature is used
-              - How it should integrate with existing functionality
-              - Any specific behavior or validation rules
+            Briefly describe the feature you're requesting. Does it involve a new accessibility check, a block type enhancement, or something else? Be as specific as possible. What accessibility problem or limitation does this feature address? How should this feature work? Be as specific as possible: What should happen when the feature is used? How it should integrate with existing functionality? Any specific behavior or validation rules?
       validations:
           required: true
 
