@@ -121,8 +121,8 @@ class SettingsPage {
 		foreach ( $external_plugins as $plugin_slug => $plugin_data ) {
 			\add_submenu_page(
 				'block-a11y-checks',
-				$plugin_data['name'] . ' ' . \esc_html__( 'Checks', 'block-accessibility-checks' ),
-				$plugin_data['name'] . ' ' . \esc_html__( 'Checks', 'block-accessibility-checks' ),
+				$plugin_data['name'],
+				$plugin_data['name'],
 				'manage_options',
 				'block-a11y-checks-' . $plugin_slug,
 				array( $this, 'external_plugin_settings_page' )
@@ -554,7 +554,7 @@ class SettingsPage {
 		$option_name  = 'block_checks_external_' . $plugin_slug;
 
 		echo '<div class="block-a11y-checks-settings">' . "\n";
-		echo '<h1>' . \esc_html( $plugin_data['name'] . ' ' . \__( 'Checks', 'block-accessibility-checks' ) ) . '</h1>' . "\n";
+		echo '<h1>' . \esc_html( $plugin_data['name'] ) . '</h1>' . "\n";
 		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
 		echo '<div class="block-a11y-checks-settings-grid">';
 
