@@ -2,7 +2,7 @@ name: 🚀 Feature Request
 description: Suggest a new feature or enhancement for Block Accessibility Checks
 title: '[Feature]: '
 labels: ['enhancement', 'feature-request']
-assignees: []
+assignees: ['troychaplin']
 body:
     - type: markdown
       attributes:
@@ -101,7 +101,6 @@ body:
               - High - Critical accessibility issue that blocks content publishing
               - Medium - Important accessibility improvement
               - Low - Nice to have enhancement
-              - Enhancement - Improves user experience but not critical
       validations:
           required: true
 
