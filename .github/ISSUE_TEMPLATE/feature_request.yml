@@ -17,7 +17,7 @@ body:
           options:
               - label: I have searched existing issues and discussions to ensure this feature hasn't been requested already
                 required: true
-              - label: This feature request is related to accessibility improvements or block validation
+              - label: This feature request is related to accessibility improvements, block validations or the plugin in general
                 required: true
 
     - type: dropdown
