@@ -1,7 +1,7 @@
 name: Add Issue to Project Board
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
   add-to-project:
