@@ -28,7 +28,7 @@ jobs:
                 "Settings/Configuration Option": "settings-config",
                 "Performance Enhancement": "performance",
                 "Integration Feature": "integration",
-                "Other": "other"
+                "Other": "needs-triage"
               };
               const label = labelMap[category];
               if (label) {

@@ -1,7 +1,7 @@
 name: 🚀 Feature Request
 description: Suggest a new feature or enhancement for Block Accessibility Checks
 title: '[Feature]: '
-labels: ['enhancement', 'needs-discussion']
+labels: ['enhancement', 'feature-request']
 assignees: []
 body:
     - type: markdown
