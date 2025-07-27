@@ -25,6 +25,11 @@ Prefix the change with one of these keywords:
 - **Unified validation architecture**: New `ba11yc.validateBlock` filter hook system for consistent validation across all block types
 - **Enhanced external plugin support**: External blocks now display visual accessibility indicators and integrate fully with the editor UI
 - **Real-time visual feedback**: All blocks (core and external) now show instant accessibility validation with visual borders and inspector panel messages
+- **Core block check settings**: Individual validation control for each core block type with enable/disable options
+- **Individual error and warning messages**: Support for custom messages and descriptions for each accessibility check
+- **Grouped error and warning messages**: Improved UI organization with grouped message display in inspector panel
+- **External block integration screenshots**: Visual documentation showing external plugin integration examples
+- Modular developer documentation: Split API, hooks, integration, advanced usage, troubleshooting, and examples into individual markdown files for improved clarity and usability
 - Input validation for heading level data to prevent invalid configurations
 - Option caching in HeadingLevels class for improved performance
 - Comprehensive settings sanitization to validate all user input
@@ -77,6 +82,7 @@ Prefix the change with one of these keywords:
 - External plugin integration support with proper dependency management and load order
 - Visual error indicators (red borders, inspector panel messages) for invalid blocks in editor
 - Complete integration documentation with working examples for external plugin developers
+- Enhanced developer API documentation with complete integration examples and troubleshooting guide
 
 ### Changed
 
@@ -84,9 +90,10 @@ Prefix the change with one of these keywords:
 - JavaScript validation system now supports external plugin checks through filter integration
 - Block error component enhanced to show visual feedback for any registered block type
 - Improved caching system for filtered checks array to prevent repeated filter applications
-- Enhanced developer API documentation with complete integration examples and troubleshooting guide
 - Minimum WordPress version requirement updated to 6.7
 - HeadingLevels class now instantiated early for correct filter timing
+- Settings page layout improved with better organization and accessibility
+- Submenu and settings page titles updated for clarity
 - Improved plugin architecture with centralized service management
 
 ### Fixed
@@ -100,6 +107,8 @@ Prefix the change with one of these keywords:
 - Issue where heading level one was a fallback in settings
 - Heading levels can now be properly removed in the plugin options
 - Heading level restrictions not working due to incorrect filter timing
+- Settings page accessibility issues with proper ARIA labels and keyboard navigation
+- Message grouping and display improvements in inspector panel
 
 ### Security
 
