@@ -17,8 +17,6 @@ body:
           options:
               - label: I have searched existing issues and discussions to ensure this feature hasn't been requested already
                 required: true
-              - label: This feature request is related to accessibility improvements, block validations or the general plugin improvements
-                required: true
 
     - type: dropdown
       id: feature-category
@@ -27,14 +25,14 @@ body:
           description: What type of feature are you requesting?
           options:
               - New Accessibility Check
-              - Block Type Support
+              - Existing Accessibility Check
               - Developer API Enhancement
               - User Interface Improvement
               - Settings/Configuration Option
               - Performance Enhancement
               - Integration Feature
               - Automation/Workflow Improvement
-              - Other
+              - Other Support Request
       validations:
           required: true
 
@@ -44,7 +42,7 @@ body:
           label: Feature Summary
           description: A clear and concise description of the feature you'd like to see
           placeholder: |
-            Briefly describe the feature you're requesting. Does it involve a new accessibility check, a block type enhancement, or something else? Be as specific as possible.
+              Briefly describe the feature you're requesting. Does it involve a new accessibility check, a block type enhancement, or something else? Be as specific as possible.
       validations:
           required: true
 

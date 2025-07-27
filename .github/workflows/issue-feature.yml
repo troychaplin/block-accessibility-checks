@@ -1,43 +1,43 @@
 name: Feature Request Label Automation
 on:
-  issues:
-    types: [opened, labeled]
+    issues:
+        types: [opened, labeled]
 
 permissions:
-  issues: write
+    issues: write
 
 jobs:
-  label-feature-category:
-    if: contains(github.event.issue.labels.*.name, 'enhancement')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Extract feature category and add label
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const body = context.payload.issue.body;
-            const match = body.match(/### Feature Category\s*\n([^\n]+)/);
-            if (match) {
-              const category = match[1].trim();
-              const labelMap = {
-                "New Accessibility Check": "accessibility-check",
-                "Block Type Support": "block-support",
-                "Developer API Enhancement": "api-enhancement",
-                "User Interface Improvement": "ui-improvement",
-                "Settings/Configuration Option": "settings-config",
-                "Performance Enhancement": "performance",
-                "Integration Feature": "integration",
-                "Automation/Workflow Improvement": "automation",
-                "Other": "needs-triage"
-              };
-              const label = labelMap[category];
-              if (label) {
-                github.rest.issues.addLabels({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  labels: [label]
-                });
-              }
-            }
+    label-feature-category:
+        if: contains(github.event.issue.labels.*.name, 'enhancement')
+        runs-on: ubuntu-latest
+        steps:
+            - name: Extract feature category and add label
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const body = context.payload.issue.body;
+                      const match = body.match(/### Feature Category\s*\n([^\n]+)/);
+                      if (match) {
+                        const category = match[1].trim();
+                        const labelMap = {
+                          "New Accessibility Check": "create-a11y-check",
+                          "Existing Accessibility Check": "update-a11y-check",
+                          "Developer API Enhancement": "api-enhancement",
+                          "User Interface Improvement": "ui-improvement",
+                          "Settings/Configuration Option": "settings-config",
+                          "Performance Enhancement": "performance",
+                          "Integration Feature": "integration",
+                          "Automation/Workflow Improvement": "automation",
+                          "Other Support Request": "needs-triage"
+                        };
+                        const label = labelMap[category];
+                        if (label) {
+                          github.rest.issues.addLabels({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            labels: [label]
+                          });
+                        }
+                      }
