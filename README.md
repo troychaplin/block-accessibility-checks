@@ -90,8 +90,7 @@ addFilter(
 
 ### Documentation
 
-- **[Complete Developer API Documentation](docs/developer-api.md)** - Comprehensive guide with examples, troubleshooting, and advanced patterns
-- **[External Plugin Integration Example](docs/external-block-example.md)** - Step-by-step guide for integrating custom blocks
+- **[Complete Developer API Documentation](docs/developer-api.md)** - Comprehensive guide with examples, troubleshooting, and advanced patterns including external plugin integration
 - **[Working Example Plugin](https://github.com/troychaplin/block-check-integration-example)** - Complete working example demonstrating integration with custom blocks
 
 ## Installation
