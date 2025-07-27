@@ -355,13 +355,34 @@ class SettingsPage {
 			$desc = ! empty( $check_config['description'] ) ? $check_config['description'] : ( $check_config['error_msg'] ?? $check_name );
 
 			echo '<div class="block-check-item">';
-			echo '<p><strong>' . \esc_html( $desc ) . '</strong></p>';
+			echo '<fieldset>';
+			echo '<legend><strong>' . \esc_html( $desc ) . '</strong></legend>';
 
 			echo '<ul class="block-check-radio-options">';
-			echo '<li><input type="radio" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '> ' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</li>';
-			echo '<li><input type="radio" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '> ' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</li>';
-			echo '<li><input type="radio" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '> ' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</li>';
+
+			// Error option.
+			$error_id = \esc_attr( $field_name . '_error' );
+			echo '<li>';
+			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
+			echo '<label for="' . \esc_attr( $error_id ) . '">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
+			echo '</li>';
+
+			// Warning option.
+			$warning_id = \esc_attr( $field_name . '_warning' );
+			echo '<li>';
+			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
+			echo '<label for="' . \esc_attr( $warning_id ) . '">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
+			echo '</li>';
+
+			// None option.
+			$none_id = \esc_attr( $field_name . '_none' );
+			echo '<li>';
+			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
+			echo '<label for="' . \esc_attr( $none_id ) . '">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
+			echo '</li>';
+
 			echo '</ul>';
+			echo '</fieldset>';
 			echo '</div>';
 		}
 	}
@@ -580,13 +601,34 @@ class SettingsPage {
 			$desc = ! empty( $check_config['description'] ) ? $check_config['description'] : ( $check_config['error_msg'] ?? $check_name );
 
 			echo '<div class="block-check-item">';
-			echo '<p><strong>' . \esc_html( $desc ) . '</strong></p>';
+			echo '<fieldset>';
+			echo '<legend><strong>' . \esc_html( $desc ) . '</strong></legend>';
 
 			echo '<ul class="block-check-radio-options">';
-			echo '<li><input type="radio" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '> ' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</li>';
-			echo '<li><input type="radio" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '> ' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</li>';
-			echo '<li><input type="radio" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '> ' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</li>';
+
+			// Error option.
+			$error_id = \esc_attr( $field_name . '_error' );
+			echo '<li>';
+			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
+			echo '<label for="' . \esc_attr( $error_id ) . '">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
+			echo '</li>';
+
+			// Warning option.
+			$warning_id = \esc_attr( $field_name . '_warning' );
+			echo '<li>';
+			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
+			echo '<label for="' . \esc_attr( $warning_id ) . '">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
+			echo '</li>';
+
+			// None option.
+			$none_id = \esc_attr( $field_name . '_none' );
+			echo '<li>';
+			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
+			echo '<label for="' . \esc_attr( $none_id ) . '">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
+			echo '</li>';
+
 			echo '</ul>';
+			echo '</fieldset>';
 			echo '</div>';
 		}
 	}
