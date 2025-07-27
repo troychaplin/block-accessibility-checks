@@ -10,40 +10,22 @@ body:
               Help us improve the documentation! Please select the relevant file and describe the issue or suggestion. Most fields are optional for a quick submission.
 
     - type: dropdown
-      id: doc-type
+      id: documentation-file
       attributes:
-          label: Documentation Type
+          label: Documentation File
+          description: Which documentation file needs improvement?
           options:
-              - Developer API Documentation
-              - Integration Examples
-              - README File
-              - Setup/Installation Guide
-              - Troubleshooting Guide
-              - Best Practices Guide
-              - Plugin Settings Help
-              - Other
-      validations:
-          required: true
-
-    - type: dropdown
-      id: doc-location
-      attributes:
-          label: Document/File Location
-          options:
-              - README.md
-              - docs/developer-api.md
-              - docs/quick-start.md
-              - docs/api-reference.md
-              - docs/features.md
-              - docs/troubleshooting.md
-              - docs/external-integration.md
-              - docs/examples.md
-              - docs/advanced.md
-              - docs/hooks.md
-              - docs/js-integration.md
-              - docs/php-integration.md
-              - Other
-          description: Where is the documentation that needs improvement?
+              - Overview (primary README.md)
+              - Developer API Features
+              - Quick Start
+              - API Reference
+              - Hooks Reference
+              - JavaScript Integration
+              - PHP Integration
+              - External Plugin Integration
+              - Advanced Usage
+              - Troubleshooting
+              - Example Plugins & Code Snippets
       validations:
           required: true
 
@@ -51,6 +33,7 @@ body:
       id: issue-type
       attributes:
           label: Type of Issue
+          description: What kind of issue are you reporting?
           options:
               - Missing Information
               - Incorrect Information
@@ -83,84 +66,12 @@ body:
       validations:
           required: true
 
-    - type: dropdown
-      id: target-audience
-      attributes:
-          label: Target Audience (optional)
-          options:
-              - Beginner WordPress Developers
-              - Experienced WordPress Developers
-              - Block Developers
-              - Plugin Developers
-              - Theme Developers
-              - Non-technical Users
-              - All Users
-              - Accessibility Specialists
-
     - type: textarea
       id: use-case
       attributes:
           label: Use Case/Context (optional)
           description: Describe the situation where you encountered this documentation issue
           placeholder: What were you trying to accomplish?
-
-    - type: textarea
-      id: example-content
-      attributes:
-          label: Example Content (optional)
-          description: Provide draft text, code, or examples
-          render: markdown
-
-    - type: checkboxes
-      id: improvement-type
-      attributes:
-          label: Improvement Type (optional)
-          options:
-              - label: More detailed explanations
-              - label: Additional code examples
-              - label: Step-by-step tutorials
-              - label: Real-world use cases
-              - label: Troubleshooting section
-              - label: Visual aids (diagrams, screenshots)
-              - label: Links to related resources
-              - label: Better organization/structure
-              - label: Search/navigation improvements
-              - label: FAQ section
-
-    - type: dropdown
-      id: complexity-level
-      attributes:
-          label: Content Complexity (optional)
-          options:
-              - Basic - High-level overview with simple examples
-              - Intermediate - Balanced detail with practical examples
-              - Advanced - Comprehensive detail with complex examples
-              - Multiple Levels - Different sections for different skill levels
-
-    - type: textarea
-      id: related-docs
-      attributes:
-          label: Related Documentation (optional)
-          description: Are there other documents or sections that relate to this issue?
-
-    - type: textarea
-      id: research-attempted
-      attributes:
-          label: Research Attempted (optional)
-          description: What did you try to find the information you needed?
-
-    - type: checkboxes
-      id: contribution-interest
-      attributes:
-          label: Contribution Interest (optional)
-          options:
-              - label: I'd be willing to write a draft of the improved content
-              - label: I'd be happy to review proposed changes
-              - label: I can provide additional examples or use cases
-              - label: I'd like to test documentation improvements
-              - label: I'm interested in ongoing documentation contributions
-
-    # Priority Level and Impact Description removed to simplify and avoid expectation setting
 
     - type: textarea
       id: additional-context

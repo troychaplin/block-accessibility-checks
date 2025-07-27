@@ -1,9 +1,6 @@
-
-# Block Accessibility Checks – Developer API Features
+# Developer API Features: Block Accessibility Checks Registry
 
 This document highlights the key features and benefits of the Block Accessibility Checks Developer API, designed for plugin and block developers to extend, customize, and integrate accessibility validation in the WordPress block editor.
-
-## Developer API Features
 
 - **Extensible Check Registration**  
   Register custom accessibility checks for any block type by defining configuration in PHP and implementing validation logic in JavaScript.
