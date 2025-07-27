@@ -29,6 +29,7 @@ Prefix the change with one of these keywords:
 - **Individual error and warning messages**: Support for custom messages and descriptions for each accessibility check
 - **Grouped error and warning messages**: Improved UI organization with grouped message display in inspector panel
 - **External block integration screenshots**: Visual documentation showing external plugin integration examples
+- Modular developer documentation: Split API, hooks, integration, advanced usage, troubleshooting, and examples into individual markdown files for improved clarity and usability
 - Input validation for heading level data to prevent invalid configurations
 - Option caching in HeadingLevels class for improved performance
 - Comprehensive settings sanitization to validate all user input
