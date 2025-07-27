@@ -2,7 +2,7 @@ name: 🐛 Bug Report
 description: Report a bug or issue with Block Accessibility Checks
 title: '[Bug]: '
 labels: ['bug', 'needs-triage']
-assignees: []
+assignees: ['troychaplin']
 body:
     - type: markdown
       attributes:
