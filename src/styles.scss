@@ -5,7 +5,7 @@
 
 .a11y-block-warning::after,
 .a11y-block-error::after {
-	content: "";
+	content: '';
 	position: absolute;
 	top: 0;
 	left: -60px;
@@ -21,7 +21,6 @@
 	background-color: #fffde2;
 	border-left: 3px solid #dbc900;
 	background-image: var(--a11y-warning-icon);
-
 }
 
 .a11y-block-error::after {
@@ -48,6 +47,64 @@
 	border-left: 3px solid #d82000;
 }
 
+/* Group containers for errors and warnings */
+.a11y-error-group,
+.a11y-warning-group {
+	width: 100%;
+}
+
+.a11y-error-group .a11y-error-msg {
+	margin-bottom: 0;
+	border-bottom: none;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.a11y-warning-group .a11y-warning-msg {
+	margin-bottom: 0;
+	border-bottom: none;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+/* Lists for grouped messages */
+.a11y-error-list,
+.a11y-warning-list {
+	margin: 0;
+	padding: 0 10px 10px 12px;
+	list-style: none;
+}
+
+.a11y-error-list {
+	background-color: #ffe4e0;
+	border-left: 3px solid #d82000;
+	border-top: none;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.a11y-warning-list {
+	background-color: #fffde2;
+	border-left: 3px solid #dbc900;
+	border-top: none;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.a11y-error-list li,
+.a11y-warning-list li {
+	list-style-type: disc;
+	margin-left: 12px;
+	margin-bottom: 8px;
+	color: #000;
+	font-weight: 400;
+}
+
+.a11y-error-list li:last-child,
+.a11y-warning-list li:last-child {
+	margin-bottom: 0;
+}
+
 /* Remove bottom spacing from block being wrapped */
 .a11y-block-warning > *:first-child,
 .a11y-block-error > *:first-child {
@@ -66,4 +123,3 @@
 	padding-top: 0;
 	padding-bottom: 0;
 }
-
