@@ -1,0 +1,156 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with Block Accessibility Checks
+title: '[Bug]: '
+labels: ['bug', 'needs-triage']
+assignees: ['troychaplin']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for taking the time to report a bug! Please provide as much detail as possible to help us reproduce and fix the issue.
+
+    - type: checkboxes
+      id: terms
+      attributes:
+          label: Prerequisites
+          description: Please confirm the following before submitting your bug report
+          options:
+              - label: I have searched existing issues to ensure this bug hasn't been reported already
+                required: true
+              - label: I have tested with the latest version of the plugin
+                required: true
+              - label: I have disabled other plugins to rule out conflicts
+                required: false
+
+    - type: textarea
+      id: bug-description
+      attributes:
+          label: Bug Description
+          description: A clear and concise description of what the bug is
+          placeholder: Describe the issue you're experiencing...
+      validations:
+          required: true
+
+    - type: textarea
+      id: steps-to-reproduce
+      attributes:
+          label: Steps to Reproduce
+          description: Step-by-step instructions to reproduce the bug
+          placeholder: |
+              1. Go to the Gutenberg editor
+              2. Add a specific block type
+              3. Configure it with specific settings
+              4. See error
+          value: |
+              1. 
+              2. 
+              3. 
+              4.
+      validations:
+          required: true
+
+    - type: textarea
+      id: expected-behavior
+      attributes:
+          label: Expected Behavior
+          description: What should have happened instead?
+          placeholder: Describe what you expected to happen...
+      validations:
+          required: true
+
+    - type: textarea
+      id: actual-behavior
+      attributes:
+          label: Actual Behavior
+          description: What actually happened?
+          placeholder: Describe what actually happened...
+      validations:
+          required: true
+
+    - type: dropdown
+      id: block-type
+      attributes:
+          label: Block Type Affected
+          description: Which block type is experiencing the issue?
+          options:
+              - Core WordPress Block (Button, Image, Heading, etc.)
+              - Custom/Third-party Block
+              - Multiple Block Types
+              - All Blocks
+              - Not block-specific
+      validations:
+          required: true
+
+    - type: input
+      id: specific-block
+      attributes:
+          label: Specific Block Name
+          description: If applicable, what's the exact block name? (e.g., core/image, create-block/my-custom-block)
+          placeholder: core/image
+
+    - type: dropdown
+      id: issue-type
+      attributes:
+          label: Issue Category
+          description: What type of issue is this?
+          options:
+              - Validation Logic Error
+              - Visual Display Issue
+              - Publishing Prevention Problem
+              - Settings Page Issue
+              - Performance Issue
+              - JavaScript Console Error
+              - PHP Error/Warning
+              - Integration with Custom Blocks
+              - Other
+      validations:
+          required: true
+
+    - type: textarea
+      id: environment
+      attributes:
+          label: Environment Details
+          description: Please provide your environment information
+          value: |
+              - **WordPress Version**: 
+              - **PHP Version**: 
+              - **Browser**: 
+              - **Block Accessibility Checks Version**: 
+              - **Active Theme**: 
+              - **Other Accessibility-related Plugins**:
+      validations:
+          required: true
+
+    - type: textarea
+      id: console-errors
+      attributes:
+          label: Console Errors
+          description: Any JavaScript console errors or PHP error logs?
+          placeholder: Paste any error messages here...
+          render: shell
+
+    - type: textarea
+      id: screenshots
+      attributes:
+          label: Screenshots/Videos
+          description: If applicable, add screenshots or videos to help explain the problem
+          placeholder: Drag and drop images here or paste URLs...
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional Context
+          description: Add any other context about the problem here
+          placeholder: Any additional information that might be helpful...
+
+    - type: checkboxes
+      id: block-config
+      attributes:
+          label: Block Configuration
+          description: If this involves a specific block configuration, please check all that apply
+          options:
+              - label: Block has custom attributes
+              - label: Block uses nested blocks
+              - label: Block has dynamic content
+              - label: Block uses custom CSS classes
+              - label: Block is part of a pattern or template

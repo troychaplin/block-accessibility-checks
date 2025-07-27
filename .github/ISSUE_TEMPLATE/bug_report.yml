@@ -23,47 +23,11 @@ body:
                 required: false
 
     - type: textarea
-      id: bug-description
+      id: bug-details
       attributes:
-          label: Bug Description
-          description: A clear and concise description of what the bug is
-          placeholder: Describe the issue you're experiencing...
-      validations:
-          required: true
-
-    - type: textarea
-      id: steps-to-reproduce
-      attributes:
-          label: Steps to Reproduce
-          description: Step-by-step instructions to reproduce the bug
-          placeholder: |
-              1. Go to the Gutenberg editor
-              2. Add a specific block type
-              3. Configure it with specific settings
-              4. See error
-          value: |
-              1. 
-              2. 
-              3. 
-              4.
-      validations:
-          required: true
-
-    - type: textarea
-      id: expected-behavior
-      attributes:
-          label: Expected Behavior
-          description: What should have happened instead?
-          placeholder: Describe what you expected to happen...
-      validations:
-          required: true
-
-    - type: textarea
-      id: actual-behavior
-      attributes:
-          label: Actual Behavior
-          description: What actually happened?
-          placeholder: Describe what actually happened...
+          label: Bug Details
+          description: What did you expect to happen, and what actually happened?
+          placeholder: Describe the issue, expected and actual behavior...
       validations:
           required: true
 
@@ -107,50 +71,30 @@ body:
           required: true
 
     - type: textarea
-      id: environment
+      id: steps-to-reproduce
       attributes:
-          label: Environment Details
-          description: Please provide your environment information
-          value: |
-              - **WordPress Version**: 
-              - **PHP Version**: 
-              - **Browser**: 
-              - **Block Accessibility Checks Version**: 
-              - **Active Theme**: 
-              - **Other Accessibility-related Plugins**:
+          label: Steps to Reproduce
+          description: How can we reproduce the bug?
+          placeholder: 1. ...
       validations:
           required: true
 
     - type: textarea
-      id: console-errors
+      id: supporting-info
       attributes:
-          label: Console Errors
-          description: Any JavaScript console errors or PHP error logs?
-          placeholder: Paste any error messages here...
-          render: shell
+          label: Supporting Info (optional)
+          description: Add any error messages, screenshots, or videos that help illustrate the issue
+          placeholder: You can paste error messages, images, or links here...
 
     - type: textarea
-      id: screenshots
+      id: environment
       attributes:
-          label: Screenshots/Videos
-          description: If applicable, add screenshots or videos to help explain the problem
-          placeholder: Drag and drop images here or paste URLs...
+          label: Environment (optional)
+          description: WordPress, PHP, browser, plugin version, etc.
+          placeholder: Any relevant environment info...
 
     - type: textarea
       id: additional-context
       attributes:
-          label: Additional Context
-          description: Add any other context about the problem here
-          placeholder: Any additional information that might be helpful...
-
-    - type: checkboxes
-      id: block-config
-      attributes:
-          label: Block Configuration
-          description: If this involves a specific block configuration, please check all that apply
-          options:
-              - label: Block has custom attributes
-              - label: Block uses nested blocks
-              - label: Block has dynamic content
-              - label: Block uses custom CSS classes
-              - label: Block is part of a pattern or template
+          label: Additional Context (optional)
+          description: Anything else that might help
