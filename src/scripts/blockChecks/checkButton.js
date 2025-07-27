@@ -1,9 +1,6 @@
 /* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
 
-// Get validation mode from plugin settings
-const validationMode = BlockAccessibilityChecks.blockChecksOptions.core_button_block_check;
-
 // Get validation rules from PHP registry
 const validationRules = BlockAccessibilityChecks.validationRules || {};
 const buttonRules = validationRules['core/button'] || {};
@@ -28,13 +25,17 @@ export function checkButtonAttributes(block) {
 		isValid: failures.length === 0,
 		message: '',
 		clientId: block.clientId,
-		mode: failures.length === 0 ? 'none' : validationMode,
+		mode: failures.length === 0 ? 'none' : 'error', // Default to error if any check fails
 	};
 
 	// If validation fails, set appropriate error message using the highest priority failure
 	if (failures.length > 0) {
 		const highestPriorityFailure = failures.sort((a, b) => a.priority - b.priority)[0];
-		response.message = formatValidationMessage(highestPriorityFailure.message, validationMode);
+		response.message = formatValidationMessage(
+			highestPriorityFailure.message,
+			highestPriorityFailure.type
+		);
+		response.mode = highestPriorityFailure.type; // Use the individual check's type
 	}
 
 	return response;
@@ -60,11 +61,11 @@ function runButtonChecks(block, rules) {
 
 		// Run the appropriate check based on the check name
 		switch (checkName) {
-			case 'button_required_content':
-				checkFailed = checkButtonRequiredContent(block.attributes);
+			case 'check_button_text':
+				checkFailed = checkButtonText(block.attributes);
 				break;
-			case 'button_text_quality':
-				checkFailed = checkButtonTextQuality(block.attributes);
+			case 'check_button_link':
+				checkFailed = checkButtonLink(block.attributes);
 				break;
 			default:
 				// Unknown check, skip
@@ -74,7 +75,7 @@ function runButtonChecks(block, rules) {
 		if (checkFailed) {
 			failures.push({
 				checkName,
-				message: config.message,
+				message: config.type === 'error' ? config.error_msg : config.warning_msg,
 				type: config.type,
 				priority: config.priority,
 			});
@@ -85,34 +86,28 @@ function runButtonChecks(block, rules) {
 }
 
 /**
- * Check if button has required content (mirrors PHP logic).
+ * Check if button has required link (mirrors PHP logic).
  *
  * @param {Object} attributes - Block attributes.
  * @return {boolean} - True if check fails.
  */
-function checkButtonRequiredContent(attributes) {
-	// Check if button has text
-	const hasText =
-		attributes.text &&
-		(attributes.text.originalHTML ||
-			(typeof attributes.text === 'string' && attributes.text.trim() !== ''));
-
+function checkButtonLink(attributes) {
 	// Check if button has URL
 	const hasUrl = attributes.url && attributes.url.trim() !== '';
 
-	// Button must have both text and URL
-	return !hasText || !hasUrl;
+	// Button must have URL
+	return !hasUrl;
 }
 
 /**
- * Check button text quality (mirrors PHP logic).
+ * Check if button has required text (mirrors PHP logic).
  *
  * @param {Object} attributes - Block attributes.
  * @return {boolean} - True if check fails.
  */
-function checkButtonTextQuality(attributes) {
+function checkButtonText(attributes) {
 	if (!attributes.text) {
-		return false;
+		return true; // Fail - no text
 	}
 
 	// Extract text content, handling both string and object types
@@ -126,10 +121,8 @@ function checkButtonTextQuality(attributes) {
 	// Strip HTML tags and trim
 	const text = textContent.replace(/<[^>]*>/g, '').trim();
 
-	// Check for generic button text
-	const genericTexts = ['click here', 'read more', 'learn more', 'more', 'here', 'link'];
-
-	return genericTexts.includes(text.toLowerCase()) || text.length < 3;
+	// Check if text exists and is not empty
+	return text.length === 0;
 }
 
 /**

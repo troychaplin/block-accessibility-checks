@@ -40,7 +40,7 @@ addFilter(
  */
 function validateImageBlock(attributes, checkName) {
 	switch (checkName) {
-		case 'alt_text_required':
+		case 'check_image_alt_text':
 			// Check if image is marked as decorative
 			if (attributes.isDecorative) {
 				return true; // Pass - decorative images don't need alt text
@@ -48,14 +48,14 @@ function validateImageBlock(attributes, checkName) {
 			// Check if alt text exists and is not empty
 			return !!(attributes.alt && attributes.alt.trim());
 
-		case 'alt_text_length':
+		case 'check_image_alt_text_length':
 			// Only check if alt text exists
 			if (!attributes.alt) {
 				return true; // Pass - no alt text to check length
 			}
 			return attributes.alt.length <= 125;
 
-		case 'alt_caption_match':
+		case 'check_image_alt_caption_match':
 			// Only check if both alt and caption exist
 			if (!attributes.alt || !attributes.caption) {
 				return true; // Pass - can't match if one is missing
@@ -74,29 +74,13 @@ function validateImageBlock(attributes, checkName) {
  */
 function validateButtonBlock(attributes, checkName) {
 	switch (checkName) {
-		case 'button_required_content':
-			// Check if button has both text and URL
-			const hasText = !!(attributes.text && attributes.text.trim());
-			const hasUrl = !!(attributes.url && attributes.url.trim());
-			return hasText && hasUrl;
+		case 'check_button_link':
+			// Check if button has a URL
+			return !!(attributes.url && attributes.url.trim());
 
-		case 'button_text_quality':
-			// Check for poor quality button text
-			if (!attributes.text) {
-				return true; // Pass - no text to check quality
-			}
-			const text = attributes.text.trim().toLowerCase();
-			const poorQualityTexts = [
-				'click here',
-				'read more',
-				'more',
-				'link',
-				'here',
-				'this',
-				'continue',
-				'go',
-			];
-			return !poorQualityTexts.includes(text);
+		case 'check_button_text':
+			// Check if button has text
+			return !!(attributes.text && attributes.text.trim());
 	}
 	return true;
 }
@@ -108,7 +92,7 @@ function validateButtonBlock(attributes, checkName) {
  */
 function validateTableBlock(attributes, checkName) {
 	switch (checkName) {
-		case 'table_headers':
+		case 'check_table_headers':
 			// Check if table has header row
 			if (
 				!attributes.body ||

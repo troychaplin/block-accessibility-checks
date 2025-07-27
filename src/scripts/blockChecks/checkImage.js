@@ -1,9 +1,6 @@
 /* global BlockAccessibilityChecks */
 import { __ } from '@wordpress/i18n';
 
-// Get validation mode from plugin settings
-const validationMode = BlockAccessibilityChecks.blockChecksOptions.core_image_block_check;
-
 // Get validation rules from PHP registry
 const validationRules = BlockAccessibilityChecks.validationRules || {};
 const imageRules = validationRules['core/image'] || {};
@@ -28,13 +25,17 @@ export function checkImageAlt(block) {
 		isValid: failures.length === 0,
 		message: '',
 		clientId: block.clientId,
-		mode: failures.length === 0 ? 'none' : validationMode,
+		mode: failures.length === 0 ? 'none' : 'error', // Default to error if any check fails
 	};
 
 	// If validation fails, set appropriate error message using the highest priority failure
 	if (failures.length > 0) {
 		const highestPriorityFailure = failures.sort((a, b) => a.priority - b.priority)[0];
-		response.message = formatValidationMessage(highestPriorityFailure.message, validationMode);
+		response.message = formatValidationMessage(
+			highestPriorityFailure.message,
+			highestPriorityFailure.type
+		);
+		response.mode = highestPriorityFailure.type; // Use the individual check's type
 	}
 
 	return response;
@@ -60,13 +61,13 @@ function runImageChecks(block, rules) {
 
 		// Run the appropriate check based on the check name
 		switch (checkName) {
-			case 'alt_text_required':
+			case 'check_image_alt_text':
 				checkFailed = checkAltTextRequired(block.attributes);
 				break;
-			case 'alt_text_length':
+			case 'check_image_alt_text_length':
 				checkFailed = checkAltTextLength(block.attributes);
 				break;
-			case 'alt_caption_match':
+			case 'check_image_alt_caption_match':
 				checkFailed = checkAltCaptionMatch(block.attributes);
 				break;
 			default:
@@ -77,7 +78,7 @@ function runImageChecks(block, rules) {
 		if (checkFailed) {
 			failures.push({
 				checkName,
-				message: config.message,
+				message: config.type === 'error' ? config.error_msg : config.warning_msg,
 				type: config.type,
 				priority: config.priority,
 			});

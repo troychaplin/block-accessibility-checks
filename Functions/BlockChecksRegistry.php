@@ -65,73 +65,81 @@ class BlockChecksRegistry {
 			return;
 		}
 
+		// Button text check.
+		$this->register_check(
+			'core/button',
+			'check_button_text',
+			array(
+				'error_msg'   => \__( 'Button text is required and should be descriptive and meaningful', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Adding text to a button is highly recommended', 'block-accessibility-checks' ),
+				'description' => \__( 'Button text validation', 'block-accessibility-checks' ),
+				'type'        => 'settings',
+				'priority'    => 10,
+			)
+		);
+
+		// Button link check.
+		$this->register_check(
+			'core/button',
+			'check_button_link',
+			array(
+				'error_msg'   => \__( 'Buttons are required to have a link', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Adding a link to a button is highly recommended', 'block-accessibility-checks' ),
+				'description' => \__( 'Button link validation', 'block-accessibility-checks' ),
+				'type'        => 'settings',
+				'priority'    => 5,
+			)
+		);
+
 		// Image block checks.
 		$this->register_check(
 			'core/image',
-			'alt_text_required',
+			'check_image_alt_text',
 			array(
 				'error_msg'   => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Using alt text is highly recommended', 'block-accessibility-checks' ),
+				'description' => \__( 'Alternative text validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
 				'priority'    => 5,
-				'description' => \__( 'Alternative text is essential for screen reader users to understand image content', 'block-accessibility-checks' ),
 			)
 		);
 
+		// Image alt text length check.
 		$this->register_check(
 			'core/image',
-			'alt_text_length',
+			'check_image_alt_text_length',
 			array(
-				'error_msg'   => \__( 'Image alternative text cannot be longer than 125 characters', 'block-accessibility-checks' ),
-				'type'        => 'warning',
+				'error_msg'   => \__( 'Image alt text cannot be longer than 125 characters', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Image alt text is recommended to be less than 125 characters', 'block-accessibility-checks' ),
+				'description' => \__( 'Alternative text length validation', 'block-accessibility-checks' ),
+				'type'        => 'settings',
 				'priority'    => 10,
-				'description' => \__( 'Screen readers may truncate very long alt text', 'block-accessibility-checks' ),
 			)
 		);
 
+		// Image alt text match check.
 		$this->register_check(
 			'core/image',
-			'alt_caption_match',
+			'check_image_alt_caption_match',
 			array(
 				'error_msg'   => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
-				'type'        => 'warning',
-				'priority'    => 10,
-				'description' => \__( 'Duplicate content provides no additional value to screen reader users', 'block-accessibility-checks' ),
-			)
-		);
-
-		// Button block checks.
-		$this->register_check(
-			'core/button',
-			'button_required_content',
-			array(
-				'error_msg'   => \__( 'Buttons must have text and a link', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Buttons without text and a link are not accessible to screen reader users', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Using different alt and caption text is highly recommended', 'block-accessibility-checks' ),
+				'description' => \__( 'Alternative and caption text match validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
-				'priority'    => 5,
-				'description' => \__( 'Buttons without text or links are not accessible to screen reader users', 'block-accessibility-checks' ),
-			)
-		);
-
-		$this->register_check(
-			'core/button',
-			'button_text_quality',
-			array(
-				'error_msg'   => \__( 'Button text should be descriptive and meaningful', 'block-accessibility-checks' ),
-				'type'        => 'warning',
 				'priority'    => 10,
-				'description' => \__( 'Generic button text like "click here" is not helpful for screen reader users', 'block-accessibility-checks' ),
 			)
 		);
 
-		// Table block checks.
+		// Table headers check.
 		$this->register_check(
 			'core/table',
-			'table_headers',
+			'check_table_headers',
 			array(
-				'error_msg'   => \__( 'Tables should include proper headers', 'block-accessibility-checks' ),
+				'error_msg'   => \__( 'Tables are required to have headers', 'block-accessibility-checks' ),
+				'warning_msg' => \__( 'Using headers in tables is highly recommended', 'block-accessibility-checks' ),
+				'description' => \__( 'Table headers validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
 				'priority'    => 5,
-				'description' => \__( 'Table headers help screen reader users navigate table content', 'block-accessibility-checks' ),
 			)
 		);
 
@@ -469,25 +477,16 @@ class BlockChecksRegistry {
 	 * Get setting for core blocks
 	 *
 	 * @param string $block_type The block type.
+	 * @param string $check_name The check name.
 	 * @return string The check level.
 	 */
-	private function get_core_block_setting( string $block_type ): string {
+	private function get_core_block_setting( string $block_type, string $check_name ): string {
 		$options = \get_option( 'block_checks_options', array() );
 
-		// Map block types to option names.
-		$option_map = array(
-			'core/button' => 'core_button_block_check',
-			'core/image'  => 'core_image_block_check',
-			'core/table'  => 'core_table_block_check',
-		);
+		// For individual check settings, use the format: block_type_check_name.
+		$field_name = $block_type . '_' . $check_name;
 
-		$option_name = $option_map[ $block_type ] ?? '';
-
-		if ( empty( $option_name ) ) {
-			return 'error'; // Default for unmapped core blocks.
-		}
-
-		return $options[ $option_name ] ?? 'error';
+		return $options[ $field_name ] ?? 'error';
 	}
 
 	/**

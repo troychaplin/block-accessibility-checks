@@ -167,7 +167,7 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
     * Ensures consistent validation behavior across all contexts
 * Enhanced BlockChecksRegistry with additional check methods:
     * `check_image_alt_required()` for verifying images have alt text (unless decorative)
-    * `check_button_required_content()` for ensuring buttons have both text and links
+    * `check_check_button_link()` for ensuring buttons have both text and links
     * All checks now include complete metadata for JavaScript consumption
 * Real-time editor validation now powered by PHP registry rules:
     * Image blocks: alt text required, length validation, caption matching
