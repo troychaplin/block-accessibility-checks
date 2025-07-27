@@ -58,6 +58,10 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		// Generate messages for all issues
 		const issues = validationResult.issues || [];
 
+		// Group issues by type
+		const errors = issues.filter(issue => issue.type === 'error');
+		const warnings = issues.filter(issue => issue.type === 'warning');
+
 		return (
 			<>
 				{validationResult.mode !== 'none' && (
@@ -66,27 +70,45 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 							title={__('Accessibility Check', 'block-accessibility-checks')}
 							initialOpen={true}
 						>
-							{issues.map((issue, index) => (
-								<PanelRow key={`${issue.checkName}-${index}`}>
-									<p
-										className={
-											issue.type === 'error'
-												? 'a11y-error-msg'
-												: 'a11y-warning-msg'
-										}
-									>
-										<strong>
-											{issue.type === 'error'
-												? __('Error', 'block-accessibility-checks')
-												: __('Warning', 'block-accessibility-checks')}
-											:
-										</strong>{' '}
-										{issue.type === 'error'
-											? issue.error_msg
-											: issue.warning_msg || issue.error_msg}
-									</p>
+							{/* Display Errors Group */}
+							{errors.length > 0 && (
+								<PanelRow>
+									<div className="a11y-error-group">
+										<p className="a11y-error-msg">
+											<strong>
+												{__('Block Errors', 'block-accessibility-checks')}
+											</strong>
+										</p>
+										<ul className="a11y-error-list">
+											{errors.map((issue, index) => (
+												<li key={`error-${issue.checkName}-${index}`}>
+													{issue.error_msg}
+												</li>
+											))}
+										</ul>
+									</div>
 								</PanelRow>
-							))}
+							)}
+
+							{/* Display Warnings Group */}
+							{warnings.length > 0 && (
+								<PanelRow>
+									<div className="a11y-warning-group">
+										<p className="a11y-warning-msg">
+											<strong>
+												{__('Block Warnings', 'block-accessibility-checks')}
+											</strong>
+										</p>
+										<ul className="a11y-warning-list">
+											{warnings.map((issue, index) => (
+												<li key={`warning-${issue.checkName}-${index}`}>
+													{issue.warning_msg || issue.error_msg}
+												</li>
+											))}
+										</ul>
+									</div>
+								</PanelRow>
+							)}
 						</PanelBody>
 					</InspectorControls>
 				)}
