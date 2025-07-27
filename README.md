@@ -12,6 +12,9 @@ Block Accessibility Checks is a WordPress plugin that helps ensure your content 
 - **Extensible Architecture:** Comprehensive developer API with hooks and filters for adding custom accessibility checks
 - **External Plugin Support:** Works seamlessly with custom blocks from third-party plugins and themes
 - **Unified Validation:** JavaScript-only validation system ensures consistent real-time feedback across all contexts
+- **Individual Check Control:** Configure validation levels (error/warning/disabled) for each accessibility check per block type
+- **Grouped Message Display:** Organized error and warning messages in the inspector panel for better user experience
+- **Custom Error Messages:** Support for custom error and warning messages for each accessibility check
 
 ## Core Block Checks
 
@@ -43,10 +46,11 @@ function my_custom_checks( $registry ) {
         'my-plugin/custom-block',
         'required_content',
         array(
-            'message'     => 'This field is required for accessibility compliance',
-            'type'        => 'error', // 'error', 'warning', or 'settings'
+            'error_msg'   => __( 'This field is required for accessibility compliance', 'my-plugin' ),
+            'warning_msg' => __( 'This field is recommended for accessibility compliance', 'my-plugin' ),
+            'description' => __( 'Content validation for accessibility compliance', 'my-plugin' ),
+            'type'        => 'settings',
             'priority'    => 10,
-            'description' => 'Content validation for accessibility compliance',
         )
     );
 }
@@ -81,18 +85,36 @@ addFilter(
 - **Publishing Control:** Error-level checks prevent publishing, warnings allow with notification
 - **Flexible Registration:** Support for multiple check types with priority control
 - **Extensive Hooks:** 12+ action and filter hooks for complete customization
+- **Individual Message Support:** Custom error and warning messages for each check
+- **Settings Integration:** Checks can be configured through the admin interface
 
 ### Documentation
 
 - **[Complete Developer API Documentation](docs/developer-api.md)** - Comprehensive guide with examples, troubleshooting, and advanced patterns
-- **[External Plugin Integration Example](docs/example-block.md)** - Step-by-step guide for integrating custom blocks
+- **[External Plugin Integration Example](docs/external-block-example.md)** - Step-by-step guide for integrating custom blocks
+- **[Working Example Plugin](https://github.com/troychaplin/block-check-integration-example)** - Complete working example demonstrating integration with custom blocks
 
 ## Installation
 
 1. Upload the plugin files to `/wp-content/plugins/block-accessibility-checks/`
 2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Navigate to **Settings → Block Accessibility Checks** to configure options
+3. Navigate to **Block Checks → Core Block Checks** to configure options
 4. Start editing content in the Gutenberg editor - accessibility checks will run automatically
+
+## Configuration
+
+### Core Block Settings
+
+The plugin provides granular control over accessibility checks for each core block type:
+
+- **Button Block:** Configure text and link validation requirements
+- **Image Block:** Set alt text requirements and validation rules
+- **Table Block:** Control header and caption requirements
+- **Heading Block:** Select which heading levels to restrict in the editor
+
+### External Plugin Integration
+
+External plugins with custom blocks automatically get their own settings page under **Block Checks** menu, allowing administrators to configure validation levels for each check.
 
 ## How It Works
 
@@ -102,7 +124,7 @@ When the plugin detects accessibility issues, it provides immediate visual feedb
 
 - **Error Icons:** Blocks with critical errors display a red accessibility icon indicator
 - **Warning Icons:** Blocks with warnings display a yellow accessibility icon indicator
-- **Inspector Panel Messages:** Detailed error messages appear in the block settings sidebar
+- **Inspector Panel Messages:** Detailed error messages appear in the block settings sidebar, grouped by severity
 - **Publishing Prevention:** Posts cannot be published until all critical errors are resolved
 - **Warning Indicators:** Non-critical issues show warnings but allow publishing
 
@@ -113,11 +135,12 @@ The plugin validates blocks as you type and edit:
 - **Immediate Feedback:** See validation results instantly as you modify block content
 - **Context-aware Checks:** Different validation rules apply based on block type and attributes
 - **Smart Caching:** Optimized performance prevents validation from slowing down the editor
+- **Grouped Messages:** Error and warning messages are organized for better readability
 
 ## Requirements
 
 - WordPress 6.7 or higher
-- PHP 7.4 or higher
+- PHP 7.0 or higher
 - Gutenberg block editor (classic editor not supported)
 
 ## Getting Involved
