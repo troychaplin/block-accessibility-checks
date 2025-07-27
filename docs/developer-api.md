@@ -69,27 +69,16 @@ addFilter(
 
 > **Note:** For a complete working example including both PHP and JavaScript integration, see the [Complete Integration Example](#complete-integration-example) section.
 
-## New Features
+## Key Features
 
-### Individual Check Control
+The plugin provides comprehensive accessibility validation with the following key capabilities:
 
-The plugin now provides granular control over accessibility checks for each block type:
-
-- **Core Block Settings**: Configure validation levels (Error/Warning/Disabled) for each core block check
-- **External Plugin Integration**: External plugins automatically get their own settings page
-- **Real-time Configuration**: Changes take effect immediately in the block editor
-
-### Grouped Message Display
-
-- **Organized Feedback**: Error and warning messages are grouped by severity in the inspector panel
-- **Multiple Issues**: All accessibility problems are displayed simultaneously
-- **Priority-based Display**: Errors are shown first, followed by warnings
-
-### Enhanced Visual Feedback
-
-- **Priority-based Borders**: Block borders reflect the highest severity issue (red for errors, yellow for warnings)
-- **Comprehensive Inspector Panel**: All validation issues listed with clear descriptions
-- **Real-time Updates**: Visual feedback updates instantly as content changes
+- **Individual Check Control**: Configure validation levels (Error/Warning/Disabled) for each accessibility check per block type
+- **Grouped Message Display**: Error and warning messages are organized by severity in the inspector panel
+- **Priority-based Visual Feedback**: Block borders reflect the highest severity issue (red for errors, yellow for warnings)
+- **Real-time Configuration**: Changes to accessibility settings take effect immediately in the block editor
+- **External Plugin Integration**: External plugins automatically get their own dedicated settings page
+- **Multiple Issues Support**: All accessibility problems are displayed simultaneously, eliminating the "fix one, see another" cycle
 
 ## Action Hooks
 
