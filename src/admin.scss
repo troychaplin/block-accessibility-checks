@@ -41,6 +41,18 @@
 	display: flex;
 	gap: 20px;
 	align-items: center;
+
+	li {
+		display: flex;
+		align-items: center;
+	}
+
+	label {
+		margin-left: 0.5rem;
+		cursor: pointer;
+		font-weight: 400;
+		color: #2f2f2f;
+	}
 }
 
 .block-check-item {
@@ -56,6 +68,23 @@
 
 	p {
 		margin: 0 0 10px 0;
+	}
+
+	// Fieldset and legend styles for radio button groups
+	fieldset {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		border: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	legend {
+		font-weight: 600;
+		color: #2f2f2f;
+		margin-bottom: 10px;
+		padding: 0;
 	}
 }
 
