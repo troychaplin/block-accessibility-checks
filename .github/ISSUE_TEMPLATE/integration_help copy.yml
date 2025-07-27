@@ -7,9 +7,7 @@ body:
     - type: markdown
       attributes:
           value: |
-              Need help integrating Block Accessibility Checks with your project? Please provide as much detail as possible so I can give you the best assistance.
-
-              **Note:** I will do my best to reply to your request, but response times may vary and I may not always be able to respond promptly.
+              Need help integrating Block Accessibility Checks with your project? We're here to help! Please provide as much detail as possible so we can give you the best assistance.
 
     - type: checkboxes
       id: prerequisites
@@ -194,7 +192,16 @@ body:
       validations:
           required: true
 
-    # Urgency Level dropdown removed to avoid setting expectations
+    - type: dropdown
+      id: urgency
+      attributes:
+          label: Urgency Level
+          description: How urgent is this help request?
+          options:
+              - Low - Learning/exploring, no rush
+              - Medium - Working on project, flexible timeline
+              - High - Need help to meet deadline
+              - Critical - Blocking project progress
 
     - type: textarea
       id: additional-context
