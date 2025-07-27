@@ -216,5 +216,3 @@ body:
           options:
               - label: I'm willing to share more code or details if needed
               - label: I can provide a test site or repository access if helpful
-              - label: I'm interested in contributing documentation improvements based on this help
-              - label: I'd like to be notified of related documentation updates
