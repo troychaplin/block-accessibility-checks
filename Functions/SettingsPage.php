@@ -36,28 +36,10 @@ class SettingsPage {
 	 */
 	private $block_settings = array(
 		array(
-			'option_name'   => 'core_button_block_check',
-			'block_label'   => 'Core Button Block',
-			'description'   => 'Buttons should have text and a link, this check will ensure that the button block has both.',
-			'function_name' => 'render_core_button_options',
-		),
-		array(
 			'option_name'   => 'core_heading_levels',
-			'block_label'   => 'Core Heading Block',
+			'block_label'   => 'Heading Block',
 			'description'   => 'Select which heading levels you want to remove from the editor. Checked levels will not be available.',
 			'function_name' => 'render_core_heading_options',
-		),
-		array(
-			'option_name'   => 'core_image_block_check',
-			'block_label'   => 'Core Image Block',
-			'description'   => 'Image alt text should be descriptive and not empty, this option will check for alternative text on images.',
-			'function_name' => 'render_core_image_options',
-		),
-		array(
-			'option_name'   => 'core_table_block_check',
-			'block_label'   => 'Core Table Block',
-			'description'   => 'Tables are required to have a header row, this option will check for a header row in tables.',
-			'function_name' => 'render_core_table_options',
 		),
 	);
 
@@ -303,6 +285,10 @@ class SettingsPage {
 
 		settings_fields( 'block_checks_settings_group' );
 
+		// Render core block checks with individual check settings.
+		$this->render_core_block_checks();
+
+		// Render heading levels (special case).
 		foreach ( $this->block_settings as $block ) {
 			echo '<div class="block-a11y-checks-settings-field">';
 			echo '<h2>' . esc_html( $block['block_label'] ) . '</h2>';
@@ -318,56 +304,66 @@ class SettingsPage {
 	}
 
 	/**
-	 * Renders the block options for the settings page.
-	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the block options in the plugin's settings page.
-	 *
-	 * @param string $block_option_name The option name for the block.
+	 * Render core block checks with individual check settings
 	 *
 	 * @return void
 	 */
-	private function render_block_options( $block_option_name ) {
-		$options = get_option( 'block_checks_options' );
-		$value   = isset( $options[ $block_option_name ] ) ? $options[ $block_option_name ] : 'error';
+	private function render_core_block_checks(): void {
+		$core_blocks = array(
+			'core/button' => __( 'Button Block', 'block-accessibility-checks' ),
+			'core/image'  => __( 'Image Block', 'block-accessibility-checks' ),
+			'core/table'  => __( 'Table Block', 'block-accessibility-checks' ),
+		);
 
-		echo '<ul class="block-check-radio-options">';
-		echo '<li><input type="radio" name="block_checks_options[' . esc_attr( $block_option_name ) . ']" value="error" ' . checked( $value, 'error', false ) . '> ' . esc_html__( 'Error', 'block-accessibility-checks' ) . '</li>';
-		echo '<li><input type="radio" name="block_checks_options[' . esc_attr( $block_option_name ) . ']" value="warning" ' . checked( $value, 'warning', false ) . '> ' . esc_html__( 'Warning', 'block-accessibility-checks' ) . '</li>';
-		echo '<li><input type="radio" name="block_checks_options[' . esc_attr( $block_option_name ) . ']" value="none" ' . checked( $value, 'none', false ) . '> ' . esc_html__( 'None', 'block-accessibility-checks' ) . '</li>';
-		echo '</ul>';
-	}
+		foreach ( $core_blocks as $block_type => $block_label ) {
+			$checks = $this->registry->get_checks( $block_type );
 
-	/**
-	 * Renders the block options based on the configuration.
-	 *
-	 * This method is responsible for rendering the block options for the
-	 * settings page based on the provided option name. It looks up the
-	 * configuration and calls the appropriate rendering method.
-	 *
-	 * @param string $option_name The option name to look up in the block settings.
-	 *
-	 * @return void
-	 */
-	private function render_block_options_from_config( $option_name ) {
-		foreach ( $this->block_settings as $block ) {
-			if ( $block['option_name'] === $option_name ) {
-				$this->render_block_options( $block['option_name'], $block['description'] );
-				return;
+			if ( empty( $checks ) ) {
+				continue;
 			}
+
+			echo '<div class="block-a11y-checks-settings-field">';
+			echo '<h2>' . esc_html( $block_label ) . '</h2>';
+			echo '<p>' . esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
+
+			$this->render_core_block_options( $block_type, $checks );
+
+			echo '</div>';
 		}
 	}
 
 	/**
-	 * Renders the core button options for the settings page.
+	 * Render core block options with individual check settings
 	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the core button options in the plugin's settings page.
-	 *
+	 * @param string $block_type The block type.
+	 * @param array  $checks     The checks for this block.
 	 * @return void
 	 */
-	public function render_core_button_options() {
-		$this->render_block_options_from_config( 'core_button_block_check' );
+	private function render_core_block_options( string $block_type, array $checks ): void {
+		$options = \get_option( 'block_checks_options', array() );
+
+		foreach ( $checks as $check_name => $check_config ) {
+			// Only show checks that are using settings (not forced).
+			if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
+				continue;
+			}
+
+			$field_name = $block_type . '_' . $check_name;
+			$value      = $options[ $field_name ] ?? 'error';
+
+			// Use description if set, otherwise fallback to message.
+			$desc = ! empty( $check_config['description'] ) ? $check_config['description'] : ( $check_config['error_msg'] ?? $check_name );
+
+			echo '<div class="block-check-item">';
+			echo '<p><strong>' . \esc_html( $desc ) . '</strong></p>';
+
+			echo '<ul class="block-check-radio-options">';
+			echo '<li><input type="radio" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '> ' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</li>';
+			echo '<li><input type="radio" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '> ' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</li>';
+			echo '<li><input type="radio" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '> ' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</li>';
+			echo '</ul>';
+			echo '</div>';
+		}
 	}
 
 	/**
@@ -399,30 +395,6 @@ class SettingsPage {
 	}
 
 	/**
-	 * Renders the core image options for the settings page.
-	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the core image options in the plugin's settings page.
-	 *
-	 * @return void
-	 */
-	public function render_core_image_options() {
-		$this->render_block_options_from_config( 'core_image_block_check' );
-	}
-
-	/**
-	 * Renders the core table options for the settings page.
-	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the core table options in the plugin's settings page.
-	 *
-	 * @return void
-	 */
-	public function render_core_table_options() {
-		$this->render_block_options_from_config( 'core_table_block_check' );
-	}
-
-	/**
 	 * Sanitizes the plugin options before saving to the database.
 	 *
 	 * This method validates and sanitizes all incoming option data to prevent
@@ -443,39 +415,37 @@ class SettingsPage {
 
 			$this->log_debug( 'Starting sanitization of plugin options.' );
 
-			// Sanitize block check options (error, warning, none).
+			// Sanitize individual core block check options (error, warning, none).
 			$valid_check_values = array( 'error', 'warning', 'none' );
-			$check_options      = array( 'core_button_block_check', 'core_image_block_check', 'core_table_block_check' );
 
-			foreach ( $check_options as $option ) {
-				if ( isset( $input[ $option ] ) ) {
-					if ( in_array( $input[ $option ], $valid_check_values, true ) ) {
-						$sanitized[ $option ] = \sanitize_text_field( $input[ $option ] );
-						$this->log_debug( "Sanitized {$option}: {$sanitized[ $option ]}" );
-					} else {
-						$this->log_error( "Invalid value for {$option}: {$input[ $option ]}. Skipping." );
-					}
-				}
-			}
+			foreach ( $input as $key => $value ) {
+				// Handle heading levels array.
+				if ( 'core_heading_levels' === $key ) {
+					if ( is_array( $value ) ) {
+						$sanitized['core_heading_levels'] = array();
+						$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
 
-			// Sanitize heading levels array.
-			if ( isset( $input['core_heading_levels'] ) ) {
-				if ( is_array( $input['core_heading_levels'] ) ) {
-					$sanitized['core_heading_levels'] = array();
-					$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
-
-					foreach ( $input['core_heading_levels'] as $level ) {
-						if ( in_array( $level, $valid_levels, true ) ) {
-							$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
-							$this->log_debug( "Added heading level: {$level}" );
-						} else {
-							$this->log_error( "Invalid heading level: {$level}. Skipping." );
+						foreach ( $value as $level ) {
+							if ( in_array( $level, $valid_levels, true ) ) {
+								$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
+								$this->log_debug( "Added heading level: {$level}" );
+							} else {
+								$this->log_error( "Invalid heading level: {$level}. Skipping." );
+							}
 						}
-					}
 
-					$this->log_debug( 'Completed heading levels sanitization.' );
-				} else {
-					$this->log_error( 'Heading levels input is not an array. Skipping.' );
+						$this->log_debug( 'Completed heading levels sanitization.' );
+					} else {
+						$this->log_error( 'Heading levels input is not an array. Skipping.' );
+					}
+				} elseif ( 'core_heading_levels' !== $key ) {
+					// Handle individual check settings.
+					if ( in_array( $value, $valid_check_values, true ) ) {
+						$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
+						$this->log_debug( "Sanitized {$key}: {$value}" );
+					} else {
+						$this->log_error( "Invalid value for {$key}: {$value}. Skipping." );
+					}
 				}
 			}
 
@@ -607,7 +577,7 @@ class SettingsPage {
 			$value      = $options[ $field_name ] ?? 'error';
 
 			// Use description if set, otherwise fallback to message.
-			$desc = ! empty( $check_config['description'] ) ? $check_config['description'] : ( $check_config['message'] ?? $check_name );
+			$desc = ! empty( $check_config['description'] ) ? $check_config['description'] : ( $check_config['error_msg'] ?? $check_name );
 
 			echo '<div class="block-check-item">';
 			echo '<p><strong>' . \esc_html( $desc ) . '</strong></p>';
