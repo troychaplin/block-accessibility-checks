@@ -107,11 +107,10 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
 
 == Screenshots ==
 
-1. **Real-time Validation in Action** - Table block showing accessibility error with red border and detailed error message preventing publication
-2. **Visual Warning System** - Image block displaying accessibility warning with clear explanation in the block inspector panel
+1. **Block Error Validation** - Button block showing accessibility error with red border and detailed error message preventing publication, also demonstrates multiple errors in a grouped display
+2. **Visual Warning System** - Image block displaying accessibility warning with clear explanation in the block inspector panel, also demonstrates multiple warnings in a grouped display
 3. **Heading Level Management** - Customized heading level restrictions maintaining proper content hierarchy in the editor
 4. **Comprehensive Settings Panel** - Plugin configuration page with granular control over accessibility check severity levels
-5. **Developer Integration** - Custom block with integrated accessibility validation showing seamless third-party plugin support
  
 == Changelog ==
 = v2.0.0-beta-1 =
