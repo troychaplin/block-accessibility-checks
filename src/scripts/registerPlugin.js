@@ -3,13 +3,8 @@ import { BlockInvalidation } from './helpers/blockInvalidation';
 import './helpers/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
 
-// Import block check functions
-import { checkButtonAttributes } from './blockChecks/checkButton';
-import { checkImageAlt } from './blockChecks/checkImage';
-import { checkTableHeaderRow } from './blockChecks/checkTable';
-
-// Base checks array with core checks
-const coreChecks = [checkButtonAttributes, checkImageAlt, checkTableHeaderRow];
+// Base checks array - now empty since validation is handled via ba11yc.validateBlock filter
+const coreChecks = [];
 
 // Cache for the filtered checks array to prevent repeated filter applications
 let cachedChecksArray = null;
