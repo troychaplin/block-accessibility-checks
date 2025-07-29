@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core;
+namespace PHP_CodeSniffer\Tests.ore;
 
 use Exception;
 use PHP_CodeSniffer\Files\DummyFile;

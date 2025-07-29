@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests;
+namespace PHP_CodeSniffer.ests;
 
 require_once 'Core/AllTests.php';
 require_once 'Standards/AllSniffs.php';

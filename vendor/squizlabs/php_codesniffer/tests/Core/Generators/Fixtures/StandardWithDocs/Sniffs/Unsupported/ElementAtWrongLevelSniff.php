@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Generators\GeneratorTest
  */
 
-namespace Fixtures\StandardWithDocs\Sniffs\Unsupported;
+namespace Fixtures\StandardWithDocs\Sniffs.nsupported;
 
 use Fixtures\StandardWithDocs\Sniffs\DummySniff;
 

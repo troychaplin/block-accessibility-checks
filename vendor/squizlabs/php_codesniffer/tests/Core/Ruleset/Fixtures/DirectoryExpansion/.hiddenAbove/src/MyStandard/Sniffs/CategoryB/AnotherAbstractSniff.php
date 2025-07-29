@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\ExpandSniffDirectoryTest
  */
 
-namespace MyStandard\Sniffs\CategoryB;
+namespace MyStandard\Sniffs.ategoryB;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 

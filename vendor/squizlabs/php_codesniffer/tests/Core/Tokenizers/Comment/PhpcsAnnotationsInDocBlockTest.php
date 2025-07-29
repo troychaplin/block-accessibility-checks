@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Tokenizers\Comment;
+namespace PHP_CodeSniffer\Tests\Core\Tokenizers.omment;
 
 /**
  * Tests that PHPCS native annotations in docblocks are tokenized correctly.

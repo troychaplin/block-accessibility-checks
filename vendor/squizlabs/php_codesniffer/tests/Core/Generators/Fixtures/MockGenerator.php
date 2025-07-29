@@ -6,7 +6,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Generators\Fixtures;
+namespace PHP_CodeSniffer\Tests\Core\Generators.ixtures;
 
 use DOMNode;
 use PHP_CodeSniffer\Generators\Generator;

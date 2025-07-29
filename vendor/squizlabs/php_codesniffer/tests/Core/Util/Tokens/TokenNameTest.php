@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Util\Tokens;
+namespace PHP_CodeSniffer\Tests\Core\Util.okens;
 
 use PHP_CodeSniffer\Util\Tokens;
 use PHPUnit\Framework\TestCase;

@@ -11,7 +11,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Standards;
+namespace PHP_CodeSniffer\Tests.tandards;
 
 use DirectoryIterator;
 use PHP_CodeSniffer\Exceptions\RuntimeException;

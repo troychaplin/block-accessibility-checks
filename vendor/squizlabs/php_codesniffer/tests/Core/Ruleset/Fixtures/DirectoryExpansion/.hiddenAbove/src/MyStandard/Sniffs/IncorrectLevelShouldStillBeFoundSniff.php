@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\ExpandSniffDirectoryTest
  */
 
-namespace MyStandard\Sniffs;
+namespace MyStandard.niffs;
 
 use MyStandard\DummySniff;
 

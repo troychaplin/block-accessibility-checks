@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\PopulateTokenListenersTest
  */
 
-namespace Fixtures\TestStandard\Sniffs\InvalidSniffs;
+namespace Fixtures\TestStandard\Sniffs.nvalidSniffs;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;

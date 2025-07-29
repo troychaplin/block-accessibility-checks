@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Tokenizers\Tokenizer;
+namespace PHP_CodeSniffer\Tests\Core\Tokenizers.okenizer;
 
 /**
  * Tab replacement test using tab width 2.

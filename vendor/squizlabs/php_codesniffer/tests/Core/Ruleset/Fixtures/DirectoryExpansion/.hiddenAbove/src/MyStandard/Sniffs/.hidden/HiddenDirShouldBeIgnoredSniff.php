@@ -8,7 +8,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\ExpandSniffDirectoryTest
  */
 
-namespace MyStandard\Sniffs\.hidden;
+namespace MyStandard\Sniffs.hidden;
 
 use MyStandard\DummySniff;
 
