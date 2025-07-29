@@ -6,7 +6,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Util\MessageCollector;
+namespace PHP_CodeSniffer\Tests\Core\Util.essageCollector;
 
 use PHP_CodeSniffer\Util\MessageCollector;
 use PHPUnit\Framework\TestCase;

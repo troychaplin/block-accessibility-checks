@@ -21,6 +21,13 @@
 	},
 	"scripts": {
 		"format": "./vendor/bin/phpcbf --standard=phpcs.xml.dist -v --report-summary --report-source || true",
-		"lint": "phpcs --standard=phpcs.xml.dist"
+		"lint": "phpcs --standard=phpcs.xml.dist",
+		"post-install-cmd": [
+			"@fix-vendor-test-files"
+		],
+		"post-update-cmd": [
+			"@fix-vendor-test-files"
+		],
+		"fix-vendor-test-files": "find vendor/squizlabs/php_codesniffer/tests -name '*.php' -exec sed -i '' 's/namespace \\([^.]*\\)\\\\.\\([^;]*\\);/namespace \\1.\\2;/g' {} \\;"
 	}
 }

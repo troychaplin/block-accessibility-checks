@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\PropertyTypeHandlingTest
  */
 
-namespace Fixtures\TestStandard\Sniffs\SetProperty;
+namespace Fixtures\TestStandard\Sniffs.etProperty;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;

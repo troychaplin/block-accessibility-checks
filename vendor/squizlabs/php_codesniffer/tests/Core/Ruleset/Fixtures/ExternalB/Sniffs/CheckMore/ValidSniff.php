@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\ExpandRulesetReferenceTest
  */
 
-namespace Fixtures\ExternalB\Sniffs\CheckMore;
+namespace Fixtures\ExternalB\Sniffs.heckMore;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;

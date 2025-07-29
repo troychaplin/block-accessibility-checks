@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\File;
+namespace PHP_CodeSniffer\Tests\Core.ile;
 
 use PHP_CodeSniffer\Tests\Core\AbstractMethodUnitTest;
 
@@ -244,7 +244,7 @@ final class GetTokensAsStringTest extends AbstractMethodUnitTest
                 'testMarker'     => '/* testNamespace */',
                 'startTokenType' => T_NAMESPACE,
                 'length'         => 8,
-                'expected'       => 'namespace Foo\Bar\Baz;',
+                'expected'       => 'namespace Foo\Bar.az;',
             ],
             'use-with-comments' => [
                 'testMarker'     => '/* testUseWithComments */',

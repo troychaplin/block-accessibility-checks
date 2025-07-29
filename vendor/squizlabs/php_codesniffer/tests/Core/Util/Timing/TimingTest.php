@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Util\Timing;
+namespace PHP_CodeSniffer\Tests\Core\Util.iming;
 
 use PHP_CodeSniffer\Util\Timing;
 use PHPUnit\Framework\TestCase;

@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\RegisterSniffsRejectsInvalidSniffTest
  */
 
-namespace Fixtures\TestStandard\Sniffs\InvalidSniffError;
+namespace Fixtures\TestStandard\Sniffs.nvalidSniffError;
 
 final class NoImplementsNoProcessSniff
 {
