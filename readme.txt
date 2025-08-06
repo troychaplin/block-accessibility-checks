@@ -1,7 +1,7 @@
 === Block Accessibility Checks ===
 
 Contributors: areziaal, mikecorkum
-Tags: accessibility, a11y, wcag, gutenberg, blocks, content, validation, compliance
+Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
 Tested up to: 6.8.2
 Stable tag: 2.0.0
@@ -45,7 +45,7 @@ The plugin provides immediate feedback as you edit content. When accessibility i
 
 **Developer API:**
 
-Extend the plugin with <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/developer-api.md">custom accessibility checks</a> for any block type. The robust API includes registration functions, validation hooks, and automatic JavaScript integration. Perfect for plugin developers who want to add accessibility validation to their custom blocks.
+Extend the plugin with <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">custom accessibility checks</a> for any block type. The robust API includes registration functions, validation hooks, and automatic JavaScript integration. Perfect for plugin developers who want to add accessibility validation to their custom blocks.
 
 == Installation ==
  
