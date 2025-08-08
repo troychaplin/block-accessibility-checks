@@ -2,6 +2,8 @@
 
 Block Accessibility Checks is a WordPress plugin that helps ensure your content meets WCAG (Web Content Accessibility Guidelines) requirements. This plugin integrates seamlessly with the Gutenberg editor to provide real-time accessibility validation for WordPress blocks, preventing users from publishing content that doesn't comply with WCAG standards.
 
+**[Download it from WordPress.org today!](https://wordpress.org/plugins/block-accessibility-checks/)**
+
 ## Features
 
 - **Real-time Accessibility Checks:** Automatically validates block configurations as you edit content in the Gutenberg editor
@@ -90,7 +92,7 @@ addFilter(
 
 ### Documentation
 
-- **[Complete Developer API Documentation](docs/developer-api.md)** - Comprehensive guide with examples, troubleshooting, and advanced patterns including external plugin integration
+- **[Complete Developer API Documentation](docs/README.md)** - Comprehensive guide with examples, troubleshooting, and advanced patterns including external plugin integration
 - **[Working Example Plugin](https://github.com/troychaplin/block-check-integration-example)** - Complete working example demonstrating integration with custom blocks
 
 ## Installation
