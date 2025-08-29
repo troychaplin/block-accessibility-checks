@@ -74,6 +74,7 @@ class BlockChecksRegistry {
 				'warning_msg' => \__( 'Adding text to a button is highly recommended', 'block-accessibility-checks' ),
 				'description' => \__( 'Button text validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
+				'category'    => 'accessibility',
 				'priority'    => 10,
 			)
 		);
@@ -87,6 +88,7 @@ class BlockChecksRegistry {
 				'warning_msg' => \__( 'Adding a link to a button is highly recommended', 'block-accessibility-checks' ),
 				'description' => \__( 'Button link validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
+				'category'    => 'validation',
 				'priority'    => 5,
 			)
 		);
@@ -100,6 +102,7 @@ class BlockChecksRegistry {
 				'warning_msg' => \__( 'Using alt text is highly recommended', 'block-accessibility-checks' ),
 				'description' => \__( 'Alternative text validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
+				'category'    => 'accessibility',
 				'priority'    => 5,
 			)
 		);
@@ -113,6 +116,7 @@ class BlockChecksRegistry {
 				'warning_msg' => \__( 'Image alt text is recommended to be less than 125 characters', 'block-accessibility-checks' ),
 				'description' => \__( 'Alternative text length validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
+				'category'    => 'accessibility',
 				'priority'    => 10,
 			)
 		);
@@ -126,6 +130,7 @@ class BlockChecksRegistry {
 				'warning_msg' => \__( 'Using different alt and caption text is highly recommended', 'block-accessibility-checks' ),
 				'description' => \__( 'Alternative and caption text match validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
+				'category'    => 'accessibility',
 				'priority'    => 10,
 			)
 		);
@@ -139,6 +144,7 @@ class BlockChecksRegistry {
 				'warning_msg' => \__( 'Using headers in tables is highly recommended', 'block-accessibility-checks' ),
 				'description' => \__( 'Table headers validation', 'block-accessibility-checks' ),
 				'type'        => 'settings',
+				'category'    => 'accessibility',
 				'priority'    => 5,
 			)
 		);
@@ -177,6 +183,7 @@ class BlockChecksRegistry {
 				'error_msg'   => '',
 				'warning_msg' => '',
 				'type'        => 'settings',
+				'category'    => 'accessibility', // New optional field.
 				'priority'    => 10,
 				'enabled'     => true,
 				'description' => '',
@@ -195,11 +202,18 @@ class BlockChecksRegistry {
 				$check_args['warning_msg'] = $check_args['error_msg'];
 			}
 
-			// Validate type parameter.
+			// Validate type parameter (optional, defaults to 'settings').
 			$valid_types = array( 'error', 'warning', 'settings', 'none' );
 			if ( ! in_array( $check_args['type'], $valid_types, true ) ) {
 				$this->log_error( "Invalid type '{$check_args['type']}' for {$block_type}/{$check_name}. Using 'settings'." );
 				$check_args['type'] = 'settings';
+			}
+
+			// Validate category parameter (optional, defaults to 'accessibility').
+			$valid_categories = array( 'accessibility', 'validation' );
+			if ( ! in_array( $check_args['category'], $valid_categories, true ) ) {
+				$this->log_error( "Invalid category '{$check_args['category']}' for {$block_type}/{$check_name}. Using 'accessibility'." );
+				$check_args['category'] = 'accessibility';
 			}
 
 			// Validate priority parameter.

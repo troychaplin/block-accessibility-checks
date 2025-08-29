@@ -16,6 +16,7 @@ Block Accessibility Checks is a WordPress plugin that helps ensure your content 
 - **Unified Validation:** JavaScript-only validation system ensures consistent real-time feedback across all contexts
 - **Individual Check Control:** Configure validation levels (error/warning/disabled) for each accessibility check per block type
 - **Grouped Message Display:** Organized error and warning messages in the inspector panel for better user experience
+- **Issue Categorization:** Separate display groups for accessibility and validation issues in the block editor
 - **Custom Error Messages:** Support for custom error and warning messages for each accessibility check
 
 ## Core Block Checks
@@ -52,6 +53,7 @@ function my_custom_checks( $registry ) {
             'warning_msg' => __( 'This field is recommended for accessibility compliance', 'my-plugin' ),
             'description' => __( 'Content validation for accessibility compliance', 'my-plugin' ),
             'type'        => 'settings',
+            'category'    => 'accessibility', // 'accessibility' or 'validation'
             'priority'    => 10,
         )
     );

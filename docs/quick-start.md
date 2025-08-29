@@ -26,6 +26,7 @@ function my_plugin_register_checks( $registry ) {
             'warning_msg' => __( 'Content is long but still allowed (warning)', 'my-plugin' ),
             'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
             'type'        => 'settings', // 'error', 'warning', or 'settings'
+            'category'    => 'validation', // 'accessibility' or 'validation'
             'priority'    => 10,
         )
     );

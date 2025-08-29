@@ -58,9 +58,15 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		// Generate messages for all issues
 		const issues = validationResult.issues || [];
 
-		// Group issues by type
+		// Group issues by type and category
 		const errors = issues.filter(issue => issue.type === 'error');
 		const warnings = issues.filter(issue => issue.type === 'warning');
+
+		// Group by category
+		const accessibilityErrors = errors.filter(issue => issue.category === 'accessibility');
+		const validationErrors = errors.filter(issue => issue.category === 'validation');
+		const accessibilityWarnings = warnings.filter(issue => issue.category === 'accessibility');
+		const validationWarnings = warnings.filter(issue => issue.category === 'validation');
 
 		return (
 			<>
@@ -70,8 +76,8 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 							title={__('Validation & Accessibility', 'block-accessibility-checks')}
 							initialOpen={true}
 						>
-							{/* Display Errors Group */}
-							{errors.length > 0 && (
+							{/* Display Accessibility Errors Group */}
+							{accessibilityErrors.length > 0 && (
 								<PanelRow>
 									<div className="a11y-error-group">
 										<p className="a11y-error-msg">
@@ -83,8 +89,10 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 											</strong>
 										</p>
 										<ul className="a11y-error-list">
-											{errors.map((issue, index) => (
-												<li key={`error-${issue.checkName}-${index}`}>
+											{accessibilityErrors.map((issue, index) => (
+												<li
+													key={`accessibility-error-${issue.checkName}-${index}`}
+												>
 													{issue.error_msg}
 												</li>
 											))}
@@ -93,8 +101,33 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 								</PanelRow>
 							)}
 
-							{/* Display Warnings Group */}
-							{warnings.length > 0 && (
+							{/* Display Validation Errors Group */}
+							{validationErrors.length > 0 && (
+								<PanelRow>
+									<div className="a11y-error-group">
+										<p className="a11y-error-msg">
+											<strong>
+												{__(
+													'Validation Errors',
+													'block-accessibility-checks'
+												)}
+											</strong>
+										</p>
+										<ul className="a11y-error-list">
+											{validationErrors.map((issue, index) => (
+												<li
+													key={`validation-error-${issue.checkName}-${index}`}
+												>
+													{issue.error_msg}
+												</li>
+											))}
+										</ul>
+									</div>
+								</PanelRow>
+							)}
+
+							{/* Display Accessibility Warnings Group */}
+							{accessibilityWarnings.length > 0 && (
 								<PanelRow>
 									<div className="a11y-warning-group">
 										<p className="a11y-warning-msg">
@@ -106,8 +139,35 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 											</strong>
 										</p>
 										<ul className="a11y-warning-list">
-											{warnings.map((issue, index) => (
-												<li key={`warning-${issue.checkName}-${index}`}>
+											{accessibilityWarnings.map((issue, index) => (
+												<li
+													key={`accessibility-warning-${issue.checkName}-${index}`}
+												>
+													{issue.warning_msg || issue.error_msg}
+												</li>
+											))}
+										</ul>
+									</div>
+								</PanelRow>
+							)}
+
+							{/* Display Validation Warnings Group */}
+							{validationWarnings.length > 0 && (
+								<PanelRow>
+									<div className="a11y-warning-group">
+										<p className="a11y-warning-msg">
+											<strong>
+												{__(
+													'Validation Warnings',
+													'block-accessibility-checks'
+												)}
+											</strong>
+										</p>
+										<ul className="a11y-warning-list">
+											{validationWarnings.map((issue, index) => (
+												<li
+													key={`validation-warning-${issue.checkName}-${index}`}
+												>
 													{issue.warning_msg || issue.error_msg}
 												</li>
 											))}

@@ -26,8 +26,11 @@ This document highlights the key features and benefits of the Block Accessibilit
 - **Settings Page Automation**  
   Checks registered with the API automatically appear in the admin settings UI for configuration by site admins.
 
+- **Issue Categorization**  
+  Categorize checks as either accessibility or validation issues, with separate display groups in the block editor for better user experience.
+
 - **Multiple Issue Reporting**  
-  Report all accessibility issues for a block at once, with grouped and prioritized feedback in the editor UI.
+  Report all accessibility and validation issues for a block at once, with grouped and prioritized feedback in the editor UI.
 
 - **Backward Compatibility**  
   Legacy check registration and message fields are supported for easier migration from older patterns.
