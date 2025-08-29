@@ -202,6 +202,7 @@ class ScriptsStyles {
 					'error_msg'   => $check_config['error_msg'],
 					'warning_msg' => $check_config['warning_msg'],
 					'type'        => $effective_type, // Use effective type instead of config type.
+					'category'    => $check_config['category'] ?? 'accessibility', // Include category field.
 					'priority'    => $check_config['priority'],
 					'enabled'     => $check_config['enabled'],
 					'description' => $check_config['description'],

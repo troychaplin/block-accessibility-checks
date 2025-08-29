@@ -16,6 +16,33 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- **Issue categorization system**: New `category` field in check registration to distinguish between "accessibility" and "validation" issues
+- **Enhanced UI organization**: Inspector panel now displays errors and warnings in consolidated panels with sub-headings for "Accessibility" and "Validation" categories
+- **CSS custom properties**: Centralized color system with semantic variable names for consistent theming:
+  - `--a11y-red`: Primary error color (#d82000)
+  - `--a11y-yellow`: Primary warning color (#dbc900) 
+  - `--a11y-light-red`: Error background color (#ffe4e0)
+  - `--a11y-light-yellow`: Warning background color (#fffde2)
+  - `--a11y-border-width`: Standardized border width (3px solid)
+- **Modular SCSS architecture**: Improved stylesheet organization with separate files for panel messages and block icons
+- **Modern Sass syntax**: Migrated from deprecated `@import` to `@use` statements for better performance and maintainability
+
+### Changed
+
+- **BlockChecksRegistry API**: Enhanced `register_check()` method to accept optional `category` parameter (defaults to 'accessibility')
+- **JavaScript validation pipeline**: Updated to pass category information from PHP registry to frontend validation
+- **UI display logic**: Consolidated error/warning display into two main panels with conditional sub-headings
+- **CSS architecture**: Refactored styles to use custom properties for improved maintainability and theme support
+- **Default check categorization**: Core button checks now categorized as "validation", image and table checks as "accessibility"
+
+### Fixed
+
+- **Sass deprecation warnings**: Resolved build warnings by migrating from `@import` to `@use` syntax
+- **UI structure issues**: Fixed conditional rendering logic for error and warning panels
+- **Data flow consistency**: Ensured category information properly flows from PHP registry to JavaScript validation
+
 ## [2.0.0]
 
 ### Added

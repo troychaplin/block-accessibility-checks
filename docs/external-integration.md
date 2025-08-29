@@ -28,6 +28,7 @@ function my_plugin_register_checks($registry) {
         'warning_msg' => __('Card content is recommended.', 'my-plugin'),
         'description' => __('Content validation for card blocks.', 'my-plugin'),
         'type'        => 'settings', // Appears in admin settings
+        'category'    => 'validation', // 'accessibility' or 'validation'
     ]);
 
     // This check is forced as an error (bypasses settings)
@@ -35,6 +36,7 @@ function my_plugin_register_checks($registry) {
         'error_msg'   => __('Card link is required.', 'my-plugin'),
         'description' => __('Link validation for card blocks.', 'my-plugin'),
         'type'        => 'error', // Always an error, no settings control
+        'category'    => 'accessibility', // 'accessibility' or 'validation'
     ]);
 }
 ```
