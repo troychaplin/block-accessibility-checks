@@ -67,7 +67,7 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 				{validationResult.mode !== 'none' && (
 					<InspectorControls>
 						<PanelBody
-							title={__('Accessibility Check', 'block-accessibility-checks')}
+							title={__('Validation & Accessibility', 'block-accessibility-checks')}
 							initialOpen={true}
 						>
 							{/* Display Errors Group */}
@@ -76,7 +76,10 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 									<div className="a11y-error-group">
 										<p className="a11y-error-msg">
 											<strong>
-												{__('Block Errors', 'block-accessibility-checks')}
+												{__(
+													'Accessibility Errors',
+													'block-accessibility-checks'
+												)}
 											</strong>
 										</p>
 										<ul className="a11y-error-list">
@@ -96,7 +99,10 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 									<div className="a11y-warning-group">
 										<p className="a11y-warning-msg">
 											<strong>
-												{__('Block Warnings', 'block-accessibility-checks')}
+												{__(
+													'Accessibility Warnings',
+													'block-accessibility-checks'
+												)}
 											</strong>
 										</p>
 										<ul className="a11y-warning-list">
