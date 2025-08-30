@@ -26,6 +26,7 @@ $check_args = array(
     'warning_msg' => 'Warning message shown in the block editor (optional)',     // Optional
     'description' => 'Explanation shown in the settings/admin UI',               // Optional
     'type'        => 'settings', // 'settings', 'error', 'warning', 'none'      // Optional
+    'category'    => 'accessibility', // 'accessibility' or 'validation'        // Optional
     'priority'    => 10,         // Lower = earlier, default: 10                // Optional
     'enabled'     => true,       // Whether check is enabled (default: true)     // Optional
 );
