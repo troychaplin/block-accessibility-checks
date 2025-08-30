@@ -28,6 +28,8 @@ Prefix the change with one of these keywords:
   - `--a11y-border-width`: Standardized border width (3px solid)
 - **Modular SCSS architecture**: Improved stylesheet organization with separate files for panel messages and block icons
 - **Modern Sass syntax**: Migrated from deprecated `@import` to `@use` statements for better performance and maintainability
+- **Enhanced settings page labels**: Improved user-friendly labels for accessibility checks in the settings page with category-based descriptions
+- **Refined inspector panel layout**: Better visual organization of accessibility and validation messages with clear sub-headings
 
 ### Changed
 
@@ -36,12 +38,15 @@ Prefix the change with one of these keywords:
 - **UI display logic**: Consolidated error/warning display into two main panels with conditional sub-headings
 - **CSS architecture**: Refactored styles to use custom properties for improved maintainability and theme support
 - **Default check categorization**: Core button checks now categorized as "validation", image and table checks as "accessibility"
+- **Inspector panel title**: Updated panel title from "Accessibility Check" to "Accessibility & Validation" for better clarity
+- **Settings page interface**: Enhanced check label generation to provide more descriptive and user-friendly names
 
 ### Fixed
 
 - **Sass deprecation warnings**: Resolved build warnings by migrating from `@import` to `@use` syntax
 - **UI structure issues**: Fixed conditional rendering logic for error and warning panels
 - **Data flow consistency**: Ensured category information properly flows from PHP registry to JavaScript validation
+- **README documentation errors**: Fixed various documentation issues and improved clarity
 
 ## [2.0.0]
 
