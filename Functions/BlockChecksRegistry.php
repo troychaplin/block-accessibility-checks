@@ -14,6 +14,7 @@ namespace BlockAccessibility;
  * Block Checks Registry Class
  *
  * Manages registration and execution of accessibility checks for different block types.
+ * Delegates core block check registration to CoreBlockChecks class for better separation of concerns.
  */
 class BlockChecksRegistry {
 
@@ -59,112 +60,39 @@ class BlockChecksRegistry {
 	}
 
 	/**
+	 * Core block checks instance
+	 *
+	 * @var CoreBlockChecks|null
+	 */
+	private $core_block_checks = null;
+
+	/**
 	 * Constructor
 	 */
 	private function __construct() {
-		$this->register_default_checks();
+		// Initialize core block checks.
+		$this->init_core_block_checks();
 	}
 
 	/**
-	 * Register default accessibility checks
+	 * Initialize core block checks
 	 *
-	 * Sets up the default accessibility checks for various core blocks
-	 * including image alt text validation and button text quality checks.
+	 * Creates and initializes the CoreBlockChecks instance to register
+	 * default accessibility checks for WordPress core blocks.
 	 *
 	 * @return void
 	 */
-	private function register_default_checks(): void {
+	private function init_core_block_checks(): void {
 		// Allow developers to prevent default checks from being registered.
 		if ( ! \apply_filters( 'ba11yc_register_default_checks', true ) ) {
 			return;
 		}
 
-		// Button text check.
-		$this->register_check(
-			'core/button',
-			'check_button_text',
-			array(
-				'error_msg'   => \__( 'Button text is required and should be descriptive and meaningful', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Adding text to a button is highly recommended', 'block-accessibility-checks' ),
-				'description' => \__( 'Button text validation', 'block-accessibility-checks' ),
-				'type'        => 'settings',
-				'category'    => 'accessibility',
-				'priority'    => 10,
-			)
-		);
+		// Create core block checks instance.
+		$this->core_block_checks = new CoreBlockChecks( $this );
 
-		// Button link check.
-		$this->register_check(
-			'core/button',
-			'check_button_link',
-			array(
-				'error_msg'   => \__( 'Buttons are required to have a link', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Adding a link to a button is highly recommended', 'block-accessibility-checks' ),
-				'description' => \__( 'Button link validation', 'block-accessibility-checks' ),
-				'type'        => 'settings',
-				'category'    => 'validation',
-				'priority'    => 5,
-			)
-		);
-
-		// Image block checks.
-		$this->register_check(
-			'core/image',
-			'check_image_alt_text',
-			array(
-				'error_msg'   => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Using alt text is highly recommended', 'block-accessibility-checks' ),
-				'description' => \__( 'Alternative text validation', 'block-accessibility-checks' ),
-				'type'        => 'settings',
-				'category'    => 'accessibility',
-				'priority'    => 5,
-			)
-		);
-
-		// Image alt text length check.
-		$this->register_check(
-			'core/image',
-			'check_image_alt_text_length',
-			array(
-				'error_msg'   => \__( 'Image alt text cannot be longer than 125 characters', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Image alt text is recommended to be less than 125 characters', 'block-accessibility-checks' ),
-				'description' => \__( 'Alternative text length validation', 'block-accessibility-checks' ),
-				'type'        => 'settings',
-				'category'    => 'accessibility',
-				'priority'    => 10,
-			)
-		);
-
-		// Image alt text match check.
-		$this->register_check(
-			'core/image',
-			'check_image_alt_caption_match',
-			array(
-				'error_msg'   => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Using different alt and caption text is highly recommended', 'block-accessibility-checks' ),
-				'description' => \__( 'Alternative and caption text match validation', 'block-accessibility-checks' ),
-				'type'        => 'settings',
-				'category'    => 'accessibility',
-				'priority'    => 10,
-			)
-		);
-
-		// Table headers check.
-		$this->register_check(
-			'core/table',
-			'check_table_headers',
-			array(
-				'error_msg'   => \__( 'Tables are required to have headers', 'block-accessibility-checks' ),
-				'warning_msg' => \__( 'Using headers in tables is highly recommended', 'block-accessibility-checks' ),
-				'description' => \__( 'Table headers validation', 'block-accessibility-checks' ),
-				'type'        => 'settings',
-				'category'    => 'accessibility',
-				'priority'    => 5,
-			)
-		);
-
-		// Hook for developers to register additional checks.
-		\do_action( 'ba11yc_register_checks', $this );
+		// Register default checks.
+		$this->core_block_checks->register_default_checks();
 	}
 
 	/**
@@ -454,18 +382,6 @@ class BlockChecksRegistry {
 	}
 
 	/**
-	 * Check image alt text length
-	 *
-	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content (unused but required by interface).
-	 * @param array  $config Check configuration (unused but required by interface).
-	 * @return bool True if check fails.
-	/**
-	 * PHP validation callbacks removed - all validation now handled in JavaScript.
-	 * See src/scripts/blockChecks/coreBlockValidation.js for the JavaScript validation logic.
-	 */
-
-	/**
 	 * Get the effective check level for a specific check
 	 *
 	 * This method determines the actual check level by considering both
@@ -577,6 +493,15 @@ class BlockChecksRegistry {
 			'plugin_info_cache' => $this->plugin_info_cache,
 			'checks'            => array_keys( $this->checks ),
 		);
+	}
+
+	/**
+	 * Get core block checks instance
+	 *
+	 * @return CoreBlockChecks|null The core block checks instance or null if not initialized.
+	 */
+	public function get_core_block_checks(): ?CoreBlockChecks {
+		return $this->core_block_checks;
 	}
 
 	/**

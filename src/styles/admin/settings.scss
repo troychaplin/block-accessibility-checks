@@ -86,6 +86,10 @@ body[class*="block-checks_page_block-a11y-checks-"] {
     padding: 30px;
 }
 
+.ba11y-settings-field {
+    max-width: 896px;
+}
+
 // Individual block group settings
 .ba11y-settings-field + .ba11y-settings-field,
 .ba11y-settings-form .button {
@@ -100,6 +104,10 @@ body[class*="block-checks_page_block-a11y-checks-"] {
 .ba11y-settings-group {
     border-bottom: 1px solid var(--a11y-lightest-grey);
     padding: 12px 0;
+
+    &:hover {
+        background-color: #fbfbfb;
+    }
     
     .ba11y-group-layout {
         display: flex;

@@ -427,7 +427,7 @@ class SettingsPage {
 			$value      = $options[ $field_name ] ?? 'error';
 
 			// Generate a user-friendly label for the check.
-			$desc     = $this->generate_check_label( $check_name, $check_config );
+			$desc     = $check_config['description'];
 			$label_id = \sanitize_title( $field_name ) . '-label';
 
 			echo '<div class="ba11y-settings-group" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
@@ -602,52 +602,6 @@ class SettingsPage {
 	}
 
 	/**
-	 * Generate a user-friendly label for a check based on its configuration
-	 *
-	 * @param string $check_name The name of the check.
-	 * @param array  $check_config The check configuration array.
-	 * @return string The generated label.
-	 */
-	private function generate_check_label( string $check_name, array $check_config ): string {
-		// If both category and description are set, combine them.
-		if ( ! empty( $check_config['category'] ) && ! empty( $check_config['description'] ) ) {
-			$category = ucwords( str_replace( array( '-', '_' ), ' ', $check_config['category'] ) );
-
-			// For accessibility category, add "check" suffix. For validation, use as-is.
-			if ( strtolower( $check_config['category'] ) === 'accessibility' ) {
-				return $check_config['description'] . ' (' . $category . ' check)';
-			}
-
-			return $check_config['description'] . ' (' . $category . ' check)';
-		}
-
-		// If only category is set, use it to generate a label.
-		if ( ! empty( $check_config['category'] ) ) {
-			$category = ucwords( str_replace( array( '-', '_' ), ' ', $check_config['category'] ) );
-
-			// For accessibility category, add "check" suffix. For validation, use as-is.
-			if ( strtolower( $check_config['category'] ) === 'accessibility' ) {
-				return $category . ' check';
-			}
-
-			return $category;
-		}
-
-		// If only description is set, use it.
-		if ( ! empty( $check_config['description'] ) ) {
-			return $check_config['description'];
-		}
-
-		// Fallback to error message if available.
-		if ( ! empty( $check_config['error_msg'] ) ) {
-			return $check_config['error_msg'];
-		}
-
-		// Final fallback to check name.
-		return ucwords( str_replace( array( '-', '_' ), ' ', $check_name ) );
-	}
-
-	/**
 	 * Render external plugin settings page
 	 *
 	 * @return void
@@ -732,7 +686,7 @@ class SettingsPage {
 			$value      = $options[ $field_name ] ?? 'error';
 
 			// Generate a user-friendly label for the check.
-			$desc     = $this->generate_check_label( $check_name, $check_config );
+			$desc     = $check_config['description'];
 			$label_id = \sanitize_title( $field_name ) . '-label';
 
 			echo '<div class="ba11y-settings-group" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
