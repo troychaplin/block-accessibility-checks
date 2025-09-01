@@ -120,6 +120,7 @@ class SettingsPage {
 	public function get_external_plugins_with_settings(): array {
 		$external_plugins = array();
 		$all_checks       = $this->registry->get_all_checks();
+		$all_plugin_info  = $this->registry->get_all_plugin_info();
 
 		foreach ( $all_checks as $block_type => $checks ) {
 			// Skip core blocks.
@@ -140,14 +141,24 @@ class SettingsPage {
 				continue;
 			}
 
-			// Extract plugin info from block type.
-			$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
-			$plugin_slug = $plugin_info['slug'];
+			// Get plugin information from registry.
+			$plugin_info = $all_plugin_info[ $block_type ] ?? array();
+
+			// If we have plugin info from registry, use it.
+			if ( ! empty( $plugin_info['name'] ) ) {
+				$plugin_slug = $plugin_info['slug'] ?? \sanitize_title( $plugin_info['name'] );
+			} else {
+				// Fallback to namespace-based extraction.
+				$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
+				$plugin_slug = $plugin_info['slug'];
+			}
 
 			if ( ! isset( $external_plugins[ $plugin_slug ] ) ) {
 				$external_plugins[ $plugin_slug ] = array(
-					'name'   => $plugin_info['name'],
-					'blocks' => array(),
+					'name'    => $plugin_info['name'] ?? '',
+					'version' => $plugin_info['version'] ?? '',
+					'file'    => $plugin_info['file'] ?? '',
+					'blocks'  => array(),
 				);
 			}
 
@@ -171,8 +182,9 @@ class SettingsPage {
 		// Convert namespace to readable name.
 		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
 
-		// Create a slug for the plugin.
-		$plugin_slug = sanitize_title( $namespace );
+		// Create a unique slug for the plugin by combining namespace and block name.
+		// This ensures different plugins with the same namespace get different slugs.
+		$plugin_slug = sanitize_title( $namespace . '-' . $block_name );
 
 		return array(
 			'name' => $plugin_name,
@@ -592,6 +604,12 @@ class SettingsPage {
 
 		echo '<div class="block-a11y-checks-settings">' . "\n";
 		echo '<h1>' . \esc_html( $plugin_data['name'] ) . '</h1>' . "\n";
+
+		// Display plugin version if available.
+		if ( ! empty( $plugin_data['version'] ) ) {
+			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $plugin_data['version'] ) . '</p>' . "\n";
+		}
+
 		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
 		echo '<div class="block-a11y-checks-settings-grid">';
 
