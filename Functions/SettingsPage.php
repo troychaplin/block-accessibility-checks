@@ -90,6 +90,241 @@ class SettingsPage {
 
 		// Add external plugin submenus.
 		$this->add_external_plugin_menus();
+
+		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+		// Add temporary design submenu for development.
+		// \add_submenu_page(
+		// 'block-a11y-checks',
+		// \esc_html__( 'Design Preview', 'block-accessibility-checks' ),
+		// \esc_html__( 'Design Preview', 'block-accessibility-checks' ),
+		// 'manage_options',
+		// 'block-a11y-checks-design',
+		// array( new SettingsHardcoded(), 'design_preview_page' )
+		// );
+		// end design preview.
+	}
+
+	/**
+	 * Initializes the settings for the plugin.
+	 *
+	 * This method is responsible for registering the settings and adding
+	 * the settings section and fields to the WordPress admin.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
+		// Register core block settings.
+		\register_setting(
+			'block_checks_settings_group',
+			'block_checks_options',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_options' ),
+			)
+		);
+
+		\add_settings_section(
+			'block_checks_options_section',
+			'',
+			false,
+			'block_checks_options'
+		);
+
+		foreach ( $this->block_settings as $block ) {
+			\add_settings_field(
+				$block['option_name'],
+				$block['block_label'],
+				array( $this, $block['function_name'] ),
+				'block_checks_options',
+				'block_checks_options_section'
+			);
+		}
+
+		// Register external plugin settings.
+		$this->register_external_plugin_settings();
+	}
+
+	/**
+	 * Renders the settings page layout for core blocks.
+	 *
+	 * @return void
+	 */
+	public function settings_page_layout(): void {
+		$this->render_settings_page(
+			\get_admin_page_title(),
+			'block_checks_settings_group',
+			'',
+			array( $this, 'render_core_settings_content' )
+		);
+	}
+
+	/**
+	 * Renders the core heading options for the settings page.
+	 *
+	 * This method is responsible for outputting the HTML or other content
+	 * necessary to display the core heading options in the plugin's settings page.
+	 *
+	 * @return void
+	 */
+	public function render_core_heading_options() {
+		$options        = \get_option( 'block_checks_options' );
+		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+
+		echo '<div class="ba11y-settings-group" role="group" aria-labelledby="heading-levels-label">';
+		echo '<div class="ba11y-group-layout">';
+		echo '<div class="ba11y-group-controls ba11y-group-controls--checkbox">';
+
+		for ( $i = 1; $i <= 6; $i++ ) {
+			$level   = 'h' . $i;
+			$checked = in_array( $level, $heading_levels, true ) ? 'checked' : '';
+			echo '<div class="ba11y-checkbox-item">';
+			echo '<input type="checkbox" 
+						 id="' . \esc_attr( 'heading-level-' . $i ) . '" 
+						 name="block_checks_options[core_heading_levels][]" 
+						 value="' . \esc_attr( $level ) . '" 
+						 ' . ( $checked ? 'checked="checked"' : '' ) . '>';
+			echo '<label for="' . \esc_attr( 'heading-level-' . $i ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
+			echo '</div>';
+		}
+
+		echo '</div>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render external plugin settings page
+	 *
+	 * @return void
+	 */
+	public function external_plugin_settings_page(): void {
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
+		}
+
+		// Get current page slug to determine which plugin.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is an admin page callback, nonce verification not required for page parameter.
+		$current_page = \sanitize_text_field( \wp_unslash( $_GET['page'] ?? '' ) );
+		$plugin_slug  = str_replace( 'block-a11y-checks-', '', $current_page );
+
+		$external_plugins = $this->get_external_plugins_with_settings();
+		$plugin_data      = $external_plugins[ $plugin_slug ] ?? null;
+
+		if ( ! $plugin_data ) {
+			\wp_die( \esc_html__( 'Plugin settings not found.', 'block-accessibility-checks' ) );
+		}
+
+		$option_group = 'block_checks_external_' . $plugin_slug . '_group';
+		$option_name  = 'block_checks_external_' . $plugin_slug;
+
+		$this->render_settings_page(
+			$plugin_data['name'],
+			$option_group,
+			$plugin_data['version'] ?? '',
+			array( $this, 'render_external_plugin_settings_content' ),
+			array( $plugin_data, $plugin_slug )
+		);
+	}
+
+	/**
+	 * Render external block options
+	 *
+	 * @param array $args Arguments containing block_type, plugin_slug, and checks.
+	 * @return void
+	 */
+	public function render_external_block_options( array $args ): void {
+		$block_type  = $args['block_type'] ?? '';
+		$plugin_slug = $args['plugin_slug'] ?? '';
+		$checks      = $args['checks'] ?? array();
+
+		$option_name = 'block_checks_external_' . $plugin_slug;
+		$this->render_block_options( $block_type, $checks, $option_name );
+	}
+
+	/**
+	 * Sanitizes the plugin options before saving to the database.
+	 *
+	 * This method validates and sanitizes all incoming option data to prevent
+	 * XSS attacks and ensure data integrity.
+	 *
+	 * @param mixed $input The input array from the settings form.
+	 *
+	 * @return array The sanitized options array.
+	 */
+	public function sanitize_options( $input ): array {
+		try {
+			$sanitized = array();
+
+			if ( ! is_array( $input ) ) {
+				$this->log_error( 'Settings input is not an array. Returning empty array.' );
+				return $sanitized;
+			}
+
+			$this->log_debug( 'Starting sanitization of plugin options.' );
+
+			// Sanitize individual core block check options (error, warning, none).
+			$valid_check_values = array( 'error', 'warning', 'none' );
+
+			foreach ( $input as $key => $value ) {
+				// Handle heading levels array.
+				if ( 'core_heading_levels' === $key ) {
+					if ( is_array( $value ) ) {
+						$sanitized['core_heading_levels'] = array();
+						$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+
+						foreach ( $value as $level ) {
+							if ( in_array( $level, $valid_levels, true ) ) {
+								$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
+								$this->log_debug( "Added heading level: {$level}" );
+							} else {
+								$this->log_error( "Invalid heading level: {$level}. Skipping." );
+							}
+						}
+
+						$this->log_debug( 'Completed heading levels sanitization.' );
+					} else {
+						$this->log_error( 'Heading levels input is not an array. Skipping.' );
+					}
+				} elseif ( 'core_heading_levels' !== $key ) {
+					// Handle individual check settings.
+					if ( in_array( $value, $valid_check_values, true ) ) {
+						$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
+						$this->log_debug( "Sanitized {$key}: {$value}" );
+					} else {
+						$this->log_error( "Invalid value for {$key}: {$value}. Skipping." );
+					}
+				}
+			}
+
+			$this->log_debug( 'Settings sanitization completed successfully.' );
+			return $sanitized;
+
+		} catch ( \Exception $e ) {
+			$this->log_error( 'Error during settings sanitization: ' . $e->getMessage() );
+			return array();
+		}
+	}
+
+	/**
+	 * Sanitize external plugin options
+	 *
+	 * @param mixed $input The input array from the settings form.
+	 * @return array The sanitized options array.
+	 */
+	public function sanitize_external_options( $input ): array {
+		$sanitized    = array();
+		$valid_values = array( 'error', 'warning', 'none' );
+
+		if ( ! is_array( $input ) ) {
+			return $sanitized;
+		}
+
+		foreach ( $input as $key => $value ) {
+			if ( in_array( $value, $valid_values, true ) ) {
+				$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
+			}
+		}
+
+		return $sanitized;
 	}
 
 	/**
@@ -169,69 +404,6 @@ class SettingsPage {
 	}
 
 	/**
-	 * Extract plugin information from block type
-	 *
-	 * @param string $block_type The block type (e.g., 'create-block/my-testimonial-block').
-	 * @return array Plugin information with name and slug
-	 */
-	private function extract_plugin_info_from_block_type( string $block_type ): array {
-		$parts      = explode( '/', $block_type );
-		$namespace  = $parts[0] ?? '';
-		$block_name = $parts[1] ?? '';
-
-		// Convert namespace to readable name.
-		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
-
-		// Create a unique slug for the plugin by combining namespace and block name.
-		// This ensures different plugins with the same namespace get different slugs.
-		$plugin_slug = sanitize_title( $namespace . '-' . $block_name );
-
-		return array(
-			'name' => $plugin_name,
-			'slug' => $plugin_slug,
-		);
-	}
-
-	/**
-	 * Initializes the settings for the plugin.
-	 *
-	 * This method is responsible for registering the settings and adding
-	 * the settings section and fields to the WordPress admin.
-	 *
-	 * @return void
-	 */
-	public function init_settings(): void {
-		// Register core block settings.
-		\register_setting(
-			'block_checks_settings_group',
-			'block_checks_options',
-			array(
-				'sanitize_callback' => array( $this, 'sanitize_options' ),
-			)
-		);
-
-		\add_settings_section(
-			'block_checks_options_section',
-			'',
-			false,
-			'block_checks_options'
-		);
-
-		foreach ( $this->block_settings as $block ) {
-			\add_settings_field(
-				$block['option_name'],
-				$block['block_label'],
-				array( $this, $block['function_name'] ),
-				'block_checks_options',
-				'block_checks_options_section'
-			);
-		}
-
-		// Register external plugin settings.
-		$this->register_external_plugin_settings();
-	}
-
-	/**
 	 * Register settings for external plugins
 	 *
 	 * @return void
@@ -278,41 +450,22 @@ class SettingsPage {
 	}
 
 	/**
-	 * Renders the settings page layout.
-	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the settings page for the plugin.
+	 * Render core settings content
 	 *
 	 * @return void
 	 */
-	public function settings_page_layout() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
-		}
-
-		echo '<div class="block-a11y-checks-settings">' . "\n";
-		echo '<h1>' . esc_html( get_admin_page_title() ) . '</h1>' . "\n";
-		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="block-a11y-checks-settings-grid">';
-
-		settings_fields( 'block_checks_settings_group' );
-
+	private function render_core_settings_content(): void {
 		// Render core block checks with individual check settings.
 		$this->render_core_block_checks();
 
 		// Render heading levels (special case).
 		foreach ( $this->block_settings as $block ) {
-			echo '<div class="block-a11y-checks-settings-field">';
-			echo '<h2>' . esc_html( $block['block_label'] ) . '</h2>';
-			echo '<p>' . esc_html( $block['description'] ) . '</p>';
+			echo '<article class="ba11y-settings-field ba11y-settings-field-core-heading">';
+			echo '<h2>' . \esc_html( $block['block_label'] ) . '</h2>';
+			echo '<p>' . \esc_html( $block['description'] ) . '</p>';
 			call_user_func( array( $this, $block['function_name'] ) );
-			echo '</div>';
+			echo '</article>';
 		}
-
-		echo '</div>';
-		submit_button();
-		echo '</form>' . "\n";
-		echo '</div>' . "\n";
 	}
 
 	/**
@@ -334,13 +487,13 @@ class SettingsPage {
 				continue;
 			}
 
-			echo '<div class="block-a11y-checks-settings-field">';
-			echo '<h2>' . esc_html( $block_label ) . '</h2>';
-			echo '<p>' . esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
+			$block_slug = str_replace( '/', '-', $block_type );
+			echo '<article class="ba11y-settings-field ba11y-settings-field-' . \esc_attr( $block_slug ) . '">';
+			echo '<h2>' . \esc_html( $block_label ) . '</h2>';
 
 			$this->render_core_block_options( $block_type, $checks );
 
-			echo '</div>';
+			echo '</article>';
 		}
 	}
 
@@ -352,7 +505,102 @@ class SettingsPage {
 	 * @return void
 	 */
 	private function render_core_block_options( string $block_type, array $checks ): void {
-		$options = \get_option( 'block_checks_options', array() );
+		$this->render_block_options( $block_type, $checks, 'block_checks_options' );
+	}
+
+	/**
+	 * Render external plugin settings content
+	 *
+	 * @param array  $plugin_data Plugin data array.
+	 * @param string $plugin_slug Plugin slug.
+	 * @return void
+	 */
+	private function render_external_plugin_settings_content( array $plugin_data, string $plugin_slug ): void {
+
+		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
+			$block_name = $this->get_block_display_name( $block_type );
+			$block_slug = str_replace( '/', '-', $block_type );
+			echo '<article class="ba11y-settings-field ba11y-settings-field-' . \esc_attr( $block_slug ) . '">';
+			echo '<h2>' . \esc_html( $block_name ) . '</h2>';
+
+			$this->render_external_block_options(
+				array(
+					'block_type'  => $block_type,
+					'plugin_slug' => $plugin_slug,
+					'checks'      => $checks,
+				)
+			);
+
+			echo '</article>';
+		}
+	}
+
+	/**
+	 * Unified settings page layout handler
+	 *
+	 * This method provides a single point for rendering all settings pages,
+	 * reducing code duplication and making maintenance easier.
+	 *
+	 * @param string        $title Page title.
+	 * @param string        $option_group Settings option group name.
+	 * @param string        $version Optional version string.
+	 * @param callable|null $content_renderer Callback function to render page content.
+	 * @param array         $callback_args Optional arguments to pass to the content renderer.
+	 * @return void
+	 */
+	private function render_settings_page( string $title, string $option_group, string $version = '', ?callable $content_renderer = null, array $callback_args = array() ): void {
+		// Permission check.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
+		}
+
+		echo '<div class="ba11y-settings">' . "\n";
+		echo '<div class="ba11y-settings-container">' . "\n";
+
+		echo '<header class="ba11y-settings-header">' . "\n";
+		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
+		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
+		echo '</header>' . "\n";
+
+		echo '<section class="ba11y-settings-section">' . "\n";
+		echo '<div class="ba11y-settings-section-title">' . "\n";
+		echo '<h2>' . \esc_html( $title ) . '</h2>' . "\n";
+		// Display plugin version if available.
+		if ( ! empty( $version ) ) {
+			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $version ) . '</p>' . "\n";
+		}
+		echo '</div>' . "\n";
+
+		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
+
+		\settings_fields( $option_group );
+
+		// Render page-specific content.
+		if ( is_callable( $content_renderer ) ) {
+			if ( ! empty( $callback_args ) ) {
+				call_user_func_array( $content_renderer, $callback_args );
+			} else {
+				call_user_func( $content_renderer );
+			}
+		}
+
+		\submit_button();
+		echo '</form>' . "\n";
+		echo '</section>' . "\n";
+		echo '</div>' . "\n";
+		echo '</div>' . "\n";
+	}
+
+	/**
+	 * Render block options with individual check settings (shared method)
+	 *
+	 * @param string $block_type The block type.
+	 * @param array  $checks     The checks for this block.
+	 * @param string $option_name The option name to get/set values.
+	 * @return void
+	 */
+	private function render_block_options( string $block_type, array $checks, string $option_name ): void {
+		$options = \get_option( $option_name, array() );
 
 		foreach ( $checks as $check_name => $check_config ) {
 			// Only show checks that are using settings (not forced).
@@ -364,131 +612,73 @@ class SettingsPage {
 			$value      = $options[ $field_name ] ?? 'error';
 
 			// Generate a user-friendly label for the check.
-			$desc = $this->generate_check_label( $check_name, $check_config );
+			$desc     = $check_config['description'];
+			$label_id = \sanitize_title( $field_name ) . '-label';
 
-			echo '<div class="block-check-item">';
-			echo '<fieldset>';
-			echo '<legend><strong>' . \esc_html( $desc ) . '</strong></legend>';
-
-			echo '<ul class="block-check-radio-options">';
+			echo '<div class="ba11y-settings-group" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
+			echo '<div class="ba11y-group-layout">';
+			echo '<div class="ba11y-group-label">';
+			echo '<p id="' . \esc_attr( $label_id ) . '">' . \esc_html( $desc ) . '</p>';
+			echo '</div>';
+			echo '<div class="ba11y-group-controls ba11y-group-controls--radio">';
 
 			// Error option.
 			$error_id = \esc_attr( $field_name . '_error' );
-			echo '<li>';
-			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
-			echo '<label for="' . \esc_attr( $error_id ) . '">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
+			echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
 
 			// Warning option.
 			$warning_id = \esc_attr( $field_name . '_warning' );
-			echo '<li>';
-			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
-			echo '<label for="' . \esc_attr( $warning_id ) . '">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
+			echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
 
 			// None option.
 			$none_id = \esc_attr( $field_name . '_none' );
-			echo '<li>';
-			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
-			echo '<label for="' . \esc_attr( $none_id ) . '">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
+			echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
 
-			echo '</ul>';
-			echo '</fieldset>';
+			echo '</div>';
+			echo '</div>';
 			echo '</div>';
 		}
 	}
 
 	/**
-	 * Renders the core heading options for the settings page.
+	 * Extract plugin information from block type
 	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the core heading options in the plugin's settings page.
-	 *
-	 * @return void
+	 * @param string $block_type The block type (e.g., 'create-block/my-testimonial-block').
+	 * @return array Plugin information with name and slug
 	 */
-	public function render_core_heading_options() {
-		$options        = get_option( 'block_checks_options' );
-		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+	private function extract_plugin_info_from_block_type( string $block_type ): array {
+		$parts      = explode( '/', $block_type );
+		$namespace  = $parts[0] ?? '';
+		$block_name = $parts[1] ?? '';
 
-		echo '<ul class="block-check-checkbox-options">';
-		for ( $i = 1; $i <= 6; $i++ ) {
-			$level   = 'h' . $i;
-			$checked = in_array( $level, $heading_levels, true ) ? 'checked' : '';
-			echo '<li>';
-			echo '<input type="checkbox" 
-						 id="' . esc_attr( 'heading-level-' . $i ) . '" 
-						 name="block_checks_options[core_heading_levels][]" 
-						 value="' . esc_attr( $level ) . '" 
-						 ' . esc_attr( $checked ) . '>';
-			echo '<label for="' . esc_attr( 'heading-level-' . $i ) . '">' . esc_html( strtoupper( $level ) ) . '</label>';
-			echo '</li>';
-		}
-		echo '</ul>';
+		// Convert namespace to readable name.
+		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
+
+		// Create a unique slug for the plugin by combining namespace and block name.
+		// This ensures different plugins with the same namespace get different slugs.
+		$plugin_slug = sanitize_title( $namespace . '-' . $block_name );
+
+		return array(
+			'name' => $plugin_name,
+			'slug' => $plugin_slug,
+		);
 	}
 
 	/**
-	 * Sanitizes the plugin options before saving to the database.
+	 * Get display name for a block type
 	 *
-	 * This method validates and sanitizes all incoming option data to prevent
-	 * XSS attacks and ensure data integrity.
-	 *
-	 * @param mixed $input The input array from the settings form.
-	 *
-	 * @return array The sanitized options array.
+	 * @param string $block_type The block type.
+	 * @return string The display name.
 	 */
-	public function sanitize_options( $input ): array {
-		try {
-			$sanitized = array();
+	private function get_block_display_name( string $block_type ): string {
+		$parts      = explode( '/', $block_type );
+		$block_name = $parts[1] ?? $block_type;
 
-			if ( ! is_array( $input ) ) {
-				$this->log_error( 'Settings input is not an array. Returning empty array.' );
-				return $sanitized;
-			}
-
-			$this->log_debug( 'Starting sanitization of plugin options.' );
-
-			// Sanitize individual core block check options (error, warning, none).
-			$valid_check_values = array( 'error', 'warning', 'none' );
-
-			foreach ( $input as $key => $value ) {
-				// Handle heading levels array.
-				if ( 'core_heading_levels' === $key ) {
-					if ( is_array( $value ) ) {
-						$sanitized['core_heading_levels'] = array();
-						$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
-
-						foreach ( $value as $level ) {
-							if ( in_array( $level, $valid_levels, true ) ) {
-								$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
-								$this->log_debug( "Added heading level: {$level}" );
-							} else {
-								$this->log_error( "Invalid heading level: {$level}. Skipping." );
-							}
-						}
-
-						$this->log_debug( 'Completed heading levels sanitization.' );
-					} else {
-						$this->log_error( 'Heading levels input is not an array. Skipping.' );
-					}
-				} elseif ( 'core_heading_levels' !== $key ) {
-					// Handle individual check settings.
-					if ( in_array( $value, $valid_check_values, true ) ) {
-						$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
-						$this->log_debug( "Sanitized {$key}: {$value}" );
-					} else {
-						$this->log_error( "Invalid value for {$key}: {$value}. Skipping." );
-					}
-				}
-			}
-
-			$this->log_debug( 'Settings sanitization completed successfully.' );
-			return $sanitized;
-
-		} catch ( \Exception $e ) {
-			$this->log_error( 'Error during settings sanitization: ' . $e->getMessage() );
-			return array();
-		}
+		// Convert kebab-case to title case.
+		return ucwords( str_replace( array( '-', '_' ), ' ', $block_name ) );
 	}
 
 	/**
@@ -511,212 +701,9 @@ class SettingsPage {
 	 * @return void
 	 */
 	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\error_log( 'Block Accessibility Checks - SettingsPage DEBUG: ' . $message );
 		}
-	}
-
-	/**
-	 * Get display name for a block type
-	 *
-	 * @param string $block_type The block type.
-	 * @return string The display name.
-	 */
-	private function get_block_display_name( string $block_type ): string {
-		$parts      = explode( '/', $block_type );
-		$block_name = $parts[1] ?? $block_type;
-
-		// Convert kebab-case to title case.
-		return ucwords( str_replace( array( '-', '_' ), ' ', $block_name ) );
-	}
-
-	/**
-	 * Generate a user-friendly label for a check based on its configuration
-	 *
-	 * @param string $check_name The name of the check.
-	 * @param array  $check_config The check configuration array.
-	 * @return string The generated label.
-	 */
-	private function generate_check_label( string $check_name, array $check_config ): string {
-		// If both category and description are set, combine them.
-		if ( ! empty( $check_config['category'] ) && ! empty( $check_config['description'] ) ) {
-			$category = ucwords( str_replace( array( '-', '_' ), ' ', $check_config['category'] ) );
-
-			// For accessibility category, add "check" suffix. For validation, use as-is.
-			if ( strtolower( $check_config['category'] ) === 'accessibility' ) {
-				return $check_config['description'] . ' (' . $category . ' check)';
-			}
-
-			return $check_config['description'] . ' (' . $category . ' check)';
-		}
-
-		// If only category is set, use it to generate a label.
-		if ( ! empty( $check_config['category'] ) ) {
-			$category = ucwords( str_replace( array( '-', '_' ), ' ', $check_config['category'] ) );
-
-			// For accessibility category, add "check" suffix. For validation, use as-is.
-			if ( strtolower( $check_config['category'] ) === 'accessibility' ) {
-				return $category . ' check';
-			}
-
-			return $category;
-		}
-
-		// If only description is set, use it.
-		if ( ! empty( $check_config['description'] ) ) {
-			return $check_config['description'];
-		}
-
-		// Fallback to error message if available.
-		if ( ! empty( $check_config['error_msg'] ) ) {
-			return $check_config['error_msg'];
-		}
-
-		// Final fallback to check name.
-		return ucwords( str_replace( array( '-', '_' ), ' ', $check_name ) );
-	}
-
-	/**
-	 * Render external plugin settings page
-	 *
-	 * @return void
-	 */
-	public function external_plugin_settings_page(): void {
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
-		}
-
-		// Get current page slug to determine which plugin.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is an admin page callback, nonce verification not required for page parameter.
-		$current_page = \sanitize_text_field( \wp_unslash( $_GET['page'] ?? '' ) );
-		$plugin_slug  = str_replace( 'block-a11y-checks-', '', $current_page );
-
-		$external_plugins = $this->get_external_plugins_with_settings();
-		$plugin_data      = $external_plugins[ $plugin_slug ] ?? null;
-
-		if ( ! $plugin_data ) {
-			\wp_die( \esc_html__( 'Plugin settings not found.', 'block-accessibility-checks' ) );
-		}
-
-		$option_group = 'block_checks_external_' . $plugin_slug . '_group';
-		$option_name  = 'block_checks_external_' . $plugin_slug;
-
-		echo '<div class="block-a11y-checks-settings">' . "\n";
-		echo '<h1>' . \esc_html( $plugin_data['name'] ) . '</h1>' . "\n";
-
-		// Display plugin version if available.
-		if ( ! empty( $plugin_data['version'] ) ) {
-			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $plugin_data['version'] ) . '</p>' . "\n";
-		}
-
-		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="block-a11y-checks-settings-grid">';
-
-		\settings_fields( $option_group );
-
-		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
-			$block_name = $this->get_block_display_name( $block_type );
-			echo '<div class="block-a11y-checks-settings-field">';
-			echo '<h2>' . \esc_html( $block_name ) . '</h2>';
-			echo '<p>' . \esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
-
-			$this->render_external_block_options(
-				array(
-					'block_type'  => $block_type,
-					'plugin_slug' => $plugin_slug,
-					'checks'      => $checks,
-				)
-			);
-
-			echo '</div>';
-		}
-
-		echo '</div>';
-		\submit_button();
-		echo '</form>' . "\n";
-		echo '</div>' . "\n";
-	}
-
-	/**
-	 * Render external block options
-	 *
-	 * @param array $args Arguments containing block_type, plugin_slug, and checks.
-	 * @return void
-	 */
-	public function render_external_block_options( array $args ): void {
-		$block_type  = $args['block_type'] ?? '';
-		$plugin_slug = $args['plugin_slug'] ?? '';
-		$checks      = $args['checks'] ?? array();
-
-		$option_name = 'block_checks_external_' . $plugin_slug;
-		$options     = \get_option( $option_name, array() );
-
-		foreach ( $checks as $check_name => $check_config ) {
-			// Only show checks that are using settings (not forced).
-			if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
-				continue;
-			}
-
-			$field_name = $block_type . '_' . $check_name;
-			$value      = $options[ $field_name ] ?? 'error';
-
-			// Generate a user-friendly label for the check.
-			$desc = $this->generate_check_label( $check_name, $check_config );
-
-			echo '<div class="block-check-item">';
-			echo '<fieldset>';
-			echo '<legend><strong>' . \esc_html( $desc ) . '</strong></legend>';
-
-			echo '<ul class="block-check-radio-options">';
-
-			// Error option.
-			$error_id = \esc_attr( $field_name . '_error' );
-			echo '<li>';
-			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
-			echo '<label for="' . \esc_attr( $error_id ) . '">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
-
-			// Warning option.
-			$warning_id = \esc_attr( $field_name . '_warning' );
-			echo '<li>';
-			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
-			echo '<label for="' . \esc_attr( $warning_id ) . '">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
-
-			// None option.
-			$none_id = \esc_attr( $field_name . '_none' );
-			echo '<li>';
-			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
-			echo '<label for="' . \esc_attr( $none_id ) . '">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
-
-			echo '</ul>';
-			echo '</fieldset>';
-			echo '</div>';
-		}
-	}
-
-	/**
-	 * Sanitize external plugin options
-	 *
-	 * @param mixed $input The input array from the settings form.
-	 * @return array The sanitized options array.
-	 */
-	public function sanitize_external_options( $input ): array {
-		$sanitized    = array();
-		$valid_values = array( 'error', 'warning', 'none' );
-
-		if ( ! is_array( $input ) ) {
-			return $sanitized;
-		}
-
-		foreach ( $input as $key => $value ) {
-			if ( in_array( $value, $valid_values, true ) ) {
-				$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
-			}
-		}
-
-		return $sanitized;
 	}
 }
