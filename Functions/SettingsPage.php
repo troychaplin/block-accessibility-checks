@@ -291,6 +291,7 @@ class SettingsPage {
 		}
 
 		echo '<div class="block-a11y-checks-settings">' . "\n";
+		echo '<div class="block-a11y-checks-settings-container">' . "\n";
 		echo '<h1>' . esc_html( get_admin_page_title() ) . '</h1>' . "\n";
 		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
 		echo '<div class="block-a11y-checks-settings-grid">';
@@ -312,6 +313,7 @@ class SettingsPage {
 		echo '</div>';
 		submit_button();
 		echo '</form>' . "\n";
+		echo '</div>' . "\n";
 		echo '</div>' . "\n";
 	}
 
