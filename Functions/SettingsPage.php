@@ -605,6 +605,7 @@ class SettingsPage {
 		$option_name  = 'block_checks_external_' . $plugin_slug;
 
 		echo '<div class="block-a11y-checks-settings">' . "\n";
+		echo '<div class="block-a11y-checks-settings-container">' . "\n";
 		echo '<h1>' . \esc_html( $plugin_data['name'] ) . '</h1>' . "\n";
 
 		// Display plugin version if available.
@@ -637,6 +638,7 @@ class SettingsPage {
 		echo '</div>';
 		\submit_button();
 		echo '</form>' . "\n";
+		echo '</div>' . "\n";
 		echo '</div>' . "\n";
 	}
 

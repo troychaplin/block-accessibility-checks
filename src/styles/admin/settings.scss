@@ -1,7 +1,7 @@
 .block-a11y-checks-settings {
     background-color: #1d2327;
     margin: 0 0 0 -20px;
-    padding: 1px 0;
+    padding: 15px 15px 0 0;
 }
 
 .block-a11y-checks-settings-container {
@@ -10,6 +10,15 @@
     padding: 20px 40px;
 }
 
-// body.toplevel_page_block-a11y-checks {
-//     background-color: #000000;
-// }
+body.toplevel_page_block-a11y-checks,
+body[class*="block-checks_page_block-a11y-checks-"] {
+    background-color: #1d2327;
+
+    #wpfooter {
+        color: #a3a3a3;
+
+        a {
+            color: #fff;
+        }
+    }
+}
