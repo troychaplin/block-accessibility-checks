@@ -90,6 +90,16 @@ class SettingsPage {
 
 		// Add external plugin submenus.
 		$this->add_external_plugin_menus();
+
+		// Add temporary design submenu for development.
+		\add_submenu_page(
+			'block-a11y-checks',
+			\esc_html__( 'Design Preview', 'block-accessibility-checks' ),
+			\esc_html__( 'Design Preview', 'block-accessibility-checks' ),
+			'manage_options',
+			'block-a11y-checks-design',
+			array( new SettingsHardcoded(), 'design_preview_page' )
+		);
 	}
 
 	/**
@@ -296,8 +306,8 @@ class SettingsPage {
 			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
 		}
 
-		echo '<div class="block-a11y-checks-settings">' . "\n";
-		echo '<div class="block-a11y-checks-settings-container">' . "\n";
+		echo '<div class="ba11y-settings">' . "\n";
+		echo '<div class="ba11y-settings-container">' . "\n";
 		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
 		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
 
@@ -308,8 +318,8 @@ class SettingsPage {
 			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $version ) . '</p>' . "\n";
 		}
 
-		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="block-a11y-checks-settings-grid">';
+		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
+		echo '<div class="ba11y-settings-grid">';
 
 		\settings_fields( $option_group );
 
@@ -354,7 +364,7 @@ class SettingsPage {
 
 		// Render heading levels (special case).
 		foreach ( $this->block_settings as $block ) {
-			echo '<div class="block-a11y-checks-settings-field">';
+			echo '<div class="ba11y-settings-field">';
 			echo '<h3>' . \esc_html( $block['block_label'] ) . '</h3>';
 			echo '<p>' . \esc_html( $block['description'] ) . '</p>';
 			call_user_func( array( $this, $block['function_name'] ) );
@@ -381,7 +391,7 @@ class SettingsPage {
 				continue;
 			}
 
-			echo '<div class="block-a11y-checks-settings-field">';
+			echo '<div class="ba11y-settings-field">';
 			echo '<h3>' . esc_html( $block_label ) . '</h3>';
 			echo '<p>' . esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
 
@@ -669,7 +679,7 @@ class SettingsPage {
 
 		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
 			$block_name = $this->get_block_display_name( $block_type );
-			echo '<div class="block-a11y-checks-settings-field">';
+			echo '<div class="ba11y-settings-field">';
 			echo '<h3>' . \esc_html( $block_name ) . '</h3>';
 			echo '<p>' . \esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
 
