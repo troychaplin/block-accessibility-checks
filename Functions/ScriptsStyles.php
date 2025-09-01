@@ -54,6 +54,11 @@ class ScriptsStyles {
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
+		// Only run in post editor, not site editor.
+		if ( ! function_exists( '\get_current_screen' ) || ! \get_current_screen() || \get_current_screen()->id !== 'post' ) {
+			return;
+		}
+
 		$script_handle = 'block-accessibility-script';
 		$this->translations->setup_script_translations( $script_handle );
 
@@ -92,7 +97,7 @@ class ScriptsStyles {
 		wp_enqueue_script(
 			$script_handle,
 			plugins_url( $script_path, $this->plugin_file ),
-			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ),
+			array( 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-data', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-plugins' ),
 			BA11YC_VERSION,
 			true
 		);

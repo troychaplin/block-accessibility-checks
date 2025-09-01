@@ -8,6 +8,9 @@ import { useEffect } from '@wordpress/element';
  * @return {null} Returns null.
  */
 export function BlockInvalidation() {
+	// Check if we're in the post editor context.
+	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
+
 	const invalidBlocks = GetInvalidBlocks();
 
 	const {
@@ -20,6 +23,11 @@ export function BlockInvalidation() {
 	} = useDispatch('core/editor');
 
 	useEffect(() => {
+		// Only run if we're in the post editor context.
+		if (!isPostEditor) {
+			return;
+		}
+
 		const hasErrors = invalidBlocks.some(block => block.mode === 'error');
 
 		if (hasErrors) {
@@ -39,6 +47,7 @@ export function BlockInvalidation() {
 		lockPostSaving,
 		unlockPostAutosaving,
 		unlockPostSaving,
+		isPostEditor,
 	]);
 
 	return null;
