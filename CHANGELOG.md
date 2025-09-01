@@ -30,6 +30,9 @@ Prefix the change with one of these keywords:
 - **Modern Sass syntax**: Migrated from deprecated `@import` to `@use` statements for better performance and maintainability
 - **Enhanced settings page labels**: Improved user-friendly labels for accessibility checks in the settings page with category-based descriptions
 - **Refined inspector panel layout**: Better visual organization of accessibility and validation messages with clear sub-headings
+- **Advanced external plugin detection**: New automatic plugin detection system that identifies external plugins by analyzing their file structure and plugin headers
+- **Plugin information caching**: Performance optimization with intelligent caching of plugin metadata to avoid repeated file system operations
+- **Enhanced settings page organization**: External plugins now display with their actual names, versions, and unique slugs for proper separation
 
 ### Changed
 
@@ -40,6 +43,8 @@ Prefix the change with one of these keywords:
 - **Default check categorization**: Core button checks now categorized as "validation", image and table checks as "accessibility"
 - **Inspector panel title**: Updated panel title from "Accessibility Check" to "Accessibility & Validation" for better clarity
 - **Settings page interface**: Enhanced check label generation to provide more descriptive and user-friendly names
+- **External plugin settings grouping**: Improved logic to properly separate external plugins based on actual plugin metadata rather than namespace-derived names
+- **Plugin slug generation**: Enhanced to use actual plugin directory names and names for unique identification, preventing conflicts between plugins with similar namespaces
 
 ### Fixed
 
@@ -47,6 +52,9 @@ Prefix the change with one of these keywords:
 - **UI structure issues**: Fixed conditional rendering logic for error and warning panels
 - **Data flow consistency**: Ensured category information properly flows from PHP registry to JavaScript validation
 - **README documentation errors**: Fixed various documentation issues and improved clarity
+- **External plugin grouping issues**: Fixed problem where multiple external plugins were incorrectly grouped together in the same settings page
+- **Plugin name display**: Resolved issue where external plugins displayed derived names instead of actual plugin names
+- **Settings page slug conflicts**: Fixed potential conflicts when multiple plugins use similar namespaces by implementing unique slug generation
 
 ## [2.0.0]
 
