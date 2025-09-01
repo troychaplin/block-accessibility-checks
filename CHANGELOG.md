@@ -33,6 +33,7 @@ Prefix the change with one of these keywords:
 - **Advanced external plugin detection**: New automatic plugin detection system that identifies external plugins by analyzing their file structure and plugin headers
 - **Plugin information caching**: Performance optimization with intelligent caching of plugin metadata to avoid repeated file system operations
 - **Enhanced settings page organization**: External plugins now display with their actual names, versions, and unique slugs for proper separation
+- **Consolidated documentation**: Merged duplicate integration guides into a single comprehensive external integration document
 
 ### Changed
 
