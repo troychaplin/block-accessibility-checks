@@ -16,13 +16,6 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
-### Fixed
-
-- **Site editor compatibility**: Fixed issue where the plugin would prevent the WordPress site editor from loading by implementing proper editor context detection
-- **Post type compatibility**: Resolved issue where accessibility checks only worked on 'post' post type by using proper screen detection instead of restrictive post type checking
-- **Security compliance**: Fixed PHPCS security warning by using WordPress's built-in `get_current_screen()` function instead of directly accessing `$_GET` parameters
-- **Editor context detection**: Improved JavaScript editor detection to properly distinguish between post editor and site editor contexts using WordPress data stores
-
 ### Added
 
 - **Issue categorization system**: New `category` field in check registration to distinguish between "accessibility" and "validation" issues
@@ -41,6 +34,9 @@ Prefix the change with one of these keywords:
 - **Plugin information caching**: Performance optimization with intelligent caching of plugin metadata to avoid repeated file system operations
 - **Enhanced settings page organization**: External plugins now display with their actual names, versions, and unique slugs for proper separation
 - **Consolidated documentation**: Merged duplicate integration guides into a single comprehensive external integration document
+- **Settings page redesign**: Complete overhaul of the admin settings interface with modern, accessible design and improved user experience
+- **Unified settings page layout**: New shared rendering system that eliminates code duplication and provides consistent layout across all settings pages
+- **Enhanced form controls**: Improved radio button and checkbox styling with semantic CSS classes for better accessibility and visual consistency
 
 ### Changed
 
@@ -53,6 +49,9 @@ Prefix the change with one of these keywords:
 - **Settings page interface**: Enhanced check label generation to provide more descriptive and user-friendly names
 - **External plugin settings grouping**: Improved logic to properly separate external plugins based on actual plugin metadata rather than namespace-derived names
 - **Plugin slug generation**: Enhanced to use actual plugin directory names and names for unique identification, preventing conflicts between plugins with similar namespaces
+- **Settings page architecture**: Refactored SettingsPage class with logical function organization and improved code maintainability
+- **Form rendering system**: Consolidated duplicate radio button rendering logic into shared methods, reducing code duplication by ~50 lines
+- **HTML structure**: Updated settings page markup to use semantic HTML elements and improved accessibility attributes
 
 ### Fixed
 
@@ -63,6 +62,12 @@ Prefix the change with one of these keywords:
 - **External plugin grouping issues**: Fixed problem where multiple external plugins were incorrectly grouped together in the same settings page
 - **Plugin name display**: Resolved issue where external plugins displayed derived names instead of actual plugin names
 - **Settings page slug conflicts**: Fixed potential conflicts when multiple plugins use similar namespaces by implementing unique slug generation
+- **Code duplication**: Eliminated redundant rendering methods and consolidated shared functionality for better maintainability
+- **Site editor compatibility**: Fixed issue where the plugin would prevent the WordPress site editor from loading by implementing proper editor context detection
+- **Post type compatibility**: Resolved issue where accessibility checks only worked on 'post' post type by using proper screen detection instead of restrictive post type checking
+- **Security compliance**: Fixed PHPCS security warning by using WordPress's built-in `get_current_screen()` function instead of directly accessing `$_GET` parameters
+- **Editor context detection**: Improved JavaScript editor detection to properly distinguish between post editor and site editor contexts using WordPress data stores
+- **Settings page checkbox state**: Fixed issue where heading level checkboxes were not properly displaying checked state due to malformed HTML attribute construction
 
 ## [2.0.0]
 
