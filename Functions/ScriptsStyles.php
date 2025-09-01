@@ -55,7 +55,9 @@ class ScriptsStyles {
 	 */
 	public function enqueue_block_assets() {
 		// Only run in post editor, not site editor.
-		if ( ! function_exists( '\get_current_screen' ) || ! \get_current_screen() || \get_current_screen()->id !== 'post' ) {
+		// Check if we're in the site editor by checking the current screen.
+		$current_screen = \get_current_screen();
+		if ( $current_screen && 'appearance_page_gutenberg-edit-site' === $current_screen->id ) {
 			return;
 		}
 
