@@ -25,6 +25,20 @@ class BlockChecksRegistry {
 	private $checks = array();
 
 	/**
+	 * Plugin information for each block type
+	 *
+	 * @var array
+	 */
+	private $plugin_info = array();
+
+	/**
+	 * Plugin information cache to avoid re-detection
+	 *
+	 * @var array
+	 */
+	private $plugin_info_cache = array();
+
+	/**
 	 * Registry instance
 	 *
 	 * @var BlockChecksRegistry|null
@@ -159,9 +173,10 @@ class BlockChecksRegistry {
 	 * @param string $block_type Block type (e.g., 'core/image').
 	 * @param string $check_name Unique check name.
 	 * @param array  $check_args Check configuration.
+	 * @param array  $plugin_info Optional plugin information (e.g., ['name' => 'Plugin Name', 'slug' => 'plugin-slug']).
 	 * @return bool True on success, false on failure.
 	 */
-	public function register_check( string $block_type, string $check_name, array $check_args ): bool {
+	public function register_check( string $block_type, string $check_name, array $check_args, array $plugin_info = array() ): bool {
 		try {
 			// Validate input parameters.
 			if ( empty( $block_type ) || ! is_string( $block_type ) ) {
@@ -176,6 +191,11 @@ class BlockChecksRegistry {
 
 			if ( ! is_array( $check_args ) ) {
 				$this->log_error( "Check arguments must be an array for {$block_type}/{$check_name}" );
+				return false;
+			}
+
+			if ( ! is_array( $plugin_info ) ) {
+				$this->log_error( "Plugin info must be an array for {$block_type}/{$check_name}" );
 				return false;
 			}
 
@@ -244,6 +264,9 @@ class BlockChecksRegistry {
 			// Store the check.
 			$this->checks[ $block_type ][ $check_name ] = $check_args;
 
+			// Store plugin info.
+			$this->plugin_info[ $block_type ] = $plugin_info;
+
 			// Sort checks by priority.
 			\uasort( $this->checks[ $block_type ], array( $this, 'sort_checks_by_priority' ) );
 
@@ -272,6 +295,7 @@ class BlockChecksRegistry {
 		}
 
 		unset( $this->checks[ $block_type ][ $check_name ] );
+		unset( $this->plugin_info[ $block_type ] );
 
 		// Action hook for developers to know when a check is unregistered.
 		\do_action( 'ba11yc_check_unregistered', $block_type, $check_name );
@@ -521,6 +545,170 @@ class BlockChecksRegistry {
 		$field_name = $block_type . '_' . $check_name;
 
 		return $options[ $field_name ] ?? 'error';
+	}
+
+	/**
+	 * Get plugin information for a block type
+	 *
+	 * @param string $block_type The block type.
+	 * @return array Plugin information array.
+	 */
+	public function get_plugin_info( string $block_type ): array {
+		return $this->plugin_info[ $block_type ] ?? array();
+	}
+
+	/**
+	 * Get all plugin information
+	 *
+	 * @return array All plugin information indexed by block type.
+	 */
+	public function get_all_plugin_info(): array {
+		return $this->plugin_info;
+	}
+
+	/**
+	 * Get debug information for plugin detection
+	 *
+	 * @return array Debug information.
+	 */
+	public function get_debug_info(): array {
+		return array(
+			'plugin_info'       => $this->plugin_info,
+			'plugin_info_cache' => $this->plugin_info_cache,
+			'checks'            => array_keys( $this->checks ),
+		);
+	}
+
+	/**
+	 * Register a check with automatic plugin detection
+	 *
+	 * @param string $block_type Block type (e.g., 'core/image').
+	 * @param string $check_name Unique check name.
+	 * @param array  $check_args Check configuration.
+	 * @return bool True on success, false on failure.
+	 */
+	public function register_check_with_plugin_detection( string $block_type, string $check_name, array $check_args ): bool {
+		// Automatically detect plugin information.
+		$plugin_info = $this->detect_plugin_info();
+
+		return $this->register_check( $block_type, $check_name, $check_args, $plugin_info );
+	}
+
+	/**
+	 * Detect plugin information from the current context
+	 *
+	 * @return array Plugin information array.
+	 */
+	private function detect_plugin_info(): array {
+		// Get the calling file to determine which plugin is registering the check.
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
+		$backtrace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 10 );
+
+		foreach ( $backtrace as $trace ) {
+			if ( isset( $trace['file'] ) && strpos( $trace['file'], WP_PLUGIN_DIR ) === 0 ) {
+				$plugin_file = $trace['file'];
+
+				// Skip if this is the Block Accessibility Checks plugin itself.
+				if ( strpos( $plugin_file, 'block-accessibility-checks' ) !== false ) {
+					continue;
+				}
+
+				// Find the main plugin file.
+				$plugin_file = $this->find_main_plugin_file( $plugin_file );
+
+				if ( $plugin_file ) {
+					// Check if we already have this plugin info cached.
+					if ( isset( $this->plugin_info_cache[ $plugin_file ] ) ) {
+						return $this->plugin_info_cache[ $plugin_file ];
+					}
+
+					// Get plugin data and cache it.
+					if ( function_exists( 'get_plugin_data' ) ) {
+						$plugin_data = \get_plugin_data( $plugin_file );
+
+						$plugin_info = array(
+							'name'    => $plugin_data['Name'] ?? '',
+							'version' => $plugin_data['Version'] ?? '',
+							'file'    => $plugin_file,
+							'slug'    => \sanitize_title( $plugin_data['Name'] ?? '' ),
+						);
+
+						// Cache the plugin info.
+						$this->plugin_info_cache[ $plugin_file ] = $plugin_info;
+
+						return $plugin_info;
+					}
+				}
+			}
+		}
+
+		// Return empty plugin info if detection fails.
+		return array(
+			'name'    => '',
+			'version' => '',
+			'file'    => '',
+			'slug'    => '',
+		);
+	}
+
+	/**
+	 * Find the main plugin file from a given file path
+	 *
+	 * @param string $file_path The file path to start from.
+	 * @return string|false The main plugin file path or false if not found.
+	 */
+	private function find_main_plugin_file( string $file_path ): string|false {
+		$dir = dirname( $file_path );
+
+		// Look for plugin files in the directory.
+		$plugin_files = glob( $dir . '/*.php' );
+
+		foreach ( $plugin_files as $plugin_file ) {
+			if ( function_exists( 'get_plugin_data' ) ) {
+				$plugin_data = \get_plugin_data( $plugin_file );
+				if ( ! empty( $plugin_data['Name'] ) ) {
+					return $plugin_file;
+				}
+			}
+		}
+
+		// If not found in current directory, try parent directory.
+		$parent_dir = dirname( $dir );
+		if ( $parent_dir !== $dir && strpos( $parent_dir, WP_PLUGIN_DIR ) === 0 ) {
+			// Look for any PHP file with a Plugin Name header in the parent directory.
+			$parent_plugin_files = glob( $parent_dir . '/*.php' );
+
+			foreach ( $parent_plugin_files as $parent_plugin_file ) {
+				if ( function_exists( 'get_plugin_data' ) ) {
+					$plugin_data = \get_plugin_data( $parent_plugin_file );
+					if ( ! empty( $plugin_data['Name'] ) ) {
+						return $parent_plugin_file;
+					}
+				}
+			}
+		}
+
+		// If still not found, try searching up the directory tree until we reach WP_PLUGIN_DIR.
+		$current_dir = $dir;
+		while ( WP_PLUGIN_DIR !== $current_dir && strpos( $current_dir, WP_PLUGIN_DIR ) === 0 ) {
+			$current_dir = dirname( $current_dir );
+			if ( $current_dir === $dir ) {
+				break; // Prevent infinite loop.
+			}
+
+			$plugin_files = glob( $current_dir . '/*.php' );
+
+			foreach ( $plugin_files as $plugin_file ) {
+				if ( function_exists( 'get_plugin_data' ) ) {
+					$plugin_data = \get_plugin_data( $plugin_file );
+					if ( ! empty( $plugin_data['Name'] ) ) {
+						return $plugin_file;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
