@@ -73,6 +73,11 @@ body[class*="block-checks_page_block-a11y-checks-"] {
         position: relative;
         z-index: 1;
     }
+
+    .plugin-version {
+        font-style: italic;
+        margin-top: 4px;
+    }
 }
 
 // Form styles and field layouts
@@ -162,6 +167,31 @@ body[class*="block-checks_page_block-a11y-checks-"] {
         input[type="radio"]:focus + label.ba11y-button {
             outline: 2px solid var(--a11y-blue);
             outline-offset: 2px;
+        }
+        
+        // Checkbox group styles
+        .ba11y-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            
+            .ba11y-checkbox-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                
+                input[type="checkbox"] {
+                    margin: 0;
+                }
+                
+                label {
+                    margin: 0;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    color: #374151;
+                    cursor: pointer;
+                }
+            }
         }
     }
 }

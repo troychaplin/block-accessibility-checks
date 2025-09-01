@@ -91,15 +91,17 @@ class SettingsPage {
 		// Add external plugin submenus.
 		$this->add_external_plugin_menus();
 
+		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		// Add temporary design submenu for development.
-		\add_submenu_page(
-			'block-a11y-checks',
-			\esc_html__( 'Design Preview', 'block-accessibility-checks' ),
-			\esc_html__( 'Design Preview', 'block-accessibility-checks' ),
-			'manage_options',
-			'block-a11y-checks-design',
-			array( new SettingsHardcoded(), 'design_preview_page' )
-		);
+		// \add_submenu_page(
+		// 'block-a11y-checks',
+		// \esc_html__( 'Design Preview', 'block-accessibility-checks' ),
+		// \esc_html__( 'Design Preview', 'block-accessibility-checks' ),
+		// 'manage_options',
+		// 'block-a11y-checks-design',
+		// array( new SettingsHardcoded(), 'design_preview_page' )
+		// );
+		// end design preview.
 	}
 
 	/**
@@ -308,18 +310,22 @@ class SettingsPage {
 
 		echo '<div class="ba11y-settings">' . "\n";
 		echo '<div class="ba11y-settings-container">' . "\n";
+
+		echo '<header class="ba11y-settings-header">' . "\n";
 		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
 		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
+		echo '</header>' . "\n";
 
+		echo '<section class="ba11y-settings-section">' . "\n";
+		echo '<div class="ba11y-settings-section-title">' . "\n";
 		echo '<h2>' . \esc_html( $title ) . '</h2>' . "\n";
-
 		// Display plugin version if available.
 		if ( ! empty( $version ) ) {
 			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $version ) . '</p>' . "\n";
 		}
+		echo '</div>' . "\n";
 
 		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="ba11y-settings-grid">';
 
 		\settings_fields( $option_group );
 
@@ -332,9 +338,9 @@ class SettingsPage {
 			}
 		}
 
-		echo '</div>';
 		\submit_button();
 		echo '</form>' . "\n";
+		echo '</section>' . "\n";
 		echo '</div>' . "\n";
 		echo '</div>' . "\n";
 	}
@@ -364,11 +370,11 @@ class SettingsPage {
 
 		// Render heading levels (special case).
 		foreach ( $this->block_settings as $block ) {
-			echo '<div class="ba11y-settings-field">';
-			echo '<h3>' . \esc_html( $block['block_label'] ) . '</h3>';
+			echo '<article class="ba11y-settings-field ba11y-settings-field-core-heading">';
+			echo '<h2>' . \esc_html( $block['block_label'] ) . '</h2>';
 			echo '<p>' . \esc_html( $block['description'] ) . '</p>';
 			call_user_func( array( $this, $block['function_name'] ) );
-			echo '</div>';
+			echo '</article>';
 		}
 	}
 
@@ -391,13 +397,13 @@ class SettingsPage {
 				continue;
 			}
 
-			echo '<div class="ba11y-settings-field">';
-			echo '<h3>' . esc_html( $block_label ) . '</h3>';
-			echo '<p>' . esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
+			$block_slug = str_replace( '/', '-', $block_type );
+			echo '<article class="ba11y-settings-field ba11y-settings-field-' . \esc_attr( $block_slug ) . '">';
+			echo '<h2>' . \esc_html( $block_label ) . '</h2>';
 
 			$this->render_core_block_options( $block_type, $checks );
 
-			echo '</div>';
+			echo '</article>';
 		}
 	}
 
@@ -421,37 +427,33 @@ class SettingsPage {
 			$value      = $options[ $field_name ] ?? 'error';
 
 			// Generate a user-friendly label for the check.
-			$desc = $this->generate_check_label( $check_name, $check_config );
+			$desc     = $this->generate_check_label( $check_name, $check_config );
+			$label_id = \sanitize_title( $field_name ) . '-label';
 
-			echo '<div class="block-check-item">';
-			echo '<fieldset>';
-			echo '<legend><strong>' . \esc_html( $desc ) . '</strong></legend>';
-
-			echo '<ul class="block-check-radio-options">';
+			echo '<div class="ba11y-settings-group" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
+			echo '<div class="ba11y-group-layout">';
+			echo '<div class="ba11y-group-label">';
+			echo '<p id="' . \esc_attr( $label_id ) . '">' . \esc_html( $desc ) . '</p>';
+			echo '</div>';
+			echo '<div class="ba11y-group-controls">';
 
 			// Error option.
 			$error_id = \esc_attr( $field_name . '_error' );
-			echo '<li>';
 			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
-			echo '<label for="' . \esc_attr( $error_id ) . '">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
 
 			// Warning option.
 			$warning_id = \esc_attr( $field_name . '_warning' );
-			echo '<li>';
 			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
-			echo '<label for="' . \esc_attr( $warning_id ) . '">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
 
 			// None option.
 			$none_id = \esc_attr( $field_name . '_none' );
-			echo '<li>';
 			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="block_checks_options[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
-			echo '<label for="' . \esc_attr( $none_id ) . '">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
 
-			echo '</ul>';
-			echo '</fieldset>';
+			echo '</div>';
+			echo '</div>';
 			echo '</div>';
 		}
 	}
@@ -465,23 +467,34 @@ class SettingsPage {
 	 * @return void
 	 */
 	public function render_core_heading_options() {
-		$options        = get_option( 'block_checks_options' );
+		$options        = \get_option( 'block_checks_options' );
 		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
 
-		echo '<ul class="block-check-checkbox-options">';
+		echo '<div class="ba11y-settings-group" role="group" aria-labelledby="heading-levels-label">';
+		echo '<div class="ba11y-group-layout">';
+		echo '<div class="ba11y-group-label">';
+		echo '<p id="heading-levels-label">Select which heading levels you want to remove from the editor. Checked levels will not be available.</p>';
+		echo '</div>';
+		echo '<div class="ba11y-group-controls">';
+		echo '<div class="ba11y-checkbox-group">';
+
 		for ( $i = 1; $i <= 6; $i++ ) {
 			$level   = 'h' . $i;
 			$checked = in_array( $level, $heading_levels, true ) ? 'checked' : '';
-			echo '<li>';
+			echo '<div class="ba11y-checkbox-item">';
 			echo '<input type="checkbox" 
-						 id="' . esc_attr( 'heading-level-' . $i ) . '" 
+						 id="' . \esc_attr( 'heading-level-' . $i ) . '" 
 						 name="block_checks_options[core_heading_levels][]" 
-						 value="' . esc_attr( $level ) . '" 
-						 ' . esc_attr( $checked ) . '>';
-			echo '<label for="' . esc_attr( 'heading-level-' . $i ) . '">' . esc_html( strtoupper( $level ) ) . '</label>';
-			echo '</li>';
+						 value="' . \esc_attr( $level ) . '" 
+						 ' . \esc_attr( $checked ) . '>';
+			echo '<label for="' . \esc_attr( 'heading-level-' . $i ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
+			echo '</div>';
 		}
-		echo '</ul>';
+
+		echo '</div>';
+		echo '</div>';
+		echo '</div>';
+		echo '</div>';
 	}
 
 	/**
@@ -679,9 +692,9 @@ class SettingsPage {
 
 		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
 			$block_name = $this->get_block_display_name( $block_type );
-			echo '<div class="ba11y-settings-field">';
-			echo '<h3>' . \esc_html( $block_name ) . '</h3>';
-			echo '<p>' . \esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
+			$block_slug = str_replace( '/', '-', $block_type );
+			echo '<article class="ba11y-settings-field ba11y-settings-field-' . \esc_attr( $block_slug ) . '">';
+			echo '<h2>' . \esc_html( $block_name ) . '</h2>';
 
 			$this->render_external_block_options(
 				array(
@@ -691,7 +704,7 @@ class SettingsPage {
 				)
 			);
 
-			echo '</div>';
+			echo '</article>';
 		}
 	}
 
@@ -719,37 +732,33 @@ class SettingsPage {
 			$value      = $options[ $field_name ] ?? 'error';
 
 			// Generate a user-friendly label for the check.
-			$desc = $this->generate_check_label( $check_name, $check_config );
+			$desc     = $this->generate_check_label( $check_name, $check_config );
+			$label_id = \sanitize_title( $field_name ) . '-label';
 
-			echo '<div class="block-check-item">';
-			echo '<fieldset>';
-			echo '<legend><strong>' . \esc_html( $desc ) . '</strong></legend>';
-
-			echo '<ul class="block-check-radio-options">';
+			echo '<div class="ba11y-settings-group" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
+			echo '<div class="ba11y-group-layout">';
+			echo '<div class="ba11y-group-label">';
+			echo '<p id="' . \esc_attr( $label_id ) . '">' . \esc_html( $desc ) . '</p>';
+			echo '</div>';
+			echo '<div class="ba11y-group-controls">';
 
 			// Error option.
 			$error_id = \esc_attr( $field_name . '_error' );
-			echo '<li>';
 			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
-			echo '<label for="' . \esc_attr( $error_id ) . '">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
 
 			// Warning option.
 			$warning_id = \esc_attr( $field_name . '_warning' );
-			echo '<li>';
 			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
-			echo '<label for="' . \esc_attr( $warning_id ) . '">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
 
 			// None option.
 			$none_id = \esc_attr( $field_name . '_none' );
-			echo '<li>';
 			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
-			echo '<label for="' . \esc_attr( $none_id ) . '">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
-			echo '</li>';
+			echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
 
-			echo '</ul>';
-			echo '</fieldset>';
+			echo '</div>';
+			echo '</div>';
 			echo '</div>';
 		}
 	}
