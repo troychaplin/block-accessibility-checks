@@ -16,6 +16,13 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Fixed
+
+- **Site editor compatibility**: Fixed issue where the plugin would prevent the WordPress site editor from loading by implementing proper editor context detection
+- **Post type compatibility**: Resolved issue where accessibility checks only worked on 'post' post type by using proper screen detection instead of restrictive post type checking
+- **Security compliance**: Fixed PHPCS security warning by using WordPress's built-in `get_current_screen()` function instead of directly accessing `$_GET` parameters
+- **Editor context detection**: Improved JavaScript editor detection to properly distinguish between post editor and site editor contexts using WordPress data stores
+
 ### Added
 
 - **Issue categorization system**: New `category` field in check registration to distinguish between "accessibility" and "validation" issues
