@@ -242,11 +242,14 @@ body[class*="block-checks_page_block-a11y-checks-"] {
 }
 
 .ba11y-settings-form .button {
+    font-size: 1rem;
+    margin-top: 48px;
+    padding: 12px 24px;
     background-color: var(--a11y-blue);
     border-color: var(--a11y-blue);
     
     &:hover {
-        background-color: var(--a11y-red);
-        border-color: var(--a11y-red);
+        background-color: var(--a11y-black);
+        border-color: var(--a11y-black);
     }
 }
