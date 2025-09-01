@@ -278,43 +278,88 @@ class SettingsPage {
 	}
 
 	/**
-	 * Renders the settings page layout.
+	 * Unified settings page layout handler
 	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the settings page for the plugin.
+	 * This method provides a single point for rendering all settings pages,
+	 * reducing code duplication and making maintenance easier.
 	 *
+	 * @param string        $title Page title.
+	 * @param string        $option_group Settings option group name.
+	 * @param string        $version Optional version string.
+	 * @param callable|null $content_renderer Callback function to render page content.
+	 * @param array         $callback_args Optional arguments to pass to the content renderer.
 	 * @return void
 	 */
-	public function settings_page_layout() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
+	private function render_settings_page( string $title, string $option_group, string $version = '', ?callable $content_renderer = null, array $callback_args = array() ): void {
+		// Permission check.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
 		}
 
 		echo '<div class="block-a11y-checks-settings">' . "\n";
 		echo '<div class="block-a11y-checks-settings-container">' . "\n";
-		echo '<h1>' . esc_html( get_admin_page_title() ) . '</h1>' . "\n";
+		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
+		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
+
+		echo '<h2>' . \esc_html( $title ) . '</h2>' . "\n";
+
+		// Display plugin version if available.
+		if ( ! empty( $version ) ) {
+			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $version ) . '</p>' . "\n";
+		}
+
 		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
 		echo '<div class="block-a11y-checks-settings-grid">';
 
-		settings_fields( 'block_checks_settings_group' );
+		\settings_fields( $option_group );
 
+		// Render page-specific content.
+		if ( is_callable( $content_renderer ) ) {
+			if ( ! empty( $callback_args ) ) {
+				call_user_func_array( $content_renderer, $callback_args );
+			} else {
+				call_user_func( $content_renderer );
+			}
+		}
+
+		echo '</div>';
+		\submit_button();
+		echo '</form>' . "\n";
+		echo '</div>' . "\n";
+		echo '</div>' . "\n";
+	}
+
+	/**
+	 * Renders the settings page layout for core blocks.
+	 *
+	 * @return void
+	 */
+	public function settings_page_layout(): void {
+		$this->render_settings_page(
+			\get_admin_page_title(),
+			'block_checks_settings_group',
+			'',
+			array( $this, 'render_core_settings_content' )
+		);
+	}
+
+	/**
+	 * Render core settings content
+	 *
+	 * @return void
+	 */
+	private function render_core_settings_content(): void {
 		// Render core block checks with individual check settings.
 		$this->render_core_block_checks();
 
 		// Render heading levels (special case).
 		foreach ( $this->block_settings as $block ) {
 			echo '<div class="block-a11y-checks-settings-field">';
-			echo '<h2>' . esc_html( $block['block_label'] ) . '</h2>';
-			echo '<p>' . esc_html( $block['description'] ) . '</p>';
+			echo '<h3>' . \esc_html( $block['block_label'] ) . '</h3>';
+			echo '<p>' . \esc_html( $block['description'] ) . '</p>';
 			call_user_func( array( $this, $block['function_name'] ) );
 			echo '</div>';
 		}
-
-		echo '</div>';
-		submit_button();
-		echo '</form>' . "\n";
-		echo '</div>' . "\n";
-		echo '</div>' . "\n";
 	}
 
 	/**
@@ -337,7 +382,7 @@ class SettingsPage {
 			}
 
 			echo '<div class="block-a11y-checks-settings-field">';
-			echo '<h2>' . esc_html( $block_label ) . '</h2>';
+			echo '<h3>' . esc_html( $block_label ) . '</h3>';
 			echo '<p>' . esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
 
 			$this->render_core_block_options( $block_type, $checks );
@@ -604,24 +649,28 @@ class SettingsPage {
 		$option_group = 'block_checks_external_' . $plugin_slug . '_group';
 		$option_name  = 'block_checks_external_' . $plugin_slug;
 
-		echo '<div class="block-a11y-checks-settings">' . "\n";
-		echo '<div class="block-a11y-checks-settings-container">' . "\n";
-		echo '<h1>' . \esc_html( $plugin_data['name'] ) . '</h1>' . "\n";
+		$this->render_settings_page(
+			$plugin_data['name'],
+			$option_group,
+			$plugin_data['version'] ?? '',
+			array( $this, 'render_external_plugin_settings_content' ),
+			array( $plugin_data, $plugin_slug )
+		);
+	}
 
-		// Display plugin version if available.
-		if ( ! empty( $plugin_data['version'] ) ) {
-			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $plugin_data['version'] ) . '</p>' . "\n";
-		}
-
-		echo '<form class="block-a11y-checks-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="block-a11y-checks-settings-grid">';
-
-		\settings_fields( $option_group );
+	/**
+	 * Render external plugin settings content
+	 *
+	 * @param array  $plugin_data Plugin data array.
+	 * @param string $plugin_slug Plugin slug.
+	 * @return void
+	 */
+	private function render_external_plugin_settings_content( array $plugin_data, string $plugin_slug ): void {
 
 		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
 			$block_name = $this->get_block_display_name( $block_type );
 			echo '<div class="block-a11y-checks-settings-field">';
-			echo '<h2>' . \esc_html( $block_name ) . '</h2>';
+			echo '<h3>' . \esc_html( $block_name ) . '</h3>';
 			echo '<p>' . \esc_html__( 'Configure accessibility check levels for this block.', 'block-accessibility-checks' ) . '</p>';
 
 			$this->render_external_block_options(
@@ -634,12 +683,6 @@ class SettingsPage {
 
 			echo '</div>';
 		}
-
-		echo '</div>';
-		\submit_button();
-		echo '</form>' . "\n";
-		echo '</div>' . "\n";
-		echo '</div>' . "\n";
 	}
 
 	/**
