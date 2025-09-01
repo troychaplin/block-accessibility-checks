@@ -134,6 +134,43 @@ body[class*="block-checks_page_block-a11y-checks-"] {
         display: flex;
         gap: 0;
         flex-wrap: wrap;
+    }
+
+    .ba11y-group-controls--checkbox {
+        gap: 20px;
+
+        .ba11y-checkbox-item {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        input[type="checkbox"] {
+            margin: 0;
+            border-radius: 0;
+            border: 1px solid var(--a11y-medium-grey);
+            box-shadow: none;
+
+            &:checked {
+                background-color: var(--a11y-blue);
+                border: 1px solid var(--a11y-blue);
+            }
+
+            &:checked::before {
+                content: '';
+            }
+        }
+
+        label {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #374151;
+            cursor: pointer;
+        }
+    }
+    
+    .ba11y-group-controls--radio {
         border: 1px solid var(--a11y-blue);
         border-radius: 4px;
         overflow: hidden;
