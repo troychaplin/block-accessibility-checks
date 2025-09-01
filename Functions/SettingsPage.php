@@ -169,9 +169,9 @@ class SettingsPage {
 		$options        = \get_option( 'block_checks_options' );
 		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
 
-		echo '<div class="ba11y-settings-group" role="group" aria-labelledby="heading-levels-label">';
-		echo '<div class="ba11y-group-layout">';
-		echo '<div class="ba11y-group-controls ba11y-group-controls--checkbox">';
+		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="heading-levels-label">';
+		echo '<div class="ba11y-field-group">';
+		echo '<div class="ba11y-field-controls ba11y-field-controls--checkbox">';
 
 		for ( $i = 1; $i <= 6; $i++ ) {
 			$level   = 'h' . $i;
@@ -460,7 +460,7 @@ class SettingsPage {
 
 		// Render heading levels (special case).
 		foreach ( $this->block_settings as $block ) {
-			echo '<article class="ba11y-settings-field ba11y-settings-field-core-heading">';
+			echo '<article class="ba11y-block-options ba11y-block-options-core-heading">';
 			echo '<h2>' . \esc_html( $block['block_label'] ) . '</h2>';
 			echo '<p>' . \esc_html( $block['description'] ) . '</p>';
 			call_user_func( array( $this, $block['function_name'] ) );
@@ -488,7 +488,7 @@ class SettingsPage {
 			}
 
 			$block_slug = str_replace( '/', '-', $block_type );
-			echo '<article class="ba11y-settings-field ba11y-settings-field-' . \esc_attr( $block_slug ) . '">';
+			echo '<article class="ba11y-block-options ba11y-block-options-' . \esc_attr( $block_slug ) . '">';
 			echo '<h2>' . \esc_html( $block_label ) . '</h2>';
 
 			$this->render_core_block_options( $block_type, $checks );
@@ -520,7 +520,7 @@ class SettingsPage {
 		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
 			$block_name = $this->get_block_display_name( $block_type );
 			$block_slug = str_replace( '/', '-', $block_type );
-			echo '<article class="ba11y-settings-field ba11y-settings-field-' . \esc_attr( $block_slug ) . '">';
+			echo '<article class="ba11y-block-options ba11y-block-options-' . \esc_attr( $block_slug ) . '">';
 			echo '<h2>' . \esc_html( $block_name ) . '</h2>';
 
 			$this->render_external_block_options(
@@ -563,7 +563,7 @@ class SettingsPage {
 		echo '</header>' . "\n";
 
 		echo '<section class="ba11y-settings-section">' . "\n";
-		echo '<div class="ba11y-settings-section-title">' . "\n";
+		echo '<div class="ba11y-settings-plugin-header">' . "\n";
 		echo '<h2>' . \esc_html( $title ) . '</h2>' . "\n";
 		// Display plugin version if available.
 		if ( ! empty( $version ) ) {
@@ -615,12 +615,12 @@ class SettingsPage {
 			$desc     = $check_config['description'];
 			$label_id = \sanitize_title( $field_name ) . '-label';
 
-			echo '<div class="ba11y-settings-group" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
-			echo '<div class="ba11y-group-layout">';
-			echo '<div class="ba11y-group-label">';
+			echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
+			echo '<div class="ba11y-field-group">';
+			echo '<div class="ba11y-field-label">';
 			echo '<p id="' . \esc_attr( $label_id ) . '">' . \esc_html( $desc ) . '</p>';
 			echo '</div>';
-			echo '<div class="ba11y-group-controls ba11y-group-controls--radio">';
+			echo '<div class="ba11y-field-controls ba11y-field-controls--radio">';
 
 			// Error option.
 			$error_id = \esc_attr( $field_name . '_error' );

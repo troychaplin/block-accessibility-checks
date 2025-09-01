@@ -43,22 +43,22 @@ class SettingsHardcoded {
 				</header>
 
 				<section class="ba11y-settings-section">
-					<div class="ba11y-settings-section-title">
+					<div class="ba11y-settings-plugin-header">
 						<h2>Core Block Checks</h2>
 					</div>
 					
 					<form class="ba11y-settings-form" action="options.php" method="post">
 
 							<!-- Button Block -->
-							<article class="ba11y-settings-field ba11y-settings-field-core-button">
+							<article class="ba11y-block-options ba11y-block-options-core-button">
 								<h2>Button Block</h2>
 
-								<div class="ba11y-settings-group" role="group" aria-labelledby="button-text-label">
-									<div class="ba11y-group-layout">
-										<div class="ba11y-group-label">
+								<div class="ba11y-block-single-option" role="group" aria-labelledby="button-text-label">
+									<div class="ba11y-field-group">
+										<div class="ba11y-field-label">
 											<p id="button-text-label">Button Text Check (Accessibility check)</p>
 										</div>
-										<div class="ba11y-group-controls">
+										<div class="ba11y-field-controls">
 											<input type="radio" id="button_text_error" name="button_text_check" value="error" checked>
 											<label for="button_text_error" class="ba11y-button">Error</label>
 											
@@ -71,12 +71,12 @@ class SettingsHardcoded {
 									</div>
 								</div>
 
-								<div class="ba11y-settings-group" role="group" aria-labelledby="button-link-label">
-									<div class="ba11y-group-layout">
-										<div class="ba11y-group-label">
+								<div class="ba11y-block-single-option" role="group" aria-labelledby="button-link-label">
+									<div class="ba11y-field-group">
+										<div class="ba11y-field-label">
 											<p id="button-link-label">Button Link Validation (Validation check)</p>
 										</div>
-										<div class="ba11y-group-controls">
+										<div class="ba11y-field-controls">
 											<input type="radio" id="button_link_error" name="button_link_check" value="error">
 											<label for="button_link_error" class="ba11y-button">Error</label>
 											
@@ -91,15 +91,15 @@ class SettingsHardcoded {
 							</article>
 
 							<!-- Image Block -->
-							<article class="ba11y-settings-field ba11y-settings-field-core-image">
+							<article class="ba11y-block-options ba11y-block-options-core-image">
 								<h2>Image Block</h2>
 
-								<div class="ba11y-settings-group" role="group" aria-labelledby="alt-text-label">
-									<div class="ba11y-group-layout">
-										<div class="ba11y-group-label">
+								<div class="ba11y-block-single-option" role="group" aria-labelledby="alt-text-label">
+									<div class="ba11y-field-group">
+										<div class="ba11y-field-label">
 											<p id="alt-text-label">Alt Text Check (Accessibility check)</p>
 										</div>
-										<div class="ba11y-group-controls">
+										<div class="ba11y-field-controls">
 											<input type="radio" id="alt_text_error" name="alt_text_check" value="error" checked>
 											<label for="alt_text_error" class="ba11y-button">Error</label>
 											
@@ -112,12 +112,12 @@ class SettingsHardcoded {
 									</div>
 								</div>
 								
-								<div class="ba11y-settings-group" role="group" aria-labelledby="image-size-label">
-									<div class="ba11y-group-layout">
-										<div class="ba11y-group-label">
+								<div class="ba11y-block-single-option" role="group" aria-labelledby="image-size-label">
+									<div class="ba11y-field-group">
+										<div class="ba11y-field-label">
 											<p id="image-size-label">Image Size Validation (Validation check)</p>
 										</div>
-										<div class="ba11y-group-controls">
+										<div class="ba11y-field-controls">
 											<input type="radio" id="image_size_error" name="image_size_check" value="error">
 											<label for="image_size_error" class="ba11y-button">Error</label>
 											
@@ -132,7 +132,7 @@ class SettingsHardcoded {
 							</article>
 
 							<!-- Heading Block -->
-							<!-- <article class="ba11y-settings-field ba11y-settings-field-core-heading">
+							<!-- <article class="ba11y-block-options ba11y-block-options-core-heading">
 								<h2>Heading Block</h2>
 								<p>Select which heading levels you want to remove from the editor. Checked levels will not be available.</p>
 
