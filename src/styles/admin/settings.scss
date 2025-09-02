@@ -27,7 +27,8 @@ body[class*="block-checks_page_block-a11y-checks-"] {
 
 // Secondary settings container
 .ba11y-settings-container {
-    background-color: var(--a11y-lightest-grey);
+    // background-color: var(--a11y-lightest-grey);
+    background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -218,9 +219,9 @@ body[class*="block-checks_page_block-a11y-checks-"] {
 }
 
 .ba11y-settings-form .button {
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin-top: 48px;
-    padding: 12px 24px;
+    padding: 8px 16px;
     background-color: var(--a11y-blue);
     border-color: var(--a11y-blue);
     
