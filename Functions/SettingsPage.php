@@ -90,18 +90,6 @@ class SettingsPage {
 
 		// Add external plugin submenus.
 		$this->add_external_plugin_menus();
-
-		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
-		// Add temporary design submenu for development.
-		// \add_submenu_page(
-		// 'block-a11y-checks',
-		// \esc_html__( 'Design Preview', 'block-accessibility-checks' ),
-		// \esc_html__( 'Design Preview', 'block-accessibility-checks' ),
-		// 'manage_options',
-		// 'block-a11y-checks-design',
-		// array( new SettingsHardcoded(), 'design_preview_page' )
-		// );
-		// end design preview.
 	}
 
 	/**
@@ -296,6 +284,10 @@ class SettingsPage {
 			}
 
 			$this->log_debug( 'Settings sanitization completed successfully.' );
+
+			// Set success notice for core settings.
+			\set_transient( 'ba11yc_core_settings_saved', true, 30 );
+
 			return $sanitized;
 
 		} catch ( \Exception $e ) {
@@ -323,6 +315,9 @@ class SettingsPage {
 				$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
 			}
 		}
+
+		// Set success notice for external plugin settings.
+		\set_transient( 'ba11yc_external_settings_saved', true, 30 );
 
 		return $sanitized;
 	}
@@ -571,6 +566,9 @@ class SettingsPage {
 		}
 		echo '</div>' . "\n";
 
+		// Display success notices after plugin header.
+		$this->display_settings_notices();
+
 		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
 
 		\settings_fields( $option_group );
@@ -704,6 +702,32 @@ class SettingsPage {
 		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\error_log( 'Block Accessibility Checks - SettingsPage DEBUG: ' . $message );
+		}
+	}
+
+	/**
+	 * Display settings notices within the settings page
+	 *
+	 * Shows success notices when settings are saved successfully.
+	 * This method is called from within the settings page layout.
+	 *
+	 * @return void
+	 */
+	private function display_settings_notices(): void {
+		// Check for core settings success notice.
+		if ( \get_transient( 'ba11yc_core_settings_saved' ) ) {
+			\delete_transient( 'ba11yc_core_settings_saved' );
+			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
+			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
+			echo '</div>' . "\n";
+		}
+
+		// Check for external plugin settings success notice.
+		if ( \get_transient( 'ba11yc_external_settings_saved' ) ) {
+			\delete_transient( 'ba11yc_external_settings_saved' );
+			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
+			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
+			echo '</div>' . "\n";
 		}
 	}
 }
