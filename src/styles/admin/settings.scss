@@ -230,3 +230,12 @@ body[class*="block-checks_page_block-a11y-checks-"] {
         border-color: var(--a11y-black);
     }
 }
+
+// Success notices
+.ba11y-settings-notice {
+    background-color: #fff;
+    color: #000;
+    margin: 30px 25px 0;
+    padding: 10px;
+    border-radius: 4px;
+}
