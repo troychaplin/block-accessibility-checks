@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
 Tested up to: 6.8.2
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,18 +116,21 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
  
 == Changelog ==
 
-= 2.0.0 =
+= 2.1.0 =
 
-**Major Release with Enhanced Developer API****
+**Enhanced User Experience & Advanced Plugin Integration**
 
-This major release transforms the plugin into a comprehensive accessibility validation platform with a powerful developer API. The complete overhaul introduces real-time JavaScript validation, eliminates the frustrating "fix one, see another" cycle, and provides seamless integration for external plugin developers. With 12+ new hooks and filters, custom block developers can now build accessibility validation directly into their blocks while maintaining full control over validation behavior and user experience.
+This release focuses on dramatically improving the user experience with better organization, modern design, and seamless integration with external plugins. The update introduces intelligent issue categorization, a completely redesigned settings interface, and advanced plugin detection capabilities that make accessibility validation more intuitive and powerful than ever.
 
-* **Complete Developer API Overhaul** - New comprehensive API with 12+ hooks and filters for custom accessibility checks, including `ba11yc_register_checks`, `ba11yc_validateBlock`, and extensive lifecycle events
-* **JavaScript-Only Validation System** - Migrated to real-time JavaScript validation for instant editor feedback across all block types (core and external plugins)
-* **Multiple Issues Display** - Complete validation overhaul showing all accessibility problems simultaneously, eliminating the "fix one, see another" user experience
-* **Enhanced External Plugin Support** - External blocks now display visual accessibility indicators and integrate fully with the editor UI
-* **Unified Validation Architecture** - New `ba11yc.validateBlock` filter hook system ensures consistent validation across all block types
-* **Individual Check Control** - Configure validation levels (error/warning/disabled) for each accessibility check per block type
-* **Visual Feedback System** - Priority-based visual indicators with red borders for errors, yellow for warnings, and comprehensive inspector panel messages
+* **Issue Categorization System** - New intelligent categorization distinguishes between "accessibility" and "validation" issues, providing clearer guidance on what needs attention
+* **Redesigned Settings Interface** - Complete overhaul of the admin settings page with modern, accessible design and improved user experience
+* **Enhanced Inspector Panel** - Consolidated error/warning display with clear sub-headings for "Accessibility" and "Validation" categories, updated panel title to "Accessibility & Validation"
+* **Advanced External Plugin Detection** - New automatic plugin detection system that identifies external plugins by analyzing file structure and plugin headers
+* **CSS Custom Properties** - Centralized color system with semantic variable names for consistent theming and better maintainability
+* **Modern Sass Architecture** - Migrated to modern `@use` syntax and modular SCSS organization for improved performance
+* **Plugin Information Caching** - Performance optimization with intelligent caching of plugin metadata
+* **Enhanced Form Controls** - Improved radio button and checkbox styling with semantic CSS classes for better accessibility
+* **Site Editor Compatibility** - Fixed compatibility issues with WordPress site editor and improved post type detection
+* **Security Improvements** - Enhanced security compliance with proper WordPress API usage
 
 * View the <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/CHANGELOG.md">full changelog</a> in Github

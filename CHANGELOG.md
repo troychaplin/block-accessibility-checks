@@ -16,6 +16,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [2.1.0]
+
 ### Added
 
 - **Issue categorization system**: New `category` field in check registration to distinguish between "accessibility" and "validation" issues
