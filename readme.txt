@@ -110,9 +110,10 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
 1. **Block Error Validation** - Button block showing accessibility error with red border and detailed error message preventing publication, also demonstrates multiple errors in a grouped display
 2. **Visual Warning System** - Image block displaying accessibility warning with clear explanation in the block inspector panel, also demonstrates multiple warnings in a grouped display
 3. **Heading Level Management** - Customized heading level restrictions maintaining proper content hierarchy in the editor
-4. **Comprehensive Settings Panel** - Plugin configuration page with granular control over accessibility check severity levels
-5. **External Block Validation** -- A custom external card block leveraging the block checks system
-5. **External Block Settings Panel** -- A custom external card block leveraging the block checks system
+4. **Table Header Validation** - Table block showing accessibility error with red border and detailed error message preventing publication
+5. **Comprehensive Settings Panel** - Plugin configuration page with granular control over accessibility check severity levels
+6. **External Block Validation** -- A custom external card block leveraging the block checks system
+7. **External Block Settings Panel** -- A custom external card block leveraging the block checks system
  
 == Changelog ==
 
