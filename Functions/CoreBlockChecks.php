@@ -96,7 +96,7 @@ class CoreBlockChecks {
 					'priority'    => 10,
 				),
 				'check_button_link' => array(
-					'error_msg'   => \__( 'Buttons are required to have a link', 'block-accessibility-checks' ),
+					'error_msg'   => \__( 'Buttons are required to have a valid link', 'block-accessibility-checks' ),
 					'warning_msg' => \__( 'Adding a link to a button is highly recommended', 'block-accessibility-checks' ),
 					'description' => \__( 'Buttons require a link', 'block-accessibility-checks' ),
 					'type'        => 'settings',

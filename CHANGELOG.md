@@ -16,6 +16,25 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- **URL validation helper function**: New `isValidUrl()` function in `checkValidUrl.js` for reusable URL validation across accessibility checks
+- **WordPress core URL validation pattern**: Implementation of WordPress core URL validation regex from nav-menu.js for consistency
+- **Accessibility-specific URL validation**: Enhanced validation that requires proper domain structure for button links to prevent invalid URLs
+
+### Changed
+
+- **Button link validation**: Updated `validateButtonLink()` function to use strict URL validation instead of basic existence check
+- **URL validation logic**: Enhanced validation to reject invalid domains like "http://test" while allowing legitimate URLs including localhost and IP addresses
+- **Code performance**: Optimized URL validation with pre-compiled regex patterns and efficient domain extraction
+
+### Fixed
+
+- **Button validation bypass**: Fixed issue where invalid URLs like "http://test" were being accepted in button blocks
+- **Domain structure validation**: Added proper validation for domains without TLDs to prevent accessibility issues
+- **Localhost support**: Fixed validation to properly allow localhost URLs for development environments
+
+
 ## [2.1.0]
 
 ### Added
