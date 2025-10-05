@@ -12,6 +12,7 @@ namespace PHP_CodeSniffer\Standards\Squiz\Sniffs\Commenting;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\AbstractVariableSniff;
 use PHP_CodeSniffer\Util\Common;
+use PHP_CodeSniffer\Util\Tokens;
 
 class VariableCommentSniff extends AbstractVariableSniff
 {
@@ -28,15 +29,14 @@ class VariableCommentSniff extends AbstractVariableSniff
      */
     public function processMemberVar(File $phpcsFile, $stackPtr)
     {
-        $tokens = $phpcsFile->getTokens();
-        $ignore = [
-            T_PUBLIC                 => T_PUBLIC,
-            T_PRIVATE                => T_PRIVATE,
-            T_PROTECTED              => T_PROTECTED,
+        $tokens  = $phpcsFile->getTokens();
+        $ignore  = Tokens::$scopeModifiers;
+        $ignore += [
             T_VAR                    => T_VAR,
             T_STATIC                 => T_STATIC,
             T_READONLY               => T_READONLY,
             T_FINAL                  => T_FINAL,
+            T_ABSTRACT               => T_ABSTRACT,
             T_WHITESPACE             => T_WHITESPACE,
             T_STRING                 => T_STRING,
             T_NS_SEPARATOR           => T_NS_SEPARATOR,

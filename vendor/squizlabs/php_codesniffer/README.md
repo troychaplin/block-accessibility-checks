@@ -2,7 +2,7 @@
 
 <div aria-hidden="true">
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/squizlabs/php_codesniffer?label=Stable)](https://github.com/PHPCSStandards/PHP_CodeSniffer/releases)
+[![Latest Stable Version](https://img.shields.io/github/v/release/PHPCSStandards/PHP_CodeSniffer?label=Stable)](https://github.com/PHPCSStandards/PHP_CodeSniffer/releases)
 [![Validate](https://github.com/PHPCSStandards/PHP_CodeSniffer/actions/workflows/validate.yml/badge.svg?branch=master)](https://github.com/PHPCSStandards/PHP_CodeSniffer/actions/workflows/validate.yml)
 [![Test](https://github.com/PHPCSStandards/PHP_CodeSniffer/actions/workflows/test.yml/badge.svg?branch=master)][GHA-test]
 [![Coverage Status](https://coveralls.io/repos/github/PHPCSStandards/PHP_CodeSniffer/badge.svg?branch=master)](https://coveralls.io/github/PHPCSStandards/PHP_CodeSniffer?branch=master)
@@ -48,9 +48,9 @@ php phpcbf.phar -h
 ```
 
 These Phars are signed with the official Release key for PHPCS with the
-fingerprint `689D AD77 8FF0 8760 E046 228B A978 2203 05CD 5C32`.
+fingerprint `D91D 8696 3AF3 A29B 6520 4622 97B0 2DD8 E507 1466`.
 
-As of PHP_CodeSniffer 3.10.3, the provenance of PHAR files associated with a release can be verified via [GitHub Artifact Attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds) using the [GitHub CLI tool](https://cli.github.com/) with the following command: `gh attestation verify [phpcs|phpcbf].phar -o PHPCSStandards`.
+As of PHP_CodeSniffer 3.10.3, the provenance of PHAR files associated with a release can be verified via [GitHub Artifact Attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations) using the [GitHub CLI tool](https://cli.github.com/) with the following command: `gh attestation verify [phpcs|phpcbf].phar -o PHPCSStandards`.
 
 ### Composer
 If you use Composer, you can install PHP_CodeSniffer system-wide with the following command:
@@ -78,8 +78,8 @@ You will then be able to run PHP_CodeSniffer from the vendor bin directory:
 ### Phive
 If you use Phive, you can install PHP_CodeSniffer as a project tool using the following commands:
 ```bash
-phive install --trust-gpg-keys 689DAD778FF08760E046228BA978220305CD5C32 phpcs
-phive install --trust-gpg-keys 689DAD778FF08760E046228BA978220305CD5C32 phpcbf
+phive install --trust-gpg-keys D91D86963AF3A29B6520462297B02DD8E5071466 phpcs
+phive install --trust-gpg-keys D91D86963AF3A29B6520462297B02DD8E5071466 phpcbf
 ```
 You will then be able to run PHP_CodeSniffer from the `tools` directory:
 ```bash

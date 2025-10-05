@@ -7,7 +7,7 @@
 /* testBitwiseAnd1 */
 $result = $value & $test /* testBitwiseAnd2 */ & $another;
 
-class TypeIntersection
+abstract class TypeIntersection
 {
     /* testTypeIntersectionOOConstSimple */
     public const Foo&Bar SIMPLE = new Foo();
@@ -68,6 +68,24 @@ class TypeIntersection
 
     /* testTypeIntersectionWithPHP84FinalKeywordFirst */
     final private \className&InterfaceName $finalKeywordB;
+
+    /* testTypeIntersectionPropertyWithPrivateSet */
+    private(set) Foo&Bar $asym1;
+
+    /* testTypeIntersectionPropertyWithPublicPrivateSet */
+    public private(set) Foo&Bar $asym2;
+
+    /* testTypeIntersectionPropertyWithProtectedSet */
+    protected(set) Foo&Bar $asym3;
+
+    /* testTypeIntersectionPropertyWithPublicProtectedSet */
+    public protected(set) Foo&Bar $asym4;
+
+    /* testTypeIntersectionWithPHP84AbstractKeyword */
+    abstract className&InterfaceName $abstractKeywordA { get; }
+
+    /* testTypeIntersectionWithPHP84AbstractKeywordFirst */
+    abstract protected \className&InterfaceName $abstractKeywordB { set; }
 
     public function paramTypes(
         /* testTypeIntersectionParam1 */

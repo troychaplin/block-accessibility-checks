@@ -92,7 +92,7 @@ class DisallowYodaConditionsSniff implements Sniff
                     return;
                 }
 
-                // If it is not an array check what is inside.
+                // If it is not an array, check what is inside.
                 $found = $phpcsFile->findPrevious(
                     T_VARIABLE,
                     ($previousIndex - 1),
@@ -164,6 +164,8 @@ class DisallowYodaConditionsSniff implements Sniff
             T_COMMA        => T_COMMA,
             T_TRUE         => T_TRUE,
             T_FALSE        => T_FALSE,
+            T_NULL         => T_NULL,
+            T_NS_SEPARATOR => T_NS_SEPARATOR,
         ];
 
         for ($i = ($start + 1); $i < $end; $i++) {

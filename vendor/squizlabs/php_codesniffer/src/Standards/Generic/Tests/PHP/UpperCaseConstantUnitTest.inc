@@ -105,3 +105,20 @@ class SkipOverPHP84FinalProperties {
     final MyType|false $propA;
     private static final null|MyClass $propB;
 }
+
+// PHP 8.4 asymmetric visibility
+class WithAsym {
+    private(set) null|true $asym1 = TRUE;
+    public private(set) ?bool $asym2 = false;
+    protected(set) false|string|null $asym3 = null;
+    public protected(set) Type|null|bool $asym4 = true;
+}
+
+abstract class SkipOverPHP84AbstractProperties {
+    abstract MyType|true $propA {get;}
+    protected abstract null|MyClass $propB {set;}
+}
+
+$a = \null;
+$a = \falSe;
+$a = \True;

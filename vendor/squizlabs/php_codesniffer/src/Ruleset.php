@@ -332,7 +332,7 @@ class Ruleset
         }//end foreach
 
         if (count($this->deprecatedSniffs) > 0) {
-            echo PHP_EOL.'* Sniffs marked with an asterix are deprecated.'.PHP_EOL;
+            echo PHP_EOL.'* Sniffs marked with an asterisk are deprecated.'.PHP_EOL;
         }
 
     }//end explain()
@@ -892,6 +892,13 @@ class Ruleset
      */
     private function expandRulesetReference($ref, $rulesetDir, $depth=0)
     {
+        // Naming an (external) standard "Internal" is deprecated.
+        if (strtolower($ref) === 'internal') {
+            $message  = 'The name "Internal" is reserved for internal use. A PHP_CodeSniffer standard should not be called "Internal".'.PHP_EOL;
+            $message .= 'Contact the maintainer of the standard to fix this.';
+            $this->msgCache->add($message, MessageCollector::DEPRECATED);
+        }
+
         // Ignore internal sniffs codes as they are used to only
         // hide and change internal messages.
         if (substr($ref, 0, 9) === 'Internal.') {
@@ -1208,7 +1215,7 @@ class Ruleset
                                 }
 
                                 $value = (string) $element['value'];
-                                if (isset($element['key']) === true) {
+                                if (isset($element['key']) === true && trim($element['key']) !== '') {
                                     $key          = (string) $element['key'];
                                     $values[$key] = $value;
                                     $printValue  .= $key.'=>'.$value.',';
@@ -1219,7 +1226,14 @@ class Ruleset
                             }
 
                             $printValue = rtrim($printValue, ',');
-                        } else {
+                        } else if (isset($prop['value']) === true) {
+                            $message  = 'Passing an array of values to a property using a comma-separated string'.PHP_EOL;
+                            $message .= 'was deprecated in PHP_CodeSniffer 3.3.0. Support will be removed in PHPCS 4.0.0.'.PHP_EOL;
+                            $message .= "The deprecated syntax was used for property \"$name\"".PHP_EOL;
+                            $message .= "for sniff \"$code\".".PHP_EOL;
+                            $message .= 'Pass array values via <element [key="..." ]value="..."> nodes instead.';
+                            $this->msgCache->add($message, MessageCollector::DEPRECATED);
+
                             $value      = (string) $prop['value'];
                             $printValue = $value;
                             if ($value !== '') {
@@ -1409,7 +1423,12 @@ class Ruleset
                 continue;
             }
 
-            if ($reflection->implementsInterface('PHP_CodeSniffer\Sniffs\Sniff') === false) {
+            if ($reflection->implementsInterface('PHP_CodeSniffer\\Sniffs\\Sniff') === false) {
+                $message  = 'All sniffs must implement the PHP_CodeSniffer\\Sniffs\\Sniff interface.'.PHP_EOL;
+                $message .= "Interface not implemented for sniff $className.".PHP_EOL;
+                $message .= 'Contact the sniff author to fix the sniff.';
+                $this->msgCache->add($message, MessageCollector::DEPRECATED);
+
                 // Skip classes which don't implement the register() or process() methods.
                 if (method_exists($className, 'register') === false
                     || method_exists($className, 'process') === false
@@ -1455,9 +1474,24 @@ class Ruleset
             $this->sniffs[$sniffClass] = new $sniffClass();
 
             $sniffCode = Common::getSniffCode($sniffClass);
+
+            if (substr($sniffCode, 0, 1) === '.'
+                || substr($sniffCode, -1) === '.'
+                || strpos($sniffCode, '..') !== false
+                || preg_match('`(^|\.)Sniffs\.`', $sniffCode) === 1
+                || preg_match('`[^\s\.-]+\\\\Sniffs\\\\[^\s\.-]+\\\\[^\s\.-]+Sniff`', $sniffClass) !== 1
+            ) {
+                $message  = "The sniff $sniffClass does not comply with the PHP_CodeSniffer naming conventions.";
+                $message .= ' This will no longer be supported in PHPCS 4.0.'.PHP_EOL;
+                $message .= 'Contact the sniff author to fix the sniff.';
+                $this->msgCache->add($message, MessageCollector::DEPRECATED);
+            }
+
             $this->sniffCodes[$sniffCode] = $sniffClass;
 
+            $isDeprecated = false;
             if ($this->sniffs[$sniffClass] instanceof DeprecatedSniff) {
+                $isDeprecated = true;
                 $this->deprecatedSniffs[$sniffCode] = $sniffClass;
             }
 
@@ -1470,6 +1504,24 @@ class Ruleset
 
             $tokenizers = [];
             $vars       = get_class_vars($sniffClass);
+            if (empty($vars['supportedTokenizers']) === false
+                && $isDeprecated === false
+                && in_array('PHP', $vars['supportedTokenizers'], true) === false
+            ) {
+                if (in_array('CSS', $vars['supportedTokenizers'], true) === true
+                    || in_array('JS', $vars['supportedTokenizers'], true) === true
+                ) {
+                    $message = 'Scanning CSS/JS files is deprecated and support will be removed in PHP_CodeSniffer 4.0.'.PHP_EOL;
+                } else {
+                    // Just in case someone has an integration with a custom tokenizer.
+                    $message = 'Support for custom tokenizers will be removed in PHP_CodeSniffer 4.0.'.PHP_EOL;
+                }
+
+                $message .= 'The %s sniff is listening for %s.';
+                $message  = sprintf($message, $sniffCode, implode(', ', $vars['supportedTokenizers']));
+                $this->msgCache->add($message, MessageCollector::DEPRECATED);
+            }
+
             if (isset($vars['supportedTokenizers']) === true) {
                 foreach ($vars['supportedTokenizers'] as $tokenizer) {
                     $tokenizers[$tokenizer] = $tokenizer;

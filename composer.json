@@ -9,19 +9,16 @@
 		}
 	},
 	"require-dev": {
-		"dealerdirect/phpcodesniffer-composer-installer": "v1.0.0",
-		"squizlabs/php_codesniffer": "3.12.2",
 		"wp-coding-standards/wpcs": "3.1"
 	},
 	"config": {
-		"autoloader-suffix": "BlockAccessibility",
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
 	},
 	"scripts": {
-		"format": "./vendor/bin/phpcbf --standard=phpcs.xml.dist -v --report-summary --report-source || true",
-		"lint": "phpcs --standard=phpcs.xml.dist",
+		"format": "phpcbf",
+		"lint": "phpcs",
 		"post-install-cmd": [
 			"@fix-vendor-test-files"
 		],
