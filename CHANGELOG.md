@@ -16,6 +16,28 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- **Advanced URL validation system**: New `isValidUrl()` function using the `tldts` library for real TLD validation against the Public Suffix List (PSL)
+- **Public Suffix List integration**: URL validation now uses the official PSL to validate legitimate top-level domains and reject fake domains
+- **International domain support**: Enhanced validation supports international domains, punycode, and complex TLDs (e.g., .co.uk)
+- **Development environment support**: Proper validation for localhost, IP addresses, and .localhost domains for development workflows
+
+### Changed
+
+- **URL validation architecture**: Migrated from custom regex patterns to the `tldts` library for more accurate and maintainable domain validation
+- **Button link validation**: Updated `validateButtonLink()` function to use the new robust URL validation system
+- **Validation accuracy**: Enhanced validation now properly rejects fake domains like "foo.notworking" while allowing legitimate URLs
+- **Code documentation**: Improved comments and documentation throughout the URL validation system for better maintainability
+
+### Fixed
+
+- **Fake domain acceptance**: Fixed critical issue where invalid domains like "foo.notworking" were being accepted due to insufficient TLD validation
+- **Button validation bypass**: Resolved issue where invalid URLs like "http://test" were being accepted in button blocks
+- **TLD validation accuracy**: Fixed validation to use real TLD data instead of hardcoded lists, ensuring accuracy and future-proofing
+- **Development workflow compatibility**: Fixed validation to properly handle localhost and IP addresses for development environments
+
+
 ## [2.1.0]
 
 ### Added

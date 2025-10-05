@@ -6,6 +6,7 @@
  */
 
 import { addFilter } from '@wordpress/hooks';
+import { isValidUrl } from '../supports/isValidUrl';
 
 /**
  * Register button block validation logic
@@ -22,7 +23,8 @@ addFilter(
 		// Run the appropriate check based on the check name
 		switch (checkName) {
 			case 'check_button_link':
-				return validateButtonLink(attributes);
+				const result = validateButtonLink(attributes);
+				return result;
 			case 'check_button_text':
 				return validateButtonText(attributes);
 			default:
@@ -38,8 +40,11 @@ addFilter(
  * @return {boolean} - True if valid, false if invalid.
  */
 function validateButtonLink(attributes) {
-	// Check if button has a URL
-	return !!(attributes.url && attributes.url.trim());
+	// Check if button has a URL and that it's valid
+	const hasUrl = !!(attributes.url && attributes.url.trim());
+	const isValid = hasUrl && isValidUrl(attributes.url);
+
+	return isValid;
 }
 
 /**

@@ -53,5 +53,8 @@
 		"husky": "9.1.7",
 		"stylelint": "16.25.0",
 		"stylelint-scss": "6.12.1"
+	},
+	"dependencies": {
+		"tldts": "^7.0.16"
 	}
 }
