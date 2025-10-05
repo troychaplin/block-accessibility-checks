@@ -9,6 +9,7 @@
 
 namespace PHP_CodeSniffer\Tests\Core.ilters;
 
+use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Filters\GitStaged;
 use PHP_CodeSniffer\Tests\Core\Filters\AbstractFilterTestCase;
 use RecursiveArrayIterator;
@@ -219,11 +220,15 @@ final class GitStagedTest extends AbstractFilterTestCase
             $this->markTestSkipped('Not a git repository');
         }
 
+        if (Config::getExecutablePath('git') === null) {
+            $this->markTestSkipped('git command not available');
+        }
+
         $fakeDI = new RecursiveArrayIterator(self::getFakeFileList());
         $filter = new GitStaged($fakeDI, '/', self::$config, self::$ruleset);
 
         $reflMethod = new ReflectionMethod($filter, 'exec');
-        $reflMethod->setAccessible(true);
+        (PHP_VERSION_ID < 80100) && $reflMethod->setAccessible(true);
         $result = $reflMethod->invoke($filter, $cmd);
 
         $this->assertSame($expected, $result);

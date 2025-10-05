@@ -85,7 +85,7 @@ class Config
      *
      * @var string
      */
-    const VERSION = '3.12.2';
+    const VERSION = '3.13.4';
 
     /**
      * Package stability; either stable, beta or alpha.
@@ -1010,8 +1010,8 @@ class Config
                 }
 
                 self::$overriddenDefaults['stdinPath'] = true;
-            } else if (PHP_CODESNIFFER_CBF === false && substr($arg, 0, 12) === 'report-file=') {
-                if (isset(self::$overriddenDefaults['reportFile']) === true) {
+            } else if (substr($arg, 0, 12) === 'report-file=') {
+                if (PHP_CODESNIFFER_CBF === true || isset(self::$overriddenDefaults['reportFile']) === true) {
                     break;
                 }
 
@@ -1704,11 +1704,6 @@ class Config
             $configFile = dirname($path).DIRECTORY_SEPARATOR.'CodeSniffer.conf';
         } else {
             $configFile = dirname(__DIR__).DIRECTORY_SEPARATOR.'CodeSniffer.conf';
-            if (is_file($configFile) === false
-                && strpos('@data_dir@', '@data_dir') === false
-            ) {
-                $configFile = '@data_dir@/PHP_CodeSniffer/CodeSniffer.conf';
-            }
         }
 
         if (is_file($configFile) === false) {
