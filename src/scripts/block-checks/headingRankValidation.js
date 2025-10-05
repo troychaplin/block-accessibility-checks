@@ -23,16 +23,6 @@ addFilter(
 			return isValid;
 		}
 
-		// Debug: Log all parameters to see what we're getting
-		console.log('Heading Rank Filter called:', {
-			blockType,
-			checkName,
-			attributes,
-			rule,
-			block,
-			hasClientId: !!(block?.clientId || attributes?.clientId)
-		});
-
 		// Run the appropriate check based on the check name
 		switch (checkName) {
 			case 'check_heading_rank':
@@ -47,15 +37,12 @@ addFilter(
 				}
 
 				const currentHeading = {
-					clientId: clientId,
-					attributes: attributes,
-					name: blockType
+					clientId,
+					attributes,
+					name: blockType,
 				};
-				
-				console.log('Created heading object:', currentHeading);
-				const result = validateHeadingRank(currentHeading);
-				console.log('Validation result:', result);
-				return result;
+
+				return validateHeadingRank(currentHeading);
 			default:
 				return isValid;
 		}
@@ -73,8 +60,7 @@ addFilter(
  */
 function validateHeadingRank(currentHeading) {
 	const currentLevel = currentHeading.attributes.level || 2;
-	console.log(`Validating H${currentLevel} heading`);
-	
+
 	// Get all blocks from the editor (including nested blocks)
 	const allBlocks = select('core/block-editor').getBlocks();
 
@@ -93,17 +79,12 @@ function validateHeadingRank(currentHeading) {
 		content: block.attributes.content || '',
 	}));
 
-	console.log('Document heading sequence:', headingLevels.map(h => `H${h.level}`).join(' > '));
-
 	// Check if there are any rank violations in the document
 	const violations = findHeadingViolations(headingLevels);
-	
+
 	if (violations.length === 0) {
-		console.log('No violations found');
 		return true;
 	}
-
-	console.log('Found violations:', violations);
 
 	// If there are violations, check if the current heading is one of the problematic ones
 	const isProblematic = violations.some(violation => {
@@ -111,7 +92,6 @@ function validateHeadingRank(currentHeading) {
 		return violation.problematicLevel === currentLevel;
 	});
 
-	console.log(`H${currentLevel} is problematic:`, isProblematic);
 	return !isProblematic; // Return false if problematic (validation fails)
 }
 
@@ -132,9 +112,9 @@ function findHeadingViolations(headingLevels) {
 		if (currentLevel > previousLevel + 1) {
 			violations.push({
 				index: i,
-				previousLevel: previousLevel,
+				previousLevel,
 				problematicLevel: currentLevel,
-				description: `H${currentLevel} after H${previousLevel} skips levels`
+				description: `H${currentLevel} after H${previousLevel} skips levels`,
 			});
 		}
 	}
@@ -168,7 +148,6 @@ function getAllHeadingBlocks(blocks) {
 	searchBlocks(blocks);
 	return headingBlocks;
 }
-
 
 /**
  * Get heading hierarchy context for debugging

@@ -470,9 +470,10 @@ class SettingsPage {
 	 */
 	private function render_core_block_checks(): void {
 		$core_blocks = array(
-			'core/button' => __( 'Button Block', 'block-accessibility-checks' ),
-			'core/image'  => __( 'Image Block', 'block-accessibility-checks' ),
-			'core/table'  => __( 'Table Block', 'block-accessibility-checks' ),
+			'core/button'  => __( 'Button Block', 'block-accessibility-checks' ),
+			'core/heading' => __( 'Heading Block', 'block-accessibility-checks' ),
+			'core/image'   => __( 'Image Block', 'block-accessibility-checks' ),
+			'core/table'   => __( 'Table Block', 'block-accessibility-checks' ),
 		);
 
 		foreach ( $core_blocks as $block_type => $block_label ) {
