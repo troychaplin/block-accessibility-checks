@@ -18,21 +18,24 @@ Prefix the change with one of these keywords:
 
 ### Added
 
-- **URL validation helper function**: New `isValidUrl()` function in `checkValidUrl.js` for reusable URL validation across accessibility checks
-- **WordPress core URL validation pattern**: Implementation of WordPress core URL validation regex from nav-menu.js for consistency
-- **Accessibility-specific URL validation**: Enhanced validation that requires proper domain structure for button links to prevent invalid URLs
+- **Advanced URL validation system**: New `isValidUrl()` function using the `tldts` library for real TLD validation against the Public Suffix List (PSL)
+- **Public Suffix List integration**: URL validation now uses the official PSL to validate legitimate top-level domains and reject fake domains
+- **International domain support**: Enhanced validation supports international domains, punycode, and complex TLDs (e.g., .co.uk)
+- **Development environment support**: Proper validation for localhost, IP addresses, and .localhost domains for development workflows
 
 ### Changed
 
-- **Button link validation**: Updated `validateButtonLink()` function to use strict URL validation instead of basic existence check
-- **URL validation logic**: Enhanced validation to reject invalid domains like "http://test" while allowing legitimate URLs including localhost and IP addresses
-- **Code performance**: Optimized URL validation with pre-compiled regex patterns and efficient domain extraction
+- **URL validation architecture**: Migrated from custom regex patterns to the `tldts` library for more accurate and maintainable domain validation
+- **Button link validation**: Updated `validateButtonLink()` function to use the new robust URL validation system
+- **Validation accuracy**: Enhanced validation now properly rejects fake domains like "foo.notworking" while allowing legitimate URLs
+- **Code documentation**: Improved comments and documentation throughout the URL validation system for better maintainability
 
 ### Fixed
 
-- **Button validation bypass**: Fixed issue where invalid URLs like "http://test" were being accepted in button blocks
-- **Domain structure validation**: Added proper validation for domains without TLDs to prevent accessibility issues
-- **Localhost support**: Fixed validation to properly allow localhost URLs for development environments
+- **Fake domain acceptance**: Fixed critical issue where invalid domains like "foo.notworking" were being accepted due to insufficient TLD validation
+- **Button validation bypass**: Resolved issue where invalid URLs like "http://test" were being accepted in button blocks
+- **TLD validation accuracy**: Fixed validation to use real TLD data instead of hardcoded lists, ensuring accuracy and future-proofing
+- **Development workflow compatibility**: Fixed validation to properly handle localhost and IP addresses for development environments
 
 
 ## [2.1.0]
