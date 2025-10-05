@@ -69,6 +69,7 @@ function validateButtonText(attributes) {
 	// Strip HTML tags and trim
 	const text = textContent.replace(/<[^>]*>/g, '').trim();
 
-	// Check if text exists and is not empty
-	return text.length > 0;
+	// Check if text exists and contains alphanumeric characters
+	// This prevents buttons with only symbols, spaces, or special characters
+	return text.length > 0 && /[a-zA-Z0-9]/.test(text);
 }
