@@ -1,97 +1,108 @@
 /**
  * URL Validation Helper
  *
- * Provides reusable URL validation functionality for accessibility checks.
- * Based on WordPress core URL validation patterns.
+ * Provides robust URL validation for accessibility checks using the tldts library
+ * for real TLD validation against the Public Suffix List (PSL).
+ *
  */
 
-// Pre-compiled regex patterns for better performance
-const RELATIVE_PATH_PATTERN = /^(\/|#|\?)/; // Matches relative paths, fragments, and query strings
-const PROTOCOL_PATTERN = /^(mailto:|tel:)/; // Matches email and phone protocols
-const URL_PATTERN = /^https?:\/\/[^\s/$.?#].[^\s]*$/i; // WordPress core URL validation pattern
-const IP_ADDRESS_PATTERN = /^\d+\.\d+\.\d+\.\d+/; // Matches IPv4 addresses
+import { parse } from 'tldts';
+
+// Pre-compiled regex patterns for performance
+const RELATIVE_PATH_PATTERN = /^(\/|#|\?)/i;
+const ALLOWED_PROTOCOLS = new Set(['http', 'https', 'mailto', 'tel']);
 
 /**
- * Check if a URL is valid according to WordPress standards
+ * Check if a URL is a valid relative path, fragment, or query string
  *
- * Allow URLs including:
- * - http://example.com/
- * - https://example.com/
- * - /directory/
- * - ?query-param
- * - #target
- * - mailto:foo@example.com
- * - tel:+1234567890
- *
- * Based on WordPress core validation pattern from nav-menu.js line 1138: https://github.com/WordPress/wordpress-develop/blob/70d00508e950f0e63de82386d453bca5ad899474/src/js/_enqueues/lib/nav-menu.js#L1126
- * /^https?:\/\/[^\s/$.?#].[^\s]*$/i
- *
- * @param {string} url - The URL to validate
- * @return {boolean} - True if valid, false if invalid
+ * @param {string} value - The URL string to check
+ * @return {boolean} - True if it's a relative path, fragment, or query string
  */
-export function isValidUrl(url) {
-	// Input validation: reject null, undefined, or non-string values
-	if (!url || typeof url !== 'string') {
+function isRelativeUrl(value) {
+	return RELATIVE_PATH_PATTERN.test(value);
+}
+
+/**
+ * Check if the URL uses an allowed protocol
+ *
+ * @param {URL} url - The parsed URL object
+ * @return {boolean} - True if the protocol is allowed
+ */
+function isAllowedProtocol(url) {
+	return ALLOWED_PROTOCOLS.has(url.protocol.replace(':', '').toLowerCase());
+}
+
+/**
+ * Validate if a URL is structurally valid and has a legitimate domain
+ *
+ * This function provides comprehensive URL validation for accessibility purposes:
+ * - Validates against the Public Suffix List for real TLD verification
+ * - Supports international domains, punycode, and complex TLDs (e.g., .co.uk)
+ * - Allows development URLs (localhost, IP addresses)
+ * - Rejects fake domains like "foo.notworking"
+ *
+ * @param {string} value - The URL string to validate
+ * @return {boolean} - True if the URL is valid, false otherwise
+ */
+export function isValidUrl(value) {
+	// Input validation: reject non-string values
+	if (typeof value !== 'string') {
 		return false;
 	}
 
-	// Normalize input by trimming whitespace
-	const trimmedUrl = url.trim();
+	const trimmedUrl = value.trim();
 	if (!trimmedUrl) {
 		return false;
 	}
 
-	// Allow relative paths, fragments, and query strings without validation
+	// Fast path: Allow relative paths, fragments, and query strings
 	// Examples: "/page", "#section", "?param=value"
-	if (RELATIVE_PATH_PATTERN.test(trimmedUrl)) {
+	if (isRelativeUrl(trimmedUrl)) {
 		return true;
 	}
 
-	// Allow email and phone protocols without domain validation
-	// Examples: "mailto:user@example.com", "tel:+1234567890"
-	if (PROTOCOL_PATTERN.test(trimmedUrl)) {
+	// Parse the URL using the platform's URL constructor
+	let parsedUrl;
+	try {
+		parsedUrl = new URL(trimmedUrl);
+	} catch {
+		// Invalid URL format (e.g., "example.com" without protocol)
+		return false;
+	}
+
+	// Check if the protocol is allowed for accessibility
+	if (!isAllowedProtocol(parsedUrl)) {
+		return false;
+	}
+
+	// Non-host-based protocols (mailto, tel) don't need domain validation
+	const protocol = parsedUrl.protocol.slice(0, -1).toLowerCase();
+	if (protocol === 'mailto' || protocol === 'tel') {
 		return true;
 	}
 
-	// Apply WordPress core URL validation pattern for http/https URLs
-	// This ensures basic URL structure is valid
-	if (!URL_PATTERN.test(trimmedUrl)) {
+	// For http/https URLs, validate the hostname
+	const hostname = parsedUrl.hostname;
+
+	// Parse hostname using tldts for Public Suffix List validation
+	const domainInfo = parse(hostname);
+
+	// Validate hostname structure
+	// Must have either a valid domain, be an IP address, or be localhost
+	if (!domainInfo.domain && !domainInfo.isIp && hostname.toLowerCase() !== 'localhost') {
 		return false;
 	}
 
-	// Extract domain for additional accessibility-specific validation
-	// Remove protocol prefix to get just the domain part
-	const domain = trimmedUrl.replace(/^https?:\/\//, '');
+	// Ensure the host has a registrable domain (not just a public suffix)
+	// This prevents URLs like "https://co.uk/" from being valid
+	const isSpecialHost =
+		domainInfo.isIp ||
+		hostname.toLowerCase() === 'localhost' ||
+		hostname.endsWith('.localhost');
 
-	// Reject domains that are too short to be valid
-	// Minimum 4 characters accounts for shortest valid domains like "a.co"
-	if (domain.length < 4) {
+	if (!isSpecialHost && (!domainInfo.publicSuffix || !domainInfo.domain)) {
 		return false;
 	}
 
-	// Validate domain structure based on whether it contains dots
-	if (domain.includes('.')) {
-		// Domains with dots should have proper structure (e.g., "example.com")
-		const parts = domain.split('.');
-
-		// Ensure no empty parts (prevents "example..com" or ".example.com")
-		for (let i = 0; i < parts.length; i++) {
-			if (parts[i].length === 0) {
-				return false;
-			}
-		}
-
-		// Top-level domain (TLD) must be at least 2 characters
-		// Examples: ".com", ".org", ".uk" are valid; ".a" is not
-		if (parts[parts.length - 1].length < 2) {
-			return false;
-		}
-	} else if (!domain.startsWith('localhost') && !IP_ADDRESS_PATTERN.test(domain)) {
-		// Domains without dots must be localhost or IP addresses
-		// Reject invalid domains like "test" or "invalid"
-		return false;
-	}
-
-	// All validation checks passed
 	return true;
 }
