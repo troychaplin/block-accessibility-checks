@@ -129,6 +129,14 @@ class CoreBlockChecks {
 					'category'    => 'accessibility',
 					'priority'    => 10,
 				),
+				'check_image_alt_text_patterns' => array(
+					'error_msg'   => \__( 'Alt text contains non-descriptive patterns like "image", "picture", or "photo"', 'block-accessibility-checks' ),
+					'warning_msg' => \__( 'Consider using more descriptive alt text instead of generic terms', 'block-accessibility-checks' ),
+					'description' => \__( 'Alt text should avoid generic patterns and be descriptive', 'block-accessibility-checks' ),
+					'type'        => 'settings',
+					'category'    => 'accessibility',
+					'priority'    => 15,
+				),
 			),
 			'core/table'  => array(
 				'check_table_headers' => array(
