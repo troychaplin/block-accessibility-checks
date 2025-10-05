@@ -1,6 +1,6 @@
 import { registerPlugin } from '@wordpress/plugins';
-import { BlockInvalidation } from './validation/blockInvalidation';
-import './validation/blockErrorComponent';
+import { BlockInvalidation } from './block-validation/blockInvalidation';
+import './block-validation/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
 
 // Base checks array - now empty since validation is handled via ba11yc.validateBlock filter
@@ -18,14 +18,14 @@ function invalidateCache() {
 // Listen for when new filters are added
 if (typeof wp !== 'undefined' && wp.hooks) {
 	wp.hooks.addAction('hookAdded', 'blockAccessibilityChecks/invalidate-cache', hookName => {
-		if (hookName === 'blockAccessibilityChecks.blockChecksArray') {
+		if (hookName === 'blockAccessibilityChecks.block-checksArray') {
 			invalidateCache();
 		}
 	});
 }
 
 // Function to get current checks array (allows dynamic updates from external plugins)
-export function getBlockChecksArray() {
+export function getblockChecksArray() {
 	if (cacheInvalidated || !cachedChecksArray) {
 		cachedChecksArray = applyFilters('blockAccessibilityChecks.blockChecksArray', coreChecks);
 		cacheInvalidated = false;
@@ -36,7 +36,7 @@ export function getBlockChecksArray() {
 // For backwards compatibility, expose the array but make it dynamic
 export const blockChecksArray = new Proxy([], {
 	get(target, prop) {
-		const currentArray = getBlockChecksArray();
+		const currentArray = getblockChecksArray();
 		if (prop === 'length') {
 			return currentArray.length;
 		}

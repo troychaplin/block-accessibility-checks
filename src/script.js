@@ -1,7 +1,7 @@
 import './styles.scss';
-import './scripts/blockMods/imageAttr';
+import './scripts/block-modifications/imageAttr';
 import './scripts/registerPlugin';
-import './scripts/validation/validationHooks';
-import './scripts/blockChecks/buttonValidation';
-import './scripts/blockChecks/imageValidation';
-import './scripts/blockChecks/tableValidation';
+import './scripts/block-validation/validationHooks';
+import './scripts/block-checks/buttonValidation';
+import './scripts/block-checks/imageValidation';
+import './scripts/block-checks/tableValidation';
