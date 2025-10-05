@@ -94,12 +94,46 @@ const headingBlocks = blocks.filter(block => block.name === 'core/heading');
 - `src/scripts/block-validation/validationHooks.js` - Ensure compatibility
 
 ## Success Criteria
-- [ ] Core heading blocks show validation warnings for rank violations
-- [ ] Validation uses WordPress core data stores (not custom parsing)
-- [ ] Problematic headings are highlighted in editor
-- [ ] Validation integrates seamlessly with existing accessibility system
-- [ ] Performance impact is minimal
-- [ ] Clear, helpful error messages guide users to fix issues
+- [x] Core heading blocks show validation warnings for rank violations
+- [x] Validation uses WordPress core data stores (not custom parsing)
+- [x] Problematic headings are highlighted in editor
+- [x] Validation integrates seamlessly with existing accessibility system
+- [x] Performance impact is minimal
+- [x] Clear, helpful error messages guide users to fix issues
+
+## Implementation Status
+
+### ✅ Phase 1: Core Heading Block Validation (COMPLETED)
+
+#### ✅ Step 1: PHP Configuration
+- Added `check_heading_rank` to `CoreBlockChecks.php` for `core/heading` blocks
+- Configured as warning (not error) to avoid blocking content creation
+- Added appropriate error/warning messages
+- Added `core/heading` to supported block types
+
+#### ✅ Step 2: JavaScript Validation Function
+- Created `headingRankValidation.js` in `src/scripts/block-checks/`
+- Implemented validation logic using WordPress `core/block-editor` data store
+- Registered with `ba11yc.validateBlock` filter
+- Added import to main `src/script.js` file
+
+#### ✅ Step 3: Document Context Analysis
+- Gets all heading blocks from document using `select('core/block-editor').getBlocks()`
+- Builds heading hierarchy map with levels, clientIds, and content
+- Identifies rank violations (skipping heading levels)
+- Returns validation results for highlighting problematic blocks
+
+### Validation Logic Implemented
+- **Primary Rule**: No skipping heading levels (h2 → h4 = violation)
+- **Exception**: Closing subsections is allowed (h4 → h2 when starting new section)
+- **Scope**: Document-wide context using WordPress core data stores
+- **Performance**: Leverages existing WordPress block data (no additional DOM parsing)
+
+### Integration Points
+- **PHP Registration**: ✅ Added to `CoreBlockChecks.php`
+- **JavaScript Validation**: ✅ Created `headingRankValidation.js`
+- **UI Integration**: ✅ Uses existing higher-order component system
+- **Build Process**: ✅ Successfully compiles and builds
 
 ## Future Enhancements
 - Support for custom blocks with headings
