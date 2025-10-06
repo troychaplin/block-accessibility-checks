@@ -150,9 +150,9 @@ class CoreBlockChecks {
 					'priority'    => 8,
 				),
 				'check_heading_first_level' => array(
-					'error_msg'   => \__( 'The first heading should be H1 or H2', 'block-accessibility-checks' ),
-					'warning_msg' => \__( 'Using H1 or H2 for the first heading improves document structure', 'block-accessibility-checks' ),
-					'description' => \__( 'First heading should be H1 or H2', 'block-accessibility-checks' ),
+					'error_msg'   => \__( 'The first heading should be H1 if available, or H2 if H1 is disabled', 'block-accessibility-checks' ),
+					'warning_msg' => \__( 'Using H1 as the first heading improves document structure when available', 'block-accessibility-checks' ),
+					'description' => \__( 'First heading should be H1 if available, or H2 if H1 is disabled', 'block-accessibility-checks' ),
 					'type'        => 'settings',
 					'category'    => 'accessibility',
 					'priority'    => 7,

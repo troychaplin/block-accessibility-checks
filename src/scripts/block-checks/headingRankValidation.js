@@ -100,7 +100,9 @@ function validateHeadingRank(currentHeading) {
 /**
  * Validate first heading level
  *
- * Checks if the first heading in the document is H1 or H2.
+ * Checks if the first heading in the document is appropriate based on available heading levels.
+ * If H1 is available, only H1 is allowed as the first heading.
+ * If H1 is not available, H2 is allowed as the first heading.
  * Only validates if this is actually the first heading block.
  *
  * @param {Object} currentHeading - The heading block being validated
@@ -131,9 +133,27 @@ function validateFirstHeadingLevel(currentHeading) {
 		return true;
 	}
 
-	// Check if the first heading is H1 or H2
+	// Get available heading levels from plugin settings
+	const restrictedLevels =
+		window.BlockAccessibilityChecks?.blockChecksOptions?.core_heading_levels || [];
+	const isH1Restricted = restrictedLevels.includes('h1');
+
 	const firstHeadingLevel = firstHeading.attributes.level || 2; // Default to h2 if no level specified
-	return firstHeadingLevel === 1 || firstHeadingLevel === 2;
+
+	// If H1 is available (not restricted), only H1 is allowed as first heading
+	if (!isH1Restricted) {
+		return firstHeadingLevel === 1;
+	}
+
+	// If H1 is restricted, check if H2 is available
+	const isH2Restricted = restrictedLevels.includes('h2');
+	if (!isH2Restricted) {
+		return firstHeadingLevel === 2;
+	}
+
+	// If both H1 and H2 are restricted, allow the first available level
+	// This is a fallback case - in practice, H2 should always be available
+	return firstHeadingLevel >= 3;
 }
 
 /**
