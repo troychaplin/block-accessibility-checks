@@ -18,6 +18,12 @@ Prefix the change with one of these keywords:
 
 ### Added
 
+- **Heading rank validation system**: New comprehensive heading hierarchy validation for WordPress core heading blocks
+- **Heading rank violation detection**: Real-time validation that detects when heading levels are skipped (e.g., H2 followed by H4)
+- **First heading level validation**: Intelligent validation of the first heading in a document based on available heading restrictions
+- **Document-wide heading analysis**: Validation system that analyzes the entire document structure, including nested blocks (groups, columns, etc.)
+- **Global heading change listener**: Real-time monitoring of heading structure changes to trigger re-validation across all heading blocks
+- **Image alt text pattern validation**: New validation system that detects non-descriptive alt text patterns like "image", "picture", "photo", and other generic terms
 - **Advanced URL validation system**: New `isValidUrl()` function using the `tldts` library for real TLD validation against the Public Suffix List (PSL)
 - **Public Suffix List integration**: URL validation now uses the official PSL to validate legitimate top-level domains and reject fake domains
 - **International domain support**: Enhanced validation supports international domains, punycode, and complex TLDs (e.g., .co.uk)
@@ -25,13 +31,23 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+- **Core block check system**: Extended `CoreBlockChecks.php` to support heading validation with new check types (`check_heading_rank` and `check_heading_first_level`) and image alt text pattern validation (`check_image_alt_text_patterns`)
+- **Settings page heading restrictions**: Enhanced heading level restriction system to only allow removal of H1, H5, and H6 levels for better accessibility compliance
+- **Image validation system**: Enhanced image alt text validation to include pattern checking for non-descriptive terms and generic phrases
+- **JavaScript validation pipeline**: Updated validation system to handle document-wide heading analysis using WordPress core data stores
+- **Settings page checkbox positioning**: Repositioned heading level restriction checkboxes above individual check settings for better UX
+- **Function organization**: Reorganized validation functions for better code flow and maintainability
 - **URL validation architecture**: Migrated from custom regex patterns to the `tldts` library for more accurate and maintainable domain validation
 - **Button link validation**: Updated `validateButtonLink()` function to use the new robust URL validation system
 - **Validation accuracy**: Enhanced validation now properly rejects fake domains like "foo.notworking" while allowing legitimate URLs
 - **Code documentation**: Improved comments and documentation throughout the URL validation system for better maintainability
+- **Heading validation documentation**: Enhanced JSDoc comments and inline documentation in `headingRankValidation.js` for improved code clarity and maintainability
 
 ### Fixed
 
+- **Heading validation error display**: Fixed issue where validation errors were incorrectly displaying on all heading blocks instead of only problematic ones
+- **First heading validation logic**: Resolved validation to properly check the first heading level based on available heading restrictions
+- **Heading level restriction validation**: Fixed settings page to only allow removal of appropriate heading levels (H1, H5, H6) while preserving essential heading structure
 - **Fake domain acceptance**: Fixed critical issue where invalid domains like "foo.notworking" were being accepted due to insufficient TLD validation
 - **Button validation bypass**: Resolved issue where invalid URLs like "http://test" were being accepted in button blocks
 - **TLD validation accuracy**: Fixed validation to use real TLD data instead of hardcoded lists, ensuring accuracy and future-proofing

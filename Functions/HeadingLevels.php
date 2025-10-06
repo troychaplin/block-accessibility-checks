@@ -98,9 +98,17 @@ class HeadingLevels {
 			$available_levels = range( 1, 6 );
 
 			// Remove restricted levels with validation.
+			// Only allow removal of H1, H5, and H6 levels.
+			$allowed_restricted_levels = array( 'h1', 'h5', 'h6' );
 			foreach ( $restricted_levels as $level ) {
 				if ( ! is_string( $level ) || ! preg_match( '/^h[1-6]$/', $level ) ) {
 					$this->log_error( "Invalid heading level format: {$level}. Expected format: h1-h6." );
+					continue;
+				}
+
+				// Only allow restriction of H1, H5, and H6.
+				if ( ! in_array( $level, $allowed_restricted_levels, true ) ) {
+					$this->log_debug( "Skipping restriction of {$level}. Only H1, H5, and H6 can be restricted." );
 					continue;
 				}
 
