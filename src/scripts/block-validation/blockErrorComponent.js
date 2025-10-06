@@ -1,5 +1,5 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { addFilter } from '@wordpress/hooks';
+import { addFilter, addAction } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, PanelRow } from '@wordpress/components';
@@ -22,6 +22,35 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		});
 		const timeoutRef = useRef(null);
 		const prevAltRef = useRef(attributes.alt);
+		const prevHeadingLevelRef = useRef(attributes.level);
+
+		// Listen for global heading structure changes
+		useEffect(() => {
+			if (name === 'core/heading') {
+				const handleHeadingStructureChange = () => {
+					// Re-validate this heading block when the document structure changes
+					const result = validateBlock({ name, attributes, clientId });
+					setValidationResult(
+						result.isValid ? { isValid: true, mode: 'none', issues: [] } : result
+					);
+				};
+
+				// Subscribe to heading structure changes
+				addAction(
+					'ba11yc.headingStructureChanged',
+					`ba11yc/heading-validation-${clientId}`,
+					handleHeadingStructureChange
+				);
+
+				// Cleanup function
+				return () => {
+					wp.hooks.removeAction(
+						'ba11yc.headingStructureChanged',
+						`ba11yc/heading-validation-${clientId}`
+					);
+				};
+			}
+		}, [name, attributes, clientId]);
 
 		useEffect(() => {
 			// Clear any existing timeout
@@ -40,6 +69,20 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 				}, 1500);
 
 				prevAltRef.current = attributes.alt;
+			} else if (
+				name === 'core/heading' &&
+				prevHeadingLevelRef.current !== attributes.level
+			) {
+				// For heading blocks with level changes, add a small delay
+				timeoutRef.current = setTimeout(() => {
+					// Use unified validation system
+					const result = validateBlock({ name, attributes, clientId });
+					setValidationResult(
+						result.isValid ? { isValid: true, mode: 'none', issues: [] } : result
+					);
+				}, 200); // Short delay for headings
+
+				prevHeadingLevelRef.current = attributes.level;
 			} else {
 				// Immediate validation for other cases using unified system
 				const result = validateBlock({ name, attributes, clientId });

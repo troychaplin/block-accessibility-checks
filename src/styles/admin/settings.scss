@@ -141,6 +141,7 @@ body[class*="block-checks_page_block-a11y-checks-"] {
 
 .ba11y-field-controls--checkbox {
     gap: 20px;
+    padding: 6px 0;
 
     .ba11y-checkbox-item {
         display: flex;
@@ -149,6 +150,8 @@ body[class*="block-checks_page_block-a11y-checks-"] {
     }
 
     input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
         margin: 0;
         border-radius: 0;
         border: 1px solid var(--a11y-medium-grey);

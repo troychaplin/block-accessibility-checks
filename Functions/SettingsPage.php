@@ -161,16 +161,57 @@ class SettingsPage {
 		echo '<div class="ba11y-field-group">';
 		echo '<div class="ba11y-field-controls ba11y-field-controls--checkbox">';
 
-		for ( $i = 1; $i <= 6; $i++ ) {
-			$level   = 'h' . $i;
-			$checked = in_array( $level, $heading_levels, true ) ? 'checked' : '';
+		// Only allow removal of H1, H5, and H6 levels.
+		$removable_levels = array( 'h1', 'h5', 'h6' );
+		foreach ( $removable_levels as $level ) {
+			$level_num = intval( substr( $level, 1 ) );
+			$checked   = in_array( $level, $heading_levels, true ) ? 'checked' : '';
 			echo '<div class="ba11y-checkbox-item">';
 			echo '<input type="checkbox" 
-						 id="' . \esc_attr( 'heading-level-' . $i ) . '" 
+						 id="' . \esc_attr( 'heading-level-' . $level_num ) . '" 
 						 name="block_checks_options[core_heading_levels][]" 
 						 value="' . \esc_attr( $level ) . '" 
 						 ' . ( $checked ? 'checked="checked"' : '' ) . '>';
-			echo '<label for="' . \esc_attr( 'heading-level-' . $i ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
+			echo '<label for="' . \esc_attr( 'heading-level-' . $level_num ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
+			echo '</div>';
+		}
+
+		echo '</div>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Renders the heading level options within the heading block section.
+	 *
+	 * This method renders the heading level checkboxes directly within the
+	 * heading block options, positioned above the individual check settings.
+	 *
+	 * @return void
+	 */
+	private function render_heading_level_options(): void {
+		$options        = \get_option( 'block_checks_options' );
+		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+
+		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="heading-levels-label">';
+		echo '<div class="ba11y-field-group">';
+		echo '<div class="ba11y-field-label">';
+		echo '<p id="heading-levels-label">' . \esc_html__( 'Select which heading levels you want to remove from the editor. H2, H3 and H4 are always available.', 'block-accessibility-checks' ) . '</p>';
+		echo '</div>';
+		echo '<div class="ba11y-field-controls ba11y-field-controls--checkbox">';
+
+		// Only allow removal of H1, H5, and H6 levels.
+		$removable_levels = array( 'h1', 'h5', 'h6' );
+		foreach ( $removable_levels as $level ) {
+			$level_num = intval( substr( $level, 1 ) );
+			$checked   = in_array( $level, $heading_levels, true ) ? 'checked' : '';
+			echo '<div class="ba11y-checkbox-item">';
+			echo '<input type="checkbox" 
+						 id="' . \esc_attr( 'heading-level-' . $level_num ) . '" 
+						 name="block_checks_options[core_heading_levels][]" 
+						 value="' . \esc_attr( $level ) . '" 
+						 ' . ( $checked ? 'checked="checked"' : '' ) . '>';
+			echo '<label for="' . \esc_attr( 'heading-level-' . $level_num ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
 			echo '</div>';
 		}
 
@@ -257,14 +298,15 @@ class SettingsPage {
 				if ( 'core_heading_levels' === $key ) {
 					if ( is_array( $value ) ) {
 						$sanitized['core_heading_levels'] = array();
-						$valid_levels                     = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+						// Only allow removal of H1, H5, and H6 levels.
+						$valid_levels = array( 'h1', 'h5', 'h6' );
 
 						foreach ( $value as $level ) {
 							if ( in_array( $level, $valid_levels, true ) ) {
 								$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
 								$this->log_debug( "Added heading level: {$level}" );
 							} else {
-								$this->log_error( "Invalid heading level: {$level}. Skipping." );
+								$this->log_error( "Invalid heading level: {$level}. Only H1, H5, and H6 can be removed. Skipping." );
 							}
 						}
 
@@ -452,15 +494,6 @@ class SettingsPage {
 	private function render_core_settings_content(): void {
 		// Render core block checks with individual check settings.
 		$this->render_core_block_checks();
-
-		// Render heading levels (special case).
-		foreach ( $this->block_settings as $block ) {
-			echo '<article class="ba11y-block-options ba11y-block-options-core-heading">';
-			echo '<h2>' . \esc_html( $block['block_label'] ) . '</h2>';
-			echo '<p>' . \esc_html( $block['description'] ) . '</p>';
-			call_user_func( array( $this, $block['function_name'] ) );
-			echo '</article>';
-		}
 	}
 
 	/**
@@ -470,9 +503,10 @@ class SettingsPage {
 	 */
 	private function render_core_block_checks(): void {
 		$core_blocks = array(
-			'core/button' => __( 'Button Block', 'block-accessibility-checks' ),
-			'core/image'  => __( 'Image Block', 'block-accessibility-checks' ),
-			'core/table'  => __( 'Table Block', 'block-accessibility-checks' ),
+			'core/button'  => __( 'Button Block', 'block-accessibility-checks' ),
+			'core/heading' => __( 'Heading Block', 'block-accessibility-checks' ),
+			'core/image'   => __( 'Image Block', 'block-accessibility-checks' ),
+			'core/table'   => __( 'Table Block', 'block-accessibility-checks' ),
 		);
 
 		foreach ( $core_blocks as $block_type => $block_label ) {
@@ -485,6 +519,11 @@ class SettingsPage {
 			$block_slug = str_replace( '/', '-', $block_type );
 			echo '<article class="ba11y-block-options ba11y-block-options-' . \esc_attr( $block_slug ) . '">';
 			echo '<h2>' . \esc_html( $block_label ) . '</h2>';
+
+			// Special handling for heading block - render heading level options first.
+			if ( 'core/heading' === $block_type ) {
+				$this->render_heading_level_options();
+			}
 
 			$this->render_core_block_options( $block_type, $checks );
 
