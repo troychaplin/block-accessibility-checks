@@ -87,14 +87,6 @@ class CoreBlockChecks {
 	private function get_core_block_check_definitions(): array {
 		return array(
 			'core/button'  => array(
-				'check_button_text' => array(
-					'error_msg'   => \__( 'Button text is required and should be descriptive and meaningful', 'block-accessibility-checks' ),
-					'warning_msg' => \__( 'Adding text to a button is highly recommended', 'block-accessibility-checks' ),
-					'description' => \__( 'Buttons require descriptive text', 'block-accessibility-checks' ),
-					'type'        => 'settings',
-					'category'    => 'accessibility',
-					'priority'    => 10,
-				),
 				'check_button_link' => array(
 					'error_msg'   => \__( 'Buttons are required to have a valid link', 'block-accessibility-checks' ),
 					'warning_msg' => \__( 'Adding a link to a button is highly recommended', 'block-accessibility-checks' ),
@@ -102,6 +94,14 @@ class CoreBlockChecks {
 					'type'        => 'settings',
 					'category'    => 'accessibility',
 					'priority'    => 5,
+				),
+				'check_button_text' => array(
+					'error_msg'   => \__( 'Button text is required and should be descriptive and meaningful', 'block-accessibility-checks' ),
+					'warning_msg' => \__( 'Adding text to a button is highly recommended', 'block-accessibility-checks' ),
+					'description' => \__( 'Buttons require descriptive text', 'block-accessibility-checks' ),
+					'type'        => 'settings',
+					'category'    => 'accessibility',
+					'priority'    => 10,
 				),
 			),
 			'core/image'   => array(
@@ -141,21 +141,21 @@ class CoreBlockChecks {
 				),
 			),
 			'core/heading' => array(
+				'check_heading_first_level' => array(
+					'error_msg'   => \__( 'The first heading should either be H1 or H2, depending on the available heading levels', 'block-accessibility-checks' ),
+					'warning_msg' => \__( 'Using H1 or H2 as the first heading improves document structure', 'block-accessibility-checks' ),
+					'description' => \__( 'First heading should be H1 or H2, depending on the available heading levels', 'block-accessibility-checks' ),
+					'type'        => 'settings',
+					'category'    => 'accessibility',
+					'priority'    => 5,
+				),
 				'check_heading_rank'        => array(
 					'error_msg'   => \__( 'Heading levels should not skip ranks (e.g., H2 followed by H4)', 'block-accessibility-checks' ),
 					'warning_msg' => \__( 'Maintaining proper heading hierarchy improves document structure', 'block-accessibility-checks' ),
 					'description' => \__( 'Headings should follow a logical hierarchy without skipping levels', 'block-accessibility-checks' ),
 					'type'        => 'settings',
 					'category'    => 'accessibility',
-					'priority'    => 8,
-				),
-				'check_heading_first_level' => array(
-					'error_msg'   => \__( 'The first heading should be H1 if available, or H2 if H1 is disabled', 'block-accessibility-checks' ),
-					'warning_msg' => \__( 'Using H1 as the first heading improves document structure when available', 'block-accessibility-checks' ),
-					'description' => \__( 'First heading should be H1 if available, or H2 if H1 is disabled', 'block-accessibility-checks' ),
-					'type'        => 'settings',
-					'category'    => 'accessibility',
-					'priority'    => 7,
+					'priority'    => 10,
 				),
 			),
 		);
