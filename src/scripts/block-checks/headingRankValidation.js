@@ -43,6 +43,8 @@ addFilter(
 				};
 
 				return validateHeadingRank(currentHeading);
+			case 'check_heading_first_level':
+				return validateFirstHeadingLevel(attributes);
 			default:
 				return isValid;
 		}
@@ -93,6 +95,34 @@ function validateHeadingRank(currentHeading) {
 	});
 
 	return !isProblematic; // Return false if problematic (validation fails)
+}
+
+/**
+ * Validate first heading level
+ *
+ * Checks if the first heading in the document is H1 or H2.
+ * Only validates if this is actually the first heading block.
+ *
+ * @return {boolean} - True if valid, false if invalid.
+ */
+function validateFirstHeadingLevel() {
+	// Get all blocks from the editor (including nested blocks)
+	const allBlocks = select('core/block-editor').getBlocks();
+
+	// Recursively find all heading blocks in document order
+	const headingBlocks = getAllHeadingBlocks(allBlocks);
+
+	// If no heading blocks exist, validation passes
+	if (headingBlocks.length === 0) {
+		return true;
+	}
+
+	// Get the first heading block
+	const firstHeading = headingBlocks[0];
+	const firstHeadingLevel = firstHeading.attributes.level || 2; // Default to h2 if no level specified
+
+	// Check if the first heading is H1 or H2
+	return firstHeadingLevel === 1 || firstHeadingLevel === 2;
 }
 
 /**

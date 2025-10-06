@@ -141,13 +141,21 @@ class CoreBlockChecks {
 				),
 			),
 			'core/heading' => array(
-				'check_heading_rank' => array(
+				'check_heading_rank'        => array(
 					'error_msg'   => \__( 'Heading levels should not skip ranks (e.g., H2 followed by H4)', 'block-accessibility-checks' ),
 					'warning_msg' => \__( 'Maintaining proper heading hierarchy improves document structure', 'block-accessibility-checks' ),
 					'description' => \__( 'Headings should follow a logical hierarchy without skipping levels', 'block-accessibility-checks' ),
 					'type'        => 'settings',
 					'category'    => 'accessibility',
 					'priority'    => 8,
+				),
+				'check_heading_first_level' => array(
+					'error_msg'   => \__( 'The first heading should be H1 or H2', 'block-accessibility-checks' ),
+					'warning_msg' => \__( 'Using H1 or H2 for the first heading improves document structure', 'block-accessibility-checks' ),
+					'description' => \__( 'First heading should be H1 or H2', 'block-accessibility-checks' ),
+					'type'        => 'settings',
+					'category'    => 'accessibility',
+					'priority'    => 7,
 				),
 			),
 		);
