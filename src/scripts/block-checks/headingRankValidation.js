@@ -1,29 +1,40 @@
 /**
  * Heading Rank Validation
  *
- * Contains validation logic for core/heading blocks to check proper heading hierarchy.
- * Leverages WordPress core's existing heading structure analysis through data stores.
+ * Provides validation logic for core/heading blocks to ensure proper heading hierarchy.
+ * Validates both heading rank progression (no skipped levels) and first heading level appropriateness.
+ *
+ * Key features:
+ * - Checks for skipped heading levels (e.g., H1 → H3)
+ * - Validates first heading level based on available heading restrictions
+ * - Works with nested blocks (groups, columns, etc.)
+ * - Integrates with the ba11yc validation system
  */
 
 import { addFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
 
-// Note: Individual heading validation doesn't need caching since each heading
-// is validated independently against its immediate context
+// Note: Each heading block is validated independently against the document-wide
+// heading hierarchy, so no per-block caching is needed.
 
 /**
- * Register heading block validation logic
+ * Register heading block validation logic with the ba11yc validation system
+ *
+ * Handles two types of heading validations:
+ * - 'check_heading_rank': Ensures proper heading hierarchy without skipped levels
+ * - 'check_heading_first_level': Validates the first heading uses appropriate level
  */
 addFilter(
 	'ba11yc.validateBlock',
 	'ba11yc/heading-rank-validation',
 	(isValid, blockType, attributes, checkName, rule, block) => {
-		// Only handle heading blocks
+		// Only process core/heading blocks - ignore all other block types
 		if (blockType !== 'core/heading') {
 			return isValid;
 		}
 
-		// Try to get clientId from different possible sources
+		// Extract clientId from various possible sources for identification
+		// This helps with debugging and block-specific validation context
 		let clientId = 'unknown';
 		if (block?.clientId) {
 			clientId = block.clientId;
@@ -39,12 +50,12 @@ addFilter(
 			name: blockType,
 		};
 
-		// Run the appropriate check based on the check name
+		// Route to the appropriate validation function based on the check type
 		switch (checkName) {
-			case 'check_heading_rank':
-				return validateHeadingRank(currentHeading);
 			case 'check_heading_first_level':
 				return validateFirstHeadingLevel(currentHeading);
+			case 'check_heading_rank':
+				return validateHeadingRank(currentHeading);
 			default:
 				return isValid;
 		}
@@ -52,115 +63,135 @@ addFilter(
 );
 
 /**
- * Validate heading rank hierarchy - simplified approach
+ * Validate first heading level appropriateness
  *
- * Since we can't reliably get the clientId, we'll use a document-wide approach
- * that flags headings when there are violations in the document.
+ * Ensures the first heading in the document uses an appropriate level based on
+ * the plugin's heading level restrictions. Only validates when the current heading
+ * is actually the first heading block in the document.
  *
- * @param {Object} currentHeading - The heading block being validated
- * @return {boolean} - True if valid, false if invalid.
- */
-function validateHeadingRank(currentHeading) {
-	const currentLevel = currentHeading.attributes.level || 2;
-
-	// Get all blocks from the editor (including nested blocks)
-	const allBlocks = select('core/block-editor').getBlocks();
-
-	// Recursively find all heading blocks, including those nested in groups, columns, etc.
-	const headingBlocks = getAllHeadingBlocks(allBlocks);
-
-	// If there are no heading blocks or only one, validation passes
-	if (headingBlocks.length <= 1) {
-		return true;
-	}
-
-	// Extract heading levels in document order
-	const headingLevels = headingBlocks.map(block => ({
-		level: block.attributes.level || 2, // Default to h2 if no level specified
-		clientId: block.clientId,
-		content: block.attributes.content || '',
-	}));
-
-	// Check if there are any rank violations in the document
-	const violations = findHeadingViolations(headingLevels);
-
-	if (violations.length === 0) {
-		return true;
-	}
-
-	// If there are violations, check if the current heading is one of the problematic ones
-	const isProblematic = violations.some(violation => {
-		// Check if this heading level is involved in a violation
-		return violation.problematicLevel === currentLevel;
-	});
-
-	return !isProblematic; // Return false if problematic (validation fails)
-}
-
-/**
- * Validate first heading level
+ * Rules:
+ * - If H1 is available (not restricted), only H1 is allowed as first heading
+ * - If H1 is restricted but H2 is available, H2 is allowed as first heading
+ * - If both H1 and H2 are restricted, first available level is allowed
  *
- * Checks if the first heading in the document is appropriate based on available heading levels.
- * If H1 is available, only H1 is allowed as the first heading.
- * If H1 is not available, H2 is allowed as the first heading.
- * Only validates if this is actually the first heading block.
- *
- * @param {Object} currentHeading - The heading block being validated
- * @return {boolean} - True if valid, false if invalid.
+ * @param {Object} currentHeading            - The heading block being validated
+ * @param {string} currentHeading.clientId   - Unique identifier for the heading block
+ * @param {Object} currentHeading.attributes - Block attributes including level and content
+ * @param {string} currentHeading.name       - Block type name (should be 'core/heading')
+ * @return {boolean} True if valid, false if invalid
  */
 function validateFirstHeadingLevel(currentHeading) {
-	// Get all blocks from the editor (including nested blocks)
+	// Retrieve all blocks from the editor to find heading blocks
 	const allBlocks = select('core/block-editor').getBlocks();
 
-	// Recursively find all heading blocks in document order
+	// Extract all heading blocks in document order for first heading analysis
 	const headingBlocks = getAllHeadingBlocks(allBlocks);
 
-	// If no heading blocks exist, validation passes
+	// No headings means no first heading validation needed
 	if (headingBlocks.length === 0) {
 		return true;
 	}
 
-	// Get the first heading block
+	// Identify the first heading block in the document
 	const firstHeading = headingBlocks[0];
 
-	// Check if this is the first heading by comparing level and content
+	// Determine if the current heading is the first heading by matching attributes
 	const isFirstHeading =
 		firstHeading.attributes.level === currentHeading.attributes.level &&
 		firstHeading.attributes.content === currentHeading.attributes.content;
 
-	// If this is not the first heading, validation passes
+	// Only validate first heading level - other headings pass automatically
 	if (!isFirstHeading) {
 		return true;
 	}
 
-	// Get available heading levels from plugin settings
+	// Retrieve heading level restrictions from plugin configuration
 	const restrictedLevels =
 		window.BlockAccessibilityChecks?.blockChecksOptions?.core_heading_levels || [];
 	const isH1Restricted = restrictedLevels.includes('h1');
 
 	const firstHeadingLevel = firstHeading.attributes.level || 2; // Default to h2 if no level specified
 
-	// If H1 is available (not restricted), only H1 is allowed as first heading
+	// Rule: If H1 is available, first heading must be H1
 	if (!isH1Restricted) {
 		return firstHeadingLevel === 1;
 	}
 
-	// If H1 is restricted, check if H2 is available
+	// Rule: If H1 is restricted but H2 is available, first heading should be H2
 	const isH2Restricted = restrictedLevels.includes('h2');
 	if (!isH2Restricted) {
 		return firstHeadingLevel === 2;
 	}
 
-	// If both H1 and H2 are restricted, allow the first available level
-	// This is a fallback case - in practice, H2 should always be available
+	// Fallback: If both H1 and H2 are restricted, allow first available level
+	// Note: In practice, H2 should always be available as a heading option
 	return firstHeadingLevel >= 3;
 }
 
 /**
- * Find all heading rank violations in the document
+ * Validate heading rank hierarchy
  *
- * @param {Array} headingLevels - Array of heading level objects with level, clientId, and content.
- * @return {Array} - Array of violation objects with details about each violation.
+ * Checks if the current heading violates proper heading hierarchy rules by analyzing
+ * the entire document's heading structure. Flags headings that participate in violations
+ * (e.g., when a heading level is skipped).
+ *
+ * @param {Object} currentHeading            - The heading block being validated
+ * @param {string} currentHeading.clientId   - Unique identifier for the heading block
+ * @param {Object} currentHeading.attributes - Block attributes including level and content
+ * @param {string} currentHeading.name       - Block type name (should be 'core/heading')
+ * @return {boolean} True if valid (no violations), false if invalid (participates in violation)
+ */
+function validateHeadingRank(currentHeading) {
+	const currentLevel = currentHeading.attributes.level || 2;
+
+	// Retrieve all blocks from the editor, including those nested within groups, columns, etc.
+	const allBlocks = select('core/block-editor').getBlocks();
+
+	// Extract all heading blocks from the document, traversing nested block structures
+	const headingBlocks = getAllHeadingBlocks(allBlocks);
+
+	// Single heading or no headings cannot violate hierarchy rules
+	if (headingBlocks.length <= 1) {
+		return true;
+	}
+
+	// Build array of heading information in document order for hierarchy analysis
+	const headingLevels = headingBlocks.map(block => ({
+		level: block.attributes.level || 2, // Default to h2 if no level specified
+		clientId: block.clientId,
+		content: block.attributes.content || '',
+	}));
+
+	// Analyze the heading sequence for hierarchy violations (skipped levels)
+	const violations = findHeadingViolations(headingLevels);
+
+	// If no violations found, all headings are valid
+	if (violations.length === 0) {
+		return true;
+	}
+
+	// Determine if the current heading participates in any hierarchy violations
+	const isProblematic = violations.some(violation => {
+		// Check if this heading's level is the problematic one in any violation
+		return violation.problematicLevel === currentLevel;
+	});
+
+	// Validation fails if this heading is part of a hierarchy violation
+	return !isProblematic;
+}
+
+/**
+ * Identify heading hierarchy violations in the document
+ *
+ * Analyzes the sequence of heading levels to find instances where heading levels
+ * are skipped (e.g., H1 followed directly by H3, skipping H2).
+ *
+ * @param {Array}  headingLevels            - Array of heading objects in document order
+ * @param {number} headingLevels[].level    - The heading level (1-6)
+ * @param {string} headingLevels[].clientId - Unique block identifier
+ * @param {string} headingLevels[].content  - Heading text content
+ * @return {Array<Object>} Array of violation objects describing each hierarchy problem.
+ * Each object contains: index, previousLevel, problematicLevel, and description.
  */
 function findHeadingViolations(headingLevels) {
 	const violations = [];
@@ -169,7 +200,7 @@ function findHeadingViolations(headingLevels) {
 		const currentLevel = headingLevels[i].level;
 		const previousLevel = headingLevels[i - 1].level;
 
-		// Check if we're skipping heading levels (violation)
+		// Detect skipped heading levels (e.g., H1 → H3 skips H2)
 		if (currentLevel > previousLevel + 1) {
 			violations.push({
 				index: i,
@@ -184,22 +215,28 @@ function findHeadingViolations(headingLevels) {
 }
 
 /**
- * Recursively find all heading blocks in the document, including nested blocks
+ * Recursively extract all heading blocks from the document structure
  *
- * @param {Array} blocks - Array of blocks to search through
- * @return {Array} Array of all heading blocks found
+ * Traverses the block hierarchy to find all core/heading blocks, including those
+ * nested within groups, columns, or other container blocks.
+ *
+ * @param {Array}  blocks               - Array of blocks to search through (typically all editor blocks)
+ * @param {string} blocks[].name        - Block type name
+ * @param {Array}  blocks[].innerBlocks - Nested blocks (optional)
+ * @param {Object} blocks[].attributes  - Block attributes (optional)
+ * @return {Array} Array of all core/heading blocks found in document order
  */
 function getAllHeadingBlocks(blocks) {
 	const headingBlocks = [];
 
 	function searchBlocks(blockList) {
 		for (const block of blockList) {
-			// Check if this block is a heading
+			// Collect core/heading blocks as we find them
 			if (block.name === 'core/heading') {
 				headingBlocks.push(block);
 			}
 
-			// Recursively search inner blocks
+			// Continue searching in nested block structures
 			if (block.innerBlocks && block.innerBlocks.length > 0) {
 				searchBlocks(block.innerBlocks);
 			}
@@ -211,11 +248,16 @@ function getAllHeadingBlocks(blocks) {
 }
 
 /**
- * Get heading hierarchy context for debugging
+ * Get heading hierarchy context for debugging and analysis
  *
- * @return {Array} Array of heading information for debugging purposes.
+ * Provides a simplified view of all headings in the document for debugging
+ * purposes or external analysis. Only searches top-level blocks (not nested).
+ *
+ * @return {Array<Object>} Array of heading information objects.
+ * Each object contains: level, content, and clientId.
  */
 function getHeadingHierarchy() {
+	// Get top-level blocks only (this is a simplified version for debugging)
 	const blocks = select('core/block-editor').getBlocks();
 	const headingBlocks = blocks.filter(block => block.name === 'core/heading');
 
@@ -226,5 +268,5 @@ function getHeadingHierarchy() {
 	}));
 }
 
-// Export for potential external use or debugging
+// Export utility function for external debugging and analysis
 export { getHeadingHierarchy };
