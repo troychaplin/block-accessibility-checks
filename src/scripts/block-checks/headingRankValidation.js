@@ -23,28 +23,28 @@ addFilter(
 			return isValid;
 		}
 
+		// Try to get clientId from different possible sources
+		let clientId = 'unknown';
+		if (block?.clientId) {
+			clientId = block.clientId;
+		} else if (attributes?.clientId) {
+			clientId = attributes.clientId;
+		} else if (rule?.clientId) {
+			clientId = rule.clientId;
+		}
+
+		const currentHeading = {
+			clientId,
+			attributes,
+			name: blockType,
+		};
+
 		// Run the appropriate check based on the check name
 		switch (checkName) {
 			case 'check_heading_rank':
-				// Try to get clientId from different possible sources
-				let clientId = 'unknown';
-				if (block?.clientId) {
-					clientId = block.clientId;
-				} else if (attributes?.clientId) {
-					clientId = attributes.clientId;
-				} else if (rule?.clientId) {
-					clientId = rule.clientId;
-				}
-
-				const currentHeading = {
-					clientId,
-					attributes,
-					name: blockType,
-				};
-
 				return validateHeadingRank(currentHeading);
 			case 'check_heading_first_level':
-				return validateFirstHeadingLevel(attributes);
+				return validateFirstHeadingLevel(currentHeading);
 			default:
 				return isValid;
 		}
@@ -103,9 +103,10 @@ function validateHeadingRank(currentHeading) {
  * Checks if the first heading in the document is H1 or H2.
  * Only validates if this is actually the first heading block.
  *
+ * @param {Object} currentHeading - The heading block being validated
  * @return {boolean} - True if valid, false if invalid.
  */
-function validateFirstHeadingLevel() {
+function validateFirstHeadingLevel(currentHeading) {
 	// Get all blocks from the editor (including nested blocks)
 	const allBlocks = select('core/block-editor').getBlocks();
 
@@ -119,9 +120,19 @@ function validateFirstHeadingLevel() {
 
 	// Get the first heading block
 	const firstHeading = headingBlocks[0];
-	const firstHeadingLevel = firstHeading.attributes.level || 2; // Default to h2 if no level specified
+
+	// Check if this is the first heading by comparing level and content
+	const isFirstHeading =
+		firstHeading.attributes.level === currentHeading.attributes.level &&
+		firstHeading.attributes.content === currentHeading.attributes.content;
+
+	// If this is not the first heading, validation passes
+	if (!isFirstHeading) {
+		return true;
+	}
 
 	// Check if the first heading is H1 or H2
+	const firstHeadingLevel = firstHeading.attributes.level || 2; // Default to h2 if no level specified
 	return firstHeadingLevel === 1 || firstHeadingLevel === 2;
 }
 
