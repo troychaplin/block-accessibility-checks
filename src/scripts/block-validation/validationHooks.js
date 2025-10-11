@@ -38,16 +38,17 @@ export function validateBlock(block) {
 		// Use the new JavaScript-only validation system
 		const isValid = wp.hooks.applyFilters(
 			'ba11yc.validateBlock',
-			true, // Default: validation passes
+			true,
 			block.name,
 			attributes,
 			checkName,
-			rule
+			rule,
+			block
 		);
 
 		// If check fails, add to issues array
 		if (!isValid) {
-			let priority = 3; // Default priority
+			let priority = 3;
 			if (rule.type === 'error') {
 				priority = 1;
 			} else if (rule.type === 'warning') {
@@ -57,7 +58,7 @@ export function validateBlock(block) {
 			issues.push({
 				checkName,
 				type: rule.type,
-				category: rule.category || 'accessibility', // Add category with default
+				category: rule.category || 'accessibility',
 				error_msg: rule.error_msg || rule.message || '',
 				warning_msg: rule.warning_msg || rule.error_msg || rule.message || '',
 				priority,
