@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
 Tested up to: 6.8.2
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,16 +12,23 @@ Configure a series of block checks to prevent WCAG accessibility errors in conte
 
 == Description ==
 
-Block Accessibility Checks is a comprehensive WordPress plugin that ensures your content meets WCAG (Web Content Accessibility Guidelines) requirements. With real-time validation in the Gutenberg block editor, this plugin helps content creators and organizations maintain accessibility compliance effortlessly.
+<a href="https://blockaccessibilitychecks.com/">Block Accessibility Checks</a> is a comprehensive WordPress plugin that proactively prevents accessibility issues in your content before they reach your audience. Designed for the Gutenberg block editor, it provides real-time validation that ensures your images, buttons, tables, headings, and galleries meet WCAG (Web Content Accessibility Guidelines) requirements.
+
+Unlike reactive accessibility tools that scan published content, this plugin catches problems during the editing process—giving immediate visual feedback and preventing publication of content with critical accessibility errors. Content creators get clear guidance on what needs fixing, while developers can extend the system with custom checks for any block type.
+
+Whether you're a content creator ensuring your posts are accessible, a developer building accessible blocks, or an organization maintaining compliance standards, Block Accessibility Checks provides the tools you need to create inclusive content effortlessly.
 
 **Key Features:**
 
-* **Real-time Visual Feedback** - See accessibility issues instantly with red borders around problematic blocks and detailed error messages in the block inspector panel
+* **Real-time Visual Feedback** - See accessibility issues instantly with color-coded borders around problematic blocks and detailed error messages in the block inspector panel
 * **Smart Publishing Control** - Prevents publication of content with critical accessibility errors while allowing warnings with user awareness
-* **Extensive Block Coverage** - Built-in checks for core WordPress blocks (images, buttons, tables, headings, galleries)
-* **Developer-Friendly** - Comprehensive API with 12+ hooks and filters for custom accessibility checks
+* **Comprehensive Block Coverage** - Built-in checks for images, buttons, tables, headings, and galleries with multiple validation rules per block type
+* **Advanced Heading Validation** - Document-wide hierarchy checking prevents skipped heading levels and ensures proper content structure
+* **Intelligent URL Validation** - Real TLD validation using the Public Suffix List ensures only legitimate domains are accepted
+* **Configurable Settings** - Granular control over each check's severity (error/warning/disabled) with an intuitive admin interface
+* **Issue Categorization** - Clear distinction between accessibility issues and validation errors for better understanding
+* **Developer-Friendly API** - Comprehensive hooks and filters system for registering custom accessibility checks
 * **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes
-* **Unified Architecture** - PHP-JavaScript integrated system ensures consistent validation everywhere
 
 **How It Works:**
 
@@ -29,10 +36,10 @@ The plugin provides immediate feedback as you edit content. When accessibility i
 
 **Built-in Accessibility Checks:**
 
-* **Button Blocks** - Ensures buttons have both text content and proper link destinations
-* **Image Blocks** - Requires alt text (unless marked decorative), validates length, prevents caption duplication
+* **Button Blocks** - Ensures buttons have descriptive text content and valid link destinations with real URL validation
+* **Image Blocks** - Requires alt text (unless marked decorative), validates length, prevents caption duplication, and detects non-descriptive patterns
 * **Table Blocks** - Requires proper headers or captions for screen reader navigation
-* **Heading Blocks** - Configurable heading level restrictions to maintain proper hierarchy
+* **Heading Blocks** - Validates proper heading hierarchy (no skipped levels), ensures appropriate first heading level, and configurable heading level restrictions
 * **Gallery Blocks** - Applies comprehensive image accessibility checks to all gallery items
 
 **Perfect For:**
@@ -117,21 +124,4 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
  
 == Changelog ==
 
-= 2.1.0 =
-
-**Enhanced User Experience & Advanced Plugin Integration**
-
-This release focuses on dramatically improving the user experience with better organization, modern design, and seamless integration with external plugins. The update introduces intelligent issue categorization, a completely redesigned settings interface, and advanced plugin detection capabilities that make accessibility validation more intuitive and powerful than ever.
-
-* **Issue Categorization System** - New intelligent categorization distinguishes between "accessibility" and "validation" issues, providing clearer guidance on what needs attention
-* **Redesigned Settings Interface** - Complete overhaul of the admin settings page with modern, accessible design and improved user experience
-* **Enhanced Inspector Panel** - Consolidated error/warning display with clear sub-headings for "Accessibility" and "Validation" categories, updated panel title to "Accessibility & Validation"
-* **Advanced External Plugin Detection** - New automatic plugin detection system that identifies external plugins by analyzing file structure and plugin headers
-* **CSS Custom Properties** - Centralized color system with semantic variable names for consistent theming and better maintainability
-* **Modern Sass Architecture** - Migrated to modern `@use` syntax and modular SCSS organization for improved performance
-* **Plugin Information Caching** - Performance optimization with intelligent caching of plugin metadata
-* **Enhanced Form Controls** - Improved radio button and checkbox styling with semantic CSS classes for better accessibility
-* **Site Editor Compatibility** - Fixed compatibility issues with WordPress site editor and improved post type detection
-* **Security Improvements** - Enhanced security compliance with proper WordPress API usage
-
-* View the <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/CHANGELOG.md">full changelog</a> in Github
+View the <a href="https://blockaccessibilitychecks.com/changelog/">changelog</a> on the plugin website.
