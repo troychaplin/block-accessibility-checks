@@ -30,20 +30,6 @@ class SettingsPage {
 	private $registry;
 
 	/**
-	 * Holds the block settings configuration.
-	 *
-	 * @var array
-	 */
-	private $block_settings = array(
-		array(
-			'option_name'   => 'core_heading_levels',
-			'block_label'   => 'Heading Block',
-			'description'   => 'Select which heading levels you want to remove from the editor. Checked levels will not be available.',
-			'function_name' => 'render_core_heading_options',
-		),
-	);
-
-	/**
 	 * SettingsPage constructor.
 	 *
 	 * This constructor initializes the settings page by adding the necessary
@@ -117,15 +103,13 @@ class SettingsPage {
 			'block_checks_options'
 		);
 
-		foreach ( $this->block_settings as $block ) {
-			\add_settings_field(
-				$block['option_name'],
-				$block['block_label'],
-				array( $this, $block['function_name'] ),
-				'block_checks_options',
-				'block_checks_options_section'
-			);
-		}
+		\add_settings_field(
+			'core_heading_levels',
+			'Heading Block',
+			array( $this, 'render_core_heading_options' ),
+			'block_checks_options',
+			'block_checks_options_section'
+		);
 
 		// Register external plugin settings.
 		$this->register_external_plugin_settings();

@@ -120,7 +120,6 @@ class ScriptsStyles {
 			'BlockAccessibilityChecks',
 			array(
 				'blockChecksOptions' => $block_checks_options,
-				'blocks'             => BlockConfig::get_instance()->get_block_config(),
 				'validationRules'    => $validation_rules,
 			)
 		);
