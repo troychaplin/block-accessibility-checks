@@ -14,6 +14,30 @@ Prefix the change with one of these keywords:
 - _Fixed_: for any bug fixes.
 - _Security_: in case of vulnerabilities.
 
+## [Unreleased]
+
+### Removed
+
+- **BlockConfig.php class**: Removed obsolete `Functions/BlockConfig.php` file (93 lines) that referenced non-existent render functions and was never used by JavaScript
+- **Unused service methods**: Removed `has_service()` and `get_all_services()` methods from `PluginInitializer` that were never called anywhere in the codebase
+- **Unnecessary wrapper methods**: Removed `register_check()` and `unregister_check()` methods from `PluginInitializer` as external plugins receive registry directly via `ba11yc_ready` hook
+- **Obsolete settings configuration**: Removed unused `$block_settings` property from `SettingsPage` that was replaced by dynamic rendering from `BlockChecksRegistry`
+- **Dead code in validation**: Removed complex validation loop in `BlockChecksRegistry::run_checks()` that always skipped execution (~30 lines)
+
+### Changed
+
+- **BlockConfig initialization**: Removed `init_block_config()` method and call from `PluginInitializer` initialization sequence
+- **JavaScript localization**: Removed unused `'blocks'` data from script localization in `ScriptsStyles.php`
+- **Settings initialization**: Simplified `SettingsPage::init_settings()` to directly register heading options field instead of looping through configuration array
+- **Validation method clarity**: Simplified `BlockChecksRegistry::run_checks()` to immediately return empty array with clear documentation that all validation is handled in JavaScript
+
+### Improved
+
+- **Code maintainability**: Removed approximately 150-170 lines of obsolete and unused code for better code clarity
+- **Performance**: Reduced unnecessary class instantiations and data passed to JavaScript
+- **Memory footprint**: Eliminated unused data structures and dead code paths
+- **Developer experience**: Codebase now contains only functional code with no misleading code paths
+
 ## [2.2.0]
 
 ### Added

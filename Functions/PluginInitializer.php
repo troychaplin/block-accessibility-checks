@@ -66,7 +66,6 @@ class PluginInitializer {
 			$this->init_translations();
 			$this->init_scripts_styles();
 			$this->init_settings_page();
-			$this->init_block_config();
 			$this->init_block_checks_registry();
 
 			// Setup hooks.
@@ -142,23 +141,6 @@ class PluginInitializer {
 	}
 
 	/**
-	 * Initialize block configuration
-	 *
-	 * @return void
-	 * @throws \Exception If block config service initialization fails.
-	 */
-	private function init_block_config(): void {
-		try {
-			$block_config                   = BlockConfig::get_instance();
-			$this->services['block_config'] = $block_config;
-			$this->log_debug( 'Block config service initialized.' );
-		} catch ( \Exception $e ) {
-			$this->log_error( 'Failed to initialize block config: ' . $e->getMessage() );
-			throw $e;
-		}
-	}
-
-	/**
 	 * Initialize block checks registry
 	 *
 	 * @return void
@@ -214,25 +196,6 @@ class PluginInitializer {
 	}
 
 	/**
-	 * Check if a service exists
-	 *
-	 * @param string $service_name Service name.
-	 * @return bool True if service exists, false otherwise.
-	 */
-	public function has_service( string $service_name ): bool {
-		return isset( $this->services[ $service_name ] );
-	}
-
-	/**
-	 * Get all registered services
-	 *
-	 * @return array All services.
-	 */
-	public function get_all_services(): array {
-		return $this->services;
-	}
-
-	/**
 	 * Get plugin file path
 	 *
 	 * @return string Plugin file path.
@@ -257,31 +220,6 @@ class PluginInitializer {
 	 */
 	public function get_block_checks_registry(): ?BlockChecksRegistry {
 		return $this->get_service( 'block_checks_registry' );
-	}
-
-	/**
-	 * Register a new accessibility check (convenience method)
-	 *
-	 * @param string $block_type Block type (e.g., 'core/image').
-	 * @param string $check_name Unique check name.
-	 * @param array  $check_args Check configuration.
-	 * @return bool True on success, false on failure.
-	 */
-	public function register_check( string $block_type, string $check_name, array $check_args ): bool {
-		$registry = $this->get_block_checks_registry();
-		return $registry ? $registry->register_check( $block_type, $check_name, $check_args ) : false;
-	}
-
-	/**
-	 * Unregister an accessibility check (convenience method)
-	 *
-	 * @param string $block_type Block type.
-	 * @param string $check_name Check name.
-	 * @return bool True on success, false if check not found.
-	 */
-	public function unregister_check( string $block_type, string $check_name ): bool {
-		$registry = $this->get_block_checks_registry();
-		return $registry ? $registry->unregister_check( $block_type, $check_name ) : false;
 	}
 
 	/**

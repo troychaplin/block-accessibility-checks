@@ -311,10 +311,9 @@ class BlockChecksRegistry {
 	 *
 	 * @param string $block_type Block type.
 	 * @param array  $attributes Block attributes.
-	 * @param string $content Block content.
-	 * @return array Array of check results.
+	 * @return array Empty array.
 	 */
-	public function run_checks( $block_type, $attributes, $content = '' ) {
+	public function run_checks( $block_type, $attributes ) {
 		try {
 			// Validate input parameters.
 			if ( empty( $block_type ) || ! is_string( $block_type ) ) {
@@ -327,42 +326,11 @@ class BlockChecksRegistry {
 				return array();
 			}
 
-			$results = array();
-			$checks  = $this->get_checks( $block_type );
+			// All validation now handled in JavaScript.
+			// This method is preserved for backward compatibility but performs no server-side validation.
+			$this->log_debug( "PHP validation disabled for {$block_type}, all validation handled in JavaScript" );
 
-			if ( empty( $checks ) ) {
-				$this->log_debug( "No checks registered for block type: {$block_type}" );
-				return array();
-			}
-
-			// Allow developers to filter which checks run for a block.
-			$checks = \apply_filters( 'ba11yc_block_checks', $checks, $block_type, $attributes, $content );
-
-			// Allow developers to completely filter the attributes before checks run.
-			$attributes = \apply_filters( 'ba11yc_block_attributes', $attributes, $block_type, $content );
-
-			foreach ( $checks as $check_name => $check_config ) {
-				try {
-					if ( ! $check_config['enabled'] ) {
-						$this->log_debug( "Check disabled, skipping: {$block_type}/{$check_name}" );
-						continue;
-					}
-
-					// Skip PHP validation - all validation now handled in JavaScript.
-					$this->log_debug( "PHP validation disabled, all validation handled in JavaScript: {$block_type}/{$check_name}" );
-					continue;
-
-				} catch ( \Exception $e ) {
-					$this->log_error( "Error processing check {$block_type}/{$check_name}: " . $e->getMessage() );
-					// Continue with other checks even if one fails.
-					continue;
-				}
-			}
-
-			// Allow developers to filter all results for a block.
-			$results = \apply_filters( 'ba11yc_block_check_results', $results, $block_type, $attributes, $content );
-
-			return $results;
+			return array();
 
 		} catch ( \Exception $e ) {
 			$this->log_error( "Error in run_checks for {$block_type}: " . $e->getMessage() );
