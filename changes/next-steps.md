@@ -12,7 +12,6 @@ This document outlines potential areas for further code cleanup and simplificati
 
 **Priority:** MEDIUM  
 **Complexity:** MEDIUM  
-**Time Estimate:** 2-3 hours  
 **Impact:** Architectural consistency
 
 ### Current Situation
@@ -82,7 +81,6 @@ public function register_heading_level_filter() {
 
 **Priority:** LOW  
 **Complexity:** LOW  
-**Time Estimate:** 1-2 hours  
 **Impact:** API clarity
 
 ### Current Situation
@@ -143,7 +141,6 @@ public function run_checks( $block_type, $attributes, $content = '' ) {
 
 **Priority:** MEDIUM  
 **Complexity:** MEDIUM-HIGH  
-**Time Estimate:** 4-6 hours  
 **Impact:** Code quality and maintainability
 
 ### Approach: Methodical Codebase Audit
@@ -296,7 +293,6 @@ Create a checklist as you review:
 
 **Priority:** HIGH (for long-term maintenance)  
 **Complexity:** HIGH  
-**Time Estimate:** 12-20 hours  
 **Impact:** Prevents future dead code, catches regressions
 
 ### Why This Matters
@@ -454,7 +450,6 @@ jobs:
 
 **Priority:** LOW-MEDIUM  
 **Complexity:** MEDIUM  
-**Time Estimate:** 3-4 hours  
 **Impact:** Code maintainability
 
 ### Current Architecture Review
@@ -534,7 +529,6 @@ src/scripts/validation/
 
 **Priority:** LOW  
 **Complexity:** LOW-MEDIUM  
-**Time Estimate:** 2-3 hours  
 **Impact:** User experience
 
 ### Current State
@@ -600,7 +594,6 @@ public function import_settings( $json ) {
 
 **Priority:** MEDIUM  
 **Complexity:** LOW  
-**Time Estimate:** 2-3 hours  
 **Impact:** Developer experience
 
 ### Areas to Enhance
@@ -657,7 +650,6 @@ This helps future developers understand the "why" behind the code.
 
 **Priority:** LOW (unless performance issues reported)  
 **Complexity:** MEDIUM  
-**Time Estimate:** 4-6 hours  
 **Impact:** Plugin performance
 
 ### Areas to Investigate
