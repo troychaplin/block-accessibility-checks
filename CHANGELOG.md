@@ -23,7 +23,7 @@ Prefix the change with one of these keywords:
 - **Unused service methods**: Removed `has_service()` and `get_all_services()` methods from `PluginInitializer` that were never called anywhere in the codebase
 - **Unnecessary wrapper methods**: Removed `register_check()` and `unregister_check()` methods from `PluginInitializer` as external plugins receive registry directly via `ba11yc_ready` hook
 - **Obsolete settings configuration**: Removed unused `$block_settings` property from `SettingsPage` that was replaced by dynamic rendering from `BlockChecksRegistry`
-- **Dead code in validation**: Removed complex validation loop in `BlockChecksRegistry::run_checks()` that always skipped execution (~30 lines)
+- **`BlockChecksRegistry::run_checks()` method**: Completely removed this method and its internal validation loop (~31 lines total) as all validation is JavaScript-based. The method always returned an empty array and was retained only for potential backward compatibility, but no internal or external usage was detected
 
 ### Changed
 
@@ -32,7 +32,6 @@ Prefix the change with one of these keywords:
 - **BlockConfig initialization**: Removed `init_block_config()` method and call from `PluginInitializer` initialization sequence
 - **JavaScript localization**: Removed unused `'blocks'` data from script localization in `ScriptsStyles.php`
 - **Settings initialization**: Simplified `SettingsPage::init_settings()` to directly register heading options field instead of looping through configuration array
-- **Validation method clarity**: Simplified `BlockChecksRegistry::run_checks()` to immediately return empty array with clear documentation that all validation is handled in JavaScript
 
 ### Improved
 
