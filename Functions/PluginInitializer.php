@@ -47,6 +47,33 @@ class PluginInitializer {
 	public function __construct( string $plugin_file, string $text_domain ) {
 		$this->plugin_file = $plugin_file;
 		$this->text_domain = $text_domain;
+
+		// Initialize heading levels immediately - must run before 'init' hook.
+		// This service registers the 'register_block_type_args' filter which must
+		// be active before blocks are registered during the 'init' hook.
+		$this->init_heading_levels();
+	}
+
+	/**
+	 * Initialize heading levels service early
+	 *
+	 * This service must be initialized before the WordPress 'init' hook because it
+	 * registers a filter on 'register_block_type_args' which needs to be active when
+	 * blocks are registered. Block registration happens during the 'init' hook, so
+	 * this filter must be in place earlier.
+	 *
+	 * @return void
+	 * @throws \Exception If heading levels service initialization fails.
+	 */
+	private function init_heading_levels(): void {
+		try {
+			$heading_levels                   = new HeadingLevels();
+			$this->services['heading_levels'] = $heading_levels;
+			$this->log_debug( 'Heading levels service initialized early.' );
+		} catch ( \Exception $e ) {
+			$this->log_error( 'Failed to initialize heading levels: ' . $e->getMessage() );
+			throw $e;
+		}
 	}
 
 	/**
@@ -220,6 +247,15 @@ class PluginInitializer {
 	 */
 	public function get_block_checks_registry(): ?BlockChecksRegistry {
 		return $this->get_service( 'block_checks_registry' );
+	}
+
+	/**
+	 * Get the heading levels service
+	 *
+	 * @return HeadingLevels|null The heading levels instance or null if not initialized.
+	 */
+	public function get_heading_levels(): ?HeadingLevels {
+		return $this->get_service( 'heading_levels' );
 	}
 
 	/**

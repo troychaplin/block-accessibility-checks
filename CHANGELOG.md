@@ -10,6 +10,7 @@ Prefix the change with one of these keywords:
 - _Added_: for new features.
 - _Changed_: for changes in existing functionality.
 - _Deprecated_: for soon-to-be removed features.
+- _Improved_: for enhancements to code or architecture.
 - _Removed_: for now removed features.
 - _Fixed_: for any bug fixes.
 - _Security_: in case of vulnerabilities.
@@ -26,6 +27,8 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
+- **HeadingLevels service integration**: Integrated HeadingLevels into PluginInitializer service container for architectural consistency. HeadingLevels is now initialized in the PluginInitializer constructor (which runs before the 'init' hook) to maintain proper timing for the `register_block_type_args` filter. All services now managed consistently through the service container.
+- **Plugin initialization timing**: PluginInitializer is now instantiated immediately in global scope (before hooks fire) to ensure HeadingLevels filter registers early enough, with remaining services initialized on the 'init' hook
 - **BlockConfig initialization**: Removed `init_block_config()` method and call from `PluginInitializer` initialization sequence
 - **JavaScript localization**: Removed unused `'blocks'` data from script localization in `ScriptsStyles.php`
 - **Settings initialization**: Simplified `SettingsPage::init_settings()` to directly register heading options field instead of looping through configuration array
@@ -37,6 +40,7 @@ Prefix the change with one of these keywords:
 - **Performance**: Reduced unnecessary class instantiations and data passed to JavaScript
 - **Memory footprint**: Eliminated unused data structures and dead code paths
 - **Developer experience**: Codebase now contains only functional code with no misleading code paths
+- **Service architecture**: All plugin services now managed consistently through PluginInitializer with proper timing and dependency management
 
 ## [2.2.0]
 

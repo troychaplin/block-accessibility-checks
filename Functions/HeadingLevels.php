@@ -16,6 +16,11 @@ namespace BlockAccessibility;
  * This class is responsible for managing and validating heading levels
  * within the context of accessibility checks for WordPress blocks.
  *
+ * IMPORTANT: This service must be initialized before the WordPress 'init' hook
+ * to ensure the 'register_block_type_args' filter is registered early enough.
+ * The PluginInitializer handles this timing automatically by initializing this
+ * service in its constructor.
+ *
  * @package BlockAccessibilityChecks
  */
 class HeadingLevels {
@@ -30,7 +35,9 @@ class HeadingLevels {
 	/**
 	 * Constructor for the HeadingLevels class.
 	 *
-	 * Initializes the class and sets up any necessary properties or functionality.
+	 * Registers the 'register_block_type_args' filter immediately to ensure it's
+	 * active before blocks are registered. This constructor is called by
+	 * PluginInitializer before the 'init' hook to maintain proper timing.
 	 */
 	public function __construct() {
 		// Add the filter immediately - don't wait for any hooks.

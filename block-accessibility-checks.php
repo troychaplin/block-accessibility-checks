@@ -26,30 +26,28 @@ define( 'BA11YC_VERSION', '2.2.0' );
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Imports the necessary classes for the plugin.
-use BlockAccessibility\HeadingLevels;
 use BlockAccessibility\PluginInitializer;
 
-// Initialize heading levels immediately - before init hook.
-$ba11yc_heading_levels_early = new HeadingLevels();
-
 // Global variables for the plugin.
-$ba11yc_plugin_file        = __FILE__;
-$ba11yc_text_domain        = 'block-accessibility-checks';
-$ba11yc_plugin_initializer = null;
+$ba11yc_plugin_file = __FILE__;
+$ba11yc_text_domain = 'block-accessibility-checks';
+
+// Initialize the PluginInitializer immediately (before 'init' hook).
+// This is required for HeadingLevels to register its filter early enough.
+$ba11yc_plugin_initializer = new PluginInitializer( $ba11yc_plugin_file, $ba11yc_text_domain );
 
 /**
- * Initializes the Block Accessibility Checks plugin.
+ * Initializes the Block Accessibility Checks plugin services.
  *
- * This function sets up the necessary hooks, filters, and functionality
- * required for the plugin to operate using the PluginInitializer class.
+ * This function is called on the 'init' hook to complete plugin initialization
+ * after HeadingLevels has been set up in the PluginInitializer constructor.
  *
  * @return void
  */
 function ba11yc_init_plugin() {
-	global $ba11yc_plugin_file, $ba11yc_text_domain, $ba11yc_plugin_initializer;
+	global $ba11yc_plugin_initializer;
 
-	// Initialize the plugin using the new initializer.
-	$ba11yc_plugin_initializer = new PluginInitializer( $ba11yc_plugin_file, $ba11yc_text_domain );
+	// Complete plugin initialization (HeadingLevels already initialized in constructor).
 	$ba11yc_plugin_initializer->init();
 }
 add_action( 'init', 'ba11yc_init_plugin' );
