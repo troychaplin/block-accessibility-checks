@@ -307,38 +307,6 @@ class BlockChecksRegistry {
 	}
 
 	/**
-	 * Run checks for a block
-	 *
-	 * @param string $block_type Block type.
-	 * @param array  $attributes Block attributes.
-	 * @return array Empty array.
-	 */
-	public function run_checks( $block_type, $attributes ) {
-		try {
-			// Validate input parameters.
-			if ( empty( $block_type ) || ! is_string( $block_type ) ) {
-				$this->log_error( "Invalid block type provided to run_checks: {$block_type}" );
-				return array();
-			}
-
-			if ( ! is_array( $attributes ) ) {
-				$this->log_error( "Invalid attributes provided to run_checks for {$block_type}" );
-				return array();
-			}
-
-			// All validation now handled in JavaScript.
-			// This method is preserved for backward compatibility but performs no server-side validation.
-			$this->log_debug( "PHP validation disabled for {$block_type}, all validation handled in JavaScript" );
-
-			return array();
-
-		} catch ( \Exception $e ) {
-			$this->log_error( "Error in run_checks for {$block_type}: " . $e->getMessage() );
-			return array();
-		}
-	}
-
-	/**
 	 * Sort checks by priority
 	 *
 	 * @param array $a First check.

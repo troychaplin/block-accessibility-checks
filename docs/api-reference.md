@@ -110,19 +110,6 @@ Get all block types that have checks registered.
 
 ---
 
-### Deprecated: `run_checks( $block_type, $attributes, $content )`
-**Note:** This method is deprecated. All validation is now handled in JavaScript.
-
-**Parameters:**
-- `$block_type` (string)
-- `$attributes` (array)
-- `$content` (string)
-
-**Returns:**
-- `array`: Empty array
-
----
-
 ## Usage Example
 
 ```php
