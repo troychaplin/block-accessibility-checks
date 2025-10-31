@@ -223,7 +223,12 @@ class BlockChecksRegistry {
 		}
 
 		unset( $this->checks[ $block_type ][ $check_name ] );
-		unset( $this->plugin_info[ $block_type ] );
+
+		// Only remove plugin info if no more checks exist for this block type.
+		if ( empty( $this->checks[ $block_type ] ) ) {
+			unset( $this->checks[ $block_type ] );
+			unset( $this->plugin_info[ $block_type ] );
+		}
 
 		// Action hook for developers to know when a check is unregistered.
 		\do_action( 'ba11yc_check_unregistered', $block_type, $check_name );
@@ -552,11 +557,7 @@ class BlockChecksRegistry {
 		// If still not found, try searching up the directory tree until we reach WP_PLUGIN_DIR.
 		$current_dir = $dir;
 		while ( WP_PLUGIN_DIR !== $current_dir && strpos( $current_dir, WP_PLUGIN_DIR ) === 0 ) {
-			$current_dir = dirname( $current_dir );
-			if ( $current_dir === $dir ) {
-				break; // Prevent infinite loop.
-			}
-
+			$current_dir  = dirname( $current_dir );
 			$plugin_files = glob( $current_dir . '/*.php' );
 
 			foreach ( $plugin_files as $plugin_file ) {

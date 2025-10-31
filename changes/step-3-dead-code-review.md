@@ -54,7 +54,7 @@ grep -rn "private function" Functions/
 
 # For each private method found, search for usage
 # Example: If you find private function foo()
-grep -rn "->foo(" Functions/
+grep -rn "\->foo(" Functions/
 grep -rn "self::foo(" Functions/
 ```
 
