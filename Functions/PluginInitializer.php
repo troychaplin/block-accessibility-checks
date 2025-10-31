@@ -266,8 +266,8 @@ class PluginInitializer {
 	public function display_initialization_error(): void {
 		printf(
 			'<div class="notice notice-error"><p><strong>%s:</strong> %s</p></div>',
-			'Plugin Error',
-			'Block Accessibility Checks plugin failed to initialize properly. Please check your error logs for more details.'
+			esc_html__( 'Plugin Error', 'block-accessibility-checks' ),
+			esc_html__( 'Block Accessibility Checks plugin failed to initialize properly. Please check your error logs for more details.', 'block-accessibility-checks' )
 		);
 	}
 
