@@ -131,7 +131,7 @@ class BlockChecksRegistry {
 				'error_msg'   => '',
 				'warning_msg' => '',
 				'type'        => 'settings',
-				'category'    => 'accessibility', // New optional field.
+				'category'    => 'accessibility',
 				'priority'    => 10,
 				'enabled'     => true,
 				'description' => '',
@@ -489,7 +489,7 @@ class BlockChecksRegistry {
 					}
 
 					// Get plugin data and cache it.
-					if ( function_exists( 'get_plugin_data' ) ) {
+					if ( $this->ensure_plugin_data_function() ) {
 						$plugin_data = \get_plugin_data( $plugin_file );
 
 						$plugin_info = array(
@@ -518,6 +518,50 @@ class BlockChecksRegistry {
 	}
 
 	/**
+	 * Ensure get_plugin_data function is available
+	 *
+	 * Loads the required WordPress file if the function doesn't exist.
+	 *
+	 * @return bool True if function is available, false otherwise.
+	 */
+	private function ensure_plugin_data_function(): bool {
+		if ( ! function_exists( 'get_plugin_data' ) ) {
+			if ( defined( 'ABSPATH' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+		}
+		return function_exists( 'get_plugin_data' );
+	}
+
+	/**
+	 * Find a plugin file in a specific directory
+	 *
+	 * Searches for PHP files with valid plugin headers in the given directory.
+	 *
+	 * @param string $dir The directory to search in.
+	 * @return string|false The plugin file path or false if not found.
+	 */
+	private function find_plugin_file_in_directory( string $dir ): string|false {
+		if ( ! $this->ensure_plugin_data_function() ) {
+			return false;
+		}
+
+		$plugin_files = glob( $dir . '/*.php' );
+		if ( false === $plugin_files ) {
+			return false;
+		}
+
+		foreach ( $plugin_files as $plugin_file ) {
+			$plugin_data = \get_plugin_data( $plugin_file );
+			if ( ! empty( $plugin_data['Name'] ) ) {
+				return $plugin_file;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Find the main plugin file from a given file path
 	 *
 	 * @param string $file_path The file path to start from.
@@ -526,47 +570,29 @@ class BlockChecksRegistry {
 	private function find_main_plugin_file( string $file_path ): string|false {
 		$dir = dirname( $file_path );
 
-		// Look for plugin files in the directory.
-		$plugin_files = glob( $dir . '/*.php' );
-
-		foreach ( $plugin_files as $plugin_file ) {
-			if ( function_exists( 'get_plugin_data' ) ) {
-				$plugin_data = \get_plugin_data( $plugin_file );
-				if ( ! empty( $plugin_data['Name'] ) ) {
-					return $plugin_file;
-				}
-			}
+		// Look for plugin files in the current directory.
+		$plugin_file = $this->find_plugin_file_in_directory( $dir );
+		if ( false !== $plugin_file ) {
+			return $plugin_file;
 		}
 
 		// If not found in current directory, try parent directory.
 		$parent_dir = dirname( $dir );
 		if ( $parent_dir !== $dir && strpos( $parent_dir, WP_PLUGIN_DIR ) === 0 ) {
-			// Look for any PHP file with a Plugin Name header in the parent directory.
-			$parent_plugin_files = glob( $parent_dir . '/*.php' );
-
-			foreach ( $parent_plugin_files as $parent_plugin_file ) {
-				if ( function_exists( 'get_plugin_data' ) ) {
-					$plugin_data = \get_plugin_data( $parent_plugin_file );
-					if ( ! empty( $plugin_data['Name'] ) ) {
-						return $parent_plugin_file;
-					}
-				}
+			$plugin_file = $this->find_plugin_file_in_directory( $parent_dir );
+			if ( false !== $plugin_file ) {
+				return $plugin_file;
 			}
 		}
 
 		// If still not found, try searching up the directory tree until we reach WP_PLUGIN_DIR.
 		$current_dir = $dir;
 		while ( WP_PLUGIN_DIR !== $current_dir && strpos( $current_dir, WP_PLUGIN_DIR ) === 0 ) {
-			$current_dir  = dirname( $current_dir );
-			$plugin_files = glob( $current_dir . '/*.php' );
+			$current_dir = dirname( $current_dir );
 
-			foreach ( $plugin_files as $plugin_file ) {
-				if ( function_exists( 'get_plugin_data' ) ) {
-					$plugin_data = \get_plugin_data( $plugin_file );
-					if ( ! empty( $plugin_data['Name'] ) ) {
-						return $plugin_file;
-					}
-				}
+			$plugin_file = $this->find_plugin_file_in_directory( $current_dir );
+			if ( false !== $plugin_file ) {
+				return $plugin_file;
 			}
 		}
 

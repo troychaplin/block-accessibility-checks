@@ -6,7 +6,7 @@ Review of `Functions/BlockChecksRegistry.php` to identify code that is no longer
 ## Issues Found
 
 ### 1. Code Duplication in `find_main_plugin_file()` (Lines 521-573)
-**Status**: 🔴 Needs Refactoring
+**Status**: ✅ Fixed
 
 **Issue**: The same "glob for PHP files and check plugin data" pattern is repeated three times:
 - Lines 525-534 (current directory)
@@ -16,6 +16,8 @@ Review of `Functions/BlockChecksRegistry.php` to identify code that is no longer
 **Solution**: Extract into a helper method `find_plugin_file_in_directory()` to eliminate duplication.
 
 **Impact**: Medium - Reduces code by ~30 lines, improves maintainability
+
+**Implementation**: Created `find_plugin_file_in_directory()` helper method that encapsulates the duplicate pattern. Refactored `find_main_plugin_file()` to use this helper three times, eliminating ~30 lines of duplicate code.
 
 ---
 
@@ -71,13 +73,15 @@ Review of `Functions/BlockChecksRegistry.php` to identify code that is no longer
 ---
 
 ### 6. Redundant Function Existence Checks (Lines 487, 528, 543, 563)
-**Status**: 🟡 Optimization Opportunity
+**Status**: ✅ Fixed
 
 **Issue**: Code repeatedly checks `function_exists( 'get_plugin_data' )` in multiple locations. This WordPress function should always be available in admin context.
 
 **Solution**: Create `ensure_plugin_data_function()` helper that loads the function file if needed, then call once at method level.
 
 **Impact**: Low - Minor optimization, cleaner code
+
+**Implementation**: Created `ensure_plugin_data_function()` helper that loads `wp-admin/includes/plugin.php` if needed. Updated `find_plugin_file_in_directory()` and `detect_plugin_info()` to use this helper, eliminating redundant checks.
 
 ---
 
@@ -96,7 +100,7 @@ Review of `Functions/BlockChecksRegistry.php` to identify code that is no longer
 1. ✅ Fix `unregister_check()` bug (#3)
 2. ✅ Remove dead code in `find_main_plugin_file()` (#4)
 
-### Phase 2: Refactoring
+### Phase 2: Refactoring ✅ COMPLETE
 3. ✅ Extract duplicate code in `find_main_plugin_file()` (#1)
 4. ✅ Create `ensure_plugin_data_function()` helper (#6)
 
