@@ -283,7 +283,7 @@ class BlockChecksRegistry {
 	 * @param string $check_name Check name.
 	 * @return bool True if registered, false otherwise.
 	 */
-	public function is_check_registered( $block_type, $check_name ) {
+	public function is_check_registered( string $block_type, string $check_name ): bool {
 		return isset( $this->checks[ $block_type ][ $check_name ] );
 	}
 
@@ -294,7 +294,7 @@ class BlockChecksRegistry {
 	 * @param string $check_name Check name.
 	 * @return array|null Check configuration or null if not found.
 	 */
-	public function get_check_config( $block_type, $check_name ) {
+	public function get_check_config( string $block_type, string $check_name ): ?array {
 		if ( ! isset( $this->checks[ $block_type ][ $check_name ] ) ) {
 			return null;
 		}
@@ -307,7 +307,7 @@ class BlockChecksRegistry {
 	 *
 	 * @return array Array of block types that have checks registered.
 	 */
-	public function get_registered_block_types() {
+	public function get_registered_block_types(): array {
 		return \array_keys( $this->checks );
 	}
 
@@ -392,10 +392,14 @@ class BlockChecksRegistry {
 	 * @return string The check level.
 	 */
 	private function get_external_block_setting( string $block_type, string $check_name ): string {
-		// Extract plugin slug from block type.
-		$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
-		$plugin_slug = $plugin_info['slug'];
+		// Use stored plugin info if available, fallback to extraction from block type.
+		$plugin_info = $this->plugin_info[ $block_type ] ?? array();
 
+		if ( empty( $plugin_info['slug'] ) ) {
+			$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
+		}
+
+		$plugin_slug = $plugin_info['slug'];
 		$option_name = 'block_checks_external_' . $plugin_slug;
 		$options     = \get_option( $option_name, array() );
 
