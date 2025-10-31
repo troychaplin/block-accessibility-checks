@@ -26,6 +26,14 @@ namespace BlockAccessibility;
 class HeadingLevels {
 
 	/**
+	 * Allowed heading levels that can be restricted.
+	 * Only H1, H5, and H6 are permitted to be restricted.
+	 *
+	 * @var array
+	 */
+	private const ALLOWED_RESTRICTED_LEVELS = array( 'h1', 'h5', 'h6' );
+
+	/**
 	 * Cached options to avoid repeated database calls.
 	 *
 	 * @var array|null
@@ -88,7 +96,7 @@ class HeadingLevels {
 
 		try {
 			$options           = $this->get_options();
-			$restricted_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+			$restricted_levels = $options['core_heading_levels'] ?? array();
 
 			// Validate restricted levels data.
 			if ( ! is_array( $restricted_levels ) ) {
@@ -106,7 +114,6 @@ class HeadingLevels {
 
 			// Remove restricted levels with validation.
 			// Only allow removal of H1, H5, and H6 levels.
-			$allowed_restricted_levels = array( 'h1', 'h5', 'h6' );
 			foreach ( $restricted_levels as $level ) {
 				if ( ! is_string( $level ) || ! preg_match( '/^h[1-6]$/', $level ) ) {
 					$this->log_error( "Invalid heading level format: {$level}. Expected format: h1-h6." );
@@ -114,7 +121,7 @@ class HeadingLevels {
 				}
 
 				// Only allow restriction of H1, H5, and H6.
-				if ( ! in_array( $level, $allowed_restricted_levels, true ) ) {
+				if ( ! in_array( $level, self::ALLOWED_RESTRICTED_LEVELS, true ) ) {
 					$this->log_debug( "Skipping restriction of {$level}. Only H1, H5, and H6 can be restricted." );
 					continue;
 				}
