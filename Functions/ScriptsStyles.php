@@ -131,15 +131,18 @@ class ScriptsStyles {
 		$block_checks_options = get_option( 'block_checks_options', array() );
 
 		// Get the block checks registry to expose validation rules to JavaScript.
-		$registry         = \BlockAccessibility\BlockChecksRegistry::get_instance();
-		$validation_rules = $this->prepare_validation_rules_for_js( $registry );
+		$registry              = \BlockAccessibility\BlockChecksRegistry::get_instance();
+		$meta_registry         = \BlockAccessibility\MetaChecksRegistry::get_instance();
+		$validation_rules      = $this->prepare_validation_rules_for_js( $registry );
+		$meta_validation_rules = $this->prepare_meta_validation_rules_for_js( $meta_registry );
 
 		\wp_localize_script(
 			self::SCRIPT_HANDLE,
 			'BlockAccessibilityChecks',
 			array(
-				'blockChecksOptions' => $block_checks_options,
-				'validationRules'    => $validation_rules,
+				'blockChecksOptions'  => $block_checks_options,
+				'validationRules'     => $validation_rules,
+				'metaValidationRules' => $meta_validation_rules,
 			)
 		);
 	}
@@ -231,6 +234,51 @@ class ScriptsStyles {
 					'enabled'     => $check_config['enabled'],
 					'description' => $check_config['description'],
 				);
+			}
+		}
+
+		return $js_rules;
+	}
+
+	/**
+	 * Prepare meta validation rules for JavaScript
+	 *
+	 * Formats the meta validation rules from the registry into a structure
+	 * that can be consumed by JavaScript.
+	 *
+	 * @param MetaChecksRegistry $meta_registry The meta checks registry instance.
+	 * @return array Formatted meta validation rules for JavaScript.
+	 */
+	private function prepare_meta_validation_rules_for_js( MetaChecksRegistry $meta_registry ): array {
+		$all_meta_checks = $meta_registry->get_all_meta_checks();
+		$js_rules        = array();
+
+		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+			$js_rules[ $post_type ] = array();
+
+			foreach ( $meta_fields as $meta_key => $checks ) {
+				$js_rules[ $post_type ][ $meta_key ] = array();
+
+				foreach ( $checks as $check_name => $check_config ) {
+					// Get the effective check level (considering settings).
+					$effective_type = $meta_registry->get_effective_meta_check_level( $post_type, $meta_key, $check_name );
+
+					// Skip checks set to 'none'.
+					if ( 'none' === $effective_type ) {
+						continue;
+					}
+
+					// Only include configuration that JavaScript needs.
+					$js_rules[ $post_type ][ $meta_key ][ $check_name ] = array(
+						'error_msg'   => $check_config['error_msg'],
+						'warning_msg' => $check_config['warning_msg'],
+						'type'        => $effective_type,
+						'category'    => $check_config['category'] ?? 'validation',
+						'priority'    => $check_config['priority'],
+						'enabled'     => $check_config['enabled'],
+						'description' => $check_config['description'],
+					);
+				}
 			}
 		}
 

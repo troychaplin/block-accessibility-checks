@@ -1,5 +1,6 @@
 import { useDispatch } from '@wordpress/data';
 import { GetInvalidBlocks } from './getInvalidBlocks';
+import { GetInvalidMeta } from './getInvalidMeta';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -13,6 +14,7 @@ export function BlockInvalidation() {
 	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
 
 	const invalidBlocks = GetInvalidBlocks();
+	const invalidMeta = GetInvalidMeta();
 
 	const {
 		lockPostSaving,
@@ -29,9 +31,10 @@ export function BlockInvalidation() {
 			return;
 		}
 
-		const hasErrors = invalidBlocks.some(block => block.mode === 'error');
+		const hasBlockErrors = invalidBlocks.some(block => block.mode === 'error');
+		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 
-		if (hasErrors) {
+		if (hasBlockErrors || hasMetaErrors) {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();
@@ -42,6 +45,7 @@ export function BlockInvalidation() {
 		}
 	}, [
 		invalidBlocks,
+		invalidMeta,
 		disablePublishSidebar,
 		enablePublishSidebar,
 		lockPostAutosaving,

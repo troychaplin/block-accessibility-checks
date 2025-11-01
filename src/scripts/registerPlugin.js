@@ -1,6 +1,6 @@
 import { registerPlugin } from '@wordpress/plugins';
-import { BlockInvalidation } from './block-validation/blockInvalidation';
-import './block-validation/blockErrorComponent';
+import { BlockInvalidation } from './validation/blockInvalidation';
+import './validation/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
 
 // Base checks array - now empty since validation is handled via ba11yc.validateBlock filter

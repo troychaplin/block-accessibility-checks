@@ -26,20 +26,27 @@ Extend the Block Accessibility Checks plugin to support post meta validation wit
 
 ### 1. PHP: Post Meta Check Registration
 
-Create a new registry system parallel to block checks but for post meta:
+**Separate Registry Class with Composition:**
+
+Created `MetaChecksRegistry` class to handle all meta validation:
 
 ```php
-// New method in BlockChecksRegistry class
-public function register_meta_check( 
-    string $post_type, 
-    string $meta_key, 
-    string $check_name, 
-    array $check_args 
-): bool {
-    // Similar to register_check() but for post meta
-    // Stores checks in $this->meta_checks array
+// New class: Functions/MetaChecksRegistry.php
+namespace BlockAccessibility;
+
+class MetaChecksRegistry {
+    private $meta_checks = array();
+    
+    public function register_meta_check(...) { ... }
+    public function get_meta_checks(...) { ... }
+    public function get_effective_meta_check_level(...) { ... }
+    // ... all meta-specific methods
 }
 ```
+
+**Clean Separation:**
+
+`BlockChecksRegistry` handles block validation only. `MetaChecksRegistry` handles meta validation only. No delegation, no mixing of concerns.
 
 **Storage Structure:**
 ```php
@@ -569,12 +576,13 @@ add_action( 'init', function() {
 
 ### How It Works
 
-1. **Call `ba11yc_required()`** in the `validate_callback` parameter
-2. **Auto-detection**: Function detects post type from REST request context
-3. **Lazy registration**: Check is registered with the validation system on first use
+1. **Call `ba11yc_required()`** with post type, meta key, and config
+2. **Immediate registration**: Check is registered with `MetaChecksRegistry` when function is called
+3. **Returns callback**: Function returns a validation callback for WordPress
 4. **Settings integration**: If `type='settings'`, appears in admin settings UI
 5. **Validation**: Respects admin configuration and returns `WP_Error` for errors
 6. **Client-side sync**: JavaScript validation mirrors server-side validation
+7. **No duplication**: Configuration is defined once, used everywhere
 
 ### Advanced Usage
 
@@ -631,11 +639,12 @@ addFilter(
 
 ## Implementation Phases
 
-### Phase 1: Core Infrastructure
-1. Add `$meta_checks` array to `BlockChecksRegistry`
-2. Implement `register_meta_check()` method
-3. Implement `get_meta_checks()` and related query methods
-4. Implement `get_effective_meta_check_level()` for settings integration
+### Phase 1: Core Infrastructure ✅
+1. Created `MetaChecksRegistry` class with separate concerns
+2. Implemented `register_meta_check()` method
+3. Implemented `get_meta_checks()` and related query methods
+4. Implemented `get_effective_meta_check_level()` for settings integration
+5. Added delegation methods in `BlockChecksRegistry` for backward compatibility
 
 ### Phase 2: Validation Callbacks
 1. Implement `ba11yc_required()` function with lazy registration

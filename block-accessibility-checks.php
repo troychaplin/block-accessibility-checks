@@ -25,6 +25,9 @@ define( 'BA11YC_VERSION', '2.2.0' );
 // This file is responsible for including the necessary autoload file.
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Include meta validation functions.
+require_once __DIR__ . '/Functions/MetaValidation.php';
+
 // Imports the necessary classes for the plugin.
 use BlockAccessibility\PluginInitializer;
 

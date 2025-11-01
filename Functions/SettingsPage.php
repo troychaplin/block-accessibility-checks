@@ -132,6 +132,9 @@ class SettingsPage {
 
 		// Register external plugin settings.
 		$this->register_external_plugin_settings();
+
+		// Register meta check settings.
+		$this->register_meta_check_settings();
 	}
 
 	/**
@@ -479,6 +482,48 @@ class SettingsPage {
 	}
 
 	/**
+	 * Register meta check settings for all post types
+	 *
+	 * @return void
+	 */
+	private function register_meta_check_settings(): void {
+		$meta_registry   = \BlockAccessibility\MetaChecksRegistry::get_instance();
+		$all_meta_checks = $meta_registry->get_all_meta_checks();
+
+		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+			$option_group = 'block_checks_meta_' . $post_type . '_group';
+			$option_name  = 'block_checks_meta_' . $post_type;
+
+			\register_setting(
+				$option_group,
+				$option_name,
+				array(
+					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Sanitize meta check options
+	 *
+	 * @param array $options The options to sanitize.
+	 * @return array Sanitized options.
+	 */
+	public function sanitize_meta_check_options( array $options ): array {
+		$sanitized = array();
+
+		foreach ( $options as $key => $value ) {
+			// Only allow valid check values.
+			if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
+				$sanitized[ $key ] = $value;
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
 	 * Render core settings content
 	 *
 	 * @return void
@@ -563,6 +608,9 @@ class SettingsPage {
 
 			echo '</article>';
 		}
+
+		// Render meta checks for this plugin if any exist.
+		$this->render_meta_checks_for_plugin( $plugin_slug );
 	}
 
 	/**
@@ -734,5 +782,149 @@ class SettingsPage {
 			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
 			echo '</div>' . "\n";
 		}
+	}
+
+	/**
+	 * Render meta checks for a specific plugin
+	 *
+	 * This method renders all meta checks associated with a plugin's post types.
+	 * Meta checks are grouped by post type and meta key.
+	 *
+	 * @param string $plugin_slug The plugin slug.
+	 * @return void
+	 */
+	private function render_meta_checks_for_plugin( string $plugin_slug ): void {
+		$meta_registry   = \BlockAccessibility\MetaChecksRegistry::get_instance();
+		$all_meta_checks = $meta_registry->get_all_meta_checks();
+
+		if ( empty( $all_meta_checks ) ) {
+			return;
+		}
+
+		// Render meta checks for each post type.
+		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+			if ( empty( $meta_fields ) ) {
+				continue;
+			}
+
+			$this->render_meta_checks_for_post_type( $post_type, $meta_fields, $plugin_slug );
+		}
+	}
+
+	/**
+	 * Render meta checks for a specific post type
+	 *
+	 * @param string $post_type   The post type.
+	 * @param array  $meta_fields The meta fields with checks.
+	 * @param string $plugin_slug The plugin slug.
+	 * @return void
+	 */
+	private function render_meta_checks_for_post_type( string $post_type, array $meta_fields, string $plugin_slug ): void {
+		$post_type_label = $this->get_post_type_label( $post_type );
+
+		echo '<article class="ba11y-block-options ba11y-meta-options ba11y-meta-options-' . \esc_attr( $post_type ) . '">';
+		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Meta Fields', 'block-accessibility-checks' ) . '</h2>';
+
+		foreach ( $meta_fields as $meta_key => $checks ) {
+			$this->render_meta_field_checks( $post_type, $meta_key, $checks, $plugin_slug );
+		}
+
+		echo '</article>';
+	}
+
+	/**
+	 * Render checks for a specific meta field
+	 *
+	 * @param string $post_type   The post type.
+	 * @param string $meta_key    The meta key.
+	 * @param array  $checks      The checks for this meta field.
+	 * @param string $plugin_slug Optional plugin slug for external plugins.
+	 * @return void
+	 */
+	private function render_meta_field_checks( string $post_type, string $meta_key, array $checks, string $plugin_slug = '' ): void {
+		$meta_label = $this->format_meta_key_label( $meta_key );
+
+		// Use external plugin option name if provided, otherwise use post type option.
+		if ( ! empty( $plugin_slug ) ) {
+			$option_name = 'block_checks_external_' . $plugin_slug;
+		} else {
+			$option_name = 'block_checks_meta_' . $post_type;
+		}
+
+		echo '<div class="ba11y-meta-field">';
+		echo '<h3>' . \esc_html( $meta_label ) . '</h3>';
+
+		foreach ( $checks as $check_name => $check ) {
+			// Only render settings-based checks (not forced error/warning).
+			if ( 'settings' !== $check['type'] ) {
+				continue;
+			}
+
+			$field_name  = $meta_key . '_' . $check_name;
+			$description = $check['description'] ?? $check['error_msg'];
+
+			$this->render_check_setting( $field_name, $description, $check, $option_name );
+		}
+
+		echo '</div>';
+	}
+
+	/**
+	 * Render a single check setting field
+	 *
+	 * @param string $field_name  The field name.
+	 * @param string $description The check description.
+	 * @param array  $check       The check configuration.
+	 * @param string $option_name The option name for this group.
+	 * @return void
+	 */
+	private function render_check_setting( string $field_name, string $description, array $check, string $option_name ): void {
+		$options = \get_option( $option_name, array() );
+		$value   = $options[ $field_name ] ?? 'error';
+
+		echo '<div class="ba11y-check-setting">';
+		echo '<label>' . \esc_html( $description ) . '</label>';
+		echo '<select name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']">';
+
+		foreach ( self::VALID_CHECK_VALUES as $check_value ) {
+			$selected = selected( $value, $check_value, false );
+			$label    = ucfirst( $check_value );
+			echo '<option value="' . \esc_attr( $check_value ) . '"' . \esc_attr( $selected ) . '>' . \esc_html( $label ) . '</option>';
+		}
+
+		echo '</select>';
+		echo '</div>';
+	}
+
+	/**
+	 * Get display label for a post type
+	 *
+	 * @param string $post_type The post type.
+	 * @return string The display label.
+	 */
+	private function get_post_type_label( string $post_type ): string {
+		$post_type_object = \get_post_type_object( $post_type );
+
+		if ( $post_type_object && ! empty( $post_type_object->labels->singular_name ) ) {
+			return $post_type_object->labels->singular_name;
+		}
+
+		return ucwords( str_replace( array( '-', '_' ), ' ', $post_type ) );
+	}
+
+	/**
+	 * Format meta key into a readable label
+	 *
+	 * @param string $meta_key The meta key.
+	 * @return string The formatted label.
+	 */
+	private function format_meta_key_label( string $meta_key ): string {
+		// Remove common prefixes.
+		$label = preg_replace( '/^(post_|meta_|custom_)/', '', $meta_key );
+
+		// Convert underscores and hyphens to spaces and capitalize.
+		$label = ucwords( str_replace( array( '_', '-' ), ' ', $label ) );
+
+		return $label;
 	}
 }

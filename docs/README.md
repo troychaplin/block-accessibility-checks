@@ -21,6 +21,7 @@ The Block Accessibility Checks plugin provides a comprehensive API for developer
 
 - [Validation API Features](./features.md)
 - [Quick Start Guide](./quick-start.md)
+- [Post Meta Validation](./meta-validation.md)
 - [API Reference](./api-reference.md)
 - [Hooks Reference](./hooks.md)
 - [JavaScript Integration](./js-integration.md)
