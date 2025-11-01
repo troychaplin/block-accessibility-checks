@@ -23,6 +23,21 @@ namespace BlockAccessibility;
 class SettingsPage {
 
 	/**
+	 * Heading levels that can be removed from the editor.
+	 * H2, H3, and H4 are always available.
+	 *
+	 * @var array
+	 */
+	private const REMOVABLE_HEADING_LEVELS = array( 'h1', 'h5', 'h6' );
+
+	/**
+	 * Valid values for check settings.
+	 *
+	 * @var array
+	 */
+	private const VALID_CHECK_VALUES = array( 'error', 'warning', 'none' );
+
+	/**
 	 * Registry instance for accessing external blocks
 	 *
 	 * @var BlockChecksRegistry
@@ -139,15 +154,34 @@ class SettingsPage {
 	 */
 	public function render_core_heading_options() {
 		$options        = \get_option( 'block_checks_options' );
-		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+		$heading_levels = $options['core_heading_levels'] ?? array();
 
+		$this->render_heading_checkboxes( $heading_levels, false );
+	}
+
+	/**
+	 * Renders heading level checkboxes
+	 *
+	 * Shared method to render heading level checkbox options with optional description.
+	 *
+	 * @param array $heading_levels Currently selected heading levels.
+	 * @param bool  $include_description Whether to include the description label.
+	 * @return void
+	 */
+	private function render_heading_checkboxes( array $heading_levels, bool $include_description = false ): void {
 		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="heading-levels-label">';
 		echo '<div class="ba11y-field-group">';
+
+		if ( $include_description ) {
+			echo '<div class="ba11y-field-label">';
+			echo '<p id="heading-levels-label">' . \esc_html__( 'Select which heading levels you want to remove from the editor. H2, H3 and H4 are always available.', 'block-accessibility-checks' ) . '</p>';
+			echo '</div>';
+		}
+
 		echo '<div class="ba11y-field-controls ba11y-field-controls--checkbox">';
 
 		// Only allow removal of H1, H5, and H6 levels.
-		$removable_levels = array( 'h1', 'h5', 'h6' );
-		foreach ( $removable_levels as $level ) {
+		foreach ( self::REMOVABLE_HEADING_LEVELS as $level ) {
 			$level_num = intval( substr( $level, 1 ) );
 			$checked   = in_array( $level, $heading_levels, true ) ? 'checked' : '';
 			echo '<div class="ba11y-checkbox-item">';
@@ -175,33 +209,9 @@ class SettingsPage {
 	 */
 	private function render_heading_level_options(): void {
 		$options        = \get_option( 'block_checks_options' );
-		$heading_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+		$heading_levels = $options['core_heading_levels'] ?? array();
 
-		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="heading-levels-label">';
-		echo '<div class="ba11y-field-group">';
-		echo '<div class="ba11y-field-label">';
-		echo '<p id="heading-levels-label">' . \esc_html__( 'Select which heading levels you want to remove from the editor. H2, H3 and H4 are always available.', 'block-accessibility-checks' ) . '</p>';
-		echo '</div>';
-		echo '<div class="ba11y-field-controls ba11y-field-controls--checkbox">';
-
-		// Only allow removal of H1, H5, and H6 levels.
-		$removable_levels = array( 'h1', 'h5', 'h6' );
-		foreach ( $removable_levels as $level ) {
-			$level_num = intval( substr( $level, 1 ) );
-			$checked   = in_array( $level, $heading_levels, true ) ? 'checked' : '';
-			echo '<div class="ba11y-checkbox-item">';
-			echo '<input type="checkbox" 
-						 id="' . \esc_attr( 'heading-level-' . $level_num ) . '" 
-						 name="block_checks_options[core_heading_levels][]" 
-						 value="' . \esc_attr( $level ) . '" 
-						 ' . ( $checked ? 'checked="checked"' : '' ) . '>';
-			echo '<label for="' . \esc_attr( 'heading-level-' . $level_num ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
-			echo '</div>';
-		}
-
-		echo '</div>';
-		echo '</div>';
-		echo '</div>';
+		$this->render_heading_checkboxes( $heading_levels, true );
 	}
 
 	/**
@@ -274,19 +284,14 @@ class SettingsPage {
 
 			$this->log_debug( 'Starting sanitization of plugin options.' );
 
-			// Sanitize individual core block check options (error, warning, none).
-			$valid_check_values = array( 'error', 'warning', 'none' );
-
 			foreach ( $input as $key => $value ) {
 				// Handle heading levels array.
 				if ( 'core_heading_levels' === $key ) {
 					if ( is_array( $value ) ) {
 						$sanitized['core_heading_levels'] = array();
-						// Only allow removal of H1, H5, and H6 levels.
-						$valid_levels = array( 'h1', 'h5', 'h6' );
 
 						foreach ( $value as $level ) {
-							if ( in_array( $level, $valid_levels, true ) ) {
+							if ( in_array( $level, self::REMOVABLE_HEADING_LEVELS, true ) ) {
 								$sanitized['core_heading_levels'][] = \sanitize_text_field( $level );
 								$this->log_debug( "Added heading level: {$level}" );
 							} else {
@@ -300,7 +305,7 @@ class SettingsPage {
 					}
 				} elseif ( 'core_heading_levels' !== $key ) {
 					// Handle individual check settings.
-					if ( in_array( $value, $valid_check_values, true ) ) {
+					if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
 						$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
 						$this->log_debug( "Sanitized {$key}: {$value}" );
 					} else {
@@ -329,15 +334,14 @@ class SettingsPage {
 	 * @return array The sanitized options array.
 	 */
 	public function sanitize_external_options( $input ): array {
-		$sanitized    = array();
-		$valid_values = array( 'error', 'warning', 'none' );
+		$sanitized = array();
 
 		if ( ! is_array( $input ) ) {
 			return $sanitized;
 		}
 
 		foreach ( $input as $key => $value ) {
-			if ( in_array( $value, $valid_values, true ) ) {
+			if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
 				$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
 			}
 		}
@@ -716,13 +720,13 @@ class SettingsPage {
 	}
 
 	/**
-	 * Log debug messages when WP_DEBUG is enabled
+	 * Log debug messages when WP_DEBUG and WP_DEBUG_LOG are enabled
 	 *
 	 * @param string $message Debug message to log.
 	 * @return void
 	 */
 	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
+		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\error_log( 'Block Accessibility Checks - SettingsPage DEBUG: ' . $message );
 		}
