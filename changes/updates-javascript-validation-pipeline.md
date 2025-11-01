@@ -54,8 +54,8 @@ src/
 │   │   ├── tableValidation.js
 │   │   └── headingRankGlobalListener.js
 │   ├── block-validation/
-│   │   ├── validationHooks.js
-│   │   ├── blockInvalidation.js
+│   │   ├── validate-blocks.js
+│   │   ├── validation-api.js
 │   │   ├── blockErrorComponent.js
 │   │   └── getInvalidBlocks.js
 │   ├── block-modifications/
@@ -110,7 +110,7 @@ User edits block
     ↓
 Block change detected
     ↓
-validationHooks.js
+validate-blocks.js
     ↓
 ba11yc_validate_block filter runs
     ↓
@@ -118,7 +118,7 @@ Individual checks execute
     ↓
 Results collected
     ↓
-blockInvalidation.js
+validation-api.js
     ↓
 Block marked invalid
     ↓
@@ -236,7 +236,7 @@ src/scripts/validation/
 ├── checks-heading.js
 ├── checks-table.js
 ├── validation-runner.js
-├── validation-hooks.js
+├── validate-blocks.js
 ├── ui-error-component.js
 ├── ui-invalidation.js
 ├── util-url.js
@@ -253,7 +253,7 @@ src/scripts/
 │   ├── table.js
 │   └── heading-listener.js
 ├── validation/          # Renamed from block-validation
-│   ├── hooks.js        # Renamed from validationHooks.js
+│   ├── hooks.js        # Renamed from validate-blocks.js
 │   ├── runner.js       # New - extracted logic
 │   ├── invalidation.js
 │   └── error-component.js

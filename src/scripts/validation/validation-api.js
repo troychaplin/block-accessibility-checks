@@ -4,11 +4,11 @@ import { GetInvalidMeta } from './getInvalidMeta';
 import { useEffect } from '@wordpress/element';
 
 /**
- * Function that handles block invalidation.
+ * Function that handles a Validation API for block attributes and post meta.
  *
  * @return {null} Returns null.
  */
-export function BlockInvalidation() {
+export function ValidationAPI() {
 	// Check if we're in the post editor context by checking if the core/editor store exists.
 	// The site editor uses different data stores, so this is a reliable way to detect context.
 	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');

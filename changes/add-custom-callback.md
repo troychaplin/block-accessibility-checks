@@ -10,7 +10,7 @@ Extend the Block Accessibility Checks plugin to support post meta validation wit
 - **PHP:** `BlockChecksRegistry` registers checks with configuration (error_msg, warning_msg, type, category)
 - **PHP → JS Bridge:** Validation rules exposed via `window.BlockAccessibilityChecks.validationRules`
 - **JavaScript:** `validateBlock()` runs checks using `ba11yc_validate_block` filter
-- **JavaScript:** `BlockInvalidation` component locks posts when errors exist
+- **JavaScript:** `ValidationAPI` component locks posts when errors exist
 - **Settings:** Checks with `type='settings'` configurable in admin UI (Error/Warning/Disabled)
 
 ### Design Goals for Post Meta
@@ -282,7 +282,7 @@ wp_localize_script(
 Create a new validation system for post meta parallel to block validation:
 
 ```javascript
-// src/scripts/meta-validation/validateMeta.js
+// src/scripts/meta-validation/validate-meta.js
 
 /**
  * Get meta check configuration from PHP
@@ -378,7 +378,7 @@ Create a component to track all post meta validation:
 // src/scripts/meta-validation/getInvalidMeta.js
 
 import { useSelect } from '@wordpress/data';
-import { validateAllMetaChecks } from './validateMeta';
+import { validateAllMetaChecks } from './validate-meta';
 
 /**
  * Get all invalid meta fields for current post
@@ -418,13 +418,13 @@ export function GetInvalidMeta() {
 
 ### 8. JavaScript: Integrate with Post Locking
 
-Modify `blockInvalidation.js` to include meta validation:
+Modify `validation-api.js` to include meta validation:
 
 ```javascript
 import { GetInvalidBlocks } from './getInvalidBlocks';
 import { GetInvalidMeta } from '../meta-validation/getInvalidMeta';
 
-export function BlockInvalidation() {
+export function ValidationAPI() {
     const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
     
     const invalidBlocks = GetInvalidBlocks();
@@ -653,12 +653,12 @@ addFilter(
 
 ### Phase 3: JavaScript Integration
 1. Create `meta-validation/` directory in `src/scripts/`
-2. Implement `validateMeta.js` with validation logic
+2. Implement `validate-meta.js` with validation logic
 3. Implement `getInvalidMeta.js` component
 4. Expose meta checks to JavaScript via localize_script
 
 ### Phase 4: Post Locking Integration
-1. Modify `blockInvalidation.js` to include meta validation
+1. Modify `validation-api.js` to include meta validation
 2. Test post locking with meta errors/warnings
 3. Ensure proper lock/unlock behavior
 

@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { validateAllMetaChecks } from './validateMeta';
+import { validateAllMetaChecks } from './validate-meta';
 
 /**
  * Get all invalid meta fields for current post

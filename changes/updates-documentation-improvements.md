@@ -188,7 +188,7 @@ export function validateHeadingRank(block, allBlocks) {
    - [ ] Explain edge cases
    - [ ] Add usage examples
 
-2. **`src/scripts/block-validation/validationHooks.js`** (15 mins)
+2. **`src/scripts/block-validation/validate-blocks.js`** (15 mins)
    - [ ] Document filter system
    - [ ] Explain hook priorities
    - [ ] Show extension examples

@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { validateBlock } from './validationHooks';
+import { validateBlock } from './validate-blocks';
 
 /**
  * Recursively retrieves invalid blocks from a list of blocks.

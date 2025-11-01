@@ -1,5 +1,5 @@
 import { registerPlugin } from '@wordpress/plugins';
-import { BlockInvalidation } from './validation/blockInvalidation';
+import { ValidationAPI } from './validation/validation-api';
 import './validation/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -50,6 +50,6 @@ export const blockChecksArray = new Proxy([], {
 	},
 });
 
-registerPlugin('block-validation', {
-	render: BlockInvalidation,
+registerPlugin('validation-api', {
+	render: ValidationAPI,
 });
