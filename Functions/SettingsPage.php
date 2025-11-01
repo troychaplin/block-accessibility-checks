@@ -641,6 +641,7 @@ class SettingsPage {
 		echo '</header>' . "\n";
 
 		echo '<section class="ba11y-settings-section">' . "\n";
+		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
 		echo '<div class="ba11y-settings-plugin-header">' . "\n";
 		echo '<h2>' . \esc_html( $title ) . '</h2>' . "\n";
 		// Display plugin version if available.
@@ -651,8 +652,6 @@ class SettingsPage {
 
 		// Display success notices after plugin header.
 		$this->display_settings_notices();
-
-		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
 
 		\settings_fields( $option_group );
 
@@ -665,7 +664,10 @@ class SettingsPage {
 			}
 		}
 
+		echo '<div class="ba11y-settings-submit">' . "\n";
 		\submit_button();
+		echo '</div>' . "\n";
+
 		echo '</form>' . "\n";
 		echo '</section>' . "\n";
 		echo '</div>' . "\n";
@@ -822,8 +824,12 @@ class SettingsPage {
 	private function render_meta_checks_for_post_type( string $post_type, array $meta_fields, string $plugin_slug ): void {
 		$post_type_label = $this->get_post_type_label( $post_type );
 
+		echo '<div class="ba11y-settings-plugin-header">' . "\n";
+		echo '<h2>' . \esc_html__( 'Post Meta Validation', 'block-accessibility-checks' ) . '</h2>';
+		echo '</div>' . "\n";
+
 		echo '<article class="ba11y-block-options ba11y-meta-options ba11y-meta-options-' . \esc_attr( $post_type ) . '">';
-		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Meta Fields', 'block-accessibility-checks' ) . '</h2>';
+		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Post Type', 'block-accessibility-checks' ) . '</h2>';
 
 		foreach ( $meta_fields as $meta_key => $checks ) {
 			$this->render_meta_field_checks( $post_type, $meta_key, $checks, $plugin_slug );
@@ -852,7 +858,6 @@ class SettingsPage {
 		}
 
 		echo '<div class="ba11y-meta-field">';
-		echo '<h3>' . \esc_html( $meta_label ) . '</h3>';
 
 		foreach ( $checks as $check_name => $check ) {
 			// Only render settings-based checks (not forced error/warning).
@@ -862,6 +867,9 @@ class SettingsPage {
 
 			$field_name  = $meta_key . '_' . $check_name;
 			$description = $check['description'] ?? $check['error_msg'];
+
+			// Prepend meta label to description with strong tag.
+			$description = '<strong>' . $meta_label . ':</strong> ' . $description;
 
 			$this->render_check_setting( $field_name, $description, $check, $option_name );
 		}
@@ -879,20 +887,40 @@ class SettingsPage {
 	 * @return void
 	 */
 	private function render_check_setting( string $field_name, string $description, array $check, string $option_name ): void {
-		$options = \get_option( $option_name, array() );
-		$value   = $options[ $field_name ] ?? 'error';
+		$options  = \get_option( $option_name, array() );
+		$value    = $options[ $field_name ] ?? 'error';
+		$label_id = \sanitize_title( $field_name ) . '-label';
 
-		echo '<div class="ba11y-check-setting">';
-		echo '<label>' . \esc_html( $description ) . '</label>';
-		echo '<select name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']">';
+		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
+		echo '<div class="ba11y-field-group">';
+		echo '<div class="ba11y-field-label">';
+		echo '<p id="' . \esc_attr( $label_id ) . '">' . \wp_kses(
+			$description,
+			array(
+				'strong' => array(),
+				'em'     => array(),
+			)
+		) . '</p>';
+		echo '</div>';
+		echo '<div class="ba11y-field-controls ba11y-field-controls--radio">';
 
-		foreach ( self::VALID_CHECK_VALUES as $check_value ) {
-			$selected = selected( $value, $check_value, false );
-			$label    = ucfirst( $check_value );
-			echo '<option value="' . \esc_attr( $check_value ) . '"' . \esc_attr( $selected ) . '>' . \esc_html( $label ) . '</option>';
-		}
+		// Error option.
+		$error_id = \esc_attr( $field_name . '_error' );
+		echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
+		echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
 
-		echo '</select>';
+		// Warning option.
+		$warning_id = \esc_attr( $field_name . '_warning' );
+		echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
+		echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
+
+		// None option.
+		$none_id = \esc_attr( $field_name . '_none' );
+		echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
+		echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
+
+		echo '</div>';
+		echo '</div>';
 		echo '</div>';
 	}
 
