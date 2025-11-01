@@ -2,11 +2,11 @@
 
 This document highlights the key features and benefits of the Block Accessibility Checks Developer API, designed for plugin and block developers to extend, customize, and integrate accessibility validation in the WordPress block editor.
 
-- **Extensible Check Registration**  
-  Register custom accessibility checks for any block type by defining configuration in PHP and implementing validation logic in JavaScript.
+- **Extensible Check Registration (PHP)**  
+  Register custom accessibility checks for any block type by defining configuration in PHP. PHP handles registration, settings, and metadata only—no validation logic.
 
 - **JavaScript-Driven Validation**  
-  Implement all validation logic in JavaScript for real-time feedback and seamless block editor integration.
+  All validation logic is implemented in JavaScript for real-time feedback in the block editor. PHP is not involved in validation execution.
 
 - **Flexible Severity Levels**  
   Define each check as an error, warning, or settings-driven, allowing granular control over validation outcomes.
@@ -14,8 +14,8 @@ This document highlights the key features and benefits of the Block Accessibilit
 - **Customizable Messages and Metadata**  
   Provide unique error/warning messages, descriptions, and configuration for each check to improve user guidance.
 
-- **Action and Filter Hooks**  
-  Use WordPress hooks to register, modify, or process checks and results at key points in the validation lifecycle.
+- **Action and Filter Hooks (PHP)**  
+  Use WordPress hooks to register and modify check configuration during registration. Validation logic uses JavaScript filters.
 
 - **Registry API**  
   Access a robust API for registering, unregistering, enabling/disabling, and querying checks programmatically.

@@ -40,9 +40,13 @@ Fired when a check is enabled or disabled.
   - `$check_name` (string)
   - `$enabled` (bool)
 
----
-
 ## Filter Hooks
+
+### Important: Configuration vs. Validation
+
+**PHP filter hooks** are for modifying check **configuration and registration** only.
+
+**JavaScript hooks** are for implementing **validation logic**. All validation happens in JavaScript for real-time feedback. See [JavaScript Integration](./js-integration.md) for the `ba11yc.validateBlock` filter.
 
 ### `ba11yc_register_default_checks`
 Controls whether default checks should be registered.
@@ -67,67 +71,9 @@ Filters check arguments before registration.
   - `$check_name` (string)
 - **Returns:** (array)
 
-### `ba11yc_block_checks`
-Filters which checks run for a specific block.
-- **Parameters:**
-  - `$checks` (array)
-  - `$block_type` (string)
-  - `$attributes` (array)
-  - `$content` (string)
-- **Returns:** (array)
+## Usage Examples
 
-### `ba11yc_block_attributes`
-Filters block attributes before checks run.
-- **Parameters:**
-  - `$attributes` (array)
-  - `$block_type` (string)
-  - `$content` (string)
-- **Returns:** (array)
-
-### `ba11yc_before_check`
-Filters check configuration before it runs.
-- **Parameters:**
-  - `$check_config` (array)
-  - `$check_name` (string)
-  - `$block_type` (string)
-  - `$attributes` (array)
-  - `$content` (string)
-- **Returns:** (array)
-
-### `ba11yc_check_result`
-Filters the result of a single check.
-- **Parameters:**
-  - `$check_result` (mixed)
-  - `$check_name` (string)
-  - `$block_type` (string)
-  - `$attributes` (array)
-  - `$content` (string)
-  - `$check_config` (array)
-- **Returns:** (mixed)
-
-### `ba11yc_final_check_result`
-Filters the final result object for a check.
-- **Parameters:**
-  - `$result` (array)
-  - `$check_name` (string)
-  - `$block_type` (string)
-  - `$attributes` (array)
-  - `$content` (string)
-  - `$check_config` (array)
-- **Returns:** (array)
-
-### `ba11yc_block_check_results`
-Filters all results for a block.
-- **Parameters:**
-  - `$results` (array)
-  - `$block_type` (string)
-  - `$attributes` (array)
-  - `$content` (string)
-- **Returns:** (array)
-
----
-
-## Usage Example
+### Registering Checks
 
 ```php
 add_action( 'ba11yc_register_checks', function( $registry ) {
@@ -137,7 +83,11 @@ add_action( 'ba11yc_register_checks', function( $registry ) {
         'type'      => 'error',
     ] );
 } );
+```
 
+### Modifying Check Registration
+
+```php
 add_filter( 'ba11yc_check_args', function( $args, $block_type, $check_name ) {
     // Modify check arguments before registration
     if ( $check_name === 'card_title_required' ) {
@@ -147,7 +97,17 @@ add_filter( 'ba11yc_check_args', function( $args, $block_type, $check_name ) {
 }, 10, 3 );
 ```
 
----
+### Preventing Check Registration
+
+```php
+add_filter( 'ba11yc_should_register_check', function( $should_register, $block_type, $check_name, $check_args ) {
+    // Don't register certain checks for specific scenarios
+    if ( $check_name === 'optional_check' && get_post_type() === 'draft' ) {
+        return false;
+    }
+    return $should_register;
+}, 10, 4 );
+```
 
 ## See Also
 - [API Reference](./api-reference.md)
