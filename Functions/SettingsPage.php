@@ -491,24 +491,28 @@ class SettingsPage {
 	/**
 	 * Render core block checks with individual check settings
 	 *
+	 * Derives the list of core blocks from the registry to ensure automatic
+	 * synchronization when new core blocks are added to CoreBlockChecks.
+	 *
 	 * @return void
 	 */
 	private function render_core_block_checks(): void {
-		$core_blocks = array(
-			'core/button'  => __( 'Button Block', 'block-accessibility-checks' ),
-			'core/heading' => __( 'Heading Block', 'block-accessibility-checks' ),
-			'core/image'   => __( 'Image Block', 'block-accessibility-checks' ),
-			'core/table'   => __( 'Table Block', 'block-accessibility-checks' ),
-		);
+		// Get all checks from registry - single source of truth.
+		$all_checks = $this->registry->get_all_checks();
 
-		foreach ( $core_blocks as $block_type => $block_label ) {
-			$checks = $this->registry->get_checks( $block_type );
+		foreach ( $all_checks as $block_type => $checks ) {
+			// Only process core blocks.
+			if ( strpos( $block_type, 'core/' ) !== 0 ) {
+				continue;
+			}
 
 			if ( empty( $checks ) ) {
 				continue;
 			}
 
-			$block_slug = str_replace( '/', '-', $block_type );
+			$block_label = $this->get_core_block_label( $block_type );
+			$block_slug  = str_replace( '/', '-', $block_type );
+
 			echo '<article class="ba11y-block-options ba11y-block-options-' . \esc_attr( $block_slug ) . '">';
 			echo '<h2>' . \esc_html( $block_label ) . '</h2>';
 
@@ -670,6 +674,26 @@ class SettingsPage {
 			echo '</div>';
 			echo '</div>';
 		}
+	}
+
+	/**
+	 * Get display label for a core block type
+	 *
+	 * Returns a translated label for core blocks, with fallback to
+	 * auto-generated label for any blocks not in the predefined list.
+	 *
+	 * @param string $block_type The block type.
+	 * @return string The display label.
+	 */
+	private function get_core_block_label( string $block_type ): string {
+		$labels = array(
+			'core/button'  => __( 'Button Block', 'block-accessibility-checks' ),
+			'core/heading' => __( 'Heading Block', 'block-accessibility-checks' ),
+			'core/image'   => __( 'Image Block', 'block-accessibility-checks' ),
+			'core/table'   => __( 'Table Block', 'block-accessibility-checks' ),
+		);
+
+		return $labels[ $block_type ] ?? $this->get_block_display_name( $block_type );
 	}
 
 	/**
