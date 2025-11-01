@@ -26,7 +26,7 @@ import { select } from '@wordpress/data';
  */
 addFilter(
 	'ba11yc_validate_block',
-	'ba11yc/heading-rank-validation',
+	'ba11yc/headingRankValidation',
 	(isValid, blockType, attributes, checkName, rule, block) => {
 		// Only process core/heading blocks - ignore all other block types
 		if (blockType !== 'core/heading') {

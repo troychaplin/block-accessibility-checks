@@ -7,12 +7,9 @@
 
 import { addFilter } from '@wordpress/hooks';
 
-/**
- * Register table block validation logic
- */
 addFilter(
 	'ba11yc_validate_block',
-	'ba11yc/table-validation',
+	'ba11yc/tableValidation',
 	(isValid, blockType, attributes, checkName) => {
 		// Only handle table blocks
 		if (blockType !== 'core/table') {

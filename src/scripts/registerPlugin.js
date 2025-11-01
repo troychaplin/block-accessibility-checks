@@ -1,7 +1,14 @@
+/**
+ * WordPress dependencies
+ */
 import { registerPlugin } from '@wordpress/plugins';
-import { ValidationAPI } from './validation/validation-api';
-import './validation/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
+
+/**
+ * Internal dependencies
+ */
+import { ValidationAPI } from './validation/validationApi';
+import './validation/blockErrorComponent';
 
 // Base checks array - now empty since validation is handled via ba11yc_validate_block filter
 const coreChecks = [];
