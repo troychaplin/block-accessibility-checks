@@ -10,6 +10,8 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\Logger;
+
 /**
  * Class HeadingLevels
  *
@@ -24,6 +26,8 @@ namespace BlockAccessibility;
  * @package BlockAccessibilityChecks
  */
 class HeadingLevels {
+
+	use Logger;
 
 	/**
 	 * Allowed heading levels that can be restricted.
@@ -157,31 +161,5 @@ class HeadingLevels {
 		}
 
 		return $args;
-	}
-
-	/**
-	 * Log error messages when WP_DEBUG is enabled.
-	 *
-	 * @param string $message Error message to log.
-	 * @return void
-	 */
-	private function log_error( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - HeadingLevels: ' . $message );
-		}
-	}
-
-	/**
-	 * Log debug messages when WP_DEBUG is enabled.
-	 *
-	 * @param string $message Debug message to log.
-	 * @return void
-	 */
-	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - HeadingLevels DEBUG: ' . $message );
-		}
 	}
 }

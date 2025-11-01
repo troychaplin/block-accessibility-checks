@@ -184,39 +184,4 @@ class CoreBlockChecks {
 	public function get_supported_core_block_types(): array {
 		return \array_keys( $this->get_core_block_check_definitions() );
 	}
-
-	/**
-	 * Check if a block type is a supported core block
-	 *
-	 * @param string $block_type The block type to check.
-	 * @return bool True if it's a supported core block, false otherwise.
-	 */
-	public function is_supported_core_block( string $block_type ): bool {
-		return in_array( $block_type, $this->get_supported_core_block_types(), true );
-	}
-
-	/**
-	 * Get check configuration for a specific core block check
-	 *
-	 * @param string $block_type The block type.
-	 * @param string $check_name The check name.
-	 * @return array|null The check configuration or null if not found.
-	 */
-	public function get_core_block_check_config( string $block_type, string $check_name ): ?array {
-		$definitions = $this->get_core_block_check_definitions();
-
-		return $definitions[ $block_type ][ $check_name ] ?? null;
-	}
-
-	/**
-	 * Get all checks for a specific core block type
-	 *
-	 * @param string $block_type The block type.
-	 * @return array Array of checks for the block type or empty array if not found.
-	 */
-	public function get_core_block_checks( string $block_type ): array {
-		$definitions = $this->get_core_block_check_definitions();
-
-		return $definitions[ $block_type ] ?? array();
-	}
 }

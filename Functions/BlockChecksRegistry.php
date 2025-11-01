@@ -10,6 +10,8 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\Logger;
+
 /**
  * Block Checks Registry Class
  *
@@ -17,6 +19,8 @@ namespace BlockAccessibility;
  * Delegates core block check registration to CoreBlockChecks class for better separation of concerns.
  */
 class BlockChecksRegistry {
+
+	use Logger;
 
 	/**
 	 * Registered checks
@@ -409,44 +413,12 @@ class BlockChecksRegistry {
 	}
 
 	/**
-	 * Get plugin information for a block type
-	 *
-	 * @param string $block_type The block type.
-	 * @return array Plugin information array.
-	 */
-	public function get_plugin_info( string $block_type ): array {
-		return $this->plugin_info[ $block_type ] ?? array();
-	}
-
-	/**
 	 * Get all plugin information
 	 *
 	 * @return array All plugin information indexed by block type.
 	 */
 	public function get_all_plugin_info(): array {
 		return $this->plugin_info;
-	}
-
-	/**
-	 * Get debug information for plugin detection
-	 *
-	 * @return array Debug information.
-	 */
-	public function get_debug_info(): array {
-		return array(
-			'plugin_info'       => $this->plugin_info,
-			'plugin_info_cache' => $this->plugin_info_cache,
-			'checks'            => array_keys( $this->checks ),
-		);
-	}
-
-	/**
-	 * Get core block checks instance
-	 *
-	 * @return CoreBlockChecks|null The core block checks instance or null if not initialized.
-	 */
-	public function get_core_block_checks(): ?CoreBlockChecks {
-		return $this->core_block_checks;
 	}
 
 	/**
@@ -606,48 +578,27 @@ class BlockChecksRegistry {
 	/**
 	 * Extract plugin information from block type
 	 *
-	 * @param string $block_type The block type.
-	 * @return array Plugin information.
+	 * Derives plugin name and slug from the block type namespace.
+	 * This ensures all blocks from the same plugin share the same slug
+	 * and are properly grouped together in settings and menus.
+	 *
+	 * @param string $block_type The block type (e.g., 'myplugin/my-block').
+	 * @return array Plugin information with 'name' and 'slug' keys.
 	 */
-	private function extract_plugin_info_from_block_type( string $block_type ): array {
+	public function extract_plugin_info_from_block_type( string $block_type ): array {
 		$parts     = explode( '/', $block_type );
 		$namespace = $parts[0] ?? '';
 
 		// Convert namespace to readable name.
 		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
 
-		// Create a slug for the plugin.
+		// Create a slug for the plugin using only the namespace.
+		// This ensures all blocks from the same plugin share the same slug.
 		$plugin_slug = \sanitize_title( $namespace );
 
 		return array(
 			'name' => $plugin_name,
 			'slug' => $plugin_slug,
 		);
-	}
-
-	/**
-	 * Log error messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Error message to log.
-	 * @return void
-	 */
-	private function log_error( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - BlockChecksRegistry: ' . $message );
-		}
-	}
-
-	/**
-	 * Log debug messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Debug message to log.
-	 * @return void
-	 */
-	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - BlockChecksRegistry DEBUG: ' . $message );
-		}
 	}
 }

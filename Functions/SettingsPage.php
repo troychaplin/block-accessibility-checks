@@ -11,6 +11,8 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\Logger;
+
 /**
  * Class SettingsPage
  *
@@ -21,6 +23,8 @@ namespace BlockAccessibility;
  * @package BlockAccessibilityChecks\Functions
  */
 class SettingsPage {
+
+	use Logger;
 
 	/**
 	 * Heading levels that can be removed from the editor.
@@ -408,8 +412,8 @@ class SettingsPage {
 			if ( ! empty( $plugin_info['name'] ) ) {
 				$plugin_slug = $plugin_info['slug'] ?? \sanitize_title( $plugin_info['name'] );
 			} else {
-				// Fallback to namespace-based extraction.
-				$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
+				// Fallback to namespace-based extraction using registry method.
+				$plugin_info = $this->registry->extract_plugin_info_from_block_type( $block_type );
 				$plugin_slug = $plugin_info['slug'];
 			}
 
@@ -669,30 +673,6 @@ class SettingsPage {
 	}
 
 	/**
-	 * Extract plugin information from block type
-	 *
-	 * @param string $block_type The block type (e.g., 'create-block/my-testimonial-block').
-	 * @return array Plugin information with name and slug
-	 */
-	private function extract_plugin_info_from_block_type( string $block_type ): array {
-		$parts      = explode( '/', $block_type );
-		$namespace  = $parts[0] ?? '';
-		$block_name = $parts[1] ?? '';
-
-		// Convert namespace to readable name.
-		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
-
-		// Create a unique slug for the plugin by combining namespace and block name.
-		// This ensures different plugins with the same namespace get different slugs.
-		$plugin_slug = sanitize_title( $namespace . '-' . $block_name );
-
-		return array(
-			'name' => $plugin_name,
-			'slug' => $plugin_slug,
-		);
-	}
-
-	/**
 	 * Get display name for a block type
 	 *
 	 * @param string $block_type The block type.
@@ -704,32 +684,6 @@ class SettingsPage {
 
 		// Convert kebab-case to title case.
 		return ucwords( str_replace( array( '-', '_' ), ' ', $block_name ) );
-	}
-
-	/**
-	 * Log error messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Error message to log.
-	 * @return void
-	 */
-	private function log_error( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - SettingsPage: ' . $message );
-		}
-	}
-
-	/**
-	 * Log debug messages when WP_DEBUG and WP_DEBUG_LOG are enabled
-	 *
-	 * @param string $message Debug message to log.
-	 * @return void
-	 */
-	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - SettingsPage DEBUG: ' . $message );
-		}
 	}
 
 	/**
