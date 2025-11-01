@@ -157,7 +157,7 @@ $meta_registry->register_meta_check( 'band', 'band_origin', 'required', [
 ] );
 ```
 
-**Note:** Most users don't need to call this directly - use `ba11yc_required()` instead, which handles registration automatically.
+**Note:** Most users don't need to call this directly - use `MetaValidation::required()` instead, which handles registration automatically.
 
 ---
 
@@ -206,12 +206,14 @@ Get the effective check level for a specific meta check, considering settings.
 
 ---
 
-## Helper Functions
+## MetaValidation Class
 
-### `ba11yc_required( $args )`
+### `MetaValidation::required( $post_type, $meta_key, $args )`
 Create a required field validator for post meta.
 
 **Parameters:**
+- `$post_type` (string): Post type (e.g., 'band', 'post')
+- `$meta_key` (string): Meta key being validated
 - `$args` (array): Configuration arguments
 
 **Returns:**
@@ -219,8 +221,10 @@ Create a required field validator for post meta.
 
 **Example:**
 ```php
+use BlockAccessibility\MetaValidation;
+
 register_post_meta( 'band', 'band_origin', [
-    'validate_callback' => ba11yc_required( 'band', 'band_origin', [
+    'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
         'error_msg' => 'City of Origin is required.',
         'type'      => 'settings',
     ]),
@@ -229,7 +233,7 @@ register_post_meta( 'band', 'band_origin', [
 
 ---
 
-### `ba11yc_detect_post_type_from_context()`
+### `MetaValidation::detect_post_type_from_context()`
 Detect post type from the current request context.
 
 **Returns:**

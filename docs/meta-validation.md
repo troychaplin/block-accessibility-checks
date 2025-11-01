@@ -16,13 +16,15 @@ The post meta validation system allows you to:
 Here's the simplest way to add validation to a post meta field:
 
 ```php
+use BlockAccessibility\MetaValidation;
+
 add_action( 'init', function() {
     register_post_meta( 'band', 'band_origin', [
         'single'            => true,
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'sanitize_text_field',
-        'validate_callback' => ba11yc_required( 'band', 'band_origin', [
+        'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
             'error_msg' => __( 'City of Origin is required.', 'my-plugin' ),
             'type'      => 'settings',
         ]),
@@ -30,7 +32,7 @@ add_action( 'init', function() {
 });
 ```
 
-That's it! The `ba11yc_required()` function handles:
+That's it! The `MetaValidation::required()` method handles:
 - ✅ Registering the validation check with `MetaChecksRegistry`
 - ✅ Integrating with settings UI
 - ✅ Server-side validation
@@ -40,10 +42,10 @@ That's it! The `ba11yc_required()` function handles:
 ## How It Works
 
 ### 1. Immediate Registration
-When you call `ba11yc_required('band', 'band_origin', [...])`, it immediately registers the check with `MetaChecksRegistry`.
+When you call `MetaValidation::required('band', 'band_origin', [...])`, it immediately registers the check with `MetaChecksRegistry`.
 
 ### 2. Returns Validation Callback
-The function returns a closure that WordPress calls when validating the meta field.
+The method returns a closure that WordPress calls when validating the meta field.
 
 ### 3. Settings Integration
 If `type` is set to `'settings'`, the check appears in the admin settings UI where site admins can configure it as error, warning, or disabled.
@@ -54,10 +56,10 @@ If `type` is set to `'settings'`, the check appears in the admin settings UI whe
 
 ## Configuration Options
 
-The `ba11yc_required()` function accepts the following options:
+The `MetaValidation::required()` method accepts the following options:
 
 ```php
-ba11yc_required( $post_type, $meta_key, [
+MetaValidation::required( $post_type, $meta_key, [
     'error_msg'   => 'Error message shown when validation fails',
     'warning_msg' => 'Warning message (optional, defaults to error_msg)',
     'description' => 'Description shown in settings UI',
@@ -77,6 +79,8 @@ ba11yc_required( $post_type, $meta_key, [
 ## Complete Example
 
 ```php
+use BlockAccessibility\MetaValidation;
+
 add_action( 'init', function() {
     // Required field with settings control
     register_post_meta( 'band', 'band_origin', [
@@ -84,7 +88,7 @@ add_action( 'init', function() {
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'sanitize_text_field',
-        'validate_callback' => ba11yc_required( 'band', 'band_origin', [
+        'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
             'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
             'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
             'description' => __( 'The city where the band originated', 'my-plugin' ),
@@ -99,7 +103,7 @@ add_action( 'init', function() {
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'sanitize_text_field',
-        'validate_callback' => ba11yc_required( 'band', 'band_name', [
+        'validate_callback' => MetaValidation::required( 'band', 'band_name', [
             'error_msg' => __( 'Band name is required.', 'my-plugin' ),
             'type'      => 'error',
         ]),
@@ -111,7 +115,7 @@ add_action( 'init', function() {
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'esc_url_raw',
-        'validate_callback' => ba11yc_required( 'band', 'band_website', [
+        'validate_callback' => MetaValidation::required( 'band', 'band_website', [
             'error_msg' => __( 'Band website is recommended.', 'my-plugin' ),
             'type'      => 'warning',
         ]),
