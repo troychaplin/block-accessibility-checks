@@ -12,7 +12,7 @@ import { isValidUrl } from '../supports/isValidUrl';
  * Register button block validation logic
  */
 addFilter(
-	'ba11yc.validateBlock',
+	'ba11yc_validate_block',
 	'ba11yc/button-validation',
 	(isValid, blockType, attributes, checkName) => {
 		// Only handle button blocks

@@ -69,7 +69,7 @@ function ba11yc_required( string $post_type, string $meta_key, array $args = arr
 
 		// Run validation through filter system.
 		$is_valid = \apply_filters(
-			'ba11yc.validateMeta',
+			'ba11yc_validate_meta',
 			true,
 			$value,
 			$post_type,

@@ -9,7 +9,7 @@ Extend the Block Accessibility Checks plugin to support post meta validation wit
 ### Block Attribute Validation (Existing)
 - **PHP:** `BlockChecksRegistry` registers checks with configuration (error_msg, warning_msg, type, category)
 - **PHP → JS Bridge:** Validation rules exposed via `window.BlockAccessibilityChecks.validationRules`
-- **JavaScript:** `validateBlock()` runs checks using `ba11yc.validateBlock` filter
+- **JavaScript:** `validateBlock()` runs checks using `ba11yc_validate_block` filter
 - **JavaScript:** `BlockInvalidation` component locks posts when errors exist
 - **Settings:** Checks with `type='settings'` configurable in admin UI (Error/Warning/Disabled)
 
@@ -141,7 +141,7 @@ function ba11yc_required( array $args = [] ): callable {
         
         // Run validation through filter system
         $is_valid = apply_filters(
-            'ba11yc.validateMeta',
+            'ba11yc_validate_meta',
             true,
             $value,
             $post_type,
@@ -316,7 +316,7 @@ export function validateMetaField( postType, metaKey, value, checkName ) {
     
     // Allow plugins to implement validation logic
     const isValid = wp.hooks.applyFilters(
-        'ba11yc.validateMeta',
+        'ba11yc_validate_meta',
         true,
         value,
         postType,
@@ -590,7 +590,7 @@ For custom validation beyond "required", use filters:
 
 ```php
 // Custom validation logic
-add_filter( 'ba11yc.validateMeta', function( $is_valid, $value, $post_type, $meta_key, $check_name, $config ) {
+add_filter( 'ba11yc_validate_meta', function( $is_valid, $value, $post_type, $meta_key, $check_name, $config ) {
     if ( $post_type === 'band' && $meta_key === 'band_origin' && $check_name === 'required' ) {
         // Custom logic: require at least city and country
         $parts = explode( ',', $value );
@@ -609,7 +609,7 @@ import { addFilter } from '@wordpress/hooks';
 
 // Implement validation logic
 addFilter(
-    'ba11yc.validateMeta',
+    'ba11yc_validate_meta',
     'my-plugin/meta-validation',
     ( isValid, value, postType, metaKey, checkName, rule ) => {
         if ( postType !== 'band' ) {
@@ -649,7 +649,7 @@ addFilter(
 ### Phase 2: Validation Callbacks
 1. Implement `ba11yc_required()` function with lazy registration
 2. Implement `ba11yc_detect_post_type_from_context()` helper
-3. Add `ba11yc.validateMeta` PHP filter support
+3. Add `ba11yc_validate_meta` PHP filter support
 
 ### Phase 3: JavaScript Integration
 1. Create `meta-validation/` directory in `src/scripts/`

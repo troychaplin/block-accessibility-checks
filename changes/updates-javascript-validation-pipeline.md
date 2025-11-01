@@ -112,7 +112,7 @@ Block change detected
     ↓
 validationHooks.js
     ↓
-ba11yc.validateBlock filter runs
+ba11yc_validate_block filter runs
     ↓
 Individual checks execute
     ↓
@@ -320,7 +320,7 @@ export function checkTwo( attributes, block ) {
  */
 export function registerButtonChecks() {
     addFilter(
-        'ba11yc.validateBlock',
+        'ba11yc_validate_block',
         'ba11yc/button-checks',
         ( results, blockName, attributes, block ) => {
             if ( blockName !== 'core/button' ) {
@@ -542,7 +542,7 @@ export function validateMyCheck( attributes ) {
 3. **Register with filter:**
 ```javascript
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'ba11yc/my-block-checks',
     ( results, blockName, attributes ) => {
         if ( blockName === 'core/my-block' ) {
@@ -561,7 +561,7 @@ addFilter(
 1. User edits block
 2. WordPress `core/block-editor` store updates
 3. Our plugin subscribes to changes
-4. `ba11yc.validateBlock` filter runs
+4. `ba11yc_validate_block` filter runs
 5. All checks execute for block type
 6. Results aggregated
 7. Block marked invalid if any errors

@@ -144,7 +144,7 @@ Prefix the change with one of these keywords:
 - **Priority-based visual indicators**: Block borders now reflect highest severity issue (red for errors, yellow for warnings) with intelligent fallback behavior
 - **Comprehensive inspector panel feedback**: All validation issues are listed at once in the sidebar, organized by severity (errors first, then warnings)
 - **JavaScript-only validation system**: Complete migration from PHP to JavaScript-only validation for real-time block editor feedback
-- **Unified validation architecture**: New `ba11yc.validateBlock` filter hook system for consistent validation across all block types
+- **Unified validation architecture**: New `ba11yc_validate_block` filter hook system for consistent validation across all block types
 - **Enhanced external plugin support**: External blocks now display visual accessibility indicators and integrate fully with the editor UI
 - **Real-time visual feedback**: All blocks (core and external) now show instant accessibility validation with visual borders and inspector panel messages
 - **Core block check settings**: Individual validation control for each core block type with enable/disable options
@@ -200,7 +200,7 @@ Prefix the change with one of these keywords:
     - Image blocks: alt text required, length validation, caption matching
     - Button blocks: required content validation, text quality checks
     - Table blocks: header or caption requirement validation
-- JavaScript-only validation system with real-time feedback using the `ba11yc.validateBlock` filter hook
+- JavaScript-only validation system with real-time feedback using the `ba11yc_validate_block` filter hook
 - External plugin integration support with proper dependency management and load order
 - Visual error indicators (red borders, inspector panel messages) for invalid blocks in editor
 - Complete integration documentation with working examples for external plugin developers

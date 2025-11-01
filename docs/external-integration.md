@@ -185,7 +185,7 @@ This example demonstrates how to implement validation logic for your custom bloc
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/card-block') {

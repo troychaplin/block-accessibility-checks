@@ -46,7 +46,7 @@ Fired when a check is enabled or disabled.
 
 **PHP filter hooks** are for modifying check **configuration and registration** only.
 
-**JavaScript hooks** are for implementing **validation logic**. All validation happens in JavaScript for real-time feedback. See [JavaScript Integration](./js-integration.md) for the `ba11yc.validateBlock` filter.
+**JavaScript hooks** are for implementing **validation logic**. All validation happens in JavaScript for real-time feedback. See [JavaScript Integration](./js-integration.md) for the `ba11yc_validate_block` filter.
 
 ### `ba11yc_register_default_checks`
 Controls whether default checks should be registered.

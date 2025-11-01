@@ -3,7 +3,7 @@ import { BlockInvalidation } from './validation/blockInvalidation';
 import './validation/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
 
-// Base checks array - now empty since validation is handled via ba11yc.validateBlock filter
+// Base checks array - now empty since validation is handled via ba11yc_validate_block filter
 const coreChecks = [];
 
 // Cache for the filtered checks array to prevent repeated filter applications

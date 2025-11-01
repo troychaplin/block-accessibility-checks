@@ -344,7 +344,7 @@ Block Accessibility Checks uses a service container pattern with clear separatio
 **Purpose:** Extensible validation framework  
 **Implementation:**
 - Uses WordPress `@wordpress/hooks` package
-- Main filter: `ba11yc.validateBlock`
+- Main filter: `ba11yc_validate_block`
 - Each check adds a filter callback
 - Results aggregated and displayed
 
@@ -381,7 +381,7 @@ function checkButtonText(attributes) {
 ### Validation Flow
 1. User edits block in editor
 2. JavaScript detects block change
-3. `ba11yc.validateBlock` filter runs
+3. `ba11yc_validate_block` filter runs
 4. All registered checks execute
 5. Results collected
 6. Block marked invalid if any errors
@@ -412,7 +412,7 @@ add_action( 'ba11yc_ready', function( $registry ) {
 ```javascript
 import { addFilter } from '@wordpress/hooks';
 
-addFilter( 'ba11yc.validateBlock', 'my-plugin', ( results, blockName, attributes ) => {
+addFilter( 'ba11yc_validate_block', 'my-plugin', ( results, blockName, attributes ) => {
     if ( blockName === 'my-plugin/block' ) {
         // Add validation result
         if ( ! attributes.myField ) {
@@ -700,7 +700,7 @@ External plugins need to add their own accessibility checks. We needed an extens
 
 Key hooks:
 - `ba11yc_ready` (PHP action) - Provides registry to external plugins
-- `ba11yc.validateBlock` (JS filter) - Adds validation checks
+- `ba11yc_validate_block` (JS filter) - Adds validation checks
 - Various PHP filters for modifying behavior
 
 ## Example Usage
@@ -714,7 +714,7 @@ add_action( 'ba11yc_ready', function( $registry ) {
 
 ```javascript
 // JavaScript: Add validation
-addFilter( 'ba11yc.validateBlock', 'my-plugin', ( results, block, attrs ) => {
+addFilter( 'ba11yc_validate_block', 'my-plugin', ( results, block, attrs ) => {
     // Add validation logic
     return results;
 } );

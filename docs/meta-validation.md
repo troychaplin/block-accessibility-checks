@@ -121,13 +121,13 @@ add_action( 'init', function() {
 
 ## JavaScript Validation
 
-To add custom validation logic beyond simple "required" checks, use the `ba11yc.validateMeta` filter:
+To add custom validation logic beyond simple "required" checks, use the `ba11yc_validate_meta` filter:
 
 ```javascript
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc.validateMeta',
+    'ba11yc_validate_meta',
     'my-plugin/meta-validation',
     ( isValid, value, postType, metaKey, checkName, rule ) => {
         if ( postType !== 'band' ) {
@@ -190,10 +190,10 @@ When configured as a warning:
 
 ### Custom PHP Validation
 
-You can add custom server-side validation logic using the `ba11yc.validateMeta` PHP filter:
+You can add custom server-side validation logic using the `ba11yc_validate_meta` PHP filter:
 
 ```php
-add_filter( 'ba11yc.validateMeta', function( $is_valid, $value, $post_type, $meta_key, $check_name, $config ) {
+add_filter( 'ba11yc_validate_meta', function( $is_valid, $value, $post_type, $meta_key, $check_name, $config ) {
     if ( $post_type === 'band' && $meta_key === 'band_origin' && $check_name === 'required' ) {
         // Custom logic: require city and country
         $parts = explode( ',', $value );
@@ -238,11 +238,11 @@ console.log( bandRules );
 
 ### PHP Filters
 
-**`ba11yc.validateMeta`**
+**`ba11yc_validate_meta`**
 Validate post meta server-side.
 
 ```php
-apply_filters( 'ba11yc.validateMeta', bool $is_valid, mixed $value, string $post_type, string $meta_key, string $check_name, array $config )
+apply_filters( 'ba11yc_validate_meta', bool $is_valid, mixed $value, string $post_type, string $meta_key, string $check_name, array $config )
 ```
 
 **`ba11yc_meta_check_args`**
@@ -261,11 +261,11 @@ apply_filters( 'ba11yc_should_register_meta_check', bool $should_register, strin
 
 ### JavaScript Filters
 
-**`ba11yc.validateMeta`**
+**`ba11yc_validate_meta`**
 Validate post meta client-side.
 
 ```javascript
-wp.hooks.applyFilters( 'ba11yc.validateMeta', true, value, postType, metaKey, checkName, rule )
+wp.hooks.applyFilters( 'ba11yc_validate_meta', true, value, postType, metaKey, checkName, rule )
 ```
 
 ## Actions

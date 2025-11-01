@@ -63,7 +63,7 @@ add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name
 
 ## Advanced JavaScript Validation
 
-**All validation logic runs in JavaScript.** The `ba11yc.validateBlock` filter is the central point for implementing validation checks. PHP only handles registration and configuration.
+**All validation logic runs in JavaScript.** The `ba11yc_validate_block` filter is the central point for implementing validation checks. PHP only handles registration and configuration.
 
 ### Multiple Validation Checks
 
@@ -73,7 +73,7 @@ Handle multiple checks for the same block in a single filter:
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName, rule, block) => {
         if (blockType !== 'my-plugin/custom-block') {
@@ -104,7 +104,7 @@ For complex scenarios, return a result object instead of a boolean:
 
 ```javascript
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/advanced-validation',
     (isValid, blockType, attributes, checkName, rule) => {
         if (blockType !== 'my-plugin/custom-block') {
@@ -135,7 +135,7 @@ The full block object is available as the last parameter:
 
 ```javascript
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/context-aware-validation',
     (isValid, blockType, attributes, checkName, rule, block) => {
         if (blockType !== 'my-plugin/custom-block') {

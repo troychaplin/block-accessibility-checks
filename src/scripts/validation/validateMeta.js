@@ -37,7 +37,7 @@ export function validateMetaField(postType, metaKey, value, checkName) {
 
 	// Allow plugins to implement validation logic
 	const isValid = wp.hooks.applyFilters(
-		'ba11yc.validateMeta',
+		'ba11yc_validate_meta',
 		true,
 		value,
 		postType,
