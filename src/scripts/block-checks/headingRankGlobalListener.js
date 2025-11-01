@@ -6,7 +6,6 @@
  */
 
 import { select, subscribe } from '@wordpress/data';
-import { addAction } from '@wordpress/hooks';
 
 // Track the last heading structure to detect changes
 let lastHeadingStructure = '';
@@ -56,9 +55,3 @@ subscribe(() => {
 		wp.hooks.doAction('ba11yc.headingStructureChanged', currentStructure);
 	}
 });
-
-/**
- * Action hook for when heading structure changes
- * This allows individual heading blocks to re-validate when the document changes
- */
-addAction('ba11yc.headingStructureChanged', 'ba11yc/heading-structure-listener');
