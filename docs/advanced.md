@@ -1,6 +1,6 @@
-# Advanced Usage: Block Accessibility Checks Developer API
+# Advanced Usage: Block Accessibility Checks Validation API
 
-This guide covers advanced patterns and techniques for customizing accessibility validation and integration using the Block Accessibility Checks developer API.
+This guide covers advanced patterns and techniques for customizing accessibility validation and integration using the Block Accessibility Checks Validation API.
 
 ## Conditional Registration
 

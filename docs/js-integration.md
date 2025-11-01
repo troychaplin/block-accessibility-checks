@@ -1,6 +1,6 @@
 # JavaScript Integration: Block Accessibility Checks
 
-This guide explains how to implement accessibility validation logic in JavaScript using the Block Accessibility Checks developer API.
+This guide explains how to implement accessibility validation logic in JavaScript using the Block Accessibility Checks Validation API.
 
 ## Overview
 

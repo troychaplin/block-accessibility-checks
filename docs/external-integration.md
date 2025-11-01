@@ -1,6 +1,6 @@
 # External Plugin Integration: Block Accessibility Checks
 
-This guide explains how to integrate external plugins and custom blocks with the Block Accessibility Checks developer API, enabling dedicated accessibility validation and settings for your blocks.
+This guide explains how to integrate external plugins and custom blocks with the Block Accessibility Checks Validation API, enabling dedicated accessibility validation and settings for your blocks.
 
 ## Overview
 

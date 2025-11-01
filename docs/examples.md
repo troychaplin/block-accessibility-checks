@@ -1,6 +1,6 @@
 # Example Plugins & Code Snippets: Block Accessibility Checks
 
-This guide provides example plugin structures and code snippets to help developers integrate with the Block Accessibility Checks developer API.
+This guide provides example plugin structures and code snippets to help developers integrate with the Block Accessibility Checks Validation API.
 
 ## Example Plugin Structure
 

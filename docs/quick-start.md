@@ -1,7 +1,7 @@
 
-# Quick Start: Block Accessibility Checks Developer API
+# Quick Start: Block Accessibility Checks Validation API
 
-This guide provides a fast path for developers to register custom accessibility checks, implement validation logic, and properly enqueue assets using the Block Accessibility Checks API. For a complete working example, see the [block-check-integration-example](https://github.com/troychaplin/block-check-integration-example).
+This guide provides a fast path for developers to register custom accessibility checks, implement validation logic, and properly enqueue assets using the Block Accessibility Checks Validation API. For a complete working example, see the [block-check-integration-example](https://github.com/troychaplin/block-check-integration-example).
 
 ## Overview
 
