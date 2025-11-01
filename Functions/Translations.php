@@ -42,7 +42,7 @@ class Translations {
 	 * @param string $plugin_file The path to the plugin file.
 	 * @param string $text_domain The text domain for translations.
 	 */
-	public function __construct( $plugin_file, $text_domain ) {
+	public function __construct( string $plugin_file, string $text_domain ) {
 		$this->plugin_file = $plugin_file;
 		$this->text_domain = $text_domain;
 	}
@@ -55,8 +55,8 @@ class Translations {
 	 *
 	 * @return void
 	 */
-	public function load_text_domain() {
-		load_plugin_textdomain( $this->text_domain, false, dirname( plugin_basename( $this->plugin_file ) ) . '/languages/' );
+	public function load_text_domain(): void {
+		\load_plugin_textdomain( $this->text_domain, false, dirname( \plugin_basename( $this->plugin_file ) ) . '/languages/' );
 	}
 
 	/**
@@ -68,11 +68,11 @@ class Translations {
 	 * @param string $script_handle The handle of the script to set up translations for.
 	 * @return void
 	 */
-	public function setup_script_translations( $script_handle ) {
-		wp_set_script_translations(
+	public function setup_script_translations( string $script_handle ): void {
+		\wp_set_script_translations(
 			$script_handle,
 			$this->text_domain,
-			plugin_dir_path( $this->plugin_file ) . 'languages'
+			\plugin_dir_path( $this->plugin_file ) . 'languages'
 		);
 	}
 }

@@ -10,6 +10,8 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\Logger;
+
 /**
  * Block Checks Registry Class
  *
@@ -17,6 +19,8 @@ namespace BlockAccessibility;
  * Delegates core block check registration to CoreBlockChecks class for better separation of concerns.
  */
 class BlockChecksRegistry {
+
+	use Logger;
 
 	/**
 	 * Registered checks
@@ -131,7 +135,7 @@ class BlockChecksRegistry {
 				'error_msg'   => '',
 				'warning_msg' => '',
 				'type'        => 'settings',
-				'category'    => 'accessibility', // New optional field.
+				'category'    => 'accessibility',
 				'priority'    => 10,
 				'enabled'     => true,
 				'description' => '',
@@ -223,7 +227,12 @@ class BlockChecksRegistry {
 		}
 
 		unset( $this->checks[ $block_type ][ $check_name ] );
-		unset( $this->plugin_info[ $block_type ] );
+
+		// Only remove plugin info if no more checks exist for this block type.
+		if ( empty( $this->checks[ $block_type ] ) ) {
+			unset( $this->checks[ $block_type ] );
+			unset( $this->plugin_info[ $block_type ] );
+		}
 
 		// Action hook for developers to know when a check is unregistered.
 		\do_action( 'ba11yc_check_unregistered', $block_type, $check_name );
@@ -278,7 +287,7 @@ class BlockChecksRegistry {
 	 * @param string $check_name Check name.
 	 * @return bool True if registered, false otherwise.
 	 */
-	public function is_check_registered( $block_type, $check_name ) {
+	public function is_check_registered( string $block_type, string $check_name ): bool {
 		return isset( $this->checks[ $block_type ][ $check_name ] );
 	}
 
@@ -289,7 +298,7 @@ class BlockChecksRegistry {
 	 * @param string $check_name Check name.
 	 * @return array|null Check configuration or null if not found.
 	 */
-	public function get_check_config( $block_type, $check_name ) {
+	public function get_check_config( string $block_type, string $check_name ): ?array {
 		if ( ! isset( $this->checks[ $block_type ][ $check_name ] ) ) {
 			return null;
 		}
@@ -302,7 +311,7 @@ class BlockChecksRegistry {
 	 *
 	 * @return array Array of block types that have checks registered.
 	 */
-	public function get_registered_block_types() {
+	public function get_registered_block_types(): array {
 		return \array_keys( $this->checks );
 	}
 
@@ -387,10 +396,14 @@ class BlockChecksRegistry {
 	 * @return string The check level.
 	 */
 	private function get_external_block_setting( string $block_type, string $check_name ): string {
-		// Extract plugin slug from block type.
-		$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
-		$plugin_slug = $plugin_info['slug'];
+		// Use stored plugin info if available, fallback to extraction from block type.
+		$plugin_info = $this->plugin_info[ $block_type ] ?? array();
 
+		if ( empty( $plugin_info['slug'] ) ) {
+			$plugin_info = $this->extract_plugin_info_from_block_type( $block_type );
+		}
+
+		$plugin_slug = $plugin_info['slug'];
 		$option_name = 'block_checks_external_' . $plugin_slug;
 		$options     = \get_option( $option_name, array() );
 
@@ -400,44 +413,12 @@ class BlockChecksRegistry {
 	}
 
 	/**
-	 * Get plugin information for a block type
-	 *
-	 * @param string $block_type The block type.
-	 * @return array Plugin information array.
-	 */
-	public function get_plugin_info( string $block_type ): array {
-		return $this->plugin_info[ $block_type ] ?? array();
-	}
-
-	/**
 	 * Get all plugin information
 	 *
 	 * @return array All plugin information indexed by block type.
 	 */
 	public function get_all_plugin_info(): array {
 		return $this->plugin_info;
-	}
-
-	/**
-	 * Get debug information for plugin detection
-	 *
-	 * @return array Debug information.
-	 */
-	public function get_debug_info(): array {
-		return array(
-			'plugin_info'       => $this->plugin_info,
-			'plugin_info_cache' => $this->plugin_info_cache,
-			'checks'            => array_keys( $this->checks ),
-		);
-	}
-
-	/**
-	 * Get core block checks instance
-	 *
-	 * @return CoreBlockChecks|null The core block checks instance or null if not initialized.
-	 */
-	public function get_core_block_checks(): ?CoreBlockChecks {
-		return $this->core_block_checks;
 	}
 
 	/**
@@ -484,7 +465,7 @@ class BlockChecksRegistry {
 					}
 
 					// Get plugin data and cache it.
-					if ( function_exists( 'get_plugin_data' ) ) {
+					if ( $this->ensure_plugin_data_function() ) {
 						$plugin_data = \get_plugin_data( $plugin_file );
 
 						$plugin_info = array(
@@ -513,6 +494,50 @@ class BlockChecksRegistry {
 	}
 
 	/**
+	 * Ensure get_plugin_data function is available
+	 *
+	 * Loads the required WordPress file if the function doesn't exist.
+	 *
+	 * @return bool True if function is available, false otherwise.
+	 */
+	private function ensure_plugin_data_function(): bool {
+		if ( ! function_exists( 'get_plugin_data' ) ) {
+			if ( defined( 'ABSPATH' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+		}
+		return function_exists( 'get_plugin_data' );
+	}
+
+	/**
+	 * Find a plugin file in a specific directory
+	 *
+	 * Searches for PHP files with valid plugin headers in the given directory.
+	 *
+	 * @param string $dir The directory to search in.
+	 * @return string|false The plugin file path or false if not found.
+	 */
+	private function find_plugin_file_in_directory( string $dir ): string|false {
+		if ( ! $this->ensure_plugin_data_function() ) {
+			return false;
+		}
+
+		$plugin_files = glob( $dir . '/*.php' );
+		if ( false === $plugin_files ) {
+			return false;
+		}
+
+		foreach ( $plugin_files as $plugin_file ) {
+			$plugin_data = \get_plugin_data( $plugin_file );
+			if ( ! empty( $plugin_data['Name'] ) ) {
+				return $plugin_file;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Find the main plugin file from a given file path
 	 *
 	 * @param string $file_path The file path to start from.
@@ -521,31 +546,18 @@ class BlockChecksRegistry {
 	private function find_main_plugin_file( string $file_path ): string|false {
 		$dir = dirname( $file_path );
 
-		// Look for plugin files in the directory.
-		$plugin_files = glob( $dir . '/*.php' );
-
-		foreach ( $plugin_files as $plugin_file ) {
-			if ( function_exists( 'get_plugin_data' ) ) {
-				$plugin_data = \get_plugin_data( $plugin_file );
-				if ( ! empty( $plugin_data['Name'] ) ) {
-					return $plugin_file;
-				}
-			}
+		// Look for plugin files in the current directory.
+		$plugin_file = $this->find_plugin_file_in_directory( $dir );
+		if ( false !== $plugin_file ) {
+			return $plugin_file;
 		}
 
 		// If not found in current directory, try parent directory.
 		$parent_dir = dirname( $dir );
 		if ( $parent_dir !== $dir && strpos( $parent_dir, WP_PLUGIN_DIR ) === 0 ) {
-			// Look for any PHP file with a Plugin Name header in the parent directory.
-			$parent_plugin_files = glob( $parent_dir . '/*.php' );
-
-			foreach ( $parent_plugin_files as $parent_plugin_file ) {
-				if ( function_exists( 'get_plugin_data' ) ) {
-					$plugin_data = \get_plugin_data( $parent_plugin_file );
-					if ( ! empty( $plugin_data['Name'] ) ) {
-						return $parent_plugin_file;
-					}
-				}
+			$plugin_file = $this->find_plugin_file_in_directory( $parent_dir );
+			if ( false !== $plugin_file ) {
+				return $plugin_file;
 			}
 		}
 
@@ -553,19 +565,10 @@ class BlockChecksRegistry {
 		$current_dir = $dir;
 		while ( WP_PLUGIN_DIR !== $current_dir && strpos( $current_dir, WP_PLUGIN_DIR ) === 0 ) {
 			$current_dir = dirname( $current_dir );
-			if ( $current_dir === $dir ) {
-				break; // Prevent infinite loop.
-			}
 
-			$plugin_files = glob( $current_dir . '/*.php' );
-
-			foreach ( $plugin_files as $plugin_file ) {
-				if ( function_exists( 'get_plugin_data' ) ) {
-					$plugin_data = \get_plugin_data( $plugin_file );
-					if ( ! empty( $plugin_data['Name'] ) ) {
-						return $plugin_file;
-					}
-				}
+			$plugin_file = $this->find_plugin_file_in_directory( $current_dir );
+			if ( false !== $plugin_file ) {
+				return $plugin_file;
 			}
 		}
 
@@ -575,48 +578,27 @@ class BlockChecksRegistry {
 	/**
 	 * Extract plugin information from block type
 	 *
-	 * @param string $block_type The block type.
-	 * @return array Plugin information.
+	 * Derives plugin name and slug from the block type namespace.
+	 * This ensures all blocks from the same plugin share the same slug
+	 * and are properly grouped together in settings and menus.
+	 *
+	 * @param string $block_type The block type (e.g., 'myplugin/my-block').
+	 * @return array Plugin information with 'name' and 'slug' keys.
 	 */
-	private function extract_plugin_info_from_block_type( string $block_type ): array {
+	public function extract_plugin_info_from_block_type( string $block_type ): array {
 		$parts     = explode( '/', $block_type );
 		$namespace = $parts[0] ?? '';
 
 		// Convert namespace to readable name.
 		$plugin_name = ucwords( str_replace( array( '-', '_' ), ' ', $namespace ) );
 
-		// Create a slug for the plugin.
+		// Create a slug for the plugin using only the namespace.
+		// This ensures all blocks from the same plugin share the same slug.
 		$plugin_slug = \sanitize_title( $namespace );
 
 		return array(
 			'name' => $plugin_name,
 			'slug' => $plugin_slug,
 		);
-	}
-
-	/**
-	 * Log error messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Error message to log.
-	 * @return void
-	 */
-	private function log_error( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - BlockChecksRegistry: ' . $message );
-		}
-	}
-
-	/**
-	 * Log debug messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Debug message to log.
-	 * @return void
-	 */
-	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - BlockChecksRegistry DEBUG: ' . $message );
-		}
 	}
 }

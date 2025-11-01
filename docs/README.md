@@ -1,10 +1,11 @@
-# Block Accessibility Checks – Developer API
+# Block Accessibility Checks – Validation API
 
 The Block Accessibility Checks plugin provides a comprehensive API for developers to extend and customize accessibility validation in the WordPress block editor. All validation logic is handled in JavaScript for real-time feedback, while PHP is used for configuration and registration.
 
 ## Overview
 
 - **Purpose:** Help developers add, configure, and validate accessibility checks for custom and core blocks.
+- **Architecture:** PHP handles check registration and configuration; JavaScript handles validation logic and real-time feedback.
 - **Audience:** WordPress plugin and block developers, site administrators.
 
 ## Key Features
@@ -18,7 +19,7 @@ The Block Accessibility Checks plugin provides a comprehensive API for developer
 
 ## Documentation Table of Contents
 
-- [Developer API Features](./features.md)
+- [Validation API Features](./features.md)
 - [Quick Start Guide](./quick-start.md)
 - [API Reference](./api-reference.md)
 - [Hooks Reference](./hooks.md)

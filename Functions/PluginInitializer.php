@@ -10,12 +10,16 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\Logger;
+
 /**
  * Plugin Initializer Class
  *
  * Handles plugin initialization in an organized way.
  */
 class PluginInitializer {
+
+	use Logger;
 
 	/**
 	 * Plugin file path
@@ -266,34 +270,8 @@ class PluginInitializer {
 	public function display_initialization_error(): void {
 		printf(
 			'<div class="notice notice-error"><p><strong>%s:</strong> %s</p></div>',
-			'Plugin Error',
-			'Block Accessibility Checks plugin failed to initialize properly. Please check your error logs for more details.'
+			esc_html__( 'Plugin Error', 'block-accessibility-checks' ),
+			esc_html__( 'Block Accessibility Checks plugin failed to initialize properly. Please check your error logs for more details.', 'block-accessibility-checks' )
 		);
-	}
-
-	/**
-	 * Log error messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Error message to log.
-	 * @return void
-	 */
-	private function log_error( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - PluginInitializer: ' . $message );
-		}
-	}
-
-	/**
-	 * Log debug messages when WP_DEBUG is enabled
-	 *
-	 * @param string $message Debug message to log.
-	 * @return void
-	 */
-	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - PluginInitializer DEBUG: ' . $message );
-		}
 	}
 }

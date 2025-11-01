@@ -10,6 +10,8 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\Logger;
+
 /**
  * Class HeadingLevels
  *
@@ -24,6 +26,16 @@ namespace BlockAccessibility;
  * @package BlockAccessibilityChecks
  */
 class HeadingLevels {
+
+	use Logger;
+
+	/**
+	 * Allowed heading levels that can be restricted.
+	 * Only H1, H5, and H6 are permitted to be restricted.
+	 *
+	 * @var array
+	 */
+	private const ALLOWED_RESTRICTED_LEVELS = array( 'h1', 'h5', 'h6' );
 
 	/**
 	 * Cached options to avoid repeated database calls.
@@ -88,7 +100,7 @@ class HeadingLevels {
 
 		try {
 			$options           = $this->get_options();
-			$restricted_levels = isset( $options['core_heading_levels'] ) ? $options['core_heading_levels'] : array();
+			$restricted_levels = $options['core_heading_levels'] ?? array();
 
 			// Validate restricted levels data.
 			if ( ! is_array( $restricted_levels ) ) {
@@ -106,7 +118,6 @@ class HeadingLevels {
 
 			// Remove restricted levels with validation.
 			// Only allow removal of H1, H5, and H6 levels.
-			$allowed_restricted_levels = array( 'h1', 'h5', 'h6' );
 			foreach ( $restricted_levels as $level ) {
 				if ( ! is_string( $level ) || ! preg_match( '/^h[1-6]$/', $level ) ) {
 					$this->log_error( "Invalid heading level format: {$level}. Expected format: h1-h6." );
@@ -114,7 +125,7 @@ class HeadingLevels {
 				}
 
 				// Only allow restriction of H1, H5, and H6.
-				if ( ! in_array( $level, $allowed_restricted_levels, true ) ) {
+				if ( ! in_array( $level, self::ALLOWED_RESTRICTED_LEVELS, true ) ) {
 					$this->log_debug( "Skipping restriction of {$level}. Only H1, H5, and H6 can be restricted." );
 					continue;
 				}
@@ -150,31 +161,5 @@ class HeadingLevels {
 		}
 
 		return $args;
-	}
-
-	/**
-	 * Log error messages when WP_DEBUG is enabled.
-	 *
-	 * @param string $message Error message to log.
-	 * @return void
-	 */
-	private function log_error( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - HeadingLevels: ' . $message );
-		}
-	}
-
-	/**
-	 * Log debug messages when WP_DEBUG is enabled.
-	 *
-	 * @param string $message Debug message to log.
-	 * @return void
-	 */
-	private function log_debug( string $message ): void {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			\error_log( 'Block Accessibility Checks - HeadingLevels DEBUG: ' . $message );
-		}
 	}
 }

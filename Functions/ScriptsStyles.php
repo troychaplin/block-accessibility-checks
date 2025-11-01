@@ -21,6 +21,34 @@ namespace BlockAccessibility;
  */
 class ScriptsStyles {
 	/**
+	 * Script handle for the main block accessibility script.
+	 *
+	 * @var string
+	 */
+	private const SCRIPT_HANDLE = 'block-accessibility-script';
+
+	/**
+	 * Path to the main block checks JavaScript file.
+	 *
+	 * @var string
+	 */
+	private const BLOCK_SCRIPT_PATH = 'build/block-checks.js';
+
+	/**
+	 * Path to the main block checks stylesheet.
+	 *
+	 * @var string
+	 */
+	private const BLOCK_STYLE_PATH = 'build/block-checks.css';
+
+	/**
+	 * Path to the admin stylesheet.
+	 *
+	 * @var string
+	 */
+	private const ADMIN_STYLE_PATH = 'build/block-admin.css';
+
+	/**
 	 * The path to the plugin file.
 	 *
 	 * @var string
@@ -61,8 +89,7 @@ class ScriptsStyles {
 			return;
 		}
 
-		$script_handle = 'block-accessibility-script';
-		$this->translations->setup_script_translations( $script_handle );
+		$this->translations->setup_script_translations( self::SCRIPT_HANDLE );
 
 		$this->enqueue_block_scripts();
 		$this->enqueue_block_styles();
@@ -77,8 +104,7 @@ class ScriptsStyles {
 	 * @return void
 	 */
 	public function enqueue_admin_assets() {
-		$script_handle = 'block-accessibility-script';
-		$this->translations->setup_script_translations( $script_handle );
+		$this->translations->setup_script_translations( self::SCRIPT_HANDLE );
 
 		$this->enqueue_admin_styles();
 	}
@@ -93,22 +119,15 @@ class ScriptsStyles {
 	 * @return void
 	 */
 	private function enqueue_block_scripts() {
-		$script_path   = 'build/block-checks.js';
-		$script_handle = 'block-accessibility-script';
-
 		wp_enqueue_script(
-			$script_handle,
-			plugins_url( $script_path, $this->plugin_file ),
+			self::SCRIPT_HANDLE,
+			plugins_url( self::BLOCK_SCRIPT_PATH, $this->plugin_file ),
 			array( 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-data', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-plugins' ),
 			BA11YC_VERSION,
 			true
 		);
 
-		/**
-		 * Retrieves the block checks options from the database.
-		 *
-		 * @return array The block checks options.
-		 */
+		// Get block checks options for JavaScript.
 		$block_checks_options = get_option( 'block_checks_options', array() );
 
 		// Get the block checks registry to expose validation rules to JavaScript.
@@ -116,7 +135,7 @@ class ScriptsStyles {
 		$validation_rules = $this->prepare_validation_rules_for_js( $registry );
 
 		\wp_localize_script(
-			$script_handle,
+			self::SCRIPT_HANDLE,
 			'BlockAccessibilityChecks',
 			array(
 				'blockChecksOptions' => $block_checks_options,
@@ -135,12 +154,10 @@ class ScriptsStyles {
 	 * @return void
 	 */
 	private function enqueue_block_styles() {
-		$style_path = 'build/block-checks.css';
-
 		// Enqueue the main stylesheet.
 		wp_enqueue_style(
 			'block-checks-style',
-			plugins_url( $style_path, $this->plugin_file ),
+			plugins_url( self::BLOCK_STYLE_PATH, $this->plugin_file ),
 			array(),
 			BA11YC_VERSION
 		);
@@ -150,12 +167,14 @@ class ScriptsStyles {
 		$error_icon_url   = plugins_url( 'src/assets/universal-access-error.svg', $this->plugin_file );
 
 		// Add the SVG URLs as CSS variables for warning and error icons.
-		$inline_css = "
-			:root {
-				--a11y-warning-icon: url('{$warning_icon_url}');
-				--a11y-error-icon: url('{$error_icon_url}');
-			}
-		";
+		$inline_css = sprintf(
+			":root {
+				--a11y-warning-icon: url('%s');
+				--a11y-error-icon: url('%s');
+			}",
+			esc_url( $warning_icon_url ),
+			esc_url( $error_icon_url )
+		);
 
 		wp_add_inline_style( 'block-checks-style', $inline_css );
 	}
@@ -169,10 +188,9 @@ class ScriptsStyles {
 	 * @access private
 	 */
 	private function enqueue_admin_styles() {
-		$style_path = 'build/block-admin.css';
 		wp_enqueue_style(
 			'block-checks-admin',
-			plugins_url( $style_path, $this->plugin_file ),
+			plugins_url( self::ADMIN_STYLE_PATH, $this->plugin_file ),
 			array(),
 			BA11YC_VERSION
 		);

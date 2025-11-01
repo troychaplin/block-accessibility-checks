@@ -1,4 +1,4 @@
-# Troubleshooting: Block Accessibility Checks Developer API
+# Troubleshooting: Block Accessibility Checks Validation API
 
 This guide covers common issues, debugging tips, and solutions for developers integrating with the Block Accessibility Checks plugin.
 

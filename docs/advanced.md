@@ -1,6 +1,6 @@
-# Advanced Usage: Block Accessibility Checks Developer API
+# Advanced Usage: Block Accessibility Checks Validation API
 
-This guide covers advanced patterns and techniques for customizing accessibility validation and integration using the Block Accessibility Checks developer API.
+This guide covers advanced patterns and techniques for customizing accessibility validation and integration using the Block Accessibility Checks Validation API.
 
 ## Conditional Registration
 
@@ -17,9 +17,9 @@ add_action( 'ba11yc_register_checks', function( $registry ) {
 } );
 ```
 
-## Dynamic Configuration
+## Dynamic Check Configuration
 
-Modify check configuration dynamically using filter hooks.
+Modify check configuration dynamically using filter hooks before registration.
 
 ```php
 add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name ) {
@@ -33,43 +33,74 @@ add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name
 }, 10, 3 );
 ```
 
-## Custom Result Processing
+## Preventing Check Registration
 
-Add contextual information or modify results before they are displayed.
+Conditionally prevent specific checks from being registered.
 
 ```php
-add_filter( 'ba11yc_block_check_results', function( $results, $block_type, $attributes, $content ) {
-    foreach ( $results as &$result ) {
-        if ( $result['check_name'] === 'heading_hierarchy' ) {
-            $result['context'] = [
-                'post_type' => get_post_type(),
-                'current_user_role' => wp_get_current_user()->roles[0] ?? 'subscriber'
-            ];
-        }
+add_filter( 'ba11yc_should_register_check', function( $should_register, $block_type, $check_name, $check_args ) {
+    // Don't register advanced checks for non-admin users
+    if ( ! current_user_can( 'manage_options' ) && $check_name === 'advanced_heading_check' ) {
+        return false;
     }
-    return $results;
+    return $should_register;
 }, 10, 4 );
 ```
 
-## Block Attribute Preprocessing
+## Modifying Check Priority
 
-Normalize or modify block attributes before validation runs.
+Adjust the order in which checks are executed.
 
 ```php
-add_filter( 'ba11yc_block_attributes', function( $attributes, $block_type, $content ) {
-    if ( $block_type === 'core/image' ) {
-        if ( ! isset( $attributes['alt'] ) ) {
-            $attributes['alt'] = '';
-        }
-        $attributes['alt'] = trim( $attributes['alt'] );
+add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name ) {
+    // Run critical checks first
+    if ( $check_name === 'image_alt_text' && $block_type === 'core/image' ) {
+        $check_args['priority'] = 5; // Lower = runs earlier
     }
-    return $attributes;
+    return $check_args;
 }, 10, 3 );
 ```
 
-## Advanced JavaScript Integration
+## Advanced JavaScript Validation
 
-Handle multiple rules, custom result objects, and advanced feedback in JS.
+**All validation logic runs in JavaScript.** The `ba11yc.validateBlock` filter is the central point for implementing validation checks. PHP only handles registration and configuration.
+
+### Multiple Validation Checks
+
+Handle multiple checks for the same block in a single filter:
+
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+    'ba11yc.validateBlock',
+    'my-plugin/validation',
+    (isValid, blockType, attributes, checkName, rule, block) => {
+        if (blockType !== 'my-plugin/custom-block') {
+            return isValid;
+        }
+        
+        switch (checkName) {
+            case 'title_required':
+                return !!(attributes.title && attributes.title.trim());
+                
+            case 'content_length':
+                const content = attributes.content || '';
+                return content.length <= 500;
+                
+            case 'image_alt':
+                return !!(attributes.imageAlt && attributes.imageAlt.trim());
+                
+            default:
+                return isValid;
+        }
+    }
+);
+```
+
+### Custom Validation Results
+
+For complex scenarios, return a result object instead of a boolean:
 
 ```javascript
 addFilter(
@@ -79,18 +110,46 @@ addFilter(
         if (blockType !== 'my-plugin/custom-block') {
             return isValid;
         }
-        // Example: Return custom result object for advanced feedback
+        
         if (checkName === 'complex_validation') {
-            const valid = validateComplexRule(attributes, rule);
-            if (!valid) {
+            const issues = validateComplexRule(attributes, rule);
+            
+            if (issues.length > 0) {
                 return {
                     isValid: false,
                     mode: 'error',
-                    message: rule.message,
-                    data: { details: 'Additional context here' }
+                    message: rule.error_msg,
+                    data: { issues }
                 };
             }
         }
+        
+        return isValid;
+    }
+);
+```
+
+### Accessing Block Context
+
+The full block object is available as the last parameter:
+
+```javascript
+addFilter(
+    'ba11yc.validateBlock',
+    'my-plugin/context-aware-validation',
+    (isValid, blockType, attributes, checkName, rule, block) => {
+        if (blockType !== 'my-plugin/custom-block') {
+            return isValid;
+        }
+        
+        if (checkName === 'nested_content_check') {
+            // Access inner blocks for complex validation
+            const hasRequiredBlocks = block.innerBlocks.some(
+                innerBlock => innerBlock.name === 'core/heading'
+            );
+            return hasRequiredBlocks;
+        }
+        
         return isValid;
     }
 );

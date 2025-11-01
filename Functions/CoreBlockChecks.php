@@ -29,6 +29,13 @@ class CoreBlockChecks {
 	private $registry;
 
 	/**
+	 * Cached core block check definitions
+	 *
+	 * @var array|null
+	 */
+	private $definitions_cache = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param BlockChecksRegistry $registry The registry instance.
@@ -52,7 +59,7 @@ class CoreBlockChecks {
 		}
 
 		// Get core block check configurations and register them.
-		$core_checks = $this->get_core_block_check_configs();
+		$core_checks = $this->get_core_block_check_definitions();
 
 		foreach ( $core_checks as $block_type => $checks ) {
 			foreach ( $checks as $check_name => $check_config ) {
@@ -65,27 +72,22 @@ class CoreBlockChecks {
 	}
 
 	/**
-	 * Get all core block check configurations
-	 *
-	 * Returns an array of all core block check configurations for reference
-	 * or programmatic use.
-	 *
-	 * @return array Array of core block check configurations.
-	 */
-	public function get_core_block_check_configs(): array {
-		return $this->get_core_block_check_definitions();
-	}
-
-	/**
 	 * Get core block check definitions
 	 *
 	 * Private method containing the actual check definitions.
 	 * This is the single source of truth for all core block checks.
+	 * Results are cached after first call for performance.
 	 *
 	 * @return array Array of core block check configurations.
 	 */
 	private function get_core_block_check_definitions(): array {
-		return array(
+		// Return cached definitions if available.
+		if ( null !== $this->definitions_cache ) {
+			return $this->definitions_cache;
+		}
+
+		// Build and cache the definitions array.
+		$this->definitions_cache = array(
 			'core/button'  => array(
 				'check_button_link' => array(
 					'error_msg'   => \__( 'Buttons are required to have a valid link', 'block-accessibility-checks' ),
@@ -167,56 +169,19 @@ class CoreBlockChecks {
 				),
 			),
 		);
+
+		return $this->definitions_cache;
 	}
 
 	/**
 	 * Get supported core block types
 	 *
 	 * Returns an array of core block types that have accessibility checks.
+	 * Derived dynamically from the check definitions for single source of truth.
 	 *
 	 * @return array Array of supported core block types.
 	 */
 	public function get_supported_core_block_types(): array {
-		return array(
-			'core/button',
-			'core/heading',
-			'core/image',
-			'core/table',
-		);
-	}
-
-	/**
-	 * Check if a block type is a supported core block
-	 *
-	 * @param string $block_type The block type to check.
-	 * @return bool True if it's a supported core block, false otherwise.
-	 */
-	public function is_supported_core_block( string $block_type ): bool {
-		return in_array( $block_type, $this->get_supported_core_block_types(), true );
-	}
-
-	/**
-	 * Get check configuration for a specific core block check
-	 *
-	 * @param string $block_type The block type.
-	 * @param string $check_name The check name.
-	 * @return array|null The check configuration or null if not found.
-	 */
-	public function get_core_block_check_config( string $block_type, string $check_name ): ?array {
-		$definitions = $this->get_core_block_check_definitions();
-
-		return $definitions[ $block_type ][ $check_name ] ?? null;
-	}
-
-	/**
-	 * Get all checks for a specific core block type
-	 *
-	 * @param string $block_type The block type.
-	 * @return array Array of checks for the block type or empty array if not found.
-	 */
-	public function get_core_block_checks( string $block_type ): array {
-		$definitions = $this->get_core_block_check_definitions();
-
-		return $definitions[ $block_type ] ?? array();
+		return \array_keys( $this->get_core_block_check_definitions() );
 	}
 }
