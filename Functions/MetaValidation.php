@@ -46,7 +46,6 @@ class MetaValidation {
 			'error_msg'   => 'This field is required.',
 			'warning_msg' => 'This field is recommended.',
 			'type'        => 'settings',
-			'category'    => 'validation',
 			'check_name'  => 'required',
 			'description' => '',
 		);

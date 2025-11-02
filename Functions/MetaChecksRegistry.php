@@ -102,7 +102,6 @@ class MetaChecksRegistry {
 				'error_msg'   => '',
 				'warning_msg' => '',
 				'type'        => 'settings',
-				'category'    => 'validation',
 				'priority'    => 10,
 				'enabled'     => true,
 				'description' => '',
@@ -126,13 +125,6 @@ class MetaChecksRegistry {
 			if ( ! in_array( $check_args['type'], $valid_types, true ) ) {
 				$this->log_error( "Invalid type '{$check_args['type']}' for {$post_type}/{$meta_key}/{$check_name}. Using 'settings'." );
 				$check_args['type'] = 'settings';
-			}
-
-			// Validate category parameter.
-			$valid_categories = array( 'accessibility', 'validation' );
-			if ( ! in_array( $check_args['category'], $valid_categories, true ) ) {
-				$this->log_error( "Invalid category '{$check_args['category']}' for {$post_type}/{$meta_key}/{$check_name}. Using 'validation'." );
-				$check_args['category'] = 'validation';
 			}
 
 			// Allow developers to filter check arguments before registration.

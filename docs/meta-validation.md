@@ -64,7 +64,6 @@ MetaValidation::required( $post_type, $meta_key, [
     'warning_msg' => 'Warning message (optional, defaults to error_msg)',
     'description' => 'Description shown in settings UI',
     'type'        => 'settings',  // 'settings', 'error', 'warning', or 'none'
-    'category'    => 'validation', // 'validation' or 'accessibility'
     'check_name'  => 'required',  // Unique identifier for the check
 ])
 ```
@@ -93,7 +92,6 @@ add_action( 'init', function() {
             'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
             'description' => __( 'The city where the band originated', 'my-plugin' ),
             'type'        => 'settings',
-            'category'    => 'validation',
         ]),
     ]);
 

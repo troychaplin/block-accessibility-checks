@@ -273,7 +273,6 @@ class ScriptsStyles {
 						'error_msg'   => $check_config['error_msg'],
 						'warning_msg' => $check_config['warning_msg'],
 						'type'        => $effective_type,
-						'category'    => $check_config['category'] ?? 'validation',
 						'priority'    => $check_config['priority'],
 						'enabled'     => $check_config['enabled'],
 						'description' => $check_config['description'],

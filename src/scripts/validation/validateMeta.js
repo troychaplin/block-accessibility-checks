@@ -74,7 +74,6 @@ export function validateAllMetaChecks(postType, metaKey, value) {
 				metaKey,
 				checkName,
 				type: rule.type,
-				category: rule.category || 'validation',
 				error_msg: rule.error_msg,
 				warning_msg: rule.warning_msg,
 				priority: rule.type === 'error' ? 1 : 2,
