@@ -1,21 +1,24 @@
+/**
+ * WordPress dependencies
+ */
 import { useDispatch } from '@wordpress/data';
-import { GetInvalidBlocks } from './getInvalidBlocks';
-import { GetInvalidMeta } from './getInvalidMeta';
 import { useEffect } from '@wordpress/element';
 
 /**
- * Function that handles a Validation API for block attributes and post meta.
+ * Internal dependencies
+ */
+import { GetInvalidBlocks } from './getInvalidBlocks';
+import { GetInvalidMeta } from './getInvalidMeta';
+
+/**
+ * Validation API
  *
- * @return {null} Returns null.
+ * Handles the validation of blocks and post meta.
  */
 export function ValidationAPI() {
-	// Check if we're in the post editor context by checking if the core/editor store exists.
-	// The site editor uses different data stores, so this is a reliable way to detect context.
 	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
-
 	const invalidBlocks = GetInvalidBlocks();
 	const invalidMeta = GetInvalidMeta();
-
 	const {
 		lockPostSaving,
 		unlockPostSaving,
