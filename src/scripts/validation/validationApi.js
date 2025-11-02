@@ -58,5 +58,37 @@ export function ValidationAPI() {
 		isPostEditor,
 	]);
 
+	// Add body classes for meta validation state
+	useEffect(() => {
+		if (!isPostEditor) {
+			return;
+		}
+
+		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
+		const hasMetaWarnings = invalidMeta.some(meta => meta.hasWarnings && !meta.hasErrors);
+
+		// Add/remove error class
+		if (hasMetaErrors) {
+			document.body.classList.add('has-meta-validation-errors');
+		} else {
+			document.body.classList.remove('has-meta-validation-errors');
+		}
+
+		// Add/remove warning class
+		if (hasMetaWarnings) {
+			document.body.classList.add('has-meta-validation-warnings');
+		} else {
+			document.body.classList.remove('has-meta-validation-warnings');
+		}
+
+		// Cleanup on unmount
+		return () => {
+			document.body.classList.remove(
+				'has-meta-validation-errors',
+				'has-meta-validation-warnings'
+			);
+		};
+	}, [invalidMeta, isPostEditor]);
+
 	return null;
 }
