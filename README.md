@@ -66,7 +66,7 @@ function my_custom_checks( $registry ) {
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-	'ba11yc.validateBlock',
+	'ba11yc_validate_block',
 	'my-plugin/validation',
 	(isValid, blockType, attributes, checkName, rule) => {
 		if (blockType !== 'my-plugin/custom-block') {

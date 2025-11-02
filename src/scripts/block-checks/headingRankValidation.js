@@ -25,8 +25,8 @@ import { select } from '@wordpress/data';
  * - 'check_heading_first_level': Validates the first heading uses appropriate level
  */
 addFilter(
-	'ba11yc.validateBlock',
-	'ba11yc/heading-rank-validation',
+	'ba11yc_validate_block',
+	'ba11yc/headingRankValidation',
 	(isValid, blockType, attributes, checkName, rule, block) => {
 		// Only process core/heading blocks - ignore all other block types
 		if (blockType !== 'core/heading') {

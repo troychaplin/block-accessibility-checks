@@ -35,13 +35,13 @@ function my_plugin_register_checks( $registry ) {
 
 ## 2. Implement Validation in JavaScript
 
-All validation logic runs in JavaScript for real-time feedback. Use the `ba11yc.validateBlock` filter:
+All validation logic runs in JavaScript for real-time feedback. Use the `ba11yc_validate_block` filter:
 
 ```javascript
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/custom-block') {

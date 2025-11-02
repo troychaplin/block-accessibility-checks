@@ -37,7 +37,7 @@ export function validateBlock(block) {
 
 		// Use the new JavaScript-only validation system
 		const isValid = wp.hooks.applyFilters(
-			'ba11yc.validateBlock',
+			'ba11yc_validate_block',
 			true,
 			block.name,
 			attributes,

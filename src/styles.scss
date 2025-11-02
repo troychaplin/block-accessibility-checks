@@ -1,10 +1,13 @@
 @use './styles/editor/panel-messages';
 @use './styles/editor/block-icon';
+@use './styles/editor/meta-validation';
 
 :root {
 	--a11y-red: #d82000;
-	--a11y-yellow: #dbc900;
 	--a11y-light-red: #ffe4e0;
+	--a11y-dark-red: #a21800;
+	--a11y-yellow: #dbc900;
 	--a11y-light-yellow: #fffde2;
+	--a11y-dark-yellow: #807500;
     --a11y-border-width: 3px solid;
 }

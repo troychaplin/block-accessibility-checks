@@ -12,6 +12,6 @@
 	},
 	"rules": {
 		"@wordpress/no-global-active-element": "warn",
-		"@wordpress/no-unsafe-wp-apis": "warn"
+		"@wordpress/no-unsafe-wp-apis": "off"
 	}
 }

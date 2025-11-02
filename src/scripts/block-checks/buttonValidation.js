@@ -8,12 +8,9 @@
 import { addFilter } from '@wordpress/hooks';
 import { isValidUrl } from '../supports/isValidUrl';
 
-/**
- * Register button block validation logic
- */
 addFilter(
-	'ba11yc.validateBlock',
-	'ba11yc/button-validation',
+	'ba11yc_validate_block',
+	'ba11yc/buttonValidation',
 	(isValid, blockType, attributes, checkName) => {
 		// Only handle button blocks
 		if (blockType !== 'core/button') {

@@ -8,13 +8,13 @@ All validation logic is handled in JavaScript for real-time feedback in the bloc
 
 ## Implementing Validation Logic
 
-Use the `ba11yc.validateBlock` filter to add your validation logic:
+Use the `ba11yc_validate_block` filter to add your validation logic:
 
 ```javascript
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName, rule) => {
         if (blockType !== 'my-plugin/custom-block') {
@@ -58,7 +58,7 @@ This example demonstrates how to handle multiple accessibility checks for a sing
 
 ```javascript
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/custom-block') {

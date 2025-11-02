@@ -32,7 +32,7 @@ add_action('ba11yc_ready', function($registry) {
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/card-block-validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/card-block') {
@@ -78,7 +78,7 @@ add_action('ba11yc_register_checks', function($registry) {
 
 ```javascript
 addFilter(
-    'ba11yc.validateBlock',
+    'ba11yc_validate_block',
     'my-plugin/advanced-validation',
     (isValid, blockType, attributes, checkName, rule) => {
         if (blockType !== 'my-plugin/custom-block') {

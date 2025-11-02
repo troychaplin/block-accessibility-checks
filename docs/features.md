@@ -35,6 +35,12 @@ This document highlights the key features and benefits of the Block Accessibilit
 - **Backward Compatibility**  
   Legacy check registration and message fields are supported for easier migration from older patterns.
 
+- **Post Meta Validation**  
+  Validate WordPress post meta fields with the same error/warning system, including required fields, custom validation logic, and settings integration.
+
+- **UI Components for Meta Validation**  
+  Drop-in wrapper components (`MetaField` and `ValidatedToolsPanelItem`) automatically display validation errors and warnings next to meta fields, requiring minimal integration code.
+
 ## Developer Benefits
 
 - **Rapid Integration**: Add accessibility validation to custom blocks or plugins with minimal code.
@@ -42,5 +48,7 @@ This document highlights the key features and benefits of the Block Accessibilit
 - **Real-Time Feedback**: Provide instant accessibility guidance to users as they edit content.
 - **Seamless Admin Experience**: Checks and settings are automatically surfaced in the admin UI.
 - **Unified PHP-JS Bridge**: Use PHP for configuration and JS for validation, keeping logic maintainable and performant.
+- **Post Meta Support**: Validate post meta fields alongside block attributes with the same powerful API.
+- **Automatic UI Display**: Wrapper components handle validation display automatically, requiring only a single `metaKey` prop.
 
 For API details, integration patterns, and code examples, see the other documentation files in this directory.

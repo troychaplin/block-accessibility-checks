@@ -130,7 +130,119 @@ add_action( 'ba11yc_ready', function( $registry ) {
 
 ---
 
+## Post Meta Validation Methods
+
+Use `MetaChecksRegistry::get_instance()` to access these methods.
+
+### `register_meta_check( $post_type, $meta_key, $check_name, $check_args )`
+Register a validation check for a post meta field.
+
+**Parameters:**
+- `$post_type` (string): Post type (e.g., 'post', 'band')
+- `$meta_key` (string): Meta key being validated
+- `$check_name` (string): Unique check name
+- `$check_args` (array): Check configuration (same as block checks)
+
+**Returns:**
+- `bool`: True on success, false on failure
+
+**Example:**
+```php
+$meta_registry = \BlockAccessibility\MetaChecksRegistry::get_instance();
+$meta_registry->register_meta_check( 'band', 'band_origin', 'required', [
+    'error_msg'   => 'City of Origin is required.',
+    'warning_msg' => 'City of Origin is recommended.',
+    'type'        => 'settings',
+    'category'    => 'validation',
+] );
+```
+
+**Note:** Most users don't need to call this directly - use `MetaValidation::required()` instead, which handles registration automatically.
+
+---
+
+### `get_meta_checks( $post_type )`
+Get all meta checks for a specific post type.
+
+**Parameters:**
+- `$post_type` (string): Post type
+
+**Returns:**
+- `array`: Array of meta checks organized by meta key
+
+---
+
+### `get_all_meta_checks()`
+Get all registered meta checks.
+
+**Returns:**
+- `array`: Complete meta checks registry organized by post type
+
+---
+
+### `get_meta_check_config( $post_type, $meta_key, $check_name )`
+Get configuration for a specific meta check.
+
+**Parameters:**
+- `$post_type` (string): Post type
+- `$meta_key` (string): Meta key
+- `$check_name` (string): Check name
+
+**Returns:**
+- `array|null`: Check configuration array or null if not found
+
+---
+
+### `get_effective_meta_check_level( $post_type, $meta_key, $check_name )`
+Get the effective check level for a specific meta check, considering settings.
+
+**Parameters:**
+- `$post_type` (string): Post type
+- `$meta_key` (string): Meta key
+- `$check_name` (string): Check name
+
+**Returns:**
+- `string`: The effective check level ('error', 'warning', 'none')
+
+---
+
+## MetaValidation Class
+
+### `MetaValidation::required( $post_type, $meta_key, $args )`
+Create a required field validator for post meta.
+
+**Parameters:**
+- `$post_type` (string): Post type (e.g., 'band', 'post')
+- `$meta_key` (string): Meta key being validated
+- `$args` (array): Configuration arguments
+
+**Returns:**
+- `callable`: Validation callback for use with `register_post_meta()`
+
+**Example:**
+```php
+use BlockAccessibility\MetaValidation;
+
+register_post_meta( 'band', 'band_origin', [
+    'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
+        'error_msg' => 'City of Origin is required.',
+        'type'      => 'settings',
+    ]),
+] );
+```
+
+---
+
+### `MetaValidation::detect_post_type_from_context()`
+Detect post type from the current request context.
+
+**Returns:**
+- `string|false`: Post type or false if not detected
+
+---
+
 ## See Also
+- [Post Meta Validation](./meta-validation.md)
 - [Hooks Reference](./hooks.md)
 - [Quick Start Guide](./quick-start.md)
 - [JavaScript Integration](./js-integration.md)

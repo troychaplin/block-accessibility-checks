@@ -7,12 +7,9 @@
 
 import { addFilter } from '@wordpress/hooks';
 
-/**
- * Register image block validation logic
- */
 addFilter(
-	'ba11yc.validateBlock',
-	'ba11yc/image-validation',
+	'ba11yc_validate_block',
+	'ba11yc/imageValidation',
 	(isValid, blockType, attributes, checkName) => {
 		// Only handle image blocks
 		if (blockType !== 'core/image') {

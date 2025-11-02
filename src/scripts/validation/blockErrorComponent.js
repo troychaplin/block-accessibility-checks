@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { validateBlock } from './validationHooks';
+import { validateBlock } from './validateBlocks';
 
 /**
  * A higher-order component that adds error handling and accessibility checks to a block component.

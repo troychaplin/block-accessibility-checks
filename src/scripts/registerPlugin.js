@@ -1,9 +1,16 @@
+/**
+ * WordPress dependencies
+ */
 import { registerPlugin } from '@wordpress/plugins';
-import { BlockInvalidation } from './block-validation/blockInvalidation';
-import './block-validation/blockErrorComponent';
 import { applyFilters } from '@wordpress/hooks';
 
-// Base checks array - now empty since validation is handled via ba11yc.validateBlock filter
+/**
+ * Internal dependencies
+ */
+import { ValidationAPI } from './validation/validationApi';
+import './validation/blockErrorComponent';
+
+// Base checks array - now empty since validation is handled via ba11yc_validate_block filter
 const coreChecks = [];
 
 // Cache for the filtered checks array to prevent repeated filter applications
@@ -50,6 +57,6 @@ export const blockChecksArray = new Proxy([], {
 	},
 });
 
-registerPlugin('block-validation', {
-	render: BlockInvalidation,
+registerPlugin('validation-api', {
+	render: ValidationAPI,
 });
