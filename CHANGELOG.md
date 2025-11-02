@@ -17,6 +17,25 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- **Post meta validation system**: Comprehensive validation framework for WordPress post meta fields with error/warning display and post locking
+- **MetaValidation class**: New `MetaValidation::required()` static method for easy registration of required field validators that integrate with both WordPress's `validate_callback` and the plugin's validation UI
+- **MetaChecksRegistry class**: Central registry for managing post meta validation checks across all post types with similar API to BlockChecksRegistry
+- **Dual validation architecture**: Server-side validation through WordPress REST API with `WP_Error` responses and client-side validation through React hooks for real-time feedback
+- **Meta validation settings UI**: Integrated settings page support for configuring meta validation severity (error/warning/disabled) alongside block checks
+- **React validation components**: New `ValidatedToolsPanelItem` and `MetaField` wrapper components for automatic validation display in the block editor
+- **useMetaValidation hook**: React hook providing validation state (isValid, hasErrors, hasWarnings, issues) for meta fields
+- **Post locking for meta errors**: Automatic disabling of Save Draft, Publish, and Auto-save buttons when required meta fields have validation errors
+- **Meta validation JavaScript API**: Client-side validation functions (`validateMetaField`, `validateAllMetaChecks`) and `GetInvalidMeta` component for tracking invalid meta across the post
+- **Meta validation hooks and filters**: New PHP filters (`ba11yc_validate_meta`, `ba11yc_meta_check_args`, `ba11yc_should_register_meta_check`) and action (`ba11yc_meta_check_registered`) for extensibility
+- **JavaScript meta validation filter**: `ba11yc_validate_meta` JavaScript filter hook for custom client-side validation logic
+- **Visual meta validation feedback**: Inline error/warning messages below meta fields with red/yellow left borders matching block validation styling
+- **Body classes for meta validation**: Dynamic CSS classes (`has-meta-validation-errors`, `has-meta-validation-warnings`) for styling the editor based on meta validation state
+- **Meta validation documentation**: Comprehensive `meta-validation.md` guide covering PHP integration, JavaScript components, custom validation, and admin settings
+- **External plugin meta validation support**: Meta validation checks from external plugins automatically appear in their respective settings pages with proper plugin detection
+- **Meta validation examples**: Complete working examples in integration plugin demonstrating band post type with required meta fields
+
 ### Removed
 
 - **BlockConfig.php class**: Removed obsolete `Functions/BlockConfig.php` file (93 lines) that referenced non-existent render functions and was never used by JavaScript
@@ -32,6 +51,11 @@ Prefix the change with one of these keywords:
 - **BlockConfig initialization**: Removed `init_block_config()` method and call from `PluginInitializer` initialization sequence
 - **JavaScript localization**: Removed unused `'blocks'` data from script localization in `ScriptsStyles.php`
 - **Settings initialization**: Simplified `SettingsPage::init_settings()` to directly register heading options field instead of looping through configuration array
+- **Validation API integration**: Extended ValidationAPI component to monitor both block and meta validation state for unified post locking behavior
+- **Script localization**: Added `metaValidationRules` to JavaScript global object for exposing PHP-registered meta checks to client-side validation
+- **Settings page architecture**: Enhanced external plugin settings to support both block checks and meta validation checks in unified interface
+- **Post locking logic**: Updated to combine block and meta validation errors for comprehensive save prevention
+- **ScriptsStyles class**: Added `prepare_meta_validation_rules_for_js()` method to format meta validation rules for JavaScript consumption
 
 ### Improved
 
@@ -40,6 +64,11 @@ Prefix the change with one of these keywords:
 - **Memory footprint**: Eliminated unused data structures and dead code paths
 - **Developer experience**: Codebase now contains only functional code with no misleading code paths
 - **Service architecture**: All plugin services now managed consistently through PluginInitializer with proper timing and dependency management
+- **Meta validation developer experience**: Simplified meta validation registration to single `MetaValidation::required()` call that handles both WordPress validation callback and plugin settings integration
+- **Validation consistency**: Unified validation messaging and visual styling between block validation and meta validation for consistent user experience
+- **Settings organization**: Meta validation checks organized by post type with clear labeling and grouped display in admin settings
+- **Real-time validation feedback**: Meta fields now provide instant validation feedback as users type, improving form usability
+- **Extensibility**: Meta validation system uses same hook-based architecture as block validation for consistent external plugin integration
 
 ## [2.2.0]
 
