@@ -7,61 +7,63 @@
 }
 
 .meta-field-error {
-	border-color: #cc1818;
-    background-color: #ffe4e0;
+	border-color: var(--a11y-red);
+    background-color: var(--a11y-light-red);
 }
 
 .meta-field-warning {
-	border-color: #f0b849;
-    background-color: #fffde2;
+	border-color: var(--a11y-yellow);
+    background-color: var(--a11y-light-yellow);
 }
 
 // Input field styling - base states (lower specificity first)
 .meta-field-error .components-base-control__field .components-text-control__input,
 .meta-field-error .components-base-control__field .components-textarea-control__input,
 .meta-field-error .components-base-control__field .components-select-control__input {
-	border-color: #cc1818;
+	border-color: var(--a11y-red);
 }
 
 .meta-field-warning .components-base-control__field .components-text-control__input,
 .meta-field-warning .components-base-control__field .components-textarea-control__input,
 .meta-field-warning .components-base-control__field .components-select-control__input {
-	border-color: #f0b849;
+	border-color: var(--a11y-yellow);
 }
 
 // Input field styling - focus states (higher specificity last)
 .meta-field-error .components-base-control__field .components-text-control__input:focus,
 .meta-field-error .components-base-control__field .components-textarea-control__input:focus,
 .meta-field-error .components-base-control__field .components-select-control__input:focus {
-	border-color: #cc1818;
-	box-shadow: 0 0 0 1px #cc1818;
+	border-color: var(--a11y-red);
+	box-shadow: 0 0 0 1px var(--a11y-red);
 }
 
 .meta-field-warning .components-base-control__field .components-text-control__input:focus,
 .meta-field-warning .components-base-control__field .components-textarea-control__input:focus,
 .meta-field-warning .components-base-control__field .components-select-control__input:focus {
-	border-color: #f0b849;
-	box-shadow: 0 0 0 1px #f0b849;
+	border-color: var(--a11y-yellow);
+	box-shadow: 0 0 0 1px var(--a11y-yellow);
+}
+
+.meta-field-error .components-base-control .components-base-control__help,
+.meta-field-warning .components-base-control .components-base-control__help {
+    color: #636363;
 }
 
 // Validation messages
-.meta-validation-messages {
+.meta-validation-error,
+.meta-validation-warning {
+    font-size: 12px;
+	margin: 4px 0;
+	font-weight: 600;
+	line-height: 1.4;
 	margin-top: 8px;
 }
 
 .meta-validation-error {
-	color: #cc1818;
-	font-size: 12px;
-	margin: 4px 0;
-	font-weight: 600;
-	line-height: 1.4;
+	color: var(--a11y-dark-red);
 }
 
 .meta-validation-warning {
-	color: #f0b849;
-	font-size: 12px;
-	margin: 4px 0;
-	font-weight: 600;
-	line-height: 1.4;
+	color: var(--a11y-dark-yellow);
 }
 
