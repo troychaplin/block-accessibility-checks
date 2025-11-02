@@ -13,6 +13,7 @@ The Block Accessibility Checks plugin provides a comprehensive API for developer
 - Extensible check registration (PHP + JS)
 - Real-time JavaScript validation
 - Configurable severity levels (Error, Warning, Disabled)
+- Post meta field validation with automatic UI components
 - Dedicated settings pages for external plugins
 - Comprehensive API and hooks for advanced integration
 - Multiple issue reporting and visual feedback

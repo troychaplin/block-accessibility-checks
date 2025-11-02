@@ -1,0 +1,67 @@
+// Meta field validation wrapper styles
+.meta-field-error,
+.meta-field-warning {
+	border-left: 3px solid;
+	padding: 10px 12px !important;
+	margin-bottom: 16px;
+}
+
+.meta-field-error {
+	border-color: #cc1818;
+    background-color: #ffe4e0;
+}
+
+.meta-field-warning {
+	border-color: #f0b849;
+    background-color: #fffde2;
+}
+
+// Input field styling - base states (lower specificity first)
+.meta-field-error .components-base-control__field .components-text-control__input,
+.meta-field-error .components-base-control__field .components-textarea-control__input,
+.meta-field-error .components-base-control__field .components-select-control__input {
+	border-color: #cc1818;
+}
+
+.meta-field-warning .components-base-control__field .components-text-control__input,
+.meta-field-warning .components-base-control__field .components-textarea-control__input,
+.meta-field-warning .components-base-control__field .components-select-control__input {
+	border-color: #f0b849;
+}
+
+// Input field styling - focus states (higher specificity last)
+.meta-field-error .components-base-control__field .components-text-control__input:focus,
+.meta-field-error .components-base-control__field .components-textarea-control__input:focus,
+.meta-field-error .components-base-control__field .components-select-control__input:focus {
+	border-color: #cc1818;
+	box-shadow: 0 0 0 1px #cc1818;
+}
+
+.meta-field-warning .components-base-control__field .components-text-control__input:focus,
+.meta-field-warning .components-base-control__field .components-textarea-control__input:focus,
+.meta-field-warning .components-base-control__field .components-select-control__input:focus {
+	border-color: #f0b849;
+	box-shadow: 0 0 0 1px #f0b849;
+}
+
+// Validation messages
+.meta-validation-messages {
+	margin-top: 8px;
+}
+
+.meta-validation-error {
+	color: #cc1818;
+	font-size: 12px;
+	margin: 4px 0;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.meta-validation-warning {
+	color: #f0b849;
+	font-size: 12px;
+	margin: 4px 0;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
