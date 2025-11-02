@@ -1,4 +1,6 @@
-import { useMetaValidation } from './useMetaValidation';
+import { useSelect } from '@wordpress/data';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { validateAllMetaChecks } from './validateMeta';
 
 /**
  * ValidationDisplay - Shared component for displaying validation
@@ -12,7 +14,74 @@ import { useMetaValidation } from './useMetaValidation';
  * @return {import('react').ReactElement} - Rendered validation display component
  */
 export function ValidationDisplay({ metaKey, children, showMessages = true, skipWrapper = false }) {
-	const validation = useMetaValidation(metaKey);
+	// Get current meta value and post type
+	const { currentValue, postType } = useSelect(
+		select => {
+			const editor = select('core/editor');
+			const meta = editor.getEditedPostAttribute('meta') || {};
+			return {
+				currentValue: meta[metaKey],
+				postType: editor.getCurrentPostType(),
+			};
+		},
+		[metaKey]
+	);
+
+	const [validationResult, setValidationResult] = useState({
+		isValid: true,
+		issues: [],
+		hasErrors: false,
+		hasWarnings: false,
+	});
+
+	const timeoutRef = useRef(null);
+	const prevValueRef = useRef(currentValue);
+
+	useEffect(() => {
+		// Clear any existing timeout
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+
+		// If value changed, add a delay before validating
+		if (prevValueRef.current !== currentValue) {
+			timeoutRef.current = setTimeout(() => {
+				const result = validateAllMetaChecks(postType, metaKey, currentValue);
+				setValidationResult(result);
+			}, 1000); // 1 second delay like image alt text
+
+			prevValueRef.current = currentValue;
+		} else {
+			// Immediate validation for initial render or when value hasn't changed
+			const result = validateAllMetaChecks(postType, metaKey, currentValue);
+			setValidationResult(result);
+		}
+
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, [currentValue, postType, metaKey]);
+
+	// Calculate wrapper class name
+	const wrapperClassName = (() => {
+		if (validationResult.hasErrors) {
+			return 'meta-field-error';
+		}
+		if (validationResult.hasWarnings) {
+			return 'meta-field-warning';
+		}
+		return '';
+	})();
+
+	// Create validation object that matches useMetaValidation interface
+	const validation = {
+		...validationResult,
+		errors: validationResult.issues.filter(issue => issue.type === 'error'),
+		warnings: validationResult.issues.filter(issue => issue.type === 'warning'),
+		wrapperClassName,
+	};
 
 	// No validation issues - return children as-is
 	if (validation.isValid) {
