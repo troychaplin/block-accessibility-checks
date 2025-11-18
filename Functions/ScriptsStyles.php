@@ -11,7 +11,7 @@
 
 namespace BlockAccessibility;
 
-use BlockAccessibility\Traits\SiteEditorDetection;
+use BlockAccessibility\Traits\ContentEditorDetection;
 
 /**
  * Class ScriptsStyles
@@ -23,7 +23,7 @@ use BlockAccessibility\Traits\SiteEditorDetection;
  */
 class ScriptsStyles {
 
-	use SiteEditorDetection;
+	use ContentEditorDetection;
 
 	/**
 	 * Script handle for the main block accessibility script.
@@ -87,8 +87,8 @@ class ScriptsStyles {
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
-		// Only run in post editor, not site editor.
-		if ( $this->is_site_editor() ) {
+		// Only run in content editor (all post types except Site Editor).
+		if ( ! $this->is_content_editor() ) {
 			return;
 		}
 
