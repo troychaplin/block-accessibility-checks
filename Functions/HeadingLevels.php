@@ -11,6 +11,7 @@
 namespace BlockAccessibility;
 
 use BlockAccessibility\Traits\Logger;
+use BlockAccessibility\Traits\SiteEditorDetection;
 
 /**
  * Class HeadingLevels
@@ -28,6 +29,7 @@ use BlockAccessibility\Traits\Logger;
 class HeadingLevels {
 
 	use Logger;
+	use SiteEditorDetection;
 
 	/**
 	 * Allowed heading levels that can be restricted.
@@ -98,6 +100,17 @@ class HeadingLevels {
 			return $args;
 		}
 
+		// Don't modify heading levels in the Site Editor.
+		if ( $this->is_site_editor() ) {
+			return $args;
+		}
+
+		// Only apply restrictions when we're in a post/page editor context.
+		// If we can't determine the context, be conservative and don't restrict.
+		if ( ! $this->is_post_page_editor() ) {
+			return $args;
+		}
+
 		try {
 			$options           = $this->get_options();
 			$restricted_levels = $options['core_heading_levels'] ?? array();
@@ -161,5 +174,78 @@ class HeadingLevels {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Check if we're in the post/page editor (not Site Editor).
+	 *
+	 * This method checks if we're in a context where heading restrictions should apply.
+	 * We only apply restrictions in the post/page editor, not in the Site Editor.
+	 *
+	 * @return bool True if in post/page editor, false otherwise.
+	 */
+	private function is_post_page_editor(): bool {
+		// If we're in the Site Editor, we're definitely not in post/page editor.
+		if ( $this->is_site_editor() ) {
+			return false;
+		}
+
+		// Check if we're in an admin context.
+		if ( ! \is_admin() ) {
+			return false;
+		}
+
+		// Method 1: Check current screen.
+		if ( function_exists( 'get_current_screen' ) ) {
+			$current_screen = \get_current_screen();
+			if ( $current_screen ) {
+				// Post/page editor screens.
+				$editor_screens = array( 'post', 'page' );
+				if ( in_array( $current_screen->base, $editor_screens, true ) && 'post' === $current_screen->base ) {
+					return true;
+				}
+				// Check if we're editing a post or page.
+				if ( isset( $current_screen->post_type ) && in_array( $current_screen->post_type, array( 'post', 'page' ), true ) ) {
+					return true;
+				}
+			}
+		}
+
+		// Method 2: Check global $pagenow for post.php or post-new.php.
+		global $pagenow;
+		if ( isset( $pagenow ) && in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) ) {
+			// Verify it's not a template or template part.
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Context detection only.
+			if ( isset( $_GET['post'] ) ) {
+				$post_id = intval( $_GET['post'] );
+				if ( $post_id > 0 ) {
+					$post_type = \get_post_type( $post_id );
+					// Only allow post and page types.
+					if ( in_array( $post_type, array( 'post', 'page' ), true ) ) {
+						return true;
+					}
+				}
+			} elseif ( isset( $_GET['post_type'] ) ) {
+				// New post - check post_type parameter.
+				$post_type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) );
+				if ( in_array( $post_type, array( 'post', 'page' ), true ) ) {
+					return true;
+				}
+			} else {
+				// Default post type is 'post'.
+				return true;
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		}
+
+		// Method 3: Check global $post.
+		global $post;
+		if ( isset( $post ) && $post && isset( $post->post_type ) ) {
+			if ( in_array( $post->post_type, array( 'post', 'page' ), true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

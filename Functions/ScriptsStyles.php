@@ -11,6 +11,8 @@
 
 namespace BlockAccessibility;
 
+use BlockAccessibility\Traits\SiteEditorDetection;
+
 /**
  * Class ScriptsStyles
  *
@@ -20,6 +22,9 @@ namespace BlockAccessibility;
  * @package BlockAccessibilityChecks
  */
 class ScriptsStyles {
+
+	use SiteEditorDetection;
+
 	/**
 	 * Script handle for the main block accessibility script.
 	 *
@@ -83,9 +88,7 @@ class ScriptsStyles {
 	 */
 	public function enqueue_block_assets() {
 		// Only run in post editor, not site editor.
-		// Check if we're in the site editor by checking the current screen.
-		$current_screen = \get_current_screen();
-		if ( $current_screen && 'appearance_page_gutenberg-edit-site' === $current_screen->id ) {
+		if ( $this->is_site_editor() ) {
 			return;
 		}
 
