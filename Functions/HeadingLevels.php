@@ -11,6 +11,7 @@
 namespace BlockAccessibility;
 
 use BlockAccessibility\Traits\Logger;
+use BlockAccessibility\Traits\EditorDetection;
 
 /**
  * Class HeadingLevels
@@ -28,6 +29,7 @@ use BlockAccessibility\Traits\Logger;
 class HeadingLevels {
 
 	use Logger;
+	use EditorDetection;
 
 	/**
 	 * Allowed heading levels that can be restricted.
@@ -95,6 +97,11 @@ class HeadingLevels {
 	public function modify_heading_levels_globally( array $args, string $block_type ): array {
 		// Early return with error handling.
 		if ( 'core/heading' !== $block_type ) {
+			return $args;
+		}
+
+		// Only apply restrictions when we're in a content editor context.
+		if ( ! $this->is_content_editor() ) {
 			return $args;
 		}
 

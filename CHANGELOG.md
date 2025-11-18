@@ -77,6 +77,7 @@ Prefix the change with one of these keywords:
 
 - **Heading rank validation accuracy**: Fixed heading rank validation to match violations by `clientId` instead of level, ensuring only the specific problematic heading is flagged rather than all headings with the same level
 - **Heading validation independence**: Resolved issue where disabling the first heading check would prevent the heading rank check from working correctly
+- **Heading level validation in template views**: Fixed issue where heading level restrictions and rank validation were not working when viewing templates within the content editor. The `register_block_type_args` filter now properly detects content editor context including template preview views, ensuring heading level restrictions and validation work consistently across all content editor contexts while remaining disabled in the Site Editor.
 
 ## [2.2.0]
 
