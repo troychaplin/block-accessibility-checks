@@ -11,7 +11,7 @@
 namespace BlockAccessibility;
 
 use BlockAccessibility\Traits\Logger;
-use BlockAccessibility\Traits\ContentEditorDetection;
+use BlockAccessibility\Traits\EditorDetection;
 
 /**
  * Class HeadingLevels
@@ -29,7 +29,7 @@ use BlockAccessibility\Traits\ContentEditorDetection;
 class HeadingLevels {
 
 	use Logger;
-	use ContentEditorDetection;
+	use EditorDetection;
 
 	/**
 	 * Allowed heading levels that can be restricted.

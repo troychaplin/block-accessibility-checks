@@ -1,6 +1,6 @@
 <?php
 /**
- * Content Editor Detection Trait
+ * Editor Detection Trait
  *
  * Provides shared functionality for detecting if we're in the WordPress content editor
  * (post/page/custom post types), excluding the Site Editor.
@@ -12,11 +12,11 @@
 namespace BlockAccessibility\Traits;
 
 /**
- * Content Editor Detection Trait
+ * Editor Detection Trait
  *
  * Shared method for detecting the content editor context (all post types except templates).
  */
-trait ContentEditorDetection {
+trait EditorDetection {
 
 	/**
 	 * Check if we're in the content editor (any post type except Site Editor templates).

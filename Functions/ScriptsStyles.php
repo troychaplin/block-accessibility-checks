@@ -11,7 +11,7 @@
 
 namespace BlockAccessibility;
 
-use BlockAccessibility\Traits\ContentEditorDetection;
+use BlockAccessibility\Traits\EditorDetection;
 
 /**
  * Class ScriptsStyles
@@ -23,7 +23,7 @@ use BlockAccessibility\Traits\ContentEditorDetection;
  */
 class ScriptsStyles {
 
-	use ContentEditorDetection;
+	use EditorDetection;
 
 	/**
 	 * Script handle for the main block accessibility script.
