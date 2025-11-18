@@ -43,6 +43,7 @@ Prefix the change with one of these keywords:
 - **Unnecessary wrapper methods**: Removed `register_check()` and `unregister_check()` methods from `PluginInitializer` as external plugins receive registry directly via `ba11yc_ready` hook
 - **Obsolete settings configuration**: Removed unused `$block_settings` property from `SettingsPage` that was replaced by dynamic rendering from `BlockChecksRegistry`
 - **`BlockChecksRegistry::run_checks()` method**: Completely removed this method and its internal validation loop (~31 lines total) as all validation is JavaScript-based. The method always returned an empty array and was retained only for potential backward compatibility, but no internal or external usage was detected
+- **Separate first heading check**: Removed the standalone `check_heading_first_level` check as its functionality has been integrated into the `check_heading_rank` validation
 
 ### Changed
 
@@ -56,6 +57,8 @@ Prefix the change with one of these keywords:
 - **Settings page architecture**: Enhanced external plugin settings to support both block checks and meta validation checks in unified interface
 - **Post locking logic**: Updated to combine block and meta validation errors for comprehensive save prevention
 - **ScriptsStyles class**: Added `prepare_meta_validation_rules_for_js()` method to format meta validation rules for JavaScript consumption
+- **Heading rank validation**: Integrated first heading level validation (H1 or H2 requirement) into the heading rank check, consolidating both validations into a single check
+- **Heading validation error messages**: Updated error messages and descriptions to reflect that the heading rank check now validates both skipped levels and first heading level requirements
 
 ### Improved
 
@@ -69,6 +72,11 @@ Prefix the change with one of these keywords:
 - **Settings organization**: Meta validation checks organized by post type with clear labeling and grouped display in admin settings
 - **Real-time validation feedback**: Meta fields now provide instant validation feedback as users type, improving form usability
 - **Extensibility**: Meta validation system uses same hook-based architecture as block validation for consistent external plugin integration
+
+### Fixed
+
+- **Heading rank validation accuracy**: Fixed heading rank validation to match violations by `clientId` instead of level, ensuring only the specific problematic heading is flagged rather than all headings with the same level
+- **Heading validation independence**: Resolved issue where disabling the first heading check would prevent the heading rank check from working correctly
 
 ## [2.2.0]
 
