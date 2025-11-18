@@ -39,6 +39,11 @@ addFilter(
  * @return {boolean} - True if valid, false if invalid.
  */
 function validateImageAltText(attributes) {
+	// Skip validation if image is in placeholder state (no URL yet)
+	if (!attributes.url || attributes.url.trim() === '') {
+		return true; // Pass - no image selected yet, user hasn't had chance to add alt text
+	}
+
 	// Check if image is marked as decorative
 	if (attributes.isDecorative) {
 		return true; // Pass - decorative images don't need alt text
@@ -54,6 +59,10 @@ function validateImageAltText(attributes) {
  * @return {boolean} - True if valid, false if invalid.
  */
 function validateImageAltTextLength(attributes) {
+	// Skip validation if image is in placeholder state (no URL yet)
+	if (!attributes.url || attributes.url.trim() === '') {
+		return true; // Pass - no image selected yet
+	}
 	// Only check if alt text exists
 	if (!attributes.alt) {
 		return true; // Pass - no alt text to check length
@@ -68,6 +77,10 @@ function validateImageAltTextLength(attributes) {
  * @return {boolean} - True if valid, false if invalid.
  */
 function validateImageAltCaptionMatch(attributes) {
+	// Skip validation if image is in placeholder state (no URL yet)
+	if (!attributes.url || attributes.url.trim() === '') {
+		return true; // Pass - no image selected yet
+	}
 	// Only check if both alt and caption exist
 	if (!attributes.alt || !attributes.caption) {
 		return true; // Pass - can't match if one is missing
@@ -84,6 +97,10 @@ function validateImageAltCaptionMatch(attributes) {
  * @return {boolean} - True if valid, false if invalid.
  */
 function validateImageAltTextPatterns(attributes) {
+	// Skip validation if image is in placeholder state (no URL yet)
+	if (!attributes.url || attributes.url.trim() === '') {
+		return true; // Pass - no image selected yet
+	}
 	// Only check if alt text exists
 	if (!attributes.alt || attributes.alt.trim() === '') {
 		return true; // Pass - no alt text to check patterns

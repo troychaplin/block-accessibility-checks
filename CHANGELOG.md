@@ -79,6 +79,7 @@ Prefix the change with one of these keywords:
 - **Heading validation independence**: Resolved issue where disabling the first heading check would prevent the heading rank check from working correctly
 - **Heading level validation in template views**: Fixed issue where heading level restrictions and rank validation were not working when viewing templates within the content editor. The `register_block_type_args` filter now properly detects content editor context including template preview views, ensuring heading level restrictions and validation work consistently across all content editor contexts while remaining disabled in the Site Editor.
 - **Button URL validation for anchor elements only**: Fixed button link validation to only check URLs when the button block is configured as an anchor element (`tagName === 'a'`). Button elements (`tagName === 'button'`) now correctly skip URL validation since they don't require links.
+- **Image validation in placeholder state**: Fixed issue where image accessibility validation errors and warnings were showing immediately when an image block was placed, even before an image was selected. Validation now skips when the image block is in placeholder state (no URL), allowing users to select an image and add alt text before validation runs.
 
 ## [2.2.0]
 
