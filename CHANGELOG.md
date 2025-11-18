@@ -17,6 +17,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [2.3.0]
+
 ### Added
 
 - **Post meta validation system**: Comprehensive validation framework for WordPress post meta fields with error/warning display and post locking

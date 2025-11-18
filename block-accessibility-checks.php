@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Defines the version of the Block Accessibility Checks plugin.
-define( 'BA11YC_VERSION', '2.2.0' );
+define( 'BA11YC_VERSION', '2.3.0' );
 
 // This file is responsible for including the necessary autoload file.
 require_once __DIR__ . '/vendor/autoload.php';
