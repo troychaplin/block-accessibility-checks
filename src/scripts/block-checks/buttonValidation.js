@@ -37,6 +37,13 @@ addFilter(
  * @return {boolean} - True if valid, false if invalid.
  */
 function validateButtonLink(attributes) {
+	// Only validate URL if the button is using an anchor element
+	// Button elements don't require URLs, so skip validation for them
+	if (attributes.tagName === 'button') {
+		return true; // Valid - button elements don't require URLs
+	}
+
+	// For anchor elements (tagName === 'a' or default), validate URL
 	// Check if button has a URL and that it's valid
 	const hasUrl = !!(attributes.url && attributes.url.trim());
 	const isValid = hasUrl && isValidUrl(attributes.url);
