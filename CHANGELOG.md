@@ -17,6 +17,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [2.3.0]
+
 ### Added
 
 #### Post Meta Validation System
