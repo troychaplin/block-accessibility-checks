@@ -306,6 +306,12 @@ Prefix the change with one of these keywords:
 
 - Enhanced input sanitization for all plugin settings to prevent malicious data injection
 
+## [1.2.1]
+
+### Fixed
+
+- Issue where heading level one was a fallback in settings
+
 ## [1.2.0]
 
 ### Added
