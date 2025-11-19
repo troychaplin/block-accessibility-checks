@@ -3,8 +3,8 @@
 Contributors: areziaal, mikecorkum
 Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
-Tested up to: 6.8.2
-Stable tag: 2.2.0
+Tested up to: 6.9
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,9 +12,9 @@ Configure a series of block checks to prevent WCAG accessibility errors in conte
 
 == Description ==
 
-<a href="https://blockaccessibilitychecks.com/">Block Accessibility Checks</a> is a comprehensive WordPress plugin that proactively prevents accessibility issues in your content before they reach your audience. Designed for the Gutenberg block editor, it provides real-time validation that ensures your images, buttons, tables, headings, and galleries meet WCAG (Web Content Accessibility Guidelines) requirements.
+<a href="https://blockaccessibilitychecks.com/">Block Accessibility Checks</a> is a comprehensive WordPress plugin that proactively prevents accessibility issues in your content before they reach your audience. Designed for the Gutenberg block editor, it provides real-time validation that ensures your images, buttons, tables, headings, galleries, and post meta fields meet WCAG (Web Content Accessibility Guidelines) requirements.
 
-Unlike reactive accessibility tools that scan published content, this plugin catches problems during the editing process—giving immediate visual feedback and preventing publication of content with critical accessibility errors. Content creators get clear guidance on what needs fixing, while developers can extend the system with custom checks for any block type.
+Unlike reactive accessibility tools that scan published content, this plugin catches problems during the editing process—giving immediate visual feedback and preventing publication of content with critical accessibility errors. Content creators get clear guidance on what needs fixing, while developers can extend the system with custom checks for any block type or post meta field.
 
 Whether you're a content creator ensuring your posts are accessible, a developer building accessible blocks, or an organization maintaining compliance standards, Block Accessibility Checks provides the tools you need to create inclusive content effortlessly.
 
@@ -23,16 +23,17 @@ Whether you're a content creator ensuring your posts are accessible, a developer
 * **Real-time Visual Feedback** - See accessibility issues instantly with color-coded borders around problematic blocks and detailed error messages in the block inspector panel
 * **Smart Publishing Control** - Prevents publication of content with critical accessibility errors while allowing warnings with user awareness
 * **Comprehensive Block Coverage** - Built-in checks for images, buttons, tables, headings, and galleries with multiple validation rules per block type
+* **Post Meta Validation** - Validate required post meta fields with real-time feedback, automatic post locking for errors, and seamless integration with block validation
 * **Advanced Heading Validation** - Document-wide hierarchy checking prevents skipped heading levels and ensures proper content structure
 * **Intelligent URL Validation** - Real TLD validation using the Public Suffix List ensures only legitimate domains are accepted
-* **Configurable Settings** - Granular control over each check's severity (error/warning/disabled) with an intuitive admin interface
+* **Configurable Settings** - Granular control over each check's severity (error/warning/disabled) with an intuitive admin interface for both block and meta validation
 * **Issue Categorization** - Clear distinction between accessibility issues and validation errors for better understanding
-* **Developer-Friendly API** - Comprehensive hooks and filters system for registering custom accessibility checks
-* **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes
+* **Developer-Friendly API** - Comprehensive hooks and filters system for registering custom accessibility checks for blocks and post meta fields
+* **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes, with automatic settings page integration
 
 **How It Works:**
 
-The plugin provides immediate feedback as you edit content. When accessibility issues are detected, blocks are highlighted with visual indicators and detailed messages explain how to fix the problems. Critical errors prevent publishing until resolved, while warnings allow publication with user acknowledgment.
+The plugin provides immediate feedback as you edit content. When accessibility issues are detected in blocks or required meta fields, they are highlighted with visual indicators and detailed messages explain how to fix the problems. Critical errors prevent publishing until resolved, while warnings allow publication with user acknowledgment.
 
 **Built-in Accessibility Checks:**
 
@@ -41,6 +42,7 @@ The plugin provides immediate feedback as you edit content. When accessibility i
 * **Table Blocks** - Requires proper headers or captions for screen reader navigation
 * **Heading Blocks** - Validates proper heading hierarchy (no skipped levels), ensures appropriate first heading level, and configurable heading level restrictions
 * **Gallery Blocks** - Applies comprehensive image accessibility checks to all gallery items
+* **Post Meta Fields** - Validate required custom fields with server-side and client-side validation, automatic post locking, and visual feedback in the editor
 
 **Perfect For:**
 
@@ -52,7 +54,7 @@ The plugin provides immediate feedback as you edit content. When accessibility i
 
 **Developer API:**
 
-Extend the plugin with <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">custom accessibility checks</a> for any block type. The robust API includes registration functions, validation hooks, and automatic JavaScript integration. Perfect for plugin developers who want to add accessibility validation to their custom blocks.
+Extend the plugin with <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">custom accessibility checks</a> for any block type or post meta field. The robust API includes registration functions, validation hooks, and automatic JavaScript integration. Perfect for plugin developers who want to add accessibility validation to their custom blocks and ensure required meta fields are properly validated.
 
 == Installation ==
  

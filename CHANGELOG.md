@@ -19,257 +19,285 @@ Prefix the change with one of these keywords:
 
 ### Added
 
-- **Post meta validation system**: Comprehensive validation framework for WordPress post meta fields with error/warning display and post locking
-- **MetaValidation class**: New `MetaValidation::required()` static method for easy registration of required field validators that integrate with both WordPress's `validate_callback` and the plugin's validation UI
-- **MetaChecksRegistry class**: Central registry for managing post meta validation checks across all post types with similar API to BlockChecksRegistry
-- **Dual validation architecture**: Server-side validation through WordPress REST API with `WP_Error` responses and client-side validation through React hooks for real-time feedback
-- **Meta validation settings UI**: Integrated settings page support for configuring meta validation severity (error/warning/disabled) alongside block checks
-- **React validation components**: New `ValidatedToolsPanelItem` and `MetaField` wrapper components for automatic validation display in the block editor
-- **useMetaValidation hook**: React hook providing validation state (isValid, hasErrors, hasWarnings, issues) for meta fields
-- **Post locking for meta errors**: Automatic disabling of Save Draft, Publish, and Auto-save buttons when required meta fields have validation errors
-- **Meta validation JavaScript API**: Client-side validation functions (`validateMetaField`, `validateAllMetaChecks`) and `GetInvalidMeta` component for tracking invalid meta across the post
-- **Meta validation hooks and filters**: New PHP filters (`ba11yc_validate_meta`, `ba11yc_meta_check_args`, `ba11yc_should_register_meta_check`) and action (`ba11yc_meta_check_registered`) for extensibility
-- **JavaScript meta validation filter**: `ba11yc_validate_meta` JavaScript filter hook for custom client-side validation logic
-- **Visual meta validation feedback**: Inline error/warning messages below meta fields with red/yellow left borders matching block validation styling
-- **Body classes for meta validation**: Dynamic CSS classes (`has-meta-validation-errors`, `has-meta-validation-warnings`) for styling the editor based on meta validation state
-- **Meta validation documentation**: Comprehensive `meta-validation.md` guide covering PHP integration, JavaScript components, custom validation, and admin settings
-- **External plugin meta validation support**: Meta validation checks from external plugins automatically appear in their respective settings pages with proper plugin detection
-- **Meta validation examples**: Complete working examples in integration plugin demonstrating band post type with required meta fields
+#### Post Meta Validation System
+- Complete validation framework for WordPress post meta fields
+- Server-side validation via WordPress REST API with `WP_Error` responses
+- Client-side validation through React hooks for real-time feedback
+- Automatic post locking when required meta fields have validation errors
+- Visual feedback with inline error/warning messages and colored borders
+- Settings page integration for configuring validation severity per check
+
+**Developer Features:**
+- `MetaValidation::required()` static method for easy registration
+- `MetaChecksRegistry` class for managing validation checks across post types
+- React components: `ValidatedToolsPanelItem` and `MetaField` wrappers
+- `useMetaValidation` hook for validation state management
+- JavaScript API: `validateMetaField()`, `validateAllMetaChecks()`, `GetInvalidMeta` component
+- PHP filters: `ba11yc_validate_meta`, `ba11yc_meta_check_args`, `ba11yc_should_register_meta_check`
+- JavaScript filter: `ba11yc_validate_meta` for custom client-side validation
+- Dynamic CSS classes: `has-meta-validation-errors`, `has-meta-validation-warnings`
+- Comprehensive documentation in `meta-validation.md`
+- External plugin support with automatic settings page integration
+- Working examples in integration plugin
 
 ### Removed
 
-- **BlockConfig.php class**: Removed obsolete `Functions/BlockConfig.php` file (93 lines) that referenced non-existent render functions and was never used by JavaScript
-- **Unused service methods**: Removed `has_service()` and `get_all_services()` methods from `PluginInitializer` that were never called anywhere in the codebase
-- **Unnecessary wrapper methods**: Removed `register_check()` and `unregister_check()` methods from `PluginInitializer` as external plugins receive registry directly via `ba11yc_ready` hook
-- **Obsolete settings configuration**: Removed unused `$block_settings` property from `SettingsPage` that was replaced by dynamic rendering from `BlockChecksRegistry`
-- **`BlockChecksRegistry::run_checks()` method**: Completely removed this method and its internal validation loop (~31 lines total) as all validation is JavaScript-based. The method always returned an empty array and was retained only for potential backward compatibility, but no internal or external usage was detected
-- **Separate first heading check**: Removed the standalone `check_heading_first_level` check as its functionality has been integrated into the `check_heading_rank` validation
+- `BlockConfig.php` class (93 lines) - obsolete file with non-existent render function references
+- `PluginInitializer` methods: `has_service()`, `get_all_services()`, `register_check()`, `unregister_check()`
+- `SettingsPage::$block_settings` property - replaced by dynamic rendering
+- `BlockChecksRegistry::run_checks()` method (~31 lines) - JavaScript-only validation makes this obsolete
+- Standalone `check_heading_first_level` check - functionality integrated into `check_heading_rank`
 
 ### Changed
 
-- **HeadingLevels service integration**: Integrated HeadingLevels into PluginInitializer service container for architectural consistency. HeadingLevels is now initialized in the PluginInitializer constructor (which runs before the 'init' hook) to maintain proper timing for the `register_block_type_args` filter. All services now managed consistently through the service container.
-- **Plugin initialization timing**: PluginInitializer is now instantiated immediately in global scope (before hooks fire) to ensure HeadingLevels filter registers early enough, with remaining services initialized on the 'init' hook
-- **BlockConfig initialization**: Removed `init_block_config()` method and call from `PluginInitializer` initialization sequence
-- **JavaScript localization**: Removed unused `'blocks'` data from script localization in `ScriptsStyles.php`
-- **Settings initialization**: Simplified `SettingsPage::init_settings()` to directly register heading options field instead of looping through configuration array
-- **Validation API integration**: Extended ValidationAPI component to monitor both block and meta validation state for unified post locking behavior
-- **Script localization**: Added `metaValidationRules` to JavaScript global object for exposing PHP-registered meta checks to client-side validation
-- **Settings page architecture**: Enhanced external plugin settings to support both block checks and meta validation checks in unified interface
-- **Post locking logic**: Updated to combine block and meta validation errors for comprehensive save prevention
-- **ScriptsStyles class**: Added `prepare_meta_validation_rules_for_js()` method to format meta validation rules for JavaScript consumption
-- **Heading rank validation**: Integrated first heading level validation (H1 or H2 requirement) into the heading rank check, consolidating both validations into a single check
-- **Heading validation error messages**: Updated error messages and descriptions to reflect that the heading rank check now validates both skipped levels and first heading level requirements
+#### Architecture & Initialization
+- Integrated `HeadingLevels` into `PluginInitializer` service container
+- `PluginInitializer` now instantiated in global scope for proper filter timing
+- Removed `init_block_config()` method from initialization sequence
+- All services now managed consistently through service container
+
+#### Validation System
+- Extended `ValidationAPI` component to monitor both block and meta validation
+- Post locking logic now combines block and meta validation errors
+- Heading rank validation now includes first heading level validation (consolidated from separate check)
+- Updated heading validation error messages to reflect consolidated functionality
+
+#### Settings & Localization
+- Simplified `SettingsPage::init_settings()` to directly register heading options
+- Enhanced external plugin settings to support both block checks and meta validation
+- Added `metaValidationRules` to JavaScript global object
+- Removed unused `'blocks'` data from script localization
+- Added `prepare_meta_validation_rules_for_js()` method to `ScriptsStyles` class
 
 ### Improved
 
-- **Code maintainability**: Removed approximately 150-170 lines of obsolete and unused code for better code clarity
-- **Performance**: Reduced unnecessary class instantiations and data passed to JavaScript
-- **Memory footprint**: Eliminated unused data structures and dead code paths
-- **Developer experience**: Codebase now contains only functional code with no misleading code paths
-- **Service architecture**: All plugin services now managed consistently through PluginInitializer with proper timing and dependency management
-- **Meta validation developer experience**: Simplified meta validation registration to single `MetaValidation::required()` call that handles both WordPress validation callback and plugin settings integration
-- **Validation consistency**: Unified validation messaging and visual styling between block validation and meta validation for consistent user experience
-- **Settings organization**: Meta validation checks organized by post type with clear labeling and grouped display in admin settings
-- **Real-time validation feedback**: Meta fields now provide instant validation feedback as users type, improving form usability
-- **Extensibility**: Meta validation system uses same hook-based architecture as block validation for consistent external plugin integration
+- **Code Quality**: Removed 150-170 lines of obsolete code
+- **Performance**: Reduced unnecessary class instantiations and JavaScript data payload
+- **Memory**: Eliminated unused data structures and dead code paths
+- **Developer Experience**: 
+  - Simplified meta validation registration to single `MetaValidation::required()` call
+  - Consistent hook-based architecture for block and meta validation
+- **User Experience**:
+  - Unified validation messaging and visual styling
+  - Real-time validation feedback as users type
+  - Better settings organization with post type grouping
 
 ### Fixed
 
-- **Heading rank validation accuracy**: Fixed heading rank validation to match violations by `clientId` instead of level, ensuring only the specific problematic heading is flagged rather than all headings with the same level
-- **Heading validation independence**: Resolved issue where disabling the first heading check would prevent the heading rank check from working correctly
-- **Heading level validation in template views**: Fixed issue where heading level restrictions and rank validation were not working when viewing templates within the content editor. The `register_block_type_args` filter now properly detects content editor context including template preview views, ensuring heading level restrictions and validation work consistently across all content editor contexts while remaining disabled in the Site Editor.
-- **Button URL validation for anchor elements only**: Fixed button link validation to only check URLs when the button block is configured as an anchor element (`tagName === 'a'`). Button elements (`tagName === 'button'`) now correctly skip URL validation since they don't require links.
-- **Image validation in placeholder state**: Fixed issue where image accessibility validation errors and warnings were showing immediately when an image block was placed, even before an image was selected. Validation now skips when the image block is in placeholder state (no URL), allowing users to select an image and add alt text before validation runs.
+- Heading rank validation now matches violations by `clientId` instead of level
+- Heading validation independence - disabling first heading check no longer breaks rank check
+- Heading level validation now works in template preview views within content editor
+- Button URL validation only applies to anchor elements (`tagName === 'a'`), not button elements
+- Image validation no longer triggers in placeholder state (before image selection)
 
 ## [2.2.0]
 
 ### Added
 
-- **Heading rank validation system**: New comprehensive heading hierarchy validation for WordPress core heading blocks
-- **Heading rank violation detection**: Real-time validation that detects when heading levels are skipped (e.g., H2 followed by H4)
-- **First heading level validation**: Intelligent validation of the first heading in a document based on available heading restrictions
-- **Document-wide heading analysis**: Validation system that analyzes the entire document structure, including nested blocks (groups, columns, etc.)
-- **Global heading change listener**: Real-time monitoring of heading structure changes to trigger re-validation across all heading blocks
-- **Image alt text pattern validation**: New validation system that detects non-descriptive alt text patterns like "image", "picture", "photo", and other generic terms
-- **Advanced URL validation system**: New `isValidUrl()` function using the `tldts` library for real TLD validation against the Public Suffix List (PSL)
-- **Public Suffix List integration**: URL validation now uses the official PSL to validate legitimate top-level domains and reject fake domains
-- **International domain support**: Enhanced validation supports international domains, punycode, and complex TLDs (e.g., .co.uk)
-- **Development environment support**: Proper validation for localhost, IP addresses, and .localhost domains for development workflows
+#### Heading Validation System
+- Comprehensive heading hierarchy validation for WordPress core heading blocks
+- Real-time detection of skipped heading levels (e.g., H2 followed by H4)
+- Intelligent validation of the first heading in a document based on available restrictions
+- Document-wide heading analysis including nested blocks (groups, columns, etc.)
+- Global heading change listener for real-time re-validation across all heading blocks
+
+#### Image Alt Text Validation
+- Pattern detection for non-descriptive alt text (e.g., "image", "picture", "photo", generic terms)
+
+#### URL Validation System
+- Advanced `isValidUrl()` function using `tldts` library
+- Real TLD validation against Public Suffix List (PSL)
+- Support for international domains, punycode, and complex TLDs (e.g., .co.uk)
+- Development environment support (localhost, IP addresses, .localhost domains)
 
 ### Changed
 
-- **Core block check system**: Extended `CoreBlockChecks.php` to support heading validation with new check types (`check_heading_rank` and `check_heading_first_level`) and image alt text pattern validation (`check_image_alt_text_patterns`)
-- **Settings page heading restrictions**: Enhanced heading level restriction system to only allow removal of H1, H5, and H6 levels for better accessibility compliance
-- **Image validation system**: Enhanced image alt text validation to include pattern checking for non-descriptive terms and generic phrases
-- **JavaScript validation pipeline**: Updated validation system to handle document-wide heading analysis using WordPress core data stores
-- **Settings page checkbox positioning**: Repositioned heading level restriction checkboxes above individual check settings for better UX
-- **Function organization**: Reorganized validation functions for better code flow and maintainability
-- **URL validation architecture**: Migrated from custom regex patterns to the `tldts` library for more accurate and maintainable domain validation
-- **Button link validation**: Updated `validateButtonLink()` function to use the new robust URL validation system
-- **Validation accuracy**: Enhanced validation now properly rejects fake domains like "foo.notworking" while allowing legitimate URLs
-- **Code documentation**: Improved comments and documentation throughout the URL validation system for better maintainability
-- **Heading validation documentation**: Enhanced JSDoc comments and inline documentation in `headingRankValidation.js` for improved code clarity and maintainability
+#### Core Validation
+- Extended `CoreBlockChecks.php` with new check types:
+  - `check_heading_rank` and `check_heading_first_level` for heading validation
+  - `check_image_alt_text_patterns` for image alt text pattern checking
+- Enhanced image alt text validation to include pattern checking
+- Updated JavaScript validation pipeline to handle document-wide heading analysis
+
+#### Settings & UI
+- Heading level restrictions now only allow removal of H1, H5, and H6 for better accessibility compliance
+- Repositioned heading level restriction checkboxes above individual check settings
+
+#### Code Architecture
+- Migrated URL validation from custom regex to `tldts` library
+- Updated `validateButtonLink()` to use new robust URL validation system
+- Reorganized validation functions for better code flow
+- Enhanced documentation with improved JSDoc comments and inline documentation
 
 ### Fixed
 
-- **Heading validation error display**: Fixed issue where validation errors were incorrectly displaying on all heading blocks instead of only problematic ones
-- **First heading validation logic**: Resolved validation to properly check the first heading level based on available heading restrictions
-- **Heading level restriction validation**: Fixed settings page to only allow removal of appropriate heading levels (H1, H5, H6) while preserving essential heading structure
-- **Fake domain acceptance**: Fixed critical issue where invalid domains like "foo.notworking" were being accepted due to insufficient TLD validation
-- **Button validation bypass**: Resolved issue where invalid URLs like "http://test" were being accepted in button blocks
-- **TLD validation accuracy**: Fixed validation to use real TLD data instead of hardcoded lists, ensuring accuracy and future-proofing
-- **Development workflow compatibility**: Fixed validation to properly handle localhost and IP addresses for development environments
-
+- Heading validation errors now display only on problematic blocks, not all heading blocks
+- First heading validation logic now properly checks based on available heading restrictions
+- Heading level restriction validation now only allows removal of appropriate levels
+- Fixed critical issue where invalid domains like "foo.notworking" were being accepted
+- Button validation no longer accepts invalid URLs like "http://test"
+- TLD validation now uses real TLD data instead of hardcoded lists
+- Development workflow compatibility for localhost and IP addresses
 
 ## [2.1.0]
 
 ### Added
 
-- **Issue categorization system**: New `category` field in check registration to distinguish between "accessibility" and "validation" issues
-- **Enhanced UI organization**: Inspector panel now displays errors and warnings in consolidated panels with sub-headings for "Accessibility" and "Validation" categories
-- **CSS custom properties**: Centralized color system with semantic variable names for consistent theming:
+#### Issue Categorization System
+- New `category` field in check registration to distinguish "accessibility" vs "validation" issues
+- Inspector panel displays errors/warnings in consolidated panels with category sub-headings
+- Enhanced settings page labels with category-based descriptions
+
+#### Design System
+- CSS custom properties for centralized color system:
   - `--a11y-red`: Primary error color (#d82000)
-  - `--a11y-yellow`: Primary warning color (#dbc900) 
-  - `--a11y-light-red`: Error background color (#ffe4e0)
-  - `--a11y-light-yellow`: Warning background color (#fffde2)
+  - `--a11y-yellow`: Primary warning color (#dbc900)
+  - `--a11y-light-red`: Error background (#ffe4e0)
+  - `--a11y-light-yellow`: Warning background (#fffde2)
   - `--a11y-border-width`: Standardized border width (3px solid)
-- **Modular SCSS architecture**: Improved stylesheet organization with separate files for panel messages and block icons
-- **Modern Sass syntax**: Migrated from deprecated `@import` to `@use` statements for better performance and maintainability
-- **Enhanced settings page labels**: Improved user-friendly labels for accessibility checks in the settings page with category-based descriptions
-- **Refined inspector panel layout**: Better visual organization of accessibility and validation messages with clear sub-headings
-- **Advanced external plugin detection**: New automatic plugin detection system that identifies external plugins by analyzing their file structure and plugin headers
-- **Plugin information caching**: Performance optimization with intelligent caching of plugin metadata to avoid repeated file system operations
-- **Enhanced settings page organization**: External plugins now display with their actual names, versions, and unique slugs for proper separation
-- **Consolidated documentation**: Merged duplicate integration guides into a single comprehensive external integration document
-- **Settings page redesign**: Complete overhaul of the admin settings interface with modern, accessible design and improved user experience
-- **Unified settings page layout**: New shared rendering system that eliminates code duplication and provides consistent layout across all settings pages
-- **Enhanced form controls**: Improved radio button and checkbox styling with semantic CSS classes for better accessibility and visual consistency
+
+#### Code Architecture
+- Modular SCSS architecture with separate files for panel messages and block icons
+- Migrated from deprecated `@import` to `@use` statements
+- Advanced external plugin detection system analyzing file structure and plugin headers
+- Plugin information caching for performance optimization
+- Consolidated documentation into single comprehensive external integration guide
+
+#### Settings Page Redesign
+- Complete overhaul with modern, accessible design
+- Unified settings page layout eliminating code duplication
+- External plugins display with actual names, versions, and unique slugs
+- Enhanced form controls with improved radio button and checkbox styling
+- Better visual organization with clear sub-headings
 
 ### Changed
 
-- **BlockChecksRegistry API**: Enhanced `register_check()` method to accept optional `category` parameter (defaults to 'accessibility')
-- **JavaScript validation pipeline**: Updated to pass category information from PHP registry to frontend validation
-- **UI display logic**: Consolidated error/warning display into two main panels with conditional sub-headings
-- **CSS architecture**: Refactored styles to use custom properties for improved maintainability and theme support
-- **Default check categorization**: Core button checks now categorized as "validation", image and table checks as "accessibility"
-- **Inspector panel title**: Updated panel title from "Accessibility Check" to "Accessibility & Validation" for better clarity
-- **Settings page interface**: Enhanced check label generation to provide more descriptive and user-friendly names
-- **External plugin settings grouping**: Improved logic to properly separate external plugins based on actual plugin metadata rather than namespace-derived names
-- **Plugin slug generation**: Enhanced to use actual plugin directory names and names for unique identification, preventing conflicts between plugins with similar namespaces
-- **Settings page architecture**: Refactored SettingsPage class with logical function organization and improved code maintainability
-- **Form rendering system**: Consolidated duplicate radio button rendering logic into shared methods, reducing code duplication by ~50 lines
-- **HTML structure**: Updated settings page markup to use semantic HTML elements and improved accessibility attributes
+#### API & Validation
+- `BlockChecksRegistry::register_check()` now accepts optional `category` parameter (defaults to 'accessibility')
+- JavaScript validation pipeline updated to pass category information from PHP to frontend
+- UI display logic consolidated into two main panels with conditional sub-headings
+- Default check categorization: button checks as "validation", image/table checks as "accessibility"
+
+#### Settings & UI
+- Inspector panel title updated from "Accessibility Check" to "Accessibility & Validation"
+- Enhanced check label generation for more descriptive, user-friendly names
+- External plugin settings grouping improved to use actual plugin metadata
+- Plugin slug generation enhanced to use directory names, preventing namespace conflicts
+
+#### Code Quality
+- Refactored CSS to use custom properties for maintainability and theme support
+- SettingsPage class refactored with logical function organization
+- Consolidated duplicate radio button rendering logic (reduced ~50 lines)
+- Updated HTML structure with semantic elements and improved accessibility attributes
 
 ### Fixed
 
-- **Sass deprecation warnings**: Resolved build warnings by migrating from `@import` to `@use` syntax
-- **UI structure issues**: Fixed conditional rendering logic for error and warning panels
-- **Data flow consistency**: Ensured category information properly flows from PHP registry to JavaScript validation
-- **README documentation errors**: Fixed various documentation issues and improved clarity
-- **External plugin grouping issues**: Fixed problem where multiple external plugins were incorrectly grouped together in the same settings page
-- **Plugin name display**: Resolved issue where external plugins displayed derived names instead of actual plugin names
-- **Settings page slug conflicts**: Fixed potential conflicts when multiple plugins use similar namespaces by implementing unique slug generation
-- **Code duplication**: Eliminated redundant rendering methods and consolidated shared functionality for better maintainability
-- **Site editor compatibility**: Fixed issue where the plugin would prevent the WordPress site editor from loading by implementing proper editor context detection
-- **Post type compatibility**: Resolved issue where accessibility checks only worked on 'post' post type by using proper screen detection instead of restrictive post type checking
-- **Security compliance**: Fixed PHPCS security warning by using WordPress's built-in `get_current_screen()` function instead of directly accessing `$_GET` parameters
-- **Editor context detection**: Improved JavaScript editor detection to properly distinguish between post editor and site editor contexts using WordPress data stores
-- **Settings page checkbox state**: Fixed issue where heading level checkboxes were not properly displaying checked state due to malformed HTML attribute construction
+- Sass deprecation warnings resolved by migrating to `@use` syntax
+- UI structure issues with conditional rendering logic for error/warning panels
+- Data flow consistency ensuring category information flows from PHP to JavaScript
+- External plugin grouping issues where multiple plugins were incorrectly grouped
+- Plugin name display now shows actual names instead of derived names
+- Settings page slug conflicts resolved with unique slug generation
+- Code duplication eliminated with consolidated shared functionality
+- Site editor compatibility - plugin no longer prevents site editor from loading
+- Post type compatibility - checks now work on all post types, not just 'post'
+- Security compliance - fixed PHPCS warning by using `get_current_screen()` instead of `$_GET`
+- Editor context detection improved to distinguish post editor vs site editor
+- Settings page checkbox state now properly displays checked state
 
 ## [2.0.0]
 
 ### Added
 
-- **Multiple issues display**: Complete validation overhaul to show all accessibility problems simultaneously, eliminating the "fix one, see another" user experience
-- **Priority-based visual indicators**: Block borders now reflect highest severity issue (red for errors, yellow for warnings) with intelligent fallback behavior
-- **Comprehensive inspector panel feedback**: All validation issues are listed at once in the sidebar, organized by severity (errors first, then warnings)
-- **JavaScript-only validation system**: Complete migration from PHP to JavaScript-only validation for real-time block editor feedback
-- **Unified validation architecture**: New `ba11yc_validate_block` filter hook system for consistent validation across all block types
-- **Enhanced external plugin support**: External blocks now display visual accessibility indicators and integrate fully with the editor UI
-- **Real-time visual feedback**: All blocks (core and external) now show instant accessibility validation with visual borders and inspector panel messages
-- **Core block check settings**: Individual validation control for each core block type with enable/disable options
-- **Individual error and warning messages**: Support for custom messages and descriptions for each accessibility check
-- **Grouped error and warning messages**: Improved UI organization with grouped message display in inspector panel
-- **External block integration screenshots**: Visual documentation showing external plugin integration examples
-- Modular developer documentation: Split API, hooks, integration, advanced usage, troubleshooting, and examples into individual markdown files for improved clarity and usability
-- Input validation for heading level data to prevent invalid configurations
-- Option caching in HeadingLevels class for improved performance
-- Comprehensive settings sanitization to validate all user input
-- PluginInitializer class for organized plugin startup and simple service location
-- BlockChecksRegistry class for centralized management of accessibility checks
-- Developer API with extensive hooks and filters for extensibility:
-    - `ba11yc_register_checks` action for registering custom accessibility checks
-    - `ba11yc_ready` action providing access to registry and plugin initializer
-    - `ba11yc_check_registered`, `ba11yc_check_unregistered`, `ba11yc_check_toggled` actions for check lifecycle events
-    - `ba11yc_register_default_checks` filter to prevent default checks from loading
-    - `ba11yc_should_register_check` filter to control individual check registration
-    - `ba11yc_check_args` filter to modify check configuration before registration
-    - `ba11yc_block_checks` filter to control which checks run for specific blocks
-    - `ba11yc_block_attributes` filter to modify block attributes before checks run
-    - `ba11yc_before_check`, `ba11yc_check_result`, `ba11yc_final_check_result` filters for check execution pipeline
-    - `ba11yc_block_check_results` filter for modifying all results for a block
-- Registry API methods for programmatic check management:
-    - `register_check()`, `unregister_check()` for check registration
-    - `set_check_enabled()` for enabling/disabling checks dynamically
-    - `is_check_registered()`, `get_check_config()` for check introspection
-    - `get_registered_block_types()` for discovering available block types
-- Example file demonstrating developer API usage patterns
-- Comprehensive error handling and debug logging system:
-    - Try-catch blocks around all critical operations to prevent plugin crashes
-    - Input validation for all user data and API parameters
-    - Graceful degradation when services fail to initialize
-    - Admin notices for initialization failures
-    - Debug logging for troubleshooting when WP_DEBUG is enabled
-    - Error logging for production issue tracking
-    - Robust fallbacks to maintain plugin functionality during errors
-- Comprehensive type hints for improved code quality and IDE support
-- Enhanced PHPDoc comments with detailed parameter and return type documentation
-- Proper @throws annotations for methods that can throw exceptions
-- Consistent void return type declarations for methods that don't return values
-- Improved nullable type hints (e.g., ?object, ?BlockChecksRegistry) for better type safety
+#### Validation System Overhaul
+- Multiple issues display - all accessibility problems shown simultaneously
+- Priority-based visual indicators - block borders reflect highest severity (red/yellow)
+- Comprehensive inspector panel feedback - all issues listed at once, organized by severity
+- JavaScript-only validation system for real-time block editor feedback
+- Unified validation architecture with `ba11yc_validate_block` filter hook system
+- Real-time visual feedback for all blocks (core and external) with borders and messages
+
+#### External Plugin Support
+- Enhanced external plugin support with full editor UI integration
+- Visual accessibility indicators for external plugin blocks
+- External block integration screenshots in documentation
+
+#### Core Block Features
+- Individual validation control for each core block type (enable/disable)
+- Custom messages and descriptions for each accessibility check
+- Grouped error and warning messages in inspector panel
+
+#### Developer API
+- `PluginInitializer` class for organized plugin startup and service location
+- `BlockChecksRegistry` class for centralized accessibility check management
+- Extensive hooks and filters for extensibility:
+  - `ba11yc_register_checks` - register custom checks
+  - `ba11yc_ready` - access to registry and plugin initializer
+  - `ba11yc_check_registered`, `ba11yc_check_unregistered`, `ba11yc_check_toggled` - lifecycle events
+  - `ba11yc_register_default_checks` - prevent default checks from loading
+  - `ba11yc_should_register_check` - control individual check registration
+  - `ba11yc_check_args` - modify check configuration
+  - `ba11yc_block_checks` - control which checks run for specific blocks
+  - `ba11yc_block_attributes` - modify block attributes before checks
+  - `ba11yc_before_check`, `ba11yc_check_result`, `ba11yc_final_check_result` - execution pipeline
+  - `ba11yc_block_check_results` - modify all results for a block
+- Registry API methods:
+  - `register_check()`, `unregister_check()` - check registration
+  - `set_check_enabled()` - enable/disable checks dynamically
+  - `is_check_registered()`, `get_check_config()` - check introspection
+  - `get_registered_block_types()` - discover available block types
+
+#### Code Quality & Architecture
 - PHP-JavaScript unified validation system:
-    - BlockChecksRegistry now serves as single source of truth for all validation rules and messages
-    - JavaScript validation functions now consume PHP registry data via `wp_localize_script()`
-    - Eliminates code duplication between PHP and JavaScript validation logic
-    - Ensures consistent validation behavior across all contexts
-- Enhanced BlockChecksRegistry with additional check methods:
-    - `check_image_alt_required()` for verifying images have alt text (unless decorative)
-    - `check_check_button_link()` for ensuring buttons have both text and links
-    - All checks now include complete metadata for JavaScript consumption
-- Real-time editor validation now powered by PHP registry rules:
-    - Image blocks: alt text required, length validation, caption matching
-    - Button blocks: required content validation, text quality checks
-    - Table blocks: header or caption requirement validation
-- JavaScript-only validation system with real-time feedback using the `ba11yc_validate_block` filter hook
-- External plugin integration support with proper dependency management and load order
-- Visual error indicators (red borders, inspector panel messages) for invalid blocks in editor
-- Complete integration documentation with working examples for external plugin developers
-- Enhanced developer API documentation with complete integration examples and troubleshooting guide
+  - `BlockChecksRegistry` as single source of truth for validation rules
+  - JavaScript validation consumes PHP registry data via `wp_localize_script()`
+  - Eliminates code duplication between PHP and JavaScript
+- Enhanced `BlockChecksRegistry` with additional check methods:
+  - `check_image_alt_required()` - verify images have alt text (unless decorative)
+  - `check_check_button_link()` - ensure buttons have both text and links
+- Input validation for heading level data
+- Option caching in `HeadingLevels` class for performance
+- Comprehensive settings sanitization
+- Comprehensive error handling and debug logging:
+  - Try-catch blocks around critical operations
+  - Input validation for all user data and API parameters
+  - Graceful degradation when services fail
+  - Admin notices for initialization failures
+  - Debug logging when `WP_DEBUG` enabled
+  - Error logging for production tracking
+- Comprehensive type hints, PHPDoc comments, and `@throws` annotations
+- Improved nullable type hints for better type safety
+
+#### Documentation
+- Modular developer documentation split into individual markdown files:
+  - API reference, hooks, integration, advanced usage, troubleshooting, examples
+- Complete integration documentation with working examples
+- Enhanced developer API documentation with troubleshooting guide
 
 ### Changed
 
-- Higher-order component system updated to use dynamic check registry instead of hardcoded block types
-- JavaScript validation system now supports external plugin checks through filter integration
+- Higher-order component system uses dynamic check registry instead of hardcoded block types
+- JavaScript validation system supports external plugin checks through filter integration
 - Block error component enhanced to show visual feedback for any registered block type
-- Improved caching system for filtered checks array to prevent repeated filter applications
+- Improved caching system for filtered checks array
 - Minimum WordPress version requirement updated to 6.7
-- HeadingLevels class now instantiated early for correct filter timing
+- `HeadingLevels` class instantiated early for correct filter timing
 - Settings page layout improved with better organization and accessibility
 - Submenu and settings page titles updated for clarity
 - Improved plugin architecture with centralized service management
 
 ### Fixed
 
-- Visual accessibility indicators not showing for external plugin blocks due to hardcoded block type checks
-- JavaScript validation system not recognizing custom block types from external plugins
-- Higher-order component applying only to core WordPress blocks instead of all registered block types
-- Block error messages and visual styling not appearing for dynamically registered checks
-- Cache invalidation issues with filtered checks array causing stale validation results
-- Debug console logging in production builds removed for cleaner output
-- Issue where heading level one was a fallback in settings
-- Heading levels can now be properly removed in the plugin options
-- Heading level restrictions not working due to incorrect filter timing
-- Settings page accessibility issues with proper ARIA labels and keyboard navigation
+- Visual accessibility indicators now show for external plugin blocks
+- JavaScript validation system now recognizes custom block types
+- Higher-order component now applies to all registered block types, not just core blocks
+- Block error messages and visual styling now appear for dynamically registered checks
+- Cache invalidation issues with filtered checks array resolved
+- Debug console logging removed from production builds
+- Heading level one fallback issue in settings resolved
+- Heading levels can now be properly removed in plugin options
+- Heading level restrictions now work with correct filter timing
+- Settings page accessibility issues resolved with proper ARIA labels
 - Message grouping and display improvements in inspector panel
 
 ### Security
@@ -280,32 +308,32 @@ Prefix the change with one of these keywords:
 
 ### Added
 
-- Condition on image block to check if more than 125 characters are used
-- Condition on image block to check if alt text matches caption text
+- Image block validation for alt text exceeding 125 characters
+- Image block validation for alt text matching caption text
 
 ### Changed
 
 - Moved message location above block options
-- Lint and format tools to handle WPCS for PHP, JS and CSS
+- Added lint and format tools for WPCS (PHP, JS, CSS)
 - Added proper escaping in PHP templates
-- Translation load order and plugin initialization
+- Updated translation load order and plugin initialization
 - Tested and bumped compatibility to WordPress 6.8
 
 ### Fixed
 
-- Lint errors related to PHP, JS and CSS
+- Lint errors related to PHP, JS, and CSS
 
 ## [1.1.0]
 
 ### Changed
 
-- Redesigned editor notice be less obtrusive, added icon
+- Redesigned editor notice to be less obtrusive, added icon
 - Moved error message to InspectorControls
 - Removed individual SCSS files
 - Updated README and Changelog
 - Updated dependencies
-- Replaced heading level validation with direct heading level restrictions in the editor
-- Updated settings page to allow selection of which heading levels to remove from the editor
+- Replaced heading level validation with direct heading level restrictions in editor
+- Updated settings page to allow selection of which heading levels to remove
 
 ### Fixed
 
@@ -328,7 +356,7 @@ Prefix the change with one of these keywords:
 
 ### Added
 
-- Add check for core/button text and link
+- Check for core/button text and link
 
 ### Changed
 
