@@ -8,6 +8,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { ValidationAPI } from './validation/validationApi';
+import { EditorValidationDisplay } from './components/EditorValidationDisplay';
 import './validation/blockErrorComponent';
 
 // Base checks array - now empty since validation is handled via ba11yc_validate_block filter
@@ -58,5 +59,10 @@ export const blockChecksArray = new Proxy([], {
 });
 
 registerPlugin('validation-api', {
-	render: ValidationAPI,
+	render: () => (
+		<>
+			<ValidationAPI />
+			<EditorValidationDisplay />
+		</>
+	),
 });

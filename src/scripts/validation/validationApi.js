@@ -9,6 +9,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { GetInvalidBlocks } from './getInvalidBlocks';
 import { GetInvalidMeta } from './getInvalidMeta';
+import { GetInvalidEditorChecks } from './getInvalidEditorChecks';
 
 /**
  * Validation API
@@ -19,6 +20,7 @@ export function ValidationAPI() {
 	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
 	const invalidBlocks = GetInvalidBlocks();
 	const invalidMeta = GetInvalidMeta();
+	const invalidEditorChecks = GetInvalidEditorChecks();
 	const {
 		lockPostSaving,
 		unlockPostSaving,
@@ -36,8 +38,9 @@ export function ValidationAPI() {
 
 		const hasBlockErrors = invalidBlocks.some(block => block.mode === 'error');
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
+		const hasEditorErrors = invalidEditorChecks.some(check => check.type === 'error');
 
-		if (hasBlockErrors || hasMetaErrors) {
+		if (hasBlockErrors || hasMetaErrors || hasEditorErrors) {
 			lockPostSaving();
 			lockPostAutosaving();
 			disablePublishSidebar();
@@ -49,6 +52,7 @@ export function ValidationAPI() {
 	}, [
 		invalidBlocks,
 		invalidMeta,
+		invalidEditorChecks,
 		disablePublishSidebar,
 		enablePublishSidebar,
 		lockPostAutosaving,
@@ -66,16 +70,18 @@ export function ValidationAPI() {
 
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 		const hasMetaWarnings = invalidMeta.some(meta => meta.hasWarnings && !meta.hasErrors);
+		const hasEditorErrors = invalidEditorChecks.some(check => check.type === 'error');
+		const hasEditorWarnings = invalidEditorChecks.some(check => check.type === 'warning');
 
 		// Add/remove error class
-		if (hasMetaErrors) {
+		if (hasMetaErrors || hasEditorErrors) {
 			document.body.classList.add('has-meta-validation-errors');
 		} else {
 			document.body.classList.remove('has-meta-validation-errors');
 		}
 
 		// Add/remove warning class
-		if (hasMetaWarnings) {
+		if (hasMetaWarnings || hasEditorWarnings) {
 			document.body.classList.add('has-meta-validation-warnings');
 		} else {
 			document.body.classList.remove('has-meta-validation-warnings');
@@ -88,7 +94,7 @@ export function ValidationAPI() {
 				'has-meta-validation-warnings'
 			);
 		};
-	}, [invalidMeta, isPostEditor]);
+	}, [invalidMeta, invalidEditorChecks, isPostEditor]);
 
 	return null;
 }

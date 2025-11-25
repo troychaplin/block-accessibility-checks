@@ -135,6 +135,9 @@ class SettingsPage {
 
 		// Register meta check settings.
 		$this->register_meta_check_settings();
+
+		// Register editor check settings.
+		$this->register_editor_check_settings();
 	}
 
 	/**
@@ -491,17 +494,41 @@ class SettingsPage {
 		$all_meta_checks = $meta_registry->get_all_meta_checks();
 
 		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
-			$option_group = 'block_checks_meta_' . $post_type . '_group';
-			$option_name  = 'block_checks_meta_' . $post_type;
-
-			\register_setting(
-				$option_group,
-				$option_name,
-				array(
-					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
-				)
-			);
+			$this->register_post_type_settings( $post_type );
 		}
+	}
+
+	/**
+	 * Register editor check settings for all post types
+	 *
+	 * @return void
+	 */
+	private function register_editor_check_settings(): void {
+		$editor_registry   = \BlockAccessibility\EditorChecksRegistry::get_instance();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		foreach ( $all_editor_checks as $post_type => $checks ) {
+			$this->register_post_type_settings( $post_type );
+		}
+	}
+
+	/**
+	 * Helper to register settings for a post type (shared by meta and editor checks)
+	 *
+	 * @param string $post_type The post type.
+	 * @return void
+	 */
+	private function register_post_type_settings( string $post_type ): void {
+		$option_group = 'block_checks_meta_' . $post_type . '_group';
+		$option_name  = 'block_checks_meta_' . $post_type;
+
+		\register_setting(
+			$option_group,
+			$option_name,
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
+			)
+		);
 	}
 
 	/**
@@ -611,6 +638,9 @@ class SettingsPage {
 
 		// Render meta checks for this plugin if any exist.
 		$this->render_meta_checks_for_plugin( $plugin_slug );
+
+		// Render editor checks for this plugin if any exist.
+		$this->render_editor_checks_for_plugin( $plugin_slug );
 	}
 
 	/**
@@ -833,6 +863,73 @@ class SettingsPage {
 
 		foreach ( $meta_fields as $meta_key => $checks ) {
 			$this->render_meta_field_checks( $post_type, $meta_key, $checks, $plugin_slug );
+		}
+
+		echo '</article>';
+	}
+
+	/**
+	 * Render editor checks for a specific plugin
+	 *
+	 * @param string $plugin_slug The plugin slug.
+	 * @return void
+	 */
+	private function render_editor_checks_for_plugin( string $plugin_slug ): void {
+		$editor_registry   = \BlockAccessibility\EditorChecksRegistry::get_instance();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		if ( empty( $all_editor_checks ) ) {
+			return;
+		}
+
+		// Render editor checks for each post type.
+		foreach ( $all_editor_checks as $post_type => $checks ) {
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$this->render_editor_checks_for_post_type( $post_type, $checks, $plugin_slug );
+		}
+	}
+
+	/**
+	 * Render editor checks for a specific post type
+	 *
+	 * @param string $post_type   The post type.
+	 * @param array  $checks      The checks.
+	 * @param string $plugin_slug The plugin slug.
+	 * @return void
+	 */
+	private function render_editor_checks_for_post_type( string $post_type, array $checks, string $plugin_slug ): void {
+		$post_type_label = $this->get_post_type_label( $post_type );
+
+		echo '<div class="ba11y-settings-plugin-header">' . "\n";
+		echo '<h2>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h2>';
+		echo '</div>' . "\n";
+
+		echo '<article class="ba11y-block-options ba11y-editor-options ba11y-editor-options-' . \esc_attr( $post_type ) . '">';
+		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Post Type', 'block-accessibility-checks' ) . '</h2>';
+
+		// Use external plugin option name if provided, otherwise use post type option.
+		if ( ! empty( $plugin_slug ) ) {
+			$option_name = 'block_checks_external_' . $plugin_slug;
+		} else {
+			$option_name = 'block_checks_meta_' . $post_type;
+		}
+
+		foreach ( $checks as $check_name => $check ) {
+			// Only render settings-based checks.
+			if ( 'settings' !== $check['type'] ) {
+				continue;
+			}
+
+			$field_name  = 'editor_' . $check_name;
+			$description = $check['description'] ?? $check['error_msg'];
+
+			// Prepend context.
+			$description = '<strong>' . \esc_html__( 'Editor Check', 'block-accessibility-checks' ) . ':</strong> ' . $description;
+
+			$this->render_check_setting( $field_name, $description, $check, $option_name );
 		}
 
 		echo '</article>';

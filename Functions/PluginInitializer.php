@@ -98,6 +98,7 @@ class PluginInitializer {
 			$this->init_scripts_styles();
 			$this->init_settings_page();
 			$this->init_block_checks_registry();
+			$this->init_editor_checks_registry();
 
 			// Setup hooks.
 			$this->setup_hooks();
@@ -107,6 +108,9 @@ class PluginInitializer {
 
 			// Allow developers to access the registry and add custom checks.
 			\do_action( 'ba11yc_ready', $this->get_service( 'block_checks_registry' ), $this );
+
+			// Allow developers to register editor checks.
+			\do_action( 'ba11yc_editor_checks_ready', $this->get_service( 'editor_checks_registry' ), $this );
 
 			$this->log_debug( 'Plugin initialization completed successfully.' );
 
@@ -189,6 +193,23 @@ class PluginInitializer {
 	}
 
 	/**
+	 * Initialize editor checks registry
+	 *
+	 * @return void
+	 * @throws \Exception If editor checks registry service initialization fails.
+	 */
+	private function init_editor_checks_registry(): void {
+		try {
+			$editor_checks_registry                   = EditorChecksRegistry::get_instance();
+			$this->services['editor_checks_registry'] = $editor_checks_registry;
+			$this->log_debug( 'Editor checks registry service initialized.' );
+		} catch ( \Exception $e ) {
+			$this->log_error( 'Failed to initialize editor checks registry: ' . $e->getMessage() );
+			throw $e;
+		}
+	}
+
+	/**
 	 * Setup WordPress hooks
 	 *
 	 * Registers WordPress action hooks for the scripts and styles service.
@@ -251,6 +272,15 @@ class PluginInitializer {
 	 */
 	public function get_block_checks_registry(): ?BlockChecksRegistry {
 		return $this->get_service( 'block_checks_registry' );
+	}
+
+	/**
+	 * Get the editor checks registry
+	 *
+	 * @return EditorChecksRegistry|null The registry instance or null if not initialized.
+	 */
+	public function get_editor_checks_registry(): ?EditorChecksRegistry {
+		return $this->get_service( 'editor_checks_registry' );
 	}
 
 	/**
