@@ -29,6 +29,19 @@ $registry->register_editor_check( string $post_type, string $check_name, array $
     *   `priority` (int): Order of execution (default: 10).
     *   `description` (string): Description displayed in the settings page.
 
+### Method: `register_editor_check_for_post_types`
+
+Convenience method to register the same check for multiple post types at once.
+
+```php
+$registry->register_editor_check_for_post_types( array $post_types, string $check_name, array $args );
+```
+
+*   `$post_types` (array): Array of post types (e.g., `['post', 'page', 'custom_type']`).
+*   `$check_name` (string): A unique identifier for your check.
+*   `$args` (array): Configuration options (same as `register_editor_check`).
+*   Returns: Array of results, keyed by post type. Each value is `true` on success, `false` on failure.
+
 ## JavaScript Validation
 
 To implement the validation logic, use the `ba11yc_validate_editor` filter in JavaScript.
@@ -50,11 +63,23 @@ Callback arguments:
 
 ### 1. Enforce First Block is a Heading
 
-This example ensures that the very first block in a 'post' is a Heading block.
+This example ensures that the very first block in specified post types is a Heading block. It demonstrates registering the same check for multiple post types.
 
 **PHP:**
 ```php
 add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
+    // Register for multiple post types at once
+    $registry->register_editor_check_for_post_types(
+        array( 'post', 'page', 'custom_post_type' ),
+        'first_block_heading',
+        array(
+            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
+            'type'        => 'error',
+            'description' => __( 'Ensures content starts with a heading.', 'text-domain' ),
+        )
+    );
+    
+    // Or register for a single post type
     $registry->register_editor_check(
         'post',
         'first_block_heading',

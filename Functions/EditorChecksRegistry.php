@@ -154,6 +154,26 @@ class EditorChecksRegistry {
 	}
 
 	/**
+	 * Register an editor check for multiple post types
+	 *
+	 * Convenience method to register the same check configuration for multiple post types.
+	 *
+	 * @param array  $post_types Array of post types (e.g., ['post', 'page', 'custom_type']).
+	 * @param string $check_name Unique check name.
+	 * @param array  $check_args Check configuration.
+	 * @return array Array of results, keyed by post type. Each value is true on success, false on failure.
+	 */
+	public function register_editor_check_for_post_types( array $post_types, string $check_name, array $check_args ): array {
+		$results = array();
+
+		foreach ( $post_types as $post_type ) {
+			$results[ $post_type ] = $this->register_editor_check( $post_type, $check_name, $check_args );
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Get editor checks for a specific post type
 	 *
 	 * @param string $post_type Post type.
