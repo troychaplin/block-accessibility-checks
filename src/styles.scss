@@ -1,6 +1,7 @@
 @use './styles/editor/panel-messages';
 @use './styles/editor/block-icon';
 @use './styles/editor/meta-validation';
+@use './styles/editor/editor-validation';
 
 :root {
 	--a11y-red: #d82000;

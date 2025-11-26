@@ -1,0 +1,52 @@
+// Editor validation messages in document settings panel
+.ba11y-validation-list {
+	margin: 0;
+	padding: 0;
+}
+
+.ba11y-validation-item {
+	width: 100%;
+	padding: 12px 14px;
+	border-left: var(--a11y-border-width);
+	margin-bottom: 12px;
+	border-radius: 2px;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.ba11y-validation-item--error {
+	background-color: var(--a11y-light-red);
+	border-color: var(--a11y-red);
+}
+
+.ba11y-validation-item--warning {
+	background-color: var(--a11y-light-yellow);
+	border-color: var(--a11y-yellow);
+}
+
+.ba11y-validation-message {
+	font-size: 13px;
+	line-height: 1.5;
+	margin: 0;
+
+	strong {
+		font-weight: 600;
+	}
+}
+
+.ba11y-validation-item--error .ba11y-validation-message {
+	color: var(--a11y-dark-red);
+}
+
+.ba11y-validation-item--warning .ba11y-validation-message {
+	color: var(--a11y-dark-yellow);
+}
+
+.ba11y-validation-description {
+	font-size: 12px;
+	line-height: 1.4;
+	margin-top: 8px;
+	color: #636363;
+}
