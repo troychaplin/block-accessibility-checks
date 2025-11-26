@@ -5,6 +5,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { validateBlock } from './validateBlocks';
+import { BlockIndicator } from '../components/BlockIndicator';
 
 /**
  * A higher-order component that adds error handling and accessibility checks to a block component.
@@ -232,7 +233,10 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 								: 'a11y-block-warning'
 						}
 					>
-						<BlockEdit {...props} />
+						<div className="a11y-block-content-wrapper">
+							<BlockIndicator issues={issues} clientId={clientId} />
+							<BlockEdit {...props} />
+						</div>
 					</div>
 				)}
 				{validationResult.mode === 'none' && <BlockEdit {...props} />}

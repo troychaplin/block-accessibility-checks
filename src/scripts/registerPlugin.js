@@ -9,6 +9,8 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { ValidationAPI } from './validation/validationApi';
 import { EditorValidationDisplay } from './components/EditorValidationDisplay';
+import { UnifiedValidationSidebar } from './components/UnifiedValidationSidebar';
+import { ValidationHeaderButton } from './components/ValidationHeaderButton';
 import './validation/blockErrorComponent';
 
 // Base checks array - now empty since validation is handled via ba11yc_validate_block filter
@@ -63,6 +65,8 @@ registerPlugin('validation-api', {
 		<>
 			<ValidationAPI />
 			<EditorValidationDisplay />
+			<UnifiedValidationSidebar />
+			<ValidationHeaderButton />
 		</>
 	),
 });

@@ -1,6 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { validateAllMetaChecks } from './validateMeta';
+import { MetaIndicator } from '../components/MetaIndicator';
 
 /**
  * ValidationDisplay - Shared component for displaying validation
@@ -117,6 +118,7 @@ export function ValidationDisplay({ metaKey, children, showMessages = true, skip
 	// Otherwise, provide the wrapper
 	return (
 		<div className={validation.wrapperClassName}>
+			<MetaIndicator issues={validation.issues} metaKey={metaKey} />
 			{children}
 			{validationMessages}
 		</div>
