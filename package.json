@@ -40,21 +40,21 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@wordpress/data": "10.32.0",
-		"@wordpress/element": "6.32.0",
-		"@wordpress/env": "10.32.0",
-		"@wordpress/eslint-plugin": "22.18.0",
-		"@wordpress/i18n": "6.5.0",
-		"@wordpress/plugins": "7.32.0",
-		"@wordpress/prettier-config": "4.32.0",
-		"@wordpress/scripts": "30.25.0",
-		"@wordpress/stylelint-config": "23.24.0",
+		"@wordpress/data": "10.35.0",
+		"@wordpress/element": "6.35.0",
+		"@wordpress/env": "10.35.0",
+		"@wordpress/eslint-plugin": "22.21.0",
+		"@wordpress/i18n": "6.8.0",
+		"@wordpress/plugins": "7.35.0",
+		"@wordpress/prettier-config": "4.35.0",
+		"@wordpress/scripts": "31.0.0",
+		"@wordpress/stylelint-config": "23.27.0",
 		"eslint-config-prettier": "10.1.8",
 		"husky": "9.1.7",
-		"stylelint": "16.25.0",
+		"stylelint": "16.26.0",
 		"stylelint-scss": "6.12.1"
 	},
 	"dependencies": {
-		"tldts": "^7.0.16"
+		"tldts": "^7.0.19"
 	}
 }

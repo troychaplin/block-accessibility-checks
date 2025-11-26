@@ -125,7 +125,7 @@ class ScriptsStyles {
 		wp_enqueue_script(
 			self::SCRIPT_HANDLE,
 			plugins_url( self::BLOCK_SCRIPT_PATH, $this->plugin_file ),
-			array( 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-data', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-plugins' ),
+			array( 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-data', 'wp-edit-post', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-plugins' ),
 			BA11YC_VERSION,
 			true
 		);
@@ -134,18 +134,21 @@ class ScriptsStyles {
 		$block_checks_options = get_option( 'block_checks_options', array() );
 
 		// Get the block checks registry to expose validation rules to JavaScript.
-		$registry              = \BlockAccessibility\BlockChecksRegistry::get_instance();
-		$meta_registry         = \BlockAccessibility\MetaChecksRegistry::get_instance();
-		$validation_rules      = $this->prepare_validation_rules_for_js( $registry );
-		$meta_validation_rules = $this->prepare_meta_validation_rules_for_js( $meta_registry );
+		$registry                = \BlockAccessibility\BlockChecksRegistry::get_instance();
+		$meta_registry           = \BlockAccessibility\MetaChecksRegistry::get_instance();
+		$editor_registry         = \BlockAccessibility\EditorChecksRegistry::get_instance();
+		$validation_rules        = $this->prepare_validation_rules_for_js( $registry );
+		$meta_validation_rules   = $this->prepare_meta_validation_rules_for_js( $meta_registry );
+		$editor_validation_rules = $this->prepare_editor_validation_rules_for_js( $editor_registry );
 
 		\wp_localize_script(
 			self::SCRIPT_HANDLE,
 			'BlockAccessibilityChecks',
 			array(
-				'blockChecksOptions'  => $block_checks_options,
-				'validationRules'     => $validation_rules,
-				'metaValidationRules' => $meta_validation_rules,
+				'blockChecksOptions'    => $block_checks_options,
+				'validationRules'       => $validation_rules,
+				'metaValidationRules'   => $meta_validation_rules,
+				'editorValidationRules' => $editor_validation_rules,
 			)
 		);
 	}
@@ -281,6 +284,46 @@ class ScriptsStyles {
 						'description' => $check_config['description'],
 					);
 				}
+			}
+		}
+
+		return $js_rules;
+	}
+
+	/**
+	 * Prepare editor validation rules for JavaScript
+	 *
+	 * Formats the editor validation rules from the registry into a structure
+	 * that can be consumed by JavaScript.
+	 *
+	 * @param EditorChecksRegistry $editor_registry The editor checks registry instance.
+	 * @return array Formatted editor validation rules for JavaScript.
+	 */
+	private function prepare_editor_validation_rules_for_js( EditorChecksRegistry $editor_registry ): array {
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+		$js_rules          = array();
+
+		foreach ( $all_editor_checks as $post_type => $checks ) {
+			$js_rules[ $post_type ] = array();
+
+			foreach ( $checks as $check_name => $check_config ) {
+				// Get the effective check level (considering settings).
+				$effective_type = $editor_registry->get_effective_editor_check_level( $post_type, $check_name );
+
+				// Skip checks set to 'none'.
+				if ( 'none' === $effective_type ) {
+					continue;
+				}
+
+				// Only include configuration that JavaScript needs.
+				$js_rules[ $post_type ][ $check_name ] = array(
+					'error_msg'   => $check_config['error_msg'],
+					'warning_msg' => $check_config['warning_msg'],
+					'type'        => $effective_type,
+					'priority'    => $check_config['priority'],
+					'enabled'     => $check_config['enabled'],
+					'description' => $check_config['description'],
+				);
 			}
 		}
 
