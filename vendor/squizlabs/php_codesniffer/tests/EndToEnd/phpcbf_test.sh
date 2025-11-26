@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function tear_down() {
-  rm -r tests/EndToEnd/Fixtures/*.fixed
+  rm -rf tests/EndToEnd/Fixtures/*.fixed
 }
 
 function test_phpcbf_is_working() {

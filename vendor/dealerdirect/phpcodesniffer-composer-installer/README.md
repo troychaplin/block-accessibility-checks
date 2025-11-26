@@ -48,7 +48,7 @@ This plugin is compatible with:
 
 - PHP **5.4+**, **7.x**, and **8.x** (Support for PHP v8 is available since [`v0.7.0`][v0.7])
 - [Composer][composer] **2.2+** (Support for Composer v2 is available since [`v0.7.0`][v0.7]; support for Composer < 2.2 was dropped in [`v1.1.0`][v1.1])
-- [PHP_CodeSniffer][codesniffer] **2.x**, **3.x** and **4.x**(Support for PHP_CodeSniffer v3 is available since [`v0.4.0`][v0.4], support for PHP_CodeSniffer v4 since [`v0.7.0`][v0.7])
+- [PHP_CodeSniffer][codesniffer] **3.x** and **4.x**(Support for PHP_CodeSniffer v4 is available since [`v0.7.0`][v0.7], support for PHP_CodeSniffer v2 was dropped in [`v1.2.0`][v1.2])
 
 ### How it works
 
@@ -71,7 +71,6 @@ multiple `phpcodesniffer-standard` packages.
     "require": {},
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "*",
-        "object-calisthenics/phpcs-calisthenics-rules": "*",
         "phpcompatibility/php-compatibility": "*",
         "wp-coding-standards/wpcs": "*"
     },
@@ -87,8 +86,8 @@ After running `composer install` PHP_CodeSniffer just works:
 
 ```bash
 $ ./vendor/bin/phpcs -i
-The installed coding standards are PEAR, PSR1, PSR2, PSR12, Squiz, Zend, ObjectCalisthenics,
-PHPCompatibility, WordPress, WordPress-Core, WordPress-Docs and WordPress-Extra
+The installed coding standards are PEAR, PSR1, PSR2, PSR12, Squiz, Zend, PHPCompatibility, Modernize,
+NormalizedArrays, Universal, PHPCSUtils, WordPress, WordPress-Core, WordPress-Docs and WordPress-Extra
 ```
 
 ### Calling the plugin directly
@@ -164,7 +163,7 @@ Create a composer package of your coding standard by adding a `composer.json` fi
   "description" : "Package contains all coding standards of the Acme company",
   "require" : {
     "php" : ">=5.4.0",
-    "squizlabs/php_codesniffer" : "^3.6"
+    "squizlabs/php_codesniffer" : "^3.13"
   },
   "type" : "phpcodesniffer-standard"
 }
@@ -274,6 +273,6 @@ THE SOFTWARE.
 [ghactions]: https://github.com/PHPCSStandards/composer-installer/actions/workflows/integrationtest.yml
 [tutorial]: https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Coding-Standard-Tutorial
 [using-composer-plugins]: https://getcomposer.org/doc/articles/plugins.md#using-plugins
-[v0.4]: https://github.com/PHPCSStandards/composer-installer/releases/tag/v0.4.0
 [v0.7]: https://github.com/PHPCSStandards/composer-installer/releases/tag/v0.7.0
 [v1.1]: https://github.com/PHPCSStandards/composer-installer/releases/tag/v1.1.0
+[v1.2]: https://github.com/PHPCSStandards/composer-installer/releases/tag/v1.2.0

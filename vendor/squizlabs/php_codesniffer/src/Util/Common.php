@@ -4,7 +4,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Util;
@@ -135,9 +135,9 @@ class Common
     /**
      * Removes a base path from the front of a file path.
      *
-     * @param string $path     The path of the file.
-     * @param string $basepath The base path to remove. This should not end
-     *                         with a directory separator.
+     * @param string      $path     The path of the file.
+     * @param string|null $basepath The base path to remove. This should not end
+     *                              with a directory separator.
      *
      * @return string
      */

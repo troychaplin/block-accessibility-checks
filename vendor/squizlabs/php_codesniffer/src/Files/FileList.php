@@ -6,7 +6,7 @@
  *
  * @author    Greg Sherwood <gsherwood@squiz.net>
  * @copyright 2006-2015 Squiz Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
+ * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
 namespace PHP_CodeSniffer\Files;
@@ -110,8 +110,8 @@ class FileList implements Iterator, Countable
      * If a file object has already been created, it can be passed here.
      * If it is left NULL, it will be created when accessed.
      *
-     * @param string                      $path The path to the file being added.
-     * @param \PHP_CodeSniffer\Files\File $file The file being added.
+     * @param string                           $path The path to the file being added.
+     * @param \PHP_CodeSniffer\Files\File|null $file The file being added.
      *
      * @return void
      */
