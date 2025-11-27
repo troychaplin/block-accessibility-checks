@@ -1,5 +1,4 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data'; // Import useSelect
 import { addFilter, addAction } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -17,13 +16,6 @@ import { BlockIndicator } from '../components/BlockIndicator';
 const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 	return props => {
 		const { name, attributes, clientId } = props;
-
-		// Subscribe to innerBlocks changes so validation runs when children are added/removed
-		const innerBlocks = useSelect(
-			select => select('core/block-editor').getBlock(clientId)?.innerBlocks,
-			[clientId]
-		);
-
 		const [validationResult, setValidationResult] = useState({
 			isValid: true,
 			mode: 'none',
@@ -94,7 +86,6 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 				prevHeadingLevelRef.current = attributes.level;
 			} else {
 				// Immediate validation for other cases using unified system
-				// Pass innerBlocks to validateBlock if it accepts it, or rely on the clientId lookup we added in validation.js
 				const result = validateBlock({ name, attributes, clientId });
 				setValidationResult(
 					result.isValid ? { isValid: true, mode: 'none', issues: [] } : result
@@ -106,7 +97,7 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 					clearTimeout(timeoutRef.current);
 				}
 			};
-		}, [name, attributes, clientId, innerBlocks]); // Add innerBlocks to dependency array
+		}, [name, attributes, clientId]);
 
 		// Generate messages for all issues
 		const issues = validationResult.issues || [];
