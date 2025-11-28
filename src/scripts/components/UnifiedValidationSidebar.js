@@ -4,7 +4,7 @@
 import { PluginSidebar } from '@wordpress/editor';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { caution } from '@wordpress/icons';
 

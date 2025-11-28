@@ -7,41 +7,18 @@ import { __ } from '@wordpress/i18n';
 import { error, caution, close } from '@wordpress/icons';
 
 /**
- * Meta Field Indicator Component
+ * Meta Indicator Component
  *
  * Displays a small icon badge in the upper-left corner of a meta field
  * when it has validation issues. Clicking shows a tooltip with issue details.
- * @param root0
- * @param root0.issues
- * @param root0.metaKey
+ *
+ * @param {Object}        props         - The component props.
+ * @param {Array<Object>} props.issues  - The issues to display.
+ * @param {string}        props.metaKey - The meta key to validate.
  */
 export function MetaIndicator({ issues, metaKey }) {
 	const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 	const buttonRef = useRef(null);
-
-	if (!issues || issues.length === 0) {
-		return null;
-	}
-
-	// Determine if we have errors or warnings
-	const hasErrors = issues.some(issue => issue.type === 'error');
-	const hasWarnings = issues.some(issue => issue.type === 'warning');
-
-	// Group issues by type and category
-	const errors = issues.filter(issue => issue.type === 'error');
-	const warnings = issues.filter(issue => issue.type === 'warning');
-
-	// Group by category for better organization
-	const accessibilityErrors = errors.filter(issue => issue.category === 'accessibility');
-	const validationErrors = errors.filter(issue => issue.category === 'validation');
-	const accessibilityWarnings = warnings.filter(issue => issue.category === 'accessibility');
-	const validationWarnings = warnings.filter(issue => issue.category === 'validation');
-
-	// Determine icon and class
-	const icon = hasErrors ? error : caution;
-	const className = hasErrors
-		? 'ba11y-meta-indicator ba11y-meta-indicator--error'
-		: 'ba11y-meta-indicator ba11y-meta-indicator--warning';
 
 	// Close tooltip when clicking outside
 	useEffect(() => {
@@ -95,6 +72,30 @@ export function MetaIndicator({ issues, metaKey }) {
 		};
 	}, [metaKey]);
 
+	if (!issues || issues.length === 0) {
+		return null;
+	}
+
+	// Determine if we have errors or warnings
+	const hasErrors = issues.some(issue => issue.type === 'error');
+	// const hasWarnings = issues.some(issue => issue.type === 'warning');
+
+	// Group issues by type and category
+	const errors = issues.filter(issue => issue.type === 'error');
+	const warnings = issues.filter(issue => issue.type === 'warning');
+
+	// Group by category for better organization
+	const accessibilityErrors = errors.filter(issue => issue.category === 'accessibility');
+	const validationErrors = errors.filter(issue => issue.category === 'validation');
+	const accessibilityWarnings = warnings.filter(issue => issue.category === 'accessibility');
+	const validationWarnings = warnings.filter(issue => issue.category === 'validation');
+
+	// Determine icon and class
+	const icon = hasErrors ? error : caution;
+	const className = hasErrors
+		? 'ba11y-meta-indicator ba11y-meta-indicator--error'
+		: 'ba11y-meta-indicator ba11y-meta-indicator--warning';
+
 	const handleToggle = () => {
 		setIsTooltipOpen(!isTooltipOpen);
 	};
@@ -133,8 +134,8 @@ export function MetaIndicator({ issues, metaKey }) {
 										{__('Accessibility Errors', 'block-accessibility-checks')}
 									</strong>
 									<ul>
-										{accessibilityErrors.map((error, index) => (
-											<li key={`a11y-error-${index}`}>{error.error_msg}</li>
+										{accessibilityErrors.map((issue, index) => (
+											<li key={`a11y-error-${index}`}>{issue.error_msg}</li>
 										))}
 									</ul>
 								</div>
@@ -147,9 +148,9 @@ export function MetaIndicator({ issues, metaKey }) {
 										{__('Validation Errors', 'block-accessibility-checks')}
 									</strong>
 									<ul>
-										{validationErrors.map((error, index) => (
+										{validationErrors.map((issue, index) => (
 											<li key={`validation-error-${index}`}>
-												{error.error_msg}
+												{issue.error_msg}
 											</li>
 										))}
 									</ul>

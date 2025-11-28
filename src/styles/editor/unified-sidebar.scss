@@ -20,6 +20,16 @@
 		}
 	}
 
+	.ba11y-error-group {
+		background-color: var(--a11y-light-red);
+		border-color: var(--a11y-red);
+	}
+
+	.ba11y-warning-group {
+		background-color: var(--a11y-light-yellow);
+		border-color: var(--a11y-yellow);
+	}
+
 	// Error and warning groups
 	.ba11y-error-group,
 	.ba11y-warning-group {
@@ -32,16 +42,6 @@
 		&:last-child {
 			margin-bottom: 0;
 		}
-	}
-
-	.ba11y-error-group {
-		background-color: var(--a11y-light-red);
-		border-color: var(--a11y-red);
-	}
-
-	.ba11y-warning-group {
-		background-color: var(--a11y-light-yellow);
-		border-color: var(--a11y-yellow);
 	}
 
 	// Subheadings
