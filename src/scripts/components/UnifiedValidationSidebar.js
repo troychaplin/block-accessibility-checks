@@ -82,7 +82,7 @@ export function UnifiedValidationSidebar() {
 	};
 
 	// Handle clicking on a meta field issue - open document settings
-	const handleMetaClick = metaKey => {
+	const handleMetaClick = () => {
 		// Note: We can't directly scroll to meta fields
 		// The meta field should be visible in its sidebar/panel
 		// Users can navigate there manually
