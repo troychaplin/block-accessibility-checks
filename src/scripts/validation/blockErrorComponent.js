@@ -1,9 +1,6 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data'; // Import useSelect
 import { addFilter, addAction } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, PanelRow } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { validateBlock } from './validateBlocks';
 import { BlockIndicator } from '../components/BlockIndicator';
@@ -111,129 +108,8 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 		// Generate messages for all issues
 		const issues = validationResult.issues || [];
 
-		// Group issues by type and category
-		const errors = issues.filter(issue => issue.type === 'error');
-		const warnings = issues.filter(issue => issue.type === 'warning');
-
-		// Group by category
-		const accessibilityErrors = errors.filter(issue => issue.category === 'accessibility');
-		const validationErrors = errors.filter(issue => issue.category === 'validation');
-		const accessibilityWarnings = warnings.filter(issue => issue.category === 'accessibility');
-		const validationWarnings = warnings.filter(issue => issue.category === 'validation');
-
 		return (
 			<>
-				{validationResult.mode !== 'none' && (
-					<InspectorControls>
-						<PanelBody
-							title={__('Accessibility & Validation', 'block-accessibility-checks')}
-							initialOpen={true}
-						>
-							{/* Display All Errors Group */}
-							{(accessibilityErrors.length > 0 || validationErrors.length > 0) && (
-								<PanelRow>
-									<div className="a11y-error-group">
-										{accessibilityErrors.length > 0 && (
-											<>
-												<p className="a11y-error-subheading">
-													<strong>
-														{__(
-															'Accessibility Errors',
-															'block-accessibility-checks'
-														)}
-													</strong>
-												</p>
-												<ul className="a11y-error-list">
-													{accessibilityErrors.map((issue, index) => (
-														<li
-															key={`accessibility-error-${issue.checkName}-${index}`}
-														>
-															{issue.error_msg}
-														</li>
-													))}
-												</ul>
-											</>
-										)}
-
-										{validationErrors.length > 0 && (
-											<>
-												<p className="a11y-error-subheading">
-													<strong>
-														{__(
-															'Validation Errors',
-															'block-accessibility-checks'
-														)}
-													</strong>
-												</p>
-												<ul className="a11y-error-list">
-													{validationErrors.map((issue, index) => (
-														<li
-															key={`validation-error-${issue.checkName}-${index}`}
-														>
-															{issue.error_msg}
-														</li>
-													))}
-												</ul>
-											</>
-										)}
-									</div>
-								</PanelRow>
-							)}
-
-							{/* Display All Warnings Group */}
-							{(accessibilityWarnings.length > 0 ||
-								validationWarnings.length > 0) && (
-								<PanelRow>
-									<div className="a11y-warning-group">
-										{accessibilityWarnings.length > 0 && (
-											<>
-												<p className="a11y-warning-subheading">
-													<strong>
-														{__(
-															'Accessibility Warnings',
-															'block-accessibility-checks'
-														)}
-													</strong>
-												</p>
-												<ul className="a11y-warning-list">
-													{accessibilityWarnings.map((issue, index) => (
-														<li
-															key={`accessibility-warning-${issue.checkName}-${index}`}
-														>
-															{issue.warning_msg || issue.error_msg}
-														</li>
-													))}
-												</ul>
-											</>
-										)}
-
-										{validationWarnings.length > 0 && (
-											<>
-												<p className="a11y-warning-subheading">
-													<strong>
-														{__(
-															'Validation Warnings',
-															'block-accessibility-checks'
-														)}
-													</strong>
-												</p>
-												<ul className="a11y-warning-list">
-													{validationWarnings.map((issue, index) => (
-														<li
-															key={`validation-warning-${issue.checkName}-${index}`}
-														>
-															{issue.warning_msg || issue.error_msg}
-														</li>
-													))}
-												</ul>
-											</>
-										)}
-									</div>
-								</PanelRow>
-							)}
-						</PanelBody>
-					</InspectorControls>
-				)}
 				{validationResult.mode !== 'none' && (
 					<div
 						className={
