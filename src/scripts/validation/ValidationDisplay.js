@@ -1,7 +1,7 @@
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { validateAllMetaChecks } from './validateMeta';
-import { MetaIndicator } from '../components/MetaIndicator';
 
 /**
  * ValidationDisplay - Shared component for displaying validation
@@ -92,15 +92,33 @@ export function ValidationDisplay({ metaKey, children, showMessages = true, skip
 	// Validation messages component (reused everywhere)
 	const validationMessages = showMessages && validation.issues.length > 0 && (
 		<div className="meta-validation-messages">
-			{validation.errors.map((error, index) => (
-				<p key={`error-${index}`} className="meta-validation-error">
-					{error.error_msg}
-				</p>
+			{validation.errors.map((errorIssue, index) => (
+				<div key={`error-${index}`} className="meta-validation-error">
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 16 16"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<circle cx="8" cy="8" r="4" fill="#D82000" />
+					</svg>
+					<span>{__('Required', 'block-accessibility-checks')}</span>
+				</div>
 			))}
 			{validation.warnings.map((warning, index) => (
-				<p key={`warning-${index}`} className="meta-validation-warning">
-					{warning.warning_msg || warning.error_msg}
-				</p>
+				<div key={`warning-${index}`} className="meta-validation-warning">
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 16 16"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<circle cx="8" cy="8" r="4" fill="#DBC900" />
+					</svg>
+					<span>{__('Recommended', 'block-accessibility-checks')}</span>
+				</div>
 			))}
 		</div>
 	);
@@ -118,7 +136,6 @@ export function ValidationDisplay({ metaKey, children, showMessages = true, skip
 	// Otherwise, provide the wrapper
 	return (
 		<div className={validation.wrapperClassName}>
-			<MetaIndicator issues={validation.issues} metaKey={metaKey} />
 			{children}
 			{validationMessages}
 		</div>
