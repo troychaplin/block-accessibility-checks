@@ -882,6 +882,10 @@ class SettingsPage {
 			return;
 		}
 
+		echo '<div class="ba11y-settings-plugin-header">' . "\n";
+		echo '<h2>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h2>';
+		echo '</div>' . "\n";
+
 		// Render editor checks for each post type.
 		foreach ( $all_editor_checks as $post_type => $checks ) {
 			if ( empty( $checks ) ) {
@@ -902,10 +906,6 @@ class SettingsPage {
 	 */
 	private function render_editor_checks_for_post_type( string $post_type, array $checks, string $plugin_slug ): void {
 		$post_type_label = $this->get_post_type_label( $post_type );
-
-		echo '<div class="ba11y-settings-plugin-header">' . "\n";
-		echo '<h2>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h2>';
-		echo '</div>' . "\n";
 
 		echo '<article class="ba11y-block-options ba11y-editor-options ba11y-editor-options-' . \esc_attr( $post_type ) . '">';
 		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Post Type', 'block-accessibility-checks' ) . '</h2>';
