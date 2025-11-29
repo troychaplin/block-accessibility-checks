@@ -1,10 +1,10 @@
 # Post Meta Validation - JavaScript Integration
 
-This guide explains how to implement post meta validation logic in JavaScript and use the provided UI components.
+This guide explains how to implement post meta validation logic in JavaScript.
 
 ## Overview
 
-All validation logic is handled in JavaScript for real-time feedback in the block editor. The plugin also provides UI components that automatically display validation errors and warnings next to meta fields.
+All validation logic is handled in JavaScript for real-time feedback in the block editor. The plugin provides a hook (`useMetaField`) that automatically handles data binding and validation display.
 
 ## Implementing Validation Logic
 
@@ -79,13 +79,13 @@ console.log(requiredRule.warning_msg); // Warning message
 console.log(requiredRule.type);        // 'error', 'warning', or 'none'
 ```
 
-## UI Components
+## UI Integration
 
-The plugin provides wrapper components to automatically display validation errors and warnings next to your meta fields.
+The plugin provides a `useMetaField` hook to automatically handle state and validation display.
 
 ### Script Dependencies
 
-When using the validation components, ensure your script has the Block Accessibility Checks script as a dependency:
+When using the validation hook, ensure your script has the Block Accessibility Checks script as a dependency:
 
 ```php
 // Add 'block-accessibility-script' as a dependency
@@ -103,49 +103,44 @@ wp_enqueue_script(
 );
 ```
 
-Then access the components with a defensive check:
+Then access the hook with a defensive check:
 
 ```javascript
-const { ValidatedToolsPanelItem, MetaField } = window.BlockAccessibilityChecks || {};
+const { useMetaField } = window.BlockAccessibilityChecks || {};
 ```
 
-### Using MetaField Component
+### Using `useMetaField` Hook
 
-For any context (PluginDocumentSettingPanel, custom blocks, etc.), use the `MetaField` wrapper:
+The `useMetaField` hook returns props that can be spread directly onto standard WordPress components like `TextControl`.
 
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { TextControl, SelectControl } from '@wordpress/components';
 
-// Import the wrapper component
-const { MetaField } = window.BlockAccessibilityChecks || {};
+// Import the hook (or use the shim)
+const { useMetaField } = window.BlockAccessibilityChecks || {};
 
 const MyMetaPanel = () => {
-    const { meta } = useSelect(select => ({
-        meta: select('core/editor').getEditedPostAttribute('meta') || {},
-    }));
-    
-    const { editPost } = useDispatch('core/editor');
-    
+    // 1. Get props for each field
+    const originProps = useMetaField('band_origin', __('Enter the city of origin', 'text-domain'));
+    const genreProps = useMetaField('band_genre', __('Select a genre', 'text-domain'));
+
+    if (!originProps || !genreProps) return null; // Defensive check
+
     return (
         <PluginDocumentSettingPanel name="my-meta" title="My Meta">
-            <MetaField metaKey="band_origin">
-                <TextControl
-                    label={__('City of Origin')}
-                    value={meta.band_origin || ''}
-                    onChange={value => editPost({ meta: { band_origin: value } })}
-                />
-            </MetaField>
+             {/* 2. Spread props into components */}
+            <TextControl
+                label={__('City of Origin')}
+                {...originProps}
+            />
             
-            <MetaField metaKey="band_genre">
-                <SelectControl
-                    label={__('Genre')}
-                    value={meta.band_genre || ''}
-                    onChange={value => editPost({ meta: { band_genre: value } })}
-                    options={genreOptions}
-                />
-            </MetaField>
+            <SelectControl
+                label={__('Genre')}
+                {...genreProps}
+                options={genreOptions}
+            />
         </PluginDocumentSettingPanel>
     );
 };
@@ -153,89 +148,49 @@ const MyMetaPanel = () => {
 
 **Key points:**
 - Works with any WordPress component (`TextControl`, `SelectControl`, `TextareaControl`, etc.)
-- Simply wrap your control with `<MetaField metaKey="...">`
-- No changes needed to your existing component code
-- Validation appears automatically below the field
+- Automatically handles `value` and `onChange`
+- Automatically appends validation messages to the `help` text
+- Applies validation classes (`ba11y-field`, `meta-field-error`, etc.)
 
-### Using ValidatedToolsPanelItem Component
+### Customizing `onChange`
 
-If you're using `ToolsPanel` and `ToolsPanelItem`, simply replace `ToolsPanelItem` with `ValidatedToolsPanelItem`:
+The hook provides a default `onChange` handler that saves the value to the post meta. You can extend or override this behavior.
+
+#### Extending (Recommended)
+Use this if you want to perform an additional action (like logging or updating another state) but **still want the value to be saved** to the database automatically.
 
 ```javascript
-import { __ } from '@wordpress/i18n';
-import { PluginSidebar } from '@wordpress/editor';
-import {
-    TextControl,
-    __experimentalToolsPanel as ToolsPanel,
-    __experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+const originProps = useMetaField('band_origin');
 
-// Import the validated component with fallback
-const { ValidatedToolsPanelItem } = window.BlockAccessibilityChecks || {};
+<TextControl
+    label="Origin City"
+    {...originProps}
+    // Define onChange AFTER spreading props
+    onChange={(newValue) => {
+        console.log('Value changed to:', newValue);
 
-const MyMetaSidebar = () => {
-    const { meta } = useSelect(select => ({
-        meta: select('core/editor').getEditedPostAttribute('meta') || {},
-    }));
-    
-    const { editPost } = useDispatch('core/editor');
-    const updateMeta = (key, value) => editPost({ meta: { [key]: value } });
-    
-    // Use ValidatedToolsPanelItem if available, otherwise fall back to standard
-    const ToolsPanelItemComponent = ValidatedToolsPanelItem || ToolsPanelItem;
-    
-    return (
-        <PluginSidebar name="my-meta" title="My Meta Fields">
-            <ToolsPanel label="Band Information">
-                <ToolsPanelItemComponent
-                    metaKey="band_origin"
-                    hasValue={() => meta.band_origin !== ''}
-                    label="City of Origin"
-                    onDeselect={() => updateMeta('band_origin', '')}
-                    isShownByDefault
-                >
-                    <TextControl
-                        label={__('City of Origin')}
-                        value={meta.band_origin || ''}
-                        onChange={value => updateMeta('band_origin', value)}
-                    />
-                </ToolsPanelItemComponent>
-            </ToolsPanel>
-        </PluginSidebar>
-    );
-};
+        // CRITICAL: Call the original handler to save the data!
+        originProps.onChange(newValue);
+    }}
+/>
 ```
 
-**Key points:**
-- Add the `metaKey` prop to specify which meta field to validate
-- All other `ToolsPanelItem` props work exactly the same
-- Validation messages appear automatically when the field fails validation
-- Error/warning styling is applied automatically
-
-### Validation Display Features
-
-Both components provide:
-- ✅ **Automatic validation** - No additional code needed
-- ✅ **Error highlighting** - Red left border for errors
-- ✅ **Warning highlighting** - Yellow left border for warnings
-- ✅ **Inline messages** - Validation messages appear below the field
-- ✅ **Real-time updates** - Validation updates as user types
-- ✅ **Consistent styling** - Matches block validation styling
-
-### Hiding Validation Messages
-
-If you want to handle the display differently, you can hide the automatic messages:
+#### Overriding (Take Control)
+Use this if you want to completely handle the saving logic yourself (e.g., validation before saving, or saving to a different store).
 
 ```javascript
-// For ValidatedToolsPanelItem
-<ValidatedToolsPanelItem
-    metaKey="band_origin"
-    showValidationMessages={false}
-    // ... other props
->
+const originProps = useMetaField('band_origin');
 
-// For MetaField
-<MetaField metaKey="band_origin" showMessages={false}>
+<TextControl
+    label="Origin City"
+    {...originProps}
+    // This completely replaces the hook's saving logic
+    onChange={(newValue) => {
+        // The data will NOT be saved to post meta automatically anymore.
+        // You must handle the save manually here.
+        myCustomSaveFunction(newValue);
+    }}
+/>
 ```
 
 ## How Validation Works
@@ -244,25 +199,25 @@ If you want to handle the display differently, you can hide the automatic messag
 2. **Export** - Configuration is exported to JavaScript via `wp_localize_script`
 3. **Validation** - When meta fields change, `validateMetaField()` is called
 4. **Filter Application** - The `ba11yc_validate_meta` filter is applied for each registered check
-5. **UI Update** - Components automatically display validation results
+5. **UI Update** - The hook automatically updates props with validation results
 6. **Post Locking** - If any checks fail with `type: 'error'`, post saving is locked
 
 ## Best Practices
 
-### Defensive Component Access
+### Defensive Access
 
-Always check for component availability:
+Always check for hook availability:
 
 ```javascript
-const { MetaField, ValidatedToolsPanelItem } = window.BlockAccessibilityChecks || {};
-if (!MetaField) {
-    // Fallback to standard component
+const { useMetaField } = window.BlockAccessibilityChecks || {};
+if (!useMetaField) {
+    // Fallback or use the shim helper provided in the integration guide
 }
 ```
 
 ### Early Returns
 
-Use early returns to avoid unnecessary processing:
+Use early returns to avoid unnecessary processing in filters:
 
 ```javascript
 addFilter(
@@ -286,15 +241,6 @@ addFilter(
 );
 ```
 
-### Defensive Programming
-
-Always check for undefined/null values:
-
-```javascript
-const value = meta.band_origin || '';
-const trimmed = value.trim();
-```
-
 ## Quick Reference
 
 ### Filter Hook
@@ -304,11 +250,7 @@ const trimmed = value.trim();
 ### Global Object
 
 - **`window.BlockAccessibilityChecks.metaValidationRules`** - All registered meta checks
-
-### Components
-
-- **`MetaField`** - Generic wrapper component for any meta field
-- **`ValidatedToolsPanelItem`** - Drop-in replacement for `ToolsPanelItem`
+- **`window.BlockAccessibilityChecks.useMetaField`** - The main validation hook
 
 ### Filter Signature
 
@@ -328,4 +270,3 @@ addFilter(
 - [PHP Integration](./php.md)
 - [Hooks Reference](../reference/hooks.md)
 - [Architecture](../architecture.md)
-

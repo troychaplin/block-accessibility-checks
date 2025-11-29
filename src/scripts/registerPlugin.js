@@ -2,69 +2,49 @@
  * WordPress dependencies
  */
 import { registerPlugin } from '@wordpress/plugins';
-import { applyFilters } from '@wordpress/hooks';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { ValidationAPI } from './validation/validationApi';
-import { EditorValidationDisplay } from './components/EditorValidationDisplay';
 import { UnifiedValidationSidebar } from './components/UnifiedValidationSidebar';
 import { ValidationHeaderButton } from './components/ValidationHeaderButton';
-import './validation/blockErrorComponent';
 
-// Base checks array - now empty since validation is handled via ba11yc_validate_block filter
-const coreChecks = [];
-
-// Cache for the filtered checks array to prevent repeated filter applications
-let cachedChecksArray = null;
-let cacheInvalidated = true;
-
-// Function to invalidate the cache when new filters are added
-function invalidateCache() {
-	cacheInvalidated = true;
+/**
+ * Add 'block-validation' category to block settings
+ *
+ * @param {Object} settings - Block settings
+ */
+function addBlockValidationCategory(settings) {
+	return settings;
 }
+addFilter(
+	'blocks.registerBlockType',
+	'block-accessibility-checks/add-validation-category',
+	addBlockValidationCategory
+);
 
-// Listen for when new filters are added
-if (typeof wp !== 'undefined' && wp.hooks) {
-	wp.hooks.addAction('hookAdded', 'blockAccessibilityChecks/invalidate-cache', hookName => {
-		if (hookName === 'blockAccessibilityChecks.block-checksArray') {
-			invalidateCache();
-		}
-	});
-}
-
-// Function to get current checks array (allows dynamic updates from external plugins)
-export function getblockChecksArray() {
-	if (cacheInvalidated || !cachedChecksArray) {
-		cachedChecksArray = applyFilters('blockAccessibilityChecks.blockChecksArray', coreChecks);
-		cacheInvalidated = false;
+// Define block checks array (this will be populated from PHP)
+export const blockChecksArray = new Proxy(
+	{},
+	{
+		get(target, prop) {
+			if (
+				window.BlockAccessibilityChecks &&
+				window.BlockAccessibilityChecks.validationRules
+			) {
+				return window.BlockAccessibilityChecks.validationRules[prop];
+			}
+			return undefined;
+		},
 	}
-	return cachedChecksArray;
-}
-
-// For backwards compatibility, expose the array but make it dynamic
-export const blockChecksArray = new Proxy([], {
-	get(target, prop) {
-		const currentArray = getblockChecksArray();
-		if (prop === 'length') {
-			return currentArray.length;
-		}
-		if (typeof prop === 'string' && !isNaN(prop)) {
-			return currentArray[parseInt(prop)];
-		}
-		if (typeof currentArray[prop] === 'function') {
-			return currentArray[prop].bind(currentArray);
-		}
-		return currentArray[prop];
-	},
-});
+);
 
 registerPlugin('validation-api', {
 	render: () => (
 		<>
 			<ValidationAPI />
-			<EditorValidationDisplay />
 			<UnifiedValidationSidebar />
 			<ValidationHeaderButton />
 		</>
