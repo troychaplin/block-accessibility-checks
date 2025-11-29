@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, cloneElement, isValidElement } from '@wordpress/element';
 import { validateAllMetaChecks } from './validateMeta';
 
 /**
@@ -11,10 +11,9 @@ import { validateAllMetaChecks } from './validateMeta';
  * @param {string}                    props.metaKey             - Meta key to validate
  * @param {import('react').ReactNode} props.children            - Content to wrap
  * @param {boolean}                   [props.showMessages=true] - Whether to show validation messages
- * @param {boolean}                   [props.skipWrapper=false] - Skip the wrapper div (when parent provides it)
  * @return {import('react').ReactElement} - Rendered validation display component
  */
-export function ValidationDisplay({ metaKey, children, showMessages = true, skipWrapper = false }) {
+export function ValidationDisplay({ metaKey, children, showMessages = true }) {
 	// Get current meta value and post type
 	const { currentValue, postType } = useSelect(
 		select => {
@@ -84,60 +83,63 @@ export function ValidationDisplay({ metaKey, children, showMessages = true, skip
 		wrapperClassName,
 	};
 
-	// No validation issues - return children as-is
-	if (validation.isValid) {
-		return children;
+	// If children is a single valid element and we have validation issues,
+	// inject message into the placeholder
+	if (showMessages && validation.issues.length > 0 && isValidElement(children)) {
+		let messageText = '';
+		if (validation.errors.length > 0) {
+			messageText = __('Required', 'block-accessibility-checks');
+		} else if (validation.warnings.length > 0) {
+			messageText = __('Recommended', 'block-accessibility-checks');
+		}
+
+		if (messageText) {
+			const existingPlaceholder = children.props.placeholder || '';
+			// Only wrap in parens if appending to existing placeholder
+			const finalMessage = existingPlaceholder
+				? `${existingPlaceholder} (${messageText})`
+				: messageText;
+
+			return cloneElement(children, {
+				placeholder: finalMessage,
+				className: `${children.props.className || ''} ${wrapperClassName}`.trim(),
+			});
+		}
 	}
 
-	// Validation messages component (reused everywhere)
-	const validationMessages = showMessages && validation.issues.length > 0 && (
-		<div className="meta-validation-messages">
-			{validation.errors.map((errorIssue, index) => (
-				<div key={`error-${index}`} className="meta-validation-error">
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 16 16"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<circle cx="8" cy="8" r="4" fill="#D82000" />
-					</svg>
-					<span>{__('Required', 'block-accessibility-checks')}</span>
-				</div>
-			))}
-			{validation.warnings.map((warning, index) => (
-				<div key={`warning-${index}`} className="meta-validation-warning">
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 16 16"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<circle cx="8" cy="8" r="4" fill="#DBC900" />
-					</svg>
-					<span>{__('Recommended', 'block-accessibility-checks')}</span>
-				</div>
-			))}
-		</div>
-	);
+	// Fallback: if we can't inject into placeholder (e.g. multiple children),
+	// render simple text above
+	if (showMessages && validation.issues.length > 0) {
+		let fallbackMessage = '';
+		if (validation.errors.length > 0) {
+			fallbackMessage = __('Required', 'block-accessibility-checks');
+		} else if (validation.warnings.length > 0) {
+			fallbackMessage = __('Recommended', 'block-accessibility-checks');
+		}
 
-	// If skipWrapper is true, parent will provide the wrapper
-	if (skipWrapper) {
-		return (
-			<>
-				{children}
-				{validationMessages}
-			</>
-		);
+		if (fallbackMessage) {
+			// For fallback, we can try to apply the class to the children if possible
+			const childrenWithClass = isValidElement(children)
+				? cloneElement(children, {
+						className: `${children.props.className || ''} ${wrapperClassName}`.trim(),
+					})
+				: children;
+
+			return (
+				<>
+					<div className="meta-validation-fallback-message">{fallbackMessage}</div>
+					{childrenWithClass}
+				</>
+			);
+		}
 	}
 
-	// Otherwise, provide the wrapper
-	return (
-		<div className={validation.wrapperClassName}>
-			{children}
-			{validationMessages}
-		</div>
-	);
+	// Even if no validation message (or showMessages is false), we still need to apply the class for border styling if there are issues
+	if (wrapperClassName && isValidElement(children)) {
+		return cloneElement(children, {
+			className: `${children.props.className || ''} ${wrapperClassName}`.trim(),
+		});
+	}
+
+	return children;
 }

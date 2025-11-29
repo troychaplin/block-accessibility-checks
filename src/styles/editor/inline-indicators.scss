@@ -68,10 +68,3 @@
         }
 	}
 }
-
-// Meta field wrapper needs relative positioning
-.meta-field-error,
-.meta-field-warning {
-	position: relative;
-	padding-top: 24px; // Make room for indicator
-}

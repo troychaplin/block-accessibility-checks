@@ -1,63 +1,33 @@
-// Meta field validation wrapper styles
-.meta-field-error,
-.meta-field-warning {
-    display: block;
-    padding: initial;
+
+.meta-field-error .components-text-control__input,
+.meta-field-error .components-textarea-control__input,
+.meta-field-error .components-select-control__input {
+    background-color: var(--a11y-light-red);
 }
 
-// Input field styling - base states (lower specificity first)
-.meta-field-error .components-base-control__field .components-text-control__input,
-.meta-field-error .components-base-control__field .components-textarea-control__input,
-.meta-field-error .components-base-control__field .components-select-control__input {
-	border-color: var(--a11y-red);
-
-    &:focus {
-        border-color: var(--a11y-red);
-	    box-shadow: 0 0 0 1px var(--a11y-red);
-    }
+.meta-field-warning .components-text-control__input,
+.meta-field-warning .components-textarea-control__input,
+.meta-field-warning .components-select-control__input {
+    background-color: var(--a11y-light-yellow);
 }
 
-.meta-field-warning .components-base-control__field .components-text-control__input,
-.meta-field-warning .components-base-control__field .components-textarea-control__input,
-.meta-field-warning .components-base-control__field .components-select-control__input {
-	border-color: var(--a11y-yellow);
-
-    &:focus {
-        border-color: var(--a11y-yellow);
-	    box-shadow: 0 0 0 1px var(--a11y-yellow);
-    }
+.meta-field-error .components-text-control__input:focus,
+.meta-field-error .components-textarea-control__input:focus,
+.meta-field-error .components-select-control__input:focus {
+    border-color: var(--a11y-red);
+    box-shadow: 0 0 0 1px var(--a11y-red);
 }
 
-// Input field styling - focus states (higher specificity last)
-.meta-field-error .components-base-control .components-base-control__help,
-.meta-field-warning .components-base-control .components-base-control__help {
-    color: #636363;
+.meta-field-warning .components-text-control__input:focus,
+.meta-field-warning .components-textarea-control__input:focus,
+.meta-field-warning .components-select-control__input:focus {
+    border-color: var(--a11y-yellow);
+    box-shadow: 0 0 0 1px var(--a11y-yellow);
 }
 
-.meta-validation-error,
-.meta-validation-warning {
-    display: flex;
-    align-items: flex-start;
-    gap: 2px;
+.meta-validation-fallback-message {
+    margin-bottom: 4px;
     font-size: 12px;
-	font-weight: 400;
-	line-height: 1.4;
-}
-
-.meta-validation-error {
-	color: var(--a11y-dark-red);
-
-    svg {
-        min-width: 16px;
-        margin-top: 1px;
-    }
-}
-
-.meta-validation-warning {
-	color: var(--a11y-dark-yellow);
-
-    svg {
-        min-width: 16px;
-        margin-top: 1px;
-    }
+    font-style: italic;
+    color: #757575;
 }
