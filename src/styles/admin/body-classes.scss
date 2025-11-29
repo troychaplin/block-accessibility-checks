@@ -1,27 +1,39 @@
 // Warnings - base state (lowest specificity)
 body.has-meta-validation-warnings .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]) {
-    background-color: var(--a11y-yellow);
+    background-color: var(--a11y--light-yellow);
+    border: 1px dotted var(--a11y-yellow);
 
     span {
-        color: #fff;
+        color: var(--a11y-yellow);
     }
 }
 
 // Errors - base state (same specificity as warnings, but logically higher priority)
 body.has-meta-validation-errors .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]) {
-    background-color: var(--a11y-red);
+    background-color: var(--a11y-light-red);
+    border: none;
+    // border: 1px dotted var(--a11y-red);
 
     span {
-        color: #fff;
+        color: var(--a11y-red);
+    }
+
+    &:hover {
+        background-color: var(--a11y-red);
+        border: 1px solid var(--a11y-red);
+
+        span {
+            color: #fff;
+        }
     }
 }
 
-// Warnings - hover state (higher specificity due to :hover)
-body.has-meta-validation-warnings .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]):hover {
-    background-color: var(--a11y-dark-yellow);
-}
+// // Warnings - hover state (higher specificity due to :hover)
+// body.has-meta-validation-warnings .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]):hover {
+//     background-color: var(--a11y-dark-yellow);
+// }
 
-// Errors - hover state (highest specificity)
-body.has-meta-validation-errors .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]):hover {
-    background-color: var(--a11y-dark-red);
-}
+// // Errors - hover state (highest specificity)
+// body.has-meta-validation-errors .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]):hover {
+//     background-color: var(--a11y-dark-red);
+// }
