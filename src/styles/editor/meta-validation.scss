@@ -25,9 +25,17 @@
     box-shadow: 0 0 0 1px var(--a11y-yellow);
 }
 
-.meta-validation-fallback-message {
-    margin-bottom: 4px;
-    font-size: 12px;
+.ba11y-error-text,
+.ba11y-warning-text {
+    display: block;
+    margin-top: 4px;
     font-style: italic;
-    color: #757575;
+}
+
+.ba11y-error-text {
+    color: var(--a11y-dark-red);
+}
+
+.ba11y-warning-text {
+    color: var(--a11y-dark-yellow); 
 }

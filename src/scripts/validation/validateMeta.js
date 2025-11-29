@@ -70,12 +70,19 @@ export function validateAllMetaChecks(postType, metaKey, value) {
 		const isValid = validateMetaField(postType, metaKey, value, checkName);
 
 		if (!isValid) {
+			// Use the correct message field from the PHP config
+			const message =
+				rule.type === 'error'
+					? rule.error_msg || rule.message
+					: rule.warning_msg || rule.message;
+
 			issues.push({
 				metaKey,
 				checkName,
 				type: rule.type,
-				error_msg: rule.error_msg,
-				warning_msg: rule.warning_msg,
+				message, // Ensure 'message' is populated for useMetaField
+				error_msg: rule.error_msg || rule.message,
+				warning_msg: rule.warning_msg || rule.message,
 				priority: rule.type === 'error' ? 1 : 2,
 			});
 		}

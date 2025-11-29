@@ -53,6 +53,7 @@ class MetaValidation {
 		$config = \wp_parse_args( $args, $defaults );
 
 		// Register the check immediately (not lazy).
+		// This is critical for client-side validation to know about the rules on initial load.
 		$registry = MetaChecksRegistry::get_instance();
 		$registry->register_meta_check(
 			$post_type,
