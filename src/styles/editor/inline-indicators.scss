@@ -1,6 +1,6 @@
 // Block wrapper needs relative positioning for absolute indicator
-.a11y-block-error,
-.a11y-block-warning {
+.ba11y-block-error,
+.ba11y-block-warning {
 	position: relative;
 }
 
@@ -12,7 +12,7 @@
 	left: 0;
 	width: 28px;
 	height: 28px;
-	z-index: 20;
+	z-index: 90; // Increased z-index to be above block selection controls
 	pointer-events: none;
 }
 

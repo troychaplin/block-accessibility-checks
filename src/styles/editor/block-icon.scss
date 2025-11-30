@@ -2,20 +2,20 @@
 // Position relative is now handled in inline-indicators.scss
 // Keeping minimal styles for backwards compatibility
 
-.a11y-block-warning,
-.a11y-block-error {
+.ba11y-block-warning,
+.ba11y-block-error {
 	// Position relative is handled by inline-indicators.scss
 	// Keeping this file for any block-specific overrides if needed
 }
 
 /* Remove bottom spacing from block being wrapped */
-.a11y-block-warning > *:first-child,
-.a11y-block-error > *:first-child {
+.ba11y-block-warning > *:first-child,
+.ba11y-block-error > *:first-child {
 	margin-top: 0;
 }
 
 /* Remove bottom spacing from block being wrapped */
-.a11y-block-warning > *:last-child,
-.a11y-block-error > *:last-child {
+.ba11y-block-warning > *:last-child,
+.ba11y-block-error > *:last-child {
 	margin-bottom: 0;
 }
