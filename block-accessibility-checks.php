@@ -26,21 +26,21 @@ define( 'BA11YC_VERSION', '2.3.0' );
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Imports the necessary classes for the plugin.
-use BlockAccessibility\PluginInitializer;
+use BlockAccessibility\Core\Plugin;
 
 // Global variables for the plugin.
 $ba11yc_plugin_file = __FILE__;
 $ba11yc_text_domain = 'block-accessibility-checks';
 
-// Initialize the PluginInitializer immediately (before 'init' hook).
+// Initialize the Plugin immediately (before 'init' hook).
 // This is required for HeadingLevels to register its filter early enough.
-$ba11yc_plugin_initializer = new PluginInitializer( $ba11yc_plugin_file, $ba11yc_text_domain );
+$ba11yc_plugin_initializer = new Plugin( $ba11yc_plugin_file, $ba11yc_text_domain );
 
 /**
  * Initializes the Block Accessibility Checks plugin services.
  *
  * This function is called on the 'init' hook to complete plugin initialization
- * after HeadingLevels has been set up in the PluginInitializer constructor.
+ * after HeadingLevels has been set up in the Plugin constructor.
  *
  * @return void
  */

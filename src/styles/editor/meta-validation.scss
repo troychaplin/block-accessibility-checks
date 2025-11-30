@@ -1,26 +1,26 @@
 
-.meta-field-error .components-text-control__input,
-.meta-field-error .components-textarea-control__input,
-.meta-field-error .components-select-control__input {
+.ba11y-meta-error .components-text-control__input,
+.ba11y-meta-error .components-textarea-control__input,
+.ba11y-meta-error .components-select-control__input {
     background-color: var(--a11y-light-red);
 }
 
-.meta-field-warning .components-text-control__input,
-.meta-field-warning .components-textarea-control__input,
-.meta-field-warning .components-select-control__input {
+.ba11y-meta-warning .components-text-control__input,
+.ba11y-meta-warning .components-textarea-control__input,
+.ba11y-meta-warning .components-select-control__input {
     background-color: var(--a11y-light-yellow);
 }
 
-.meta-field-error .components-text-control__input:focus,
-.meta-field-error .components-textarea-control__input:focus,
-.meta-field-error .components-select-control__input:focus {
+.ba11y-meta-error .components-text-control__input:focus,
+.ba11y-meta-error .components-textarea-control__input:focus,
+.ba11y-meta-error .components-select-control__input:focus {
     border-color: var(--a11y-red);
     box-shadow: 0 0 0 1px var(--a11y-red);
 }
 
-.meta-field-warning .components-text-control__input:focus,
-.meta-field-warning .components-textarea-control__input:focus,
-.meta-field-warning .components-select-control__input:focus {
+.ba11y-meta-warning .components-text-control__input:focus,
+.ba11y-meta-warning .components-textarea-control__input:focus,
+.ba11y-meta-warning .components-select-control__input:focus {
     border-color: var(--a11y-yellow);
     box-shadow: 0 0 0 1px var(--a11y-yellow);
 }
