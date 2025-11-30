@@ -199,7 +199,7 @@ const originProps = useMetaField('band_origin');
 2. **Export** - Configuration is exported to JavaScript via `wp_localize_script`
 3. **Validation** - When meta fields change, `validateMetaField()` is called
 4. **Filter Application** - The `ba11yc_validate_meta` filter is applied for each registered check
-5. **UI Update** - The hook automatically updates props with validation results
+5. **UI Update** - The hook automatically updates props with validation results, and errors are also collected in the Unified Sidebar
 6. **Post Locking** - If any checks fail with `type: 'error'`, post saving is locked
 
 ## Best Practices
