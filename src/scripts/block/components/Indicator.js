@@ -9,25 +9,32 @@ import { error, caution, close } from '@wordpress/icons';
 /**
  * Block Indicator Component
  *
- * Displays a small icon badge in the upper-left corner of a block
- * when it has validation issues. Clicking shows a tooltip with issue details.
+ * Displays a visual indicator icon in the upper-left corner of blocks with
+ * validation issues. The indicator shows an error or warning icon based on
+ * issue severity. Clicking the indicator opens a popover displaying all
+ * validation issues grouped by type and category.
  *
  * @param {Object}        props          - The component props.
- * @param {Array<Object>} props.issues   - The issues to display.
- * @param {string}        props.clientId - The client ID of the block.
+ * @param {Array<Object>} props.issues   - Array of validation issues to display.
+ * @param {string}        props.clientId - The unique client ID of the block.
  */
 export function BlockIndicator({ issues, clientId }) {
 	const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 	const buttonRef = useRef(null);
 
-	// Close tooltip when clicking outside
+	/**
+	 * Handle tooltip open/close behavior and click-outside detection
+	 *
+	 * Manages closing the popover when user clicks outside of it and ensures
+	 * only one tooltip is open at a time across all block indicators.
+	 */
 	useEffect(() => {
 		if (!isTooltipOpen) {
 			return;
 		}
 
 		const handleClickOutside = event => {
-			// Check if click is inside the button or popover
+			// Detect if click occurred inside the button or popover
 			const popover = document.querySelector('.ba11y-block-indicator-popover');
 			const isClickInsideButton = buttonRef.current?.contains(event.target);
 			const isClickInsidePopover = popover?.contains(event.target);
@@ -37,9 +44,8 @@ export function BlockIndicator({ issues, clientId }) {
 			}
 		};
 
-		// Close other tooltips when this one opens
+		// Broadcast event to close all other open tooltips
 		const closeOtherTooltips = () => {
-			// Dispatch event to close other indicators
 			window.dispatchEvent(
 				new CustomEvent('ba11y-close-other-tooltips', {
 					detail: { clientId },
@@ -47,7 +53,7 @@ export function BlockIndicator({ issues, clientId }) {
 			);
 		};
 
-		// Use setTimeout to ensure popover is rendered
+		// Defer event listener attachment to ensure popover DOM is ready
 		setTimeout(() => {
 			document.addEventListener('mousedown', handleClickOutside);
 			closeOtherTooltips();
@@ -58,7 +64,12 @@ export function BlockIndicator({ issues, clientId }) {
 		};
 	}, [isTooltipOpen, clientId]);
 
-	// Listen for close events from other indicators
+	/**
+	 * Listen for close events broadcast by other indicators
+	 *
+	 * When another indicator opens its tooltip, this effect ensures this
+	 * tooltip closes, maintaining a single-open-tooltip behavior.
+	 */
 	useEffect(() => {
 		const handleCloseEvent = event => {
 			if (event.detail.clientId !== clientId) {
@@ -72,25 +83,26 @@ export function BlockIndicator({ issues, clientId }) {
 		};
 	}, [clientId]);
 
+	// Don't render indicator if there are no issues
 	if (!issues || issues.length === 0) {
 		return null;
 	}
 
-	// Determine if we have errors or warnings
+	// Check issue severity to determine which icon to display
 	const hasErrors = issues.some(issue => issue.type === 'error');
 	// const hasWarnings = issues.some(issue => issue.type === 'warning');
 
-	// Group issues by type and category
+	// Separate issues by severity type
 	const errors = issues.filter(issue => issue.type === 'error');
 	const warnings = issues.filter(issue => issue.type === 'warning');
 
-	// Group by category for better organization
+	// Further organize issues by category for grouped display in popover
 	const accessibilityErrors = errors.filter(issue => issue.category === 'accessibility');
 	const validationErrors = errors.filter(issue => issue.category === 'validation');
 	const accessibilityWarnings = warnings.filter(issue => issue.category === 'accessibility');
 	const validationWarnings = warnings.filter(issue => issue.category === 'validation');
 
-	// Determine icon and class
+	// Set icon and CSS classes based on severity (errors take precedence)
 	const icon = hasErrors ? error : caution;
 	const className = hasErrors
 		? 'ba11y-block-indicator ba11y-block-indicator--error'

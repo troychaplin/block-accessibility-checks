@@ -12,32 +12,37 @@ import { validateBlock } from '../validation';
 import { BlockIndicator as Indicator } from './Indicator';
 
 /**
- * Higher-order component that adds validation indicators to blocks
+ * Higher-order component that adds validation indicators to blocks.
+ *
+ * Wraps the block editor component to display validation errors and warnings
+ * based on registered block validation rules. Invalid blocks are wrapped in
+ * a container with visual indicators showing the validation issues.
  */
 const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 	return props => {
 		const { clientId, attributes } = props;
 
-		// Subscribe to block changes to trigger validation
-		// We need to watch attributes for validation, but use select for block data
+		// Get the block data from the store
+		// The block object is needed for validation, including name, innerBlocks, etc.
 		const block = useSelect(
 			select => {
 				return select('core/block-editor').getBlock(clientId);
 			},
-			[clientId] // Only clientId is needed here, attributes change will trigger re-render anyway
+			[clientId] // Dependencies: only clientId needed as attributes from props trigger re-render
 		);
 
+		// Store validation state for this block instance
 		const [validationResult, setValidationResult] = useState({
 			isValid: true,
 			issues: [],
 			mode: 'none',
 		});
 
+		// Run validation whenever the block or its attributes change
 		useEffect(() => {
 			if (block) {
-				// If block attributes from props are different from what we got from select,
-				// we might want to use the props ones for immediate validation responsiveness
-				// creating a synthetic block object if needed
+				// Use attributes from props for immediate validation responsiveness
+				// Props attributes update before the store, ensuring real-time feedback
 				const blockToValidate = {
 					...block,
 					attributes: attributes || block.attributes,
@@ -47,12 +52,12 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 			}
 		}, [block, attributes]);
 
-		// If block is valid, just render it normally
+		// Render block normally without wrapper if validation passes
 		if (validationResult.isValid) {
 			return <BlockEdit {...props} />;
 		}
 
-		// Determine wrapper classes
+		// Build wrapper classes based on validation severity
 		let wrapperClass = 'ba11y-block-wrapper';
 		if (validationResult.mode === 'error') {
 			wrapperClass += ' ba11y-block-error';
@@ -60,6 +65,7 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 			wrapperClass += ' ba11y-block-warning';
 		}
 
+		// Wrap invalid blocks with validation indicator
 		return (
 			<div className={wrapperClass}>
 				<BlockEdit {...props} />
@@ -69,7 +75,12 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 	};
 }, 'withErrorHandling');
 
-// Register the HOC
+/**
+ * Register the HOC with WordPress block editor
+ *
+ * This filter intercepts all block editor components and wraps them
+ * with our validation and error handling functionality.
+ */
 wp.hooks.addFilter(
 	'editor.BlockEdit',
 	'block-accessibility-checks/with-error-handling',
