@@ -9,12 +9,7 @@ import { error, caution } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import {
-	hasErrors,
-	getErrors,
-	getWarnings,
-	filterIssuesByCategory,
-} from '../../core/utils/issueHelpers';
+import { hasErrors, getErrors, getWarnings } from '../../core/utils/issueHelpers';
 
 /**
  * Block Indicator Component
@@ -42,17 +37,6 @@ export function BlockIndicator({ issues }) {
 	const errors = getErrors(issues);
 	const warnings = getWarnings(issues);
 
-	// Further organize issues by category for grouped display
-	const accessibilityErrors = filterIssuesByCategory(errors, 'accessibility');
-	const validationErrors = filterIssuesByCategory(errors, 'validation');
-	const accessibilityWarnings = filterIssuesByCategory(warnings, 'accessibility');
-	const validationWarnings = filterIssuesByCategory(warnings, 'validation');
-
-	// Determine if divider is needed
-	const showDivider =
-		(accessibilityErrors.length > 0 || validationErrors.length > 0) &&
-		(accessibilityWarnings.length > 0 || validationWarnings.length > 0);
-
 	// Set icon and CSS classes based on severity (errors take precedence)
 	const icon = hasBlockErrors ? error : caution;
 	const className = hasBlockErrors
@@ -62,6 +46,16 @@ export function BlockIndicator({ issues }) {
 	const openModal = () => setIsModalOpen(true);
 	const closeModal = () => setIsModalOpen(false);
 
+	// Helper to format message with category
+	const getMessageWithCategory = (text, category) => {
+		const categoryLabel =
+			category === 'validation'
+				? __('(Validation)', 'block-accessibility-checks')
+				: __('(Accessibility)', 'block-accessibility-checks');
+
+		return `${text} ${categoryLabel}`;
+	};
+
 	return (
 		<>
 			<div className={className}>
@@ -69,73 +63,54 @@ export function BlockIndicator({ issues }) {
 					icon={icon}
 					onClick={openModal}
 					className="ba11y-block-indicator-button"
-					aria-label={__('View validation issues', 'block-accessibility-checks')}
+					aria-label={__('View block issues or concerns', 'block-accessibility-checks')}
 				/>
 			</div>
 			{isModalOpen && (
 				<Modal
-					title={__('Validation Issues', 'block-accessibility-checks')}
+					title={__('Issues or Concerns', 'block-accessibility-checks')}
 					onRequestClose={closeModal}
 					className="ba11y-block-indicator-modal"
 				>
 					<div className="ba11y-indicator-modal-content">
-						{/* Accessibility Errors */}
-						{accessibilityErrors.length > 0 && (
+						{/* Errors Section */}
+						{errors.length > 0 && (
 							<div className="ba11y-indicator-section ba11y-indicator-errors">
-								<strong className="ba11y-indicator-section-title">
-									{__('Accessibility Errors', 'block-accessibility-checks')}
-								</strong>
+								<p>
+									<strong className="ba11y-indicator-section-title">
+										<span className="ba11y-indicator-section-title-circle"></span>
+										{__('Errors', 'block-accessibility-checks')}
+									</strong>
+								</p>
 								<ul>
-									{accessibilityErrors.map((issue, index) => (
-										<li key={`a11y-error-${index}`}>{issue.error_msg}</li>
-									))}
-								</ul>
-							</div>
-						)}
-
-						{/* Validation Errors */}
-						{validationErrors.length > 0 && (
-							<div className="ba11y-indicator-section ba11y-indicator-errors">
-								<strong className="ba11y-indicator-section-title">
-									{__('Validation Errors', 'block-accessibility-checks')}
-								</strong>
-								<ul>
-									{validationErrors.map((issue, index) => (
-										<li key={`validation-error-${index}`}>{issue.error_msg}</li>
-									))}
-								</ul>
-							</div>
-						)}
-
-						{/* Divider between errors and warnings */}
-						{showDivider && <div className="ba11y-indicator-divider"></div>}
-
-						{/* Accessibility Warnings */}
-						{accessibilityWarnings.length > 0 && (
-							<div className="ba11y-indicator-section ba11y-indicator-warnings">
-								<strong className="ba11y-indicator-section-title">
-									{__('Accessibility Warnings', 'block-accessibility-checks')}
-								</strong>
-								<ul>
-									{accessibilityWarnings.map((warning, index) => (
-										<li key={`a11y-warning-${index}`}>
-											{warning.warning_msg || warning.error_msg}
+									{errors.map((issue, index) => (
+										<li key={`error-${index}`}>
+											{getMessageWithCategory(
+												issue.error_msg,
+												issue.category
+											)}
 										</li>
 									))}
 								</ul>
 							</div>
 						)}
 
-						{/* Validation Warnings */}
-						{validationWarnings.length > 0 && (
+						{/* Warnings Section */}
+						{warnings.length > 0 && (
 							<div className="ba11y-indicator-section ba11y-indicator-warnings">
-								<strong className="ba11y-indicator-section-title">
-									{__('Validation Warnings', 'block-accessibility-checks')}
-								</strong>
+								<p>
+									<strong className="ba11y-indicator-section-title">
+										<span className="ba11y-indicator-section-title-circle"></span>
+										{__('Warnings', 'block-accessibility-checks')}
+									</strong>
+								</p>
 								<ul>
-									{validationWarnings.map((warning, index) => (
-										<li key={`validation-warning-${index}`}>
-											{warning.warning_msg || warning.error_msg}
+									{warnings.map((warning, index) => (
+										<li key={`warning-${index}`}>
+											{getMessageWithCategory(
+												warning.warning_msg || warning.error_msg,
+												warning.category
+											)}
 										</li>
 									))}
 								</ul>
