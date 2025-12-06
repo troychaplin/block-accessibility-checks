@@ -16,41 +16,53 @@ import { GetInvalidMeta } from '../core/utils/getInvalidMeta';
 import { GetInvalidEditorChecks } from '../core/utils/getInvalidEditorChecks';
 
 /**
- * Unified Validation Sidebar
+ * Unified Validation Sidebar Component
  *
- * Consolidates all validation issues (blocks, editor, meta) into a single sidebar.
- * Allows users to click on issues to navigate to the relevant block or field.
+ * Consolidates all validation issues from blocks, editor checks, and meta fields
+ * into a single sidebar panel. Provides a comprehensive view of all accessibility
+ * and validation issues in the current post, organized by severity (errors/warnings)
+ * and source type. Users can click on issues to navigate directly to the relevant
+ * block or field in the editor.
+ *
+ * The sidebar only renders when validation issues exist and displays an icon
+ * that changes color based on the highest severity issue present.
  */
 export function UnifiedValidationSidebar() {
+	// Retrieve validation results from all sources
 	const invalidBlocks = GetInvalidBlocks() || [];
 	const invalidMeta = GetInvalidMeta() || [];
 	const invalidEditorChecks = GetInvalidEditorChecks() || [];
+
+	// Get dispatch function to select blocks when user clicks on issues
 	const { selectBlock } = useDispatch('core/block-editor');
+
+	// Ref to track scroll timeout for cleanup
 	const scrollTimeoutRef = useRef(null);
 
-	// Group blocks by error/warning
+	// Organize validation issues by type and severity for display
 	const blockErrors = invalidBlocks.filter(block => block.mode === 'error');
 	const blockWarnings = invalidBlocks.filter(block => block.mode === 'warning');
 
-	// Group editor checks by type
 	const editorErrors = invalidEditorChecks.filter(check => check.type === 'error');
 	const editorWarnings = invalidEditorChecks.filter(check => check.type === 'warning');
 
-	// Group meta by error/warning
+	// Meta warnings only shown if no errors exist (errors take precedence)
 	const metaErrors = invalidMeta.filter(meta => meta.hasErrors);
 	const metaWarnings = invalidMeta.filter(meta => meta.hasWarnings && !meta.hasErrors);
 
-	// Calculate totals
+	// Calculate total counts across all validation sources
 	const totalErrors = blockErrors.length + editorErrors.length + metaErrors.length;
 	const totalWarnings = blockWarnings.length + editorWarnings.length + metaWarnings.length;
 
+	// Set icon color based on highest severity issue (errors > warnings > none)
 	let iconColor = '#000000';
 	if (totalErrors > 0) {
-		iconColor = '#d82000';
+		iconColor = '#d82000'; // Red for errors
 	} else if (totalWarnings > 0) {
-		iconColor = '#dbc900';
+		iconColor = '#dbc900'; // Yellow/amber for warnings
 	}
 
+	// Accessibility icon SVG that changes color based on validation severity
 	const ba11yIcon = (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -66,34 +78,45 @@ export function UnifiedValidationSidebar() {
 		</svg>
 	);
 
-	// Handle clicking on a block issue - select and scroll to it
+	/**
+	 * Handle clicking on a block validation issue
+	 *
+	 * Selects the block in the editor and scrolls it into view. Uses multiple
+	 * selector strategies to find the block element since WordPress block DOM
+	 * structure can vary. Includes a delay to ensure block selection completes
+	 * before attempting to scroll.
+	 *
+	 * @param {string} clientId - The unique client ID of the block to navigate to.
+	 */
 	const handleBlockClick = clientId => {
 		if (!clientId) {
 			return;
 		}
 
-		// Select the block
+		// Select the block in the editor (highlights it in the UI)
 		selectBlock(clientId);
 
-		// Scroll to block after a short delay to ensure it's selected
+		// Clear any existing scroll timeout to prevent conflicts
 		if (scrollTimeoutRef.current) {
 			clearTimeout(scrollTimeoutRef.current);
 		}
 
+		// Delay scroll to ensure block selection and DOM update complete
 		scrollTimeoutRef.current = setTimeout(() => {
-			// Try multiple selectors to find the block element
+			// Try primary selector: standard block data attribute
 			let blockElement = document.querySelector(`[data-block="${clientId}"]`);
 
+			// Fallback: try with data-type attribute
 			if (!blockElement) {
-				// Try alternative selector
 				blockElement = document.querySelector(`[data-type][data-block="${clientId}"]`);
 			}
 
+			// Fallback: try with WordPress block class
 			if (!blockElement) {
-				// Try finding by block class
 				blockElement = document.querySelector(`.wp-block[data-block="${clientId}"]`);
 			}
 
+			// Scroll block into view if found
 			if (blockElement) {
 				blockElement.scrollIntoView({
 					behavior: 'smooth',
@@ -103,14 +126,28 @@ export function UnifiedValidationSidebar() {
 		}, 100);
 	};
 
-	// Handle clicking on a meta field issue - open document settings
-	const handleMetaClick = () => {
-		// Note: We can't directly scroll to meta fields
-		// The meta field should be visible in its sidebar/panel
-		// Users can navigate there manually
+	/**
+	 * Handle clicking on a meta field validation issue
+	 *
+	 * Placeholder for future enhancement. Meta fields are typically in document
+	 * settings panels that aren't directly scrollable. Users must navigate to
+	 * the appropriate settings panel manually.
+	 *
+	 * @param {string} metaKey - The meta key of the field with the issue (reserved for future use).
+	 */
+	// eslint-disable-next-line no-unused-vars
+	const handleMetaClick = metaKey => {
+		// Meta fields are in document settings panels that can't be directly scrolled to
+		// Users should navigate to the appropriate settings panel manually
+		// Future: Use metaKey to open/focus the relevant settings panel
 	};
 
-	// Cleanup timeout on unmount
+	/**
+	 * Cleanup scroll timeout on component unmount
+	 *
+	 * Prevents memory leaks by clearing any pending scroll timeouts when
+	 * the component is unmounted or when the user navigates away.
+	 */
 	useEffect(() => {
 		return () => {
 			if (scrollTimeoutRef.current) {
@@ -119,7 +156,7 @@ export function UnifiedValidationSidebar() {
 		};
 	}, []);
 
-	// Don't render if no issues
+	// Don't render sidebar if there are no validation issues
 	if (totalErrors === 0 && totalWarnings === 0) {
 		return null;
 	}
@@ -131,7 +168,7 @@ export function UnifiedValidationSidebar() {
 			icon={ba11yIcon}
 			className="ba11y-unified-validation-sidebar"
 		>
-			{/* Errors Section */}
+			{/* Errors Panel: Displays all validation errors grouped by source type */}
 			{totalErrors > 0 && (
 				<PanelBody
 					title={sprintf(
@@ -142,7 +179,7 @@ export function UnifiedValidationSidebar() {
 					initialOpen={true}
 					className="ba11y-errors-panel"
 				>
-					{/* Block Errors */}
+					{/* Block Errors: Individual block validation issues */}
 					{blockErrors.length > 0 && (
 						<PanelRow>
 							<div className="ba11y-error-group">
@@ -153,6 +190,7 @@ export function UnifiedValidationSidebar() {
 								</p>
 								<ul className="ba11y-error-list">
 									{blockErrors.map((block, index) => {
+										// Separate errors and warnings for this block
 										const errors =
 											block.issues?.filter(issue => issue.type === 'error') ||
 											[];
@@ -268,7 +306,7 @@ export function UnifiedValidationSidebar() {
 				</PanelBody>
 			)}
 
-			{/* Warnings Section */}
+			{/* Warnings Panel: Displays all validation warnings grouped by source type */}
 			{totalWarnings > 0 && (
 				<PanelBody
 					title={sprintf(
@@ -279,7 +317,7 @@ export function UnifiedValidationSidebar() {
 					initialOpen={true}
 					className="ba11y-warnings-panel"
 				>
-					{/* Block Warnings */}
+					{/* Block Warnings: Individual block validation warnings */}
 					{blockWarnings.length > 0 && (
 						<PanelRow>
 							<div className="ba11y-warning-group">
@@ -290,6 +328,7 @@ export function UnifiedValidationSidebar() {
 								</p>
 								<ul className="ba11y-warning-list">
 									{blockWarnings.map((block, index) => {
+										// Extract warnings for this block
 										const warnings =
 											block.issues?.filter(
 												issue => issue.type === 'warning'

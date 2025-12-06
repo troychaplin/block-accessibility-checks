@@ -9,11 +9,17 @@ import { useSelect } from '@wordpress/data';
 import { validateEditor } from '../../editor/validation';
 
 /**
- * Get all invalid editor checks for current post.
+ * React hook that retrieves all invalid editor-level validation checks.
  *
- * @return {Array} Array of invalid editor validation results.
+ * Fetches the current post type and blocks from the editor, then runs
+ * editor-level validation rules (distinct from block-level validation).
+ * Editor checks validate overall document structure and post-level
+ * accessibility requirements. Updates automatically when editor state changes.
+ *
+ * @return {Array} Array of validation issues for editor-level checks that failed.
  */
 export function GetInvalidEditorChecks() {
+	// Retrieve current post type and all blocks from the editor store
 	const { blocks, postType } = useSelect(select => {
 		const editor = select('core/editor');
 		const blockEditor = select('core/block-editor');
@@ -24,11 +30,14 @@ export function GetInvalidEditorChecks() {
 		};
 	}, []);
 
+	// Return empty array if required data is not yet available
 	if (!postType || !blocks) {
 		return [];
 	}
 
+	// Run editor-level validation for the current post type and blocks
 	const validation = validateEditor(postType, blocks);
 
+	// Return only the issues array from the validation result
 	return validation.issues;
 }

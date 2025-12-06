@@ -9,7 +9,13 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { blockChecksArray } from '../core/register';
 
-// Default checks that should always be run unless disabled
+/**
+ * Default client-side validation checks for core WordPress blocks.
+ *
+ * These checks run automatically in the block editor unless explicitly disabled.
+ * Each check defines a type (error/warning), default enabled state, and message.
+ * PHP-registered checks from the server will override these defaults if present.
+ */
 const defaultChecks = {
 	'core/image': {
 		check_image_alt_text: {
@@ -40,23 +46,28 @@ const defaultChecks = {
 };
 
 /**
- * Validates a block against registered checks
+ * Validates a block against all registered accessibility and validation checks.
  *
- * @param {Object} block Block object
- * @return {Object} Validation result object { isValid, issues, mode, clientId, name }
+ * Runs through both client-side default checks and server-registered PHP checks,
+ * executing each enabled validator and collecting any issues found. Supports
+ * custom validators from external plugins via the window object or filter hooks.
+ *
+ * @param {Object} block - The block object containing name, attributes, clientId, etc.
+ * @return {Object} Validation result with isValid, issues array, severity mode, clientId, and block name.
  */
 export const validateBlock = block => {
 	const blockType = block.name;
 	const attributes = block.attributes;
 	const issues = [];
 
-	// Combine PHP-registered checks and default checks
-	// Note: PHP checks take precedence if they exist
+	// Merge default JavaScript checks with PHP-registered checks
+	// PHP checks (from blockChecksArray) take precedence over defaults
 	const checks = {
 		...(defaultChecks[blockType] || {}),
 		...(blockChecksArray[blockType] || {}),
 	};
 
+	// No checks registered for this block type - return valid
 	if (Object.keys(checks).length === 0) {
 		return {
 			isValid: true,
@@ -67,46 +78,47 @@ export const validateBlock = block => {
 		};
 	}
 
+	// Run each registered check for this block type
 	Object.entries(checks).forEach(([checkName, checkConfig]) => {
-		// Skip if check is disabled
+		// Skip checks that have been explicitly disabled
 		if (checkConfig.enabled === false) {
 			return;
 		}
 
-		// Run validation logic based on check name
-		// This is a simplified mapping - actual logic would be more complex
-		// and likely split into separate validator functions per check type
 		let isValid = true;
 
-		// Check if there is a custom validator function registered
-		// This allows external plugins to provide their own validation logic
+		// Check if a custom validator function is registered in the check config
+		// Custom validators allow external plugins to provide their own validation logic
 		if (typeof checkConfig.validator === 'function') {
 			isValid = checkConfig.validator(attributes, block);
 		} else {
-			// Fallback to built-in checks
+			// Use built-in validation logic for known check types
 			switch (checkName) {
 				case 'check_image_alt_text':
 				case 'check_image_alt_text_length':
 				case 'check_image_alt_caption_match':
 				case 'check_image_alt_text_patterns':
-					// Let the filter handle it
+					// Image validation delegated to filter hooks for complex logic
+					// The actual validation occurs in the ba11yc_validate_block filter
 					isValid = true;
 					break;
 				case 'check_button_text':
+					// Verify button has non-empty text content
 					isValid = attributes.text !== undefined && attributes.text.trim() !== '';
 					break;
 				case 'check_button_link':
+					// Verify button has a valid URL
 					isValid = attributes.url !== undefined && attributes.url.trim() !== '';
 					break;
 				case 'check_heading_order':
-					// The heading rank validation logic is complex and handled by the
-					// ba11yc/headingRankValidation filter hooked into ba11yc_validate_block.
-					// We return true here to allow the filter to determine validity.
+					// Heading order validation requires document context (previous headings)
+					// Handled by the ba11yc/headingRankValidation filter via ba11yc_validate_block
+					// Return true here to defer to the filter for actual validation
 					isValid = true;
 					break;
 				default:
-					// If no specific validator is found, check if there's a generic one
-					// or if the external plugin registered a validator in the window object
+					// Check for external validators registered via window object
+					// This provides a fallback for third-party plugins to register validators
 					if (
 						window.BlockAccessibilityChecks &&
 						window.BlockAccessibilityChecks.validators &&
@@ -121,21 +133,26 @@ export const validateBlock = block => {
 			}
 		}
 
-		// Allow external plugins to modify validation result
+		/**
+		 * Filter: ba11yc_validate_block
+		 *
+		 * Allows external plugins and custom validators to modify or override
+		 * the validation result. This is the primary extension point for adding
+		 * custom validation logic without modifying core code.
+		 */
 		isValid = applyFilters(
 			'ba11yc_validate_block',
 			isValid,
 			blockType,
 			attributes,
 			checkName,
-			block // Pass the full block object to the filter for context
+			block
 		);
 
+		// Build issue object if validation failed
 		if (!isValid) {
-			// Determine the message to display
-			// Prefer error_msg for errors and warning_msg for warnings
-			// Fallback to message property if specific type message is missing
-			// Default to generic message if nothing is found
+			// Determine appropriate error message based on severity type
+			// Priority: specific type message (error_msg/warning_msg) > generic message > default
 			const defaultMessage = __('Accessibility issue found', 'block-accessibility-checks');
 			const message = checkConfig.message || defaultMessage;
 
@@ -148,14 +165,16 @@ export const validateBlock = block => {
 				type: checkConfig.type || 'error',
 				error_msg: errorMsg,
 				warning_msg: warningMsg,
-				category: checkConfig.category || 'accessibility', // Ensure category is passed
+				category: checkConfig.category || 'accessibility',
 			});
 		}
 	});
 
+	// Determine severity level based on issue types
 	const hasErrors = issues.some(issue => issue.type === 'error');
 	const hasWarnings = issues.some(issue => issue.type === 'warning');
 
+	// Set validation mode (errors take precedence over warnings)
 	let mode = 'none';
 	if (hasErrors) {
 		mode = 'error';
@@ -163,6 +182,7 @@ export const validateBlock = block => {
 		mode = 'warning';
 	}
 
+	// Return comprehensive validation result
 	return {
 		isValid: issues.length === 0,
 		issues,

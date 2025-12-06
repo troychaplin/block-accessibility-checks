@@ -1,24 +1,35 @@
+/**
+ * WordPress dependencies
+ */
 import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
 import { validateBlock } from '../../block/validation';
 
 /**
- * Recursively retrieves invalid blocks from a list of blocks.
+ * Recursively retrieves invalid blocks from a block tree.
  *
- * @param {Array} blocks - Array of blocks to check.
- * @return {Array} An array of invalid blocks.
+ * Traverses the entire block hierarchy, validating each block and its
+ * nested innerBlocks. Collects and returns all blocks that fail validation.
+ * This function handles blocks of any nesting depth.
+ *
+ * @param {Array} blocks - Array of block objects to validate.
+ * @return {Array} Array of validation results for blocks that failed validation.
  */
 function getInvalidBlocksRecursive(blocks) {
-	// Recursive function to check each block and its inner blocks
 	return blocks.flatMap(block => {
-		// Use unified validation system
+		// Validate the current block using the unified validation system
 		const result = validateBlock(block);
 		const results = [];
 
+		// Collect this block's result if it failed validation
 		if (!result.isValid) {
 			results.push(result);
 		}
 
-		// If the block has inner blocks, recursively check them
+		// Recursively validate nested innerBlocks if present
 		if (block.innerBlocks && block.innerBlocks.length > 0) {
 			return [...results, ...getInvalidBlocksRecursive(block.innerBlocks)];
 		}
@@ -28,17 +39,23 @@ function getInvalidBlocksRecursive(blocks) {
 }
 
 /**
- * Retrieves the invalid blocks from the block editor.
+ * React hook that retrieves all invalid blocks from the current editor state.
  *
- * @return {Array} An array of invalid blocks.
+ * Fetches all top-level blocks from the block editor store and recursively
+ * validates them along with their nested children. Returns an array of
+ * validation results for blocks that failed accessibility or validation checks.
+ * Updates automatically when blocks change due to useSelect reactivity.
+ *
+ * @return {Array} Array of validation results for all invalid blocks in the editor.
  */
 export function GetInvalidBlocks() {
-	// Hook to get all blocks once, at the top level
+	// Retrieve all top-level blocks from the editor store
 	const allBlocks = useSelect(select => select('core/block-editor').getBlocks(), []);
 
-	// Now, use the recursive function to check all blocks and their inner blocks
+	// Recursively validate all blocks and their innerBlocks, collecting failures
 	const invalidBlocks = getInvalidBlocksRecursive(allBlocks);
 
-	// Filter out valid blocks and return only invalid ones
+	// Return the array of invalid block validation results
+	// Note: getInvalidBlocksRecursive already filters to only invalid blocks
 	return invalidBlocks.filter(result => !result.isValid);
 }
