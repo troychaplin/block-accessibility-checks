@@ -10,6 +10,7 @@ import { useEffect } from '@wordpress/element';
 import { GetInvalidBlocks } from './utils/getInvalidBlocks';
 import { GetInvalidMeta } from './utils/getInvalidMeta';
 import { GetInvalidEditorChecks } from './utils/getInvalidEditorChecks';
+import { hasErrors, hasWarnings } from './utils/issueHelpers';
 
 /**
  * Validation API Component
@@ -57,7 +58,7 @@ export function ValidationAPI() {
 		// Check for errors across all validation types
 		const hasBlockErrors = invalidBlocks.some(block => block.mode === 'error');
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
-		const hasEditorErrors = invalidEditorChecks.some(check => check.type === 'error');
+		const hasEditorErrors = hasErrors(invalidEditorChecks);
 
 		// Lock saving if any validation errors exist
 		if (hasBlockErrors || hasMetaErrors || hasEditorErrors) {
@@ -100,8 +101,8 @@ export function ValidationAPI() {
 		// Check for errors and warnings in meta and editor validation
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 		const hasMetaWarnings = invalidMeta.some(meta => meta.hasWarnings && !meta.hasErrors);
-		const hasEditorErrors = invalidEditorChecks.some(check => check.type === 'error');
-		const hasEditorWarnings = invalidEditorChecks.some(check => check.type === 'warning');
+		const hasEditorErrors = hasErrors(invalidEditorChecks);
+		const hasEditorWarnings = hasWarnings(invalidEditorChecks);
 
 		// Toggle error class based on validation state
 		if (hasMetaErrors || hasEditorErrors) {

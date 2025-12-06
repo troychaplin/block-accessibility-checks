@@ -4,6 +4,11 @@
 import { applyFilters } from '@wordpress/hooks';
 
 /**
+ * Internal dependencies
+ */
+import { isCheckEnabled, createIssue, createValidationResult } from '../core/utils/issueHelpers';
+
+/**
  * Editor validation rules configuration from PHP
  *
  * Contains validation rules registered server-side for editor-level checks.
@@ -32,7 +37,7 @@ export function validateEditor(postType, blocks) {
 	// Iterate through each registered validation rule for this post type
 	for (const [checkName, rule] of Object.entries(postTypeRules)) {
 		// Skip rules that have been explicitly disabled
-		if (!rule.enabled) {
+		if (!isCheckEnabled(rule)) {
 			continue;
 		}
 
@@ -53,23 +58,11 @@ export function validateEditor(postType, blocks) {
 
 		// Build issue object if validation failed
 		if (!isValid) {
-			// Assign priority based on issue type (errors first, then warnings, then others)
-			let priority = 3;
-			if (rule.type === 'error') {
-				priority = 1;
-			} else if (rule.type === 'warning') {
-				priority = 2;
-			}
-
 			// Create issue object with all relevant information
-			issues.push({
-				checkName,
-				type: rule.type,
-				category: rule.category || 'accessibility',
-				error_msg: rule.error_msg || rule.message || '',
-				warning_msg: rule.warning_msg || rule.error_msg || rule.message || '',
-				priority,
-			});
+			const issue = createIssue(rule, checkName);
+			// Ensure checkName is included (createIssue uses 'check' as primary key)
+			issue.checkName = checkName;
+			issues.push(issue);
 		}
 	}
 
@@ -77,15 +70,6 @@ export function validateEditor(postType, blocks) {
 	// This ensures the most critical issues appear first in the UI
 	issues.sort((a, b) => a.priority - b.priority);
 
-	// Determine overall validation state flags
-	const hasErrors = issues.some(issue => issue.type === 'error');
-	const hasWarnings = issues.some(issue => issue.type === 'warning');
-
 	// Return comprehensive validation result
-	return {
-		isValid: issues.length === 0,
-		issues,
-		hasErrors,
-		hasWarnings,
-	};
+	return createValidationResult(issues);
 }

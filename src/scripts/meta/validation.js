@@ -4,6 +4,11 @@
 import { applyFilters } from '@wordpress/hooks';
 
 /**
+ * Internal dependencies
+ */
+import { isCheckEnabled, createIssue, createValidationResult } from '../core/utils/issueHelpers';
+
+/**
  * Meta validation rules configuration from PHP
  *
  * Contains validation rules registered server-side for meta field validation.
@@ -31,7 +36,7 @@ export function validateMetaField(postType, metaKey, value, checkName) {
 	const rules = metaValidationRules[postType]?.[metaKey]?.[checkName];
 
 	// Return valid if rule doesn't exist or is disabled
-	if (!rules || !rules.enabled) {
+	if (!isCheckEnabled(rules)) {
 		return true;
 	}
 
@@ -81,7 +86,7 @@ export function validateAllMetaChecks(postType, metaKey, value) {
 	// Run each registered validation check for this meta field
 	for (const [checkName, rule] of Object.entries(metaRules)) {
 		// Skip checks that have been explicitly disabled
-		if (!rule.enabled) {
+		if (!isCheckEnabled(rule)) {
 			continue;
 		}
 
@@ -90,31 +95,14 @@ export function validateAllMetaChecks(postType, metaKey, value) {
 
 		// Build issue object if validation failed
 		if (!isValid) {
-			// Select appropriate message based on issue type
-			// Priority: type-specific message (error_msg/warning_msg) > generic message
-			const message =
-				rule.type === 'error'
-					? rule.error_msg || rule.message
-					: rule.warning_msg || rule.message;
-
 			// Create issue object with all relevant information
-			issues.push({
-				metaKey,
-				checkName,
-				type: rule.type,
-				message, // Populated for useMetaField hook compatibility
-				error_msg: rule.error_msg || rule.message,
-				warning_msg: rule.warning_msg || rule.message,
-				priority: rule.type === 'error' ? 1 : 2, // Errors have higher priority
-			});
+			const issue = createIssue(rule, checkName, { metaKey });
+			// Ensure checkName is included (createIssue uses 'check' as primary key)
+			issue.checkName = checkName;
+			issues.push(issue);
 		}
 	}
 
 	// Return comprehensive validation result
-	return {
-		isValid: issues.length === 0,
-		issues,
-		hasErrors: issues.some(issue => issue.type === 'error'),
-		hasWarnings: issues.some(issue => issue.type === 'warning'),
-	};
+	return createValidationResult(issues);
 }
