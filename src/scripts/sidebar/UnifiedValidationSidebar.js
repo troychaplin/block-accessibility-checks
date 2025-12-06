@@ -14,6 +14,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { GetInvalidBlocks } from '../core/utils/getInvalidBlocks';
 import { GetInvalidMeta } from '../core/utils/getInvalidMeta';
 import { GetInvalidEditorChecks } from '../core/utils/getInvalidEditorChecks';
+import { filterIssuesByType, getErrors, getWarnings } from '../core/utils/issueHelpers';
 
 /**
  * Unified Validation Sidebar Component
@@ -43,8 +44,8 @@ export function UnifiedValidationSidebar() {
 	const blockErrors = invalidBlocks.filter(block => block.mode === 'error');
 	const blockWarnings = invalidBlocks.filter(block => block.mode === 'warning');
 
-	const editorErrors = invalidEditorChecks.filter(check => check.type === 'error');
-	const editorWarnings = invalidEditorChecks.filter(check => check.type === 'warning');
+	const editorErrors = filterIssuesByType(invalidEditorChecks, 'error');
+	const editorWarnings = filterIssuesByType(invalidEditorChecks, 'warning');
 
 	// Meta warnings only shown if no errors exist (errors take precedence)
 	const metaErrors = invalidMeta.filter(meta => meta.hasErrors);
@@ -191,13 +192,8 @@ export function UnifiedValidationSidebar() {
 								<ul className="ba11y-error-list">
 									{blockErrors.map((block, index) => {
 										// Separate errors and warnings for this block
-										const errors =
-											block.issues?.filter(issue => issue.type === 'error') ||
-											[];
-										const warnings =
-											block.issues?.filter(
-												issue => issue.type === 'warning'
-											) || [];
+										const errors = getErrors(block.issues || []);
+										const warnings = getWarnings(block.issues || []);
 
 										return (
 											<li key={`block-error-${block.clientId}-${index}`}>
@@ -278,9 +274,7 @@ export function UnifiedValidationSidebar() {
 								</p>
 								<ul className="ba11y-error-list">
 									{metaErrors.map((meta, index) => {
-										const errors =
-											meta.issues?.filter(issue => issue.type === 'error') ||
-											[];
+										const errors = getErrors(meta.issues || []);
 
 										return (
 											<li key={`meta-error-${meta.metaKey}-${index}`}>
@@ -329,10 +323,7 @@ export function UnifiedValidationSidebar() {
 								<ul className="ba11y-warning-list">
 									{blockWarnings.map((block, index) => {
 										// Extract warnings for this block
-										const warnings =
-											block.issues?.filter(
-												issue => issue.type === 'warning'
-											) || [];
+										const warnings = getWarnings(block.issues || []);
 
 										return (
 											<li key={`block-warning-${block.clientId}-${index}`}>
@@ -402,10 +393,7 @@ export function UnifiedValidationSidebar() {
 								</p>
 								<ul className="ba11y-warning-list">
 									{metaWarnings.map((meta, index) => {
-										const warnings =
-											meta.issues?.filter(
-												issue => issue.type === 'warning'
-											) || [];
+										const warnings = getWarnings(meta.issues || []);
 
 										return (
 											<li key={`meta-warning-${meta.metaKey}-${index}`}>

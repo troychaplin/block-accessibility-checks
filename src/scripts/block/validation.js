@@ -8,6 +8,13 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { blockChecksArray } from '../core/register';
+import {
+	isCheckEnabled,
+	createIssue,
+	hasErrors,
+	hasWarnings,
+	createValidationResult,
+} from '../core/utils/issueHelpers';
 
 /**
  * Default client-side validation checks for core WordPress blocks.
@@ -81,7 +88,7 @@ export const validateBlock = block => {
 	// Run each registered check for this block type
 	Object.entries(checks).forEach(([checkName, checkConfig]) => {
 		// Skip checks that have been explicitly disabled
-		if (checkConfig.enabled === false) {
+		if (!isCheckEnabled(checkConfig)) {
 			return;
 		}
 
@@ -151,43 +158,34 @@ export const validateBlock = block => {
 
 		// Build issue object if validation failed
 		if (!isValid) {
-			// Determine appropriate error message based on severity type
-			// Priority: specific type message (error_msg/warning_msg) > generic message > default
 			const defaultMessage = __('Accessibility issue found', 'block-accessibility-checks');
-			const message = checkConfig.message || defaultMessage;
-
-			const errorMsg = checkConfig.error_msg || message;
-			const warningMsg = checkConfig.warning_msg || message;
-
-			issues.push({
-				check: checkName,
-				message,
-				type: checkConfig.type || 'error',
-				error_msg: errorMsg,
-				warning_msg: warningMsg,
-				category: checkConfig.category || 'accessibility',
-			});
+			const issue = createIssue(checkConfig, checkName);
+			// Override message with default if config doesn't have one
+			if (!checkConfig.message) {
+				issue.message = defaultMessage;
+				issue.error_msg = issue.error_msg || defaultMessage;
+				issue.warning_msg = issue.warning_msg || defaultMessage;
+			}
+			issues.push(issue);
 		}
 	});
 
 	// Determine severity level based on issue types
-	const hasErrors = issues.some(issue => issue.type === 'error');
-	const hasWarnings = issues.some(issue => issue.type === 'warning');
+	const hasBlockErrors = hasErrors(issues);
+	const hasBlockWarnings = hasWarnings(issues);
 
 	// Set validation mode (errors take precedence over warnings)
 	let mode = 'none';
-	if (hasErrors) {
+	if (hasBlockErrors) {
 		mode = 'error';
-	} else if (hasWarnings) {
+	} else if (hasBlockWarnings) {
 		mode = 'warning';
 	}
 
 	// Return comprehensive validation result
-	return {
-		isValid: issues.length === 0,
-		issues,
+	return createValidationResult(issues, {
 		mode,
 		clientId: block.clientId,
 		name: blockType,
-	};
+	});
 };

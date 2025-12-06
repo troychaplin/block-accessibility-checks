@@ -7,6 +7,16 @@ import { __ } from '@wordpress/i18n';
 import { error, caution, close } from '@wordpress/icons';
 
 /**
+ * Internal dependencies
+ */
+import {
+	hasErrors,
+	getErrors,
+	getWarnings,
+	filterIssuesByCategory,
+} from '../../core/utils/issueHelpers';
+
+/**
  * Block Indicator Component
  *
  * Displays a visual indicator icon in the upper-left corner of blocks with
@@ -89,22 +99,22 @@ export function BlockIndicator({ issues, clientId }) {
 	}
 
 	// Check issue severity to determine which icon to display
-	const hasErrors = issues.some(issue => issue.type === 'error');
+	const hasBlockErrors = hasErrors(issues);
 	// const hasWarnings = issues.some(issue => issue.type === 'warning');
 
 	// Separate issues by severity type
-	const errors = issues.filter(issue => issue.type === 'error');
-	const warnings = issues.filter(issue => issue.type === 'warning');
+	const errors = getErrors(issues);
+	const warnings = getWarnings(issues);
 
 	// Further organize issues by category for grouped display in popover
-	const accessibilityErrors = errors.filter(issue => issue.category === 'accessibility');
-	const validationErrors = errors.filter(issue => issue.category === 'validation');
-	const accessibilityWarnings = warnings.filter(issue => issue.category === 'accessibility');
-	const validationWarnings = warnings.filter(issue => issue.category === 'validation');
+	const accessibilityErrors = filterIssuesByCategory(errors, 'accessibility');
+	const validationErrors = filterIssuesByCategory(errors, 'validation');
+	const accessibilityWarnings = filterIssuesByCategory(warnings, 'accessibility');
+	const validationWarnings = filterIssuesByCategory(warnings, 'validation');
 
 	// Set icon and CSS classes based on severity (errors take precedence)
-	const icon = hasErrors ? error : caution;
-	const className = hasErrors
+	const icon = hasBlockErrors ? error : caution;
+	const className = hasBlockErrors
 		? 'ba11y-block-indicator ba11y-block-indicator--error'
 		: 'ba11y-block-indicator ba11y-block-indicator--warning';
 
