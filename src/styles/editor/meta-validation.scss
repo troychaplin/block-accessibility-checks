@@ -1,35 +1,36 @@
-
 .ba11y-meta-error .components-text-control__input,
 .ba11y-meta-error .components-textarea-control__input,
 .ba11y-meta-error .components-select-control__input {
-    background-color: var(--a11y-light-red);
+    border-left: 4px solid var(--a11y-red);
 }
 
 .ba11y-meta-warning .components-text-control__input,
 .ba11y-meta-warning .components-textarea-control__input,
 .ba11y-meta-warning .components-select-control__input {
-    background-color: var(--a11y-light-yellow);
+    border-left: 4px solid var(--a11y-yellow);
 }
 
 .ba11y-meta-error .components-text-control__input:focus,
 .ba11y-meta-error .components-textarea-control__input:focus,
 .ba11y-meta-error .components-select-control__input:focus {
-    border-color: var(--a11y-red);
+    border: none;
+    border-left: 4px solid var(--a11y-red);
     box-shadow: 0 0 0 1px var(--a11y-red);
 }
 
 .ba11y-meta-warning .components-text-control__input:focus,
 .ba11y-meta-warning .components-textarea-control__input:focus,
 .ba11y-meta-warning .components-select-control__input:focus {
-    border-color: var(--a11y-yellow);
+    border: none;
+    border-left: 4px solid var(--a11y-yellow);
     box-shadow: 0 0 0 1px var(--a11y-yellow);
 }
 
 .ba11y-error-text,
 .ba11y-warning-text {
     display: block;
+    font-weight: 500;
     margin-top: 4px;
-    font-style: italic;
 }
 
 .ba11y-error-text {

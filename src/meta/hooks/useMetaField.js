@@ -51,12 +51,11 @@ export function useMetaField(metaKey, originalHelp = '') {
 			helpText = (
 				<>
 					{helpText}
-					<br />
-					<span className={messageClass}>{messages}</span>
+					<span className={messageClass}>* {messages}</span>
 				</>
 			);
 		} else {
-			helpText = <span className={messageClass}>{messages}</span>;
+			helpText = <span className={messageClass}>* {messages}</span>;
 		}
 	}
 
