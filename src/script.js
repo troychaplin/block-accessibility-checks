@@ -1,25 +1,25 @@
 // Register the plugin
-import './core/register';
+import './scripts/core/register';
 
 // Validate blocks
-import './block/validation';
-import './block/components/ErrorComponent';
+import './scripts/block/validation';
+import './scripts/block/components/ErrorComponent';
 
 // Block Checks
-import './block/checks/buttonValidation';
-import './block/checks/headingRankListener';
-import './block/checks/headingRankValidation';
-import './block/checks/imageValidation';
-import './block/checks/tableValidation';
+import './scripts/block/checks/buttonValidation';
+import './scripts/block/checks/headingRankListener';
+import './scripts/block/checks/headingRankValidation';
+import './scripts/block/checks/imageValidation';
+import './scripts/block/checks/tableValidation';
 
 // Block Modifications
-import './block/modifications/imageAttributes';
+import './scripts/block/modifications/imageAttributes';
 
 // Styles
 import './styles.scss';
 
 // Export meta validation components for external plugins
-import { useMetaField } from './meta/hooks/useMetaField';
+import { useMetaField } from './scripts/meta/hooks/useMetaField';
 
 // Make available globally
 if (typeof window.BlockAccessibilityChecks === 'undefined') {

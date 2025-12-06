@@ -8,8 +8,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { ValidationAPI } from './validationApi';
-import { UnifiedValidationSidebar } from '../ui/sidebar/UnifiedValidationSidebar';
-import { ValidationHeaderButton } from '../ui/sidebar/ValidationHeaderButton';
+import { UnifiedValidationSidebar } from '../sidebar/UnifiedValidationSidebar';
 
 /**
  * Add 'block-validation' category to block settings
@@ -46,7 +45,6 @@ registerPlugin('validation-api', {
 		<>
 			<ValidationAPI />
 			<UnifiedValidationSidebar />
-			<ValidationHeaderButton />
 		</>
 	),
 });

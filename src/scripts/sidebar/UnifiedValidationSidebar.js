@@ -11,9 +11,9 @@ import { useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { GetInvalidBlocks } from '../../core/utils/getInvalidBlocks';
-import { GetInvalidMeta } from '../../core/utils/getInvalidMeta';
-import { GetInvalidEditorChecks } from '../../core/utils/getInvalidEditorChecks';
+import { GetInvalidBlocks } from '../core/utils/getInvalidBlocks';
+import { GetInvalidMeta } from '../core/utils/getInvalidMeta';
+import { GetInvalidEditorChecks } from '../core/utils/getInvalidEditorChecks';
 
 /**
  * Unified Validation Sidebar
