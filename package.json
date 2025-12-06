@@ -55,6 +55,7 @@
 		"stylelint-scss": "6.12.1"
 	},
 	"dependencies": {
+		"@wordpress/icons": "^11.3.0",
 		"tldts": "^7.0.19"
 	}
 }

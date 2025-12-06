@@ -7,5 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => array($vendorDir . '/dealerdirect/phpcodesniffer-composer-installer/src'),
-    'BlockAccessibility\\' => array($baseDir . '/Functions'),
+    'BlockAccessibility\\' => array($baseDir . '/includes'),
 );

@@ -144,9 +144,10 @@ validateEditor(blocks, postType) {
 
 Validation results trigger UI updates:
 
-- **Block Validation** - Shows error/warning borders and messages on blocks
+- **Unified Sidebar** - Consolidates all block, meta, and editor issues in one place
+- **Header Button** - Shows a badge count of total issues and toggles the sidebar
+- **Block Indicators** - Small icon badges on blocks that show tooltips with issue details
 - **Meta Validation** - Shows error/warning styling on meta fields (via `MetaField` component)
-- **Editor Validation** - Shows validation messages in editor sidebar
 
 ### 5. Post Locking Phase (JavaScript)
 
@@ -222,6 +223,9 @@ Warnings do not lock the post, but are displayed for user feedback.
 - **validateMeta.js** - Meta validation logic
 - **validateEditor.js** - Editor validation logic
 - **validationApi.js** - Coordinates all validation and post locking
+- **UnifiedValidationSidebar.js** - Consolidates all validation issues
+- **ValidationHeaderButton.js** - Header toolbar button with issue count
+- **BlockIndicator.js** - Inline indicator for block validation issues
 - **MetaField.js** - UI component for meta field validation display
 - **ValidatedToolsPanelItem.js** - UI component for ToolsPanel validation
 - **ValidationDisplay.js** - Generic validation display component

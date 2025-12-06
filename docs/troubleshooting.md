@@ -7,13 +7,15 @@ This guide covers common issues, debugging tips, and solutions for developers in
 ### Block Attributes Validation
 
 #### Visual Indicators Not Showing
-**Problem:** Validation works, but error/warning borders or messages do not appear in the block editor.
+**Problem:** Validation works, but error/warning icons/badges or messages do not appear in the block editor.
 
 **Solution:**
 - Ensure your JavaScript validation returns the correct result
 - Verify your script is loaded after the core plugin script (`block-accessibility-script` dependency)
 - Check browser console for JavaScript errors
 - Verify the check is enabled and not set to `'none'`
+- Check if the block is selected (some indicators may only show on selection)
+
 
 #### JavaScript Checks Not Running
 **Problem:** Your validation logic is not being called.
@@ -81,6 +83,8 @@ This guide covers common issues, debugging tips, and solutions for developers in
 - Check that components are accessed correctly: `window.BlockAccessibilityChecks?.MetaField`
 - Verify the `metaKey` prop matches the registered meta key
 - Check browser console for JavaScript errors
+- Check the Unified Sidebar (click accessibility icon in header) to see if errors are reported there
+
 
 ### Editor Validation
 

@@ -178,7 +178,7 @@ add_action( 'enqueue_block_editor_assets', 'my_plugin_enqueue_accessibility_asse
 2. **Export** - Configuration is exported to JavaScript via `wp_localize_script`
 3. **Validation** - When blocks change, `validateBlock()` is called
 4. **Filter Application** - The `ba11yc_validate_block` filter is applied for each registered check
-5. **Result Collection** - Validation results are collected and displayed in the editor
+5. **Result Collection** - Validation results are collected and displayed in the editor via the Unified Sidebar and block indicators
 6. **Post Locking** - If any checks fail with `type: 'error'`, post saving is locked
 
 ## Best Practices
