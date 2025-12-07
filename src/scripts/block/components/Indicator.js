@@ -53,7 +53,11 @@ export function BlockIndicator({ issues }) {
 				? __('(Validation)', 'block-accessibility-checks')
 				: __('(Accessibility)', 'block-accessibility-checks');
 
-		return `${text} ${categoryLabel}`;
+		return (
+			<>
+				{text} <span className="ba11y-indicator-category-label">{categoryLabel}</span>
+			</>
+		);
 	};
 
 	return (

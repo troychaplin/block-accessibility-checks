@@ -9,6 +9,10 @@
     margin-bottom: 2px;
 }
 
+.ba11y-indicator-category-label {
+    font-style: italic;
+}
+
 .ba11y-indicator-errors .ba11y-indicator-section-title-circle {
     background-color: var(--a11y-red);
 }
@@ -26,7 +30,7 @@
     p, ul {
         margin: 0;
     }
-    
+
     ul {
         margin-left: 3px;
         padding: 4px 0 2px 14px;
