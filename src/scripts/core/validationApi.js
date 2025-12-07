@@ -87,8 +87,8 @@ export function ValidationAPI() {
 	/**
 	 * Manage body classes for validation state styling
 	 *
-	 * Adds CSS classes to the document body based on validation results from meta
-	 * fields and editor checks. These classes enable theme/plugin developers to
+	 * Adds CSS classes to the document body based on validation results from blocks,
+	 * meta fields, and editor checks. These classes enable theme/plugin developers to
 	 * style the editor interface based on validation state (e.g., highlighting
 	 * areas with issues). Classes are removed when validation passes or component unmounts.
 	 */
@@ -98,34 +98,54 @@ export function ValidationAPI() {
 			return;
 		}
 
-		// Check for errors and warnings in meta and editor validation
+		// Ensure document.body is available before manipulating classes
+		if (!document.body) {
+			return;
+		}
+
+		// Check for errors and warnings across all validation types
+		const hasBlockErrors = invalidBlocks.some(block => block.mode === 'error');
+		const hasBlockWarnings = invalidBlocks.some(block => block.mode === 'warning');
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 		const hasMetaWarnings = invalidMeta.some(meta => meta.hasWarnings && !meta.hasErrors);
 		const hasEditorErrors = hasErrors(invalidEditorChecks);
 		const hasEditorWarnings = hasWarnings(invalidEditorChecks);
 
-		// Toggle error class based on validation state
-		if (hasMetaErrors || hasEditorErrors) {
-			document.body.classList.add('has-meta-validation-errors');
-		} else {
-			document.body.classList.remove('has-meta-validation-errors');
-		}
+		// Check for overall errors first (blocks, meta, or editor)
+		const hasAnyErrors = hasBlockErrors || hasMetaErrors || hasEditorErrors;
 
-		// Toggle warning class (only if no errors present)
-		if (hasMetaWarnings || hasEditorWarnings) {
-			document.body.classList.add('has-meta-validation-warnings');
-		} else {
+		// Check for overall warnings only if no errors exist
+		const hasAnyWarnings =
+			!hasAnyErrors && (hasBlockWarnings || hasMetaWarnings || hasEditorWarnings);
+
+		// Apply error class if errors exist
+		if (hasAnyErrors) {
+			document.body.classList.add('has-meta-validation-errors');
 			document.body.classList.remove('has-meta-validation-warnings');
 		}
-
-		// Cleanup: Remove classes when component unmounts
-		return () => {
+		// Apply warning class only if no errors but warnings exist
+		else if (hasAnyWarnings) {
+			document.body.classList.add('has-meta-validation-warnings');
+			document.body.classList.remove('has-meta-validation-errors');
+		}
+		// Remove both classes if no issues
+		else {
 			document.body.classList.remove(
 				'has-meta-validation-errors',
 				'has-meta-validation-warnings'
 			);
+		}
+
+		// Cleanup: Remove classes when component unmounts
+		return () => {
+			if (document.body) {
+				document.body.classList.remove(
+					'has-meta-validation-errors',
+					'has-meta-validation-warnings'
+				);
+			}
 		};
-	}, [invalidMeta, invalidEditorChecks, isPostEditor]);
+	}, [invalidBlocks, invalidMeta, invalidEditorChecks, isPostEditor]);
 
 	// This component manages side effects only, no UI rendering
 	return null;
