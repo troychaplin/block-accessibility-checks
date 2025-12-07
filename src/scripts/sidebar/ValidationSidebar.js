@@ -360,9 +360,7 @@ export function ValidationSidebar() {
 								</p>
 								<ul className="ba11y-error-list">
 									{deduplicatedMetaErrors.map((issue, index) => (
-										<li key={`meta-error-${index}`}>
-											<strong>{issue.metaKey}:</strong> {issue.message}
-										</li>
+										<li key={`meta-error-${index}`}>{issue.message}</li>
 									))}
 								</ul>
 							</div>
@@ -441,9 +439,7 @@ export function ValidationSidebar() {
 								</p>
 								<ul className="ba11y-warning-list">
 									{deduplicatedMetaWarnings.map((issue, index) => (
-										<li key={`meta-warning-${index}`}>
-											<strong>{issue.metaKey}:</strong> {issue.message}
-										</li>
+										<li key={`meta-warning-${index}`}>{issue.message}</li>
 									))}
 								</ul>
 							</div>
