@@ -1,130 +1,73 @@
-// .ba11y-unified-validation-sidebar {
-// 	// Panel body styling
-// 	.components-panel__body {
-// 		margin-bottom: 16px;
-// 	}
+.ba11y-errors-panel .components-panel__row + .components-panel__row,
+.ba11y-warnings-panel .components-panel__row + .components-panel__row {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e9e9e9;
+}
 
-// 	.ba11y-errors-panel {
-// 		.components-panel__body-title {
-// 			color: var(--a11y-dark-red);
-// 			font-weight: 600;
-// 		}
-// 	}
+.ba11y-error-group .ba11y-indicator-circle,
+.ba11y-warning-group .ba11y-indicator-circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+    margin-bottom: 2px;
+}
 
-// 	.ba11y-warnings-panel {
-// 		.components-panel__body-title {
-// 			color: var(--a11y-dark-yellow);
-// 			font-weight: 600;
-// 		}
-// 	}
+.ba11y-error-group .ba11y-indicator-circle {
+    background-color: var(--a11y-red);
+}
 
-// 	.ba11y-error-group {
-// 		background-color: var(--a11y-light-red);
-// 		border-color: var(--a11y-red);
-// 	}
+.ba11y-warning-group .ba11y-indicator-circle {
+    background-color: var(--a11y-yellow);
+}
 
-// 	.ba11y-warning-group {
-// 		background-color: var(--a11y-light-yellow);
-// 		border-color: var(--a11y-yellow);
-// 	}
+.ba11y-error-group,
+.ba11y-warning-group {
+    p, ul {
+        line-height: 1.4;
+        margin: 0;
+    }
 
-// 	// Error and warning groups
-// 	.ba11y-error-group,
-// 	.ba11y-warning-group {
-// 		width: 100%;
-// 		padding: 12px 14px;
-// 		border-left: var(--a11y-border-width);
-// 		border-radius: 2px;
-// 		margin-bottom: 12px;
+    ul {
+        margin-left: 3px;
+        padding: 4px 0 2px 14px;
+    }
 
-// 		&:last-child {
-// 			margin-bottom: 0;
-// 		}
-// 	}
+    li {
+        padding: 6px 0;
+        margin: 0;
 
-// 	// Subheadings
-// 	.ba11y-error-subheading,
-// 	.ba11y-warning-subheading {
-// 		margin: 0 0 8px 0;
-// 		font-size: 13px;
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
 
-// 		strong {
-// 			font-weight: 600;
-// 		}
-// 	}
+    strong {
+        font-weight: 500;
+    }
+}
 
-// 	.ba11y-error-subheading {
-// 		color: var(--a11y-dark-red);
-// 	}
+.ba11y-error-group .ba11y-issue-link,
+.ba11y-warning-group .ba11y-issue-link {
+    cursor: pointer;
+    font-weight: 500;
+    padding: 0 0 0 4px;
+    margin: 0;
+    border: none;
+    background: none;
 
-// 	.ba11y-warning-subheading {
-// 		color: var(--a11y-dark-yellow);
-// 	}
+    &:hover {
+        text-decoration: underline;
+    }
+}
 
-// 	// Lists
-// 	.ba11y-error-list,
-// 	.ba11y-warning-list {
-// 		margin: 0;
-// 		padding: 0;
-// 		list-style: none;
-// 	}
-
-// 	.ba11y-error-list li,
-// 	.ba11y-warning-list li {
-// 		margin-bottom: 8px;
-// 		padding: 8px;
-// 		background-color: rgba(255, 255, 255, 0.5);
-// 		border-radius: 2px;
-// 		font-size: 13px;
-// 		line-height: 1.5;
-
-// 		&:last-child {
-// 			margin-bottom: 0;
-// 		}
-// 	}
-
-// 	// Clickable issue links
-// 	.ba11y-issue-link {
-// 		width: 100%;
-// 		text-align: left;
-// 		padding: 0;
-// 		margin: 0;
-// 		background: none;
-// 		border: none;
-// 		cursor: pointer;
-// 		color: inherit;
-// 		text-decoration: none;
-// 		transition: opacity 0.2s ease;
-
-// 		&:hover {
-// 			opacity: 0.8;
-// 		}
-
-// 		&:focus {
-// 			outline: 2px solid var(--wp-admin-theme-color);
-// 			outline-offset: 2px;
-// 		}
-
-// 		strong {
-// 			font-weight: 600;
-// 		}
-
-// 		div {
-// 			margin-bottom: 4px;
-
-// 			&:last-child {
-// 				margin-bottom: 0;
-// 			}
-// 		}
-// 	}
-
-// 	// Validation description
-// 	.ba11y-validation-description {
-// 		font-size: 12px;
-// 		line-height: 1.4;
-// 		margin-top: 6px;
-// 		color: #636363;
-// 		font-style: italic;
-// 	}
+// .ba11y-error-group .ba11y-issue-link {
+//     color: var(--a11y-red);
 // }
 
+// .ba11y-warning-group .ba11y-issue-link {
+//     color: var(--a11y-dark-yellow);
+// }

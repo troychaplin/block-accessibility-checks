@@ -307,7 +307,7 @@ export function ValidationSidebar() {
 			name="unified-validation-sidebar"
 			title={__('Accessibility & Validation', 'block-accessibility-checks')}
 			icon={ba11yIcon}
-			className="ba11y-unified-validation-sidebar"
+			className="ba11y-validation-sidebar"
 		>
 			{/* Errors Panel: Displays all validation errors grouped by source type */}
 			{totalErrors > 0 && (
@@ -326,18 +326,20 @@ export function ValidationSidebar() {
 							<div className="ba11y-error-group">
 								<p className="ba11y-error-subheading">
 									<strong>
+										<span className="ba11y-indicator-circle"></span>
 										{__('Block Errors', 'block-accessibility-checks')}
 									</strong>
 								</p>
 								<ul className="ba11y-error-list">
 									{deduplicatedBlockErrors.map((issue, index) => (
 										<li key={`block-error-${index}`}>
+											<strong>{issue.blockName}:</strong> {issue.message}
 											<button
 												type="button"
 												className="ba11y-issue-link"
 												onClick={() => handleBlockClick(issue.clientIds[0])}
 											>
-												<strong>{issue.blockName}:</strong> {issue.message}
+												{__('View block', 'block-accessibility-checks')}
 											</button>
 										</li>
 									))}
@@ -352,19 +354,14 @@ export function ValidationSidebar() {
 							<div className="ba11y-error-group">
 								<p className="ba11y-error-subheading">
 									<strong>
+										<span className="ba11y-indicator-circle"></span>
 										{__('Meta Errors', 'block-accessibility-checks')}
 									</strong>
 								</p>
 								<ul className="ba11y-error-list">
 									{deduplicatedMetaErrors.map((issue, index) => (
 										<li key={`meta-error-${index}`}>
-											<button
-												type="button"
-												className="ba11y-issue-link"
-												onClick={() => handleMetaClick(issue.metaKey)}
-											>
-												<strong>{issue.metaKey}:</strong> {issue.message}
-											</button>
+											<strong>{issue.metaKey}:</strong> {issue.message}
 										</li>
 									))}
 								</ul>
@@ -378,19 +375,13 @@ export function ValidationSidebar() {
 							<div className="ba11y-error-group">
 								<p className="ba11y-error-subheading">
 									<strong>
+										<span className="ba11y-indicator-circle"></span>
 										{__('Editor Errors', 'block-accessibility-checks')}
 									</strong>
 								</p>
 								<ul className="ba11y-error-list">
 									{deduplicatedEditorErrors.map((issue, index) => (
-										<li key={`editor-error-${index}`}>
-											<div>{issue.message}</div>
-											{issue.description && (
-												<div className="ba11y-validation-description">
-													{issue.description}
-												</div>
-											)}
-										</li>
+										<li key={`editor-error-${index}`}>{issue.message}</li>
 									))}
 								</ul>
 							</div>
@@ -416,18 +407,20 @@ export function ValidationSidebar() {
 							<div className="ba11y-warning-group">
 								<p className="ba11y-warning-subheading">
 									<strong>
+										<span className="ba11y-indicator-circle"></span>
 										{__('Block Warnings', 'block-accessibility-checks')}
 									</strong>
 								</p>
 								<ul className="ba11y-warning-list">
 									{deduplicatedBlockWarnings.map((issue, index) => (
 										<li key={`block-warning-${index}`}>
+											<strong>{issue.blockName}:</strong> {issue.message}
 											<button
 												type="button"
 												className="ba11y-issue-link"
 												onClick={() => handleBlockClick(issue.clientIds[0])}
 											>
-												<strong>{issue.blockName}:</strong> {issue.message}
+												{__('View block', 'block-accessibility-checks')}
 											</button>
 										</li>
 									))}
@@ -442,19 +435,14 @@ export function ValidationSidebar() {
 							<div className="ba11y-warning-group">
 								<p className="ba11y-warning-subheading">
 									<strong>
+										<span className="ba11y-indicator-circle"></span>
 										{__('Meta Warnings', 'block-accessibility-checks')}
 									</strong>
 								</p>
 								<ul className="ba11y-warning-list">
 									{deduplicatedMetaWarnings.map((issue, index) => (
 										<li key={`meta-warning-${index}`}>
-											<button
-												type="button"
-												className="ba11y-issue-link"
-												onClick={() => handleMetaClick(issue.metaKey)}
-											>
-												<strong>{issue.metaKey}:</strong> {issue.message}
-											</button>
+											<strong>{issue.metaKey}:</strong> {issue.message}
 										</li>
 									))}
 								</ul>
@@ -468,19 +456,13 @@ export function ValidationSidebar() {
 							<div className="ba11y-warning-group">
 								<p className="ba11y-warning-subheading">
 									<strong>
+										<span className="ba11y-indicator-circle"></span>
 										{__('Editor Warnings', 'block-accessibility-checks')}
 									</strong>
 								</p>
 								<ul className="ba11y-warning-list">
 									{deduplicatedEditorWarnings.map((issue, index) => (
-										<li key={`editor-warning-${index}`}>
-											<div>{issue.message}</div>
-											{issue.description && (
-												<div className="ba11y-validation-description">
-													{issue.description}
-												</div>
-											)}
-										</li>
+										<li key={`editor-warning-${index}`}>{issue.message}</li>
 									))}
 								</ul>
 							</div>
