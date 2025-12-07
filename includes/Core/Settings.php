@@ -288,10 +288,12 @@ class Settings {
 	 */
 	public function sanitize_options( $input ): array {
 		try {
-			$sanitized = array();
+			// Get existing options to preserve values not in the current form submission.
+			$existing_options = \get_option( 'block_checks_options', array() );
+			$sanitized        = $existing_options;
 
 			if ( ! is_array( $input ) ) {
-				$this->log_error( 'Settings input is not an array. Returning empty array.' );
+				$this->log_error( 'Settings input is not an array. Returning existing options.' );
 				return $sanitized;
 			}
 
@@ -336,7 +338,8 @@ class Settings {
 
 		} catch ( \Exception $e ) {
 			$this->log_error( 'Error during settings sanitization: ' . $e->getMessage() );
-			return array();
+			// Return existing options on error to prevent data loss.
+			return \get_option( 'block_checks_options', array() );
 		}
 	}
 

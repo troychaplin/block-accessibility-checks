@@ -304,7 +304,7 @@ export function ValidationSidebar() {
 	// This ensures the icon appears in the same location regardless of validation state
 	return (
 		<PluginSidebar
-			name="unified-validation-sidebar"
+			name="validation-sidebar"
 			title={__('Accessibility & Validation', 'block-accessibility-checks')}
 			icon={ba11yIcon}
 			className="ba11y-validation-sidebar"

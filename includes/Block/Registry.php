@@ -385,7 +385,18 @@ class Registry {
 		// For individual check settings, use the format: block_type_check_name.
 		$field_name = $block_type . '_' . $check_name;
 
-		return $options[ $field_name ] ?? 'error';
+		// If the setting exists in options, return it (including 'none').
+		// Only default to 'error' if the setting has never been configured.
+		if ( isset( $options[ $field_name ] ) ) {
+			$value = $options[ $field_name ];
+			// Validate that the stored value is one of the valid options.
+			if ( in_array( $value, array( 'error', 'warning', 'none' ), true ) ) {
+				return $value;
+			}
+		}
+
+		// Default to 'error' only for unconfigured checks.
+		return 'error';
 	}
 
 	/**
@@ -409,7 +420,18 @@ class Registry {
 
 		$field_name = $block_type . '_' . $check_name;
 
-		return $options[ $field_name ] ?? 'error';
+		// If the setting exists in options, return it (including 'none').
+		// Only default to 'error' if the setting has never been configured.
+		if ( isset( $options[ $field_name ] ) ) {
+			$value = $options[ $field_name ];
+			// Validate that the stored value is one of the valid options.
+			if ( in_array( $value, array( 'error', 'warning', 'none' ), true ) ) {
+				return $value;
+			}
+		}
+
+		// Default to 'error' only for unconfigured checks.
+		return 'error';
 	}
 
 	/**
