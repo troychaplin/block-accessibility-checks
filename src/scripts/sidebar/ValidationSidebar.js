@@ -28,7 +28,7 @@ import { filterIssuesByType, getErrors, getWarnings } from '../core/utils/issueH
  * The sidebar only renders when validation issues exist and displays an icon
  * that changes color based on the highest severity issue present.
  */
-export function UnifiedValidationSidebar() {
+export function ValidationSidebar() {
 	// Retrieve validation results from all sources
 	const invalidBlocks = GetInvalidBlocks() || [];
 	const invalidMeta = GetInvalidMeta() || [];
@@ -79,21 +79,6 @@ export function UnifiedValidationSidebar() {
 			/>
 		</svg>
 	);
-
-	// const ba11yIcon = (
-	// 	<svg
-	// 		xmlns="http://www.w3.org/2000/svg"
-	// 		width="480"
-	// 		height="480"
-	// 		fill="none"
-	// 		viewBox="0 0 480 480"
-	// 	>
-	// 		<path
-	// 			fill={iconColor}
-	// 			d="M240 0c53.307 0 102.554 17.379 142.386 46.78L346.52 82.647C316.139 62.04 279.476 50 240 50 135.066 50 50 135.066 50 240s85.066 190 190 190c96.919 0 176.889-72.568 188.539-166.333L306.781 385.426c-4.926 4.927-11.398 7.365-17.855 7.319-6.457.046-12.929-2.392-17.856-7.319L112.678 227.033c-9.763-9.763-9.763-25.592 0-35.355s25.592-9.763 35.355 0l74.019 74.018L410.07 77.678c9.763-9.763 25.593-9.763 35.356 0s9.763 25.592 0 35.355L257.407 301.052l31.519 31.518 140.892-140.892a25 25 0 0 1 3.233-2.731l32.137-32.136C474.767 182.729 480 210.753 480 240c0 132.548-107.452 240-240 240S0 372.548 0 240 107.452 0 240 0"
-	// 		/>
-	// 	</svg>
-	// );
 
 	/**
 	 * Handle clicking on a block validation issue
@@ -173,11 +158,8 @@ export function UnifiedValidationSidebar() {
 		};
 	}, []);
 
-	// Don't render sidebar if there are no validation issues
-	if (totalErrors === 0 && totalWarnings === 0) {
-		return null;
-	}
-
+	// Always render the sidebar to maintain consistent icon position
+	// This ensures the icon appears in the same location regardless of validation state
 	return (
 		<PluginSidebar
 			name="unified-validation-sidebar"

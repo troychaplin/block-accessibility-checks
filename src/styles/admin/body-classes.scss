@@ -1,40 +1,11 @@
-.has-meta-validation-warnings button[aria-controls="validation-api:unified-validation-sidebar"] {
-    background-color: var(--a11y-light-yellow);
-}
+// .has-meta-validation-warnings button[aria-controls="validation-api:unified-validation-sidebar"] {
+//     background-color: var(--a11y-light-yellow);
+// }
 
-.has-meta-validation-errors button[aria-controls="validation-api:unified-validation-sidebar"] {
-    background-color: var(--a11y-light-red);
-}
+// .has-meta-validation-errors button[aria-controls="validation-api:unified-validation-sidebar"] {
+//     background-color: var(--a11y-light-red);
+// }
 
 .ba11y-sidebar-icon {
     padding: 2px 0;
 }
-
-// Warnings - base state (lowest specificity)
-// body.has-meta-validation-warnings .interface-pinned-items button[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]) {
-//     background-color: var(--a11y--light-yellow);
-//     border: 1px dotted var(--a11y-yellow);
-
-//     span {
-//         color: var(--a11y-yellow);
-//     }
-// }
-
-// Errors - base state (same specificity as warnings, but logically higher priority)
-// body.has-meta-validation-errors .interface-pinned-items button:not(.is-pressed)[aria-label]:not([aria-label*="Settings"]):not([aria-label*="Tools"]):not([aria-label*="Options"]) {
-//     span {
-//         color: var(--a11y-red);
-//     }
-
-//     &:hover, &:active {
-//         background-color: var(--a11y-red);
-
-//         span {
-//             color: #fff;
-//         }
-
-//         svg path {
-//             fill: #fff;
-//         }
-//     }
-// }

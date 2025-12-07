@@ -8,7 +8,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { ValidationAPI } from './validationApi';
-import { UnifiedValidationSidebar } from '../sidebar/UnifiedValidationSidebar';
+import { ValidationSidebar } from '../sidebar/ValidationSidebar';
 
 /**
  * Filter callback for block registration (currently a placeholder).
@@ -69,14 +69,14 @@ export const blockChecksArray = new Proxy(
  *
  * This plugin registration activates the validation system in the block editor,
  * rendering both the ValidationAPI (which handles validation logic and state)
- * and the UnifiedValidationSidebar (which displays validation results to users).
+ * and the ValidationSidebar (which displays validation results to users).
  * Both components are rendered together to provide a complete validation experience.
  */
 registerPlugin('validation-api', {
 	render: () => (
 		<>
 			<ValidationAPI />
-			<UnifiedValidationSidebar />
+			<ValidationSidebar />
 		</>
 	),
 });
