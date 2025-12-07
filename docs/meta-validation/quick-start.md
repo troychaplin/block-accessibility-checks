@@ -11,23 +11,34 @@ Post meta validation allows you to validate WordPress post meta fields with the 
 Here's the simplest way to add validation to a post meta field:
 
 ```php
-use BlockAccessibility\MetaValidation;
-
 add_action( 'init', function() {
+    // Check if Validator class is available (plugin may be deactivated)
+    $validator_class = '\BlockAccessibility\Meta\Validator';
+    $validator_available = class_exists( $validator_class );
+
     register_post_meta( 'band', 'band_origin', [
         'single'            => true,
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'sanitize_text_field',
-        'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
-            'error_msg' => __( 'City of Origin is required.', 'my-plugin' ),
-            'type'      => 'settings',
-        ]),
+        'validate_callback' => $validator_available
+            ? call_user_func(
+                array( $validator_class, 'required' ),
+                'band',
+                'band_origin',
+                [
+                    'error_msg' => __( 'City of Origin is required.', 'my-plugin' ),
+                    'type'      => 'settings',
+                ]
+            )
+            : null,
     ]);
 });
 ```
 
-That's it! The `MetaValidation::required()` method handles:
+**Note:** The conditional check ensures your plugin continues to work even if the Block Accessibility Checks plugin is deactivated.
+
+That's it! The `Validator::required()` method handles:
 - ✅ Registering the validation check
 - ✅ Integrating with settings UI
 - ✅ Server-side validation

@@ -21,7 +21,13 @@ This guide covers common issues, debugging tips, and solutions for developers in
 **Problem:** Your validation logic is not being called.
 
 **Solution:**
-- Confirm your script is enqueued with the correct dependencies (`block-accessibility-script`)
+- Confirm your script is enqueued with the correct dependencies
+- **For better compatibility:** Conditionally add `'block-accessibility-script'` only if it's registered:
+  ```php
+  if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+      $dependencies[] = 'block-accessibility-script';
+  }
+  ```
 - Use the `enqueue_block_editor_assets` action
 - Check for typos in block type and check name
 - Verify the check is registered in PHP
@@ -53,8 +59,12 @@ This guide covers common issues, debugging tips, and solutions for developers in
 **Solution:**
 - Ensure `type` is set to `'settings'` in the check configuration
 - Verify the check is being registered (check PHP errors)
+- **If the Block Accessibility Checks plugin is deactivated:** Use conditional checks:
+  ```php
+  $validator_class = '\BlockAccessibility\Meta\Validator';
+  $validator_available = class_exists( $validator_class );
+  ```
 - Clear WordPress cache and reload admin page
-- Check that `MetaValidation::required()` was called correctly
 
 #### Validation Not Working
 **Problem:** Meta field validation doesn't work in the editor.
@@ -79,11 +89,17 @@ This guide covers common issues, debugging tips, and solutions for developers in
 **Problem:** `MetaField` or `ValidatedToolsPanelItem` don't show validation.
 
 **Solution:**
-- Ensure `'block-accessibility-script'` is included as a dependency
+- **For better compatibility:** Conditionally add `'block-accessibility-script'` only if it's registered:
+  ```php
+  if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+      $dependencies[] = 'block-accessibility-script';
+  }
+  ```
 - Check that components are accessed correctly: `window.BlockAccessibilityChecks?.MetaField`
 - Verify the `metaKey` prop matches the registered meta key
 - Check browser console for JavaScript errors
 - Check the Unified Sidebar (click accessibility icon in header) to see if errors are reported there
+- **Note:** If the Block Accessibility Checks plugin is not active, the `useMetaField` hook includes a fallback that works without the plugin
 
 
 ### Editor Validation

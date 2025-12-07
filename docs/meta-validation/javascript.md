@@ -85,14 +85,19 @@ The plugin provides a `useMetaField` hook to automatically handle state and vali
 
 ### Script Dependencies
 
-When using the validation hook, ensure your script has the Block Accessibility Checks script as a dependency:
+When using the validation hook, you should conditionally add the Block Accessibility Checks script as a dependency to allow your plugin to work even when the Block Accessibility Checks plugin is deactivated:
 
 ```php
-// Add 'block-accessibility-script' as a dependency
-$dependencies = array_merge(
-    $asset_file['dependencies'],
-    array( 'block-accessibility-script' )
-);
+$asset_file = include plugin_dir_path( __FILE__ ) . 'build/my-script.asset.php';
+
+// Start with base dependencies
+$dependencies = $asset_file['dependencies'];
+
+// Only add Block Accessibility Checks plugin as a dependency if it's active.
+// This allows your sidebar/UI to work even when the plugin is deactivated.
+if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+    $dependencies[] = 'block-accessibility-script';
+}
 
 wp_enqueue_script(
     'my-script-handle',
@@ -102,6 +107,8 @@ wp_enqueue_script(
     false
 );
 ```
+
+**Note:** If the Block Accessibility Checks plugin is not active, validation will not work, but your UI components (like sidebars) will still function. The `useMetaField` hook includes a fallback that works without the plugin.
 
 Then access the hook with a defensive check:
 
