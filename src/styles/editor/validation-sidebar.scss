@@ -50,6 +50,14 @@
     }
 }
 
+.ba11y-error-group .ba11y-issue-link {
+    color: var(--a11y-red);
+}
+
+.ba11y-warning-group .ba11y-issue-link {
+    color: var(--wp-admin-theme-color);
+}
+
 .ba11y-error-group .ba11y-issue-link,
 .ba11y-warning-group .ba11y-issue-link {
     cursor: pointer;
@@ -63,11 +71,3 @@
         text-decoration: underline;
     }
 }
-
-// .ba11y-error-group .ba11y-issue-link {
-//     color: var(--a11y-red);
-// }
-
-// .ba11y-warning-group .ba11y-issue-link {
-//     color: var(--a11y-dark-yellow);
-// }
