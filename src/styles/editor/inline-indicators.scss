@@ -1,0 +1,69 @@
+// Block wrapper needs relative positioning for absolute indicator
+.ba11y-block-error,
+.ba11y-block-warning {
+	position: relative;
+}
+
+// Inline block and meta field indicators
+.ba11y-block-indicator,
+.ba11y-meta-indicator {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 24px;
+	height: 24px;
+	z-index: 20;
+	pointer-events: none;
+}
+
+// Inline block and meta field indicator buttons
+.editor-visual-editor .ba11y-block-indicator-button.components-button,
+.editor-visual-editor .ba11y-meta-indicator-button.components-button {
+	pointer-events: all;
+    position: absolute;
+    min-width: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	background-color: var(--a11y-light-red);
+	border: 1px solid var(--a11y-red);
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	svg {
+        fill: var(--a11y-dark-red);
+		width: 18px;
+		height: 18px;
+	}
+
+	&:hover {
+		background-color: var(--a11y-red);
+        
+        svg {
+            fill: #fff;
+        }
+	}
+}
+
+// Inline block and meta field warning buttons
+.editor-visual-editor .ba11y-block-indicator--warning .ba11y-block-indicator-button.components-button,
+.editor-visual-editor .ba11y-meta-indicator--warning .ba11y-meta-indicator-button.components-button {
+	background-color: var(--a11y-light-yellow);
+	border-color: var(--a11y-yellow);
+	color: var(--a11y-yellow);
+
+	svg {
+        fill: var(--a11y-dark-yellow);
+        width: 20px;
+        height: 20px;
+	}
+
+	&:hover {
+		background-color: var(--a11y-yellow);
+        border: 1px solid var(--a11y-yellow);
+        
+        svg {
+            fill: #fff;
+        }
+	}
+}

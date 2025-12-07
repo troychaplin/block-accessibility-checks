@@ -1,0 +1,43 @@
+.ba11y-indicator-errors .ba11y-indicator-section-title-circle,
+.ba11y-indicator-warnings .ba11y-indicator-section-title-circle {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+    margin-bottom: 2px;
+}
+
+.ba11y-indicator-category-label {
+    font-style: italic;
+}
+
+.ba11y-indicator-errors .ba11y-indicator-section-title-circle {
+    background-color: var(--a11y-red);
+}
+
+.ba11y-indicator-warnings .ba11y-indicator-section-title-circle {
+    background-color: var(--a11y-yellow);
+}
+
+.ba11y-indicator-section + .ba11y-indicator-section {
+    margin-top: 24px;
+}
+
+.ba11y-indicator-modal-content .ba11y-indicator-errors,
+.ba11y-indicator-modal-content .ba11y-indicator-warnings {
+    p, ul {
+        margin: 0;
+    }
+
+    ul {
+        margin-left: 3px;
+        padding: 4px 0 2px 14px;
+    }
+
+    li {
+        padding: 4px 0 4px 0;
+        margin: 0;
+    }
+}

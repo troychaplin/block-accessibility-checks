@@ -174,6 +174,15 @@ addFilter(
 );
 ```
 
+## User Interface
+
+Your registered checks will automatically appear in the block editor in the following places:
+
+- **Unified Sidebar** - A dedicated sidebar consolidating all validation issues (click the accessibility icon in the header).
+- **Block Indicators** - Blocks with issues will display a small icon/badge. Clicking this badge shows a popover with error details.
+- **Header Badge** - The total count of errors/warnings is shown in the editor toolbar.
+
+
 ## Block Naming Convention
 
 Use a consistent namespace for all blocks from your plugin:

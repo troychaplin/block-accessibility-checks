@@ -141,7 +141,8 @@ body[class*="block-checks_page_block-a11y-checks-"] {
 .ba11y-field-controls {
     display: flex;
     gap: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    flex: none;
 }
 
 .ba11y-field-controls--checkbox {

@@ -1,7 +1,8 @@
-@use './styles/editor/panel-messages';
-@use './styles/editor/block-icon';
-@use './styles/editor/meta-validation';
 @use './styles/editor/editor-validation';
+@use './styles/editor/inline-indicators';
+@use './styles/editor/inline-modal';
+@use './styles/editor/meta-validation';
+@use './styles/editor/validation-sidebar';
 
 :root {
 	--a11y-red: #d82000;

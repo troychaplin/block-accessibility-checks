@@ -1,69 +1,42 @@
-// Meta field validation wrapper styles
-.meta-field-error,
-.meta-field-warning {
-	border-left: 3px solid;
-	padding: 10px 12px !important;
-	margin-bottom: 16px;
+.ba11y-meta-error .components-text-control__input,
+.ba11y-meta-error .components-textarea-control__input,
+.ba11y-meta-error .components-select-control__input {
+    border-left: 4px solid var(--a11y-red);
 }
 
-.meta-field-error {
-	border-color: var(--a11y-red);
-    background-color: var(--a11y-light-red);
+.ba11y-meta-warning .components-text-control__input,
+.ba11y-meta-warning .components-textarea-control__input,
+.ba11y-meta-warning .components-select-control__input {
+    border-left: 4px solid var(--a11y-yellow);
 }
 
-.meta-field-warning {
-	border-color: var(--a11y-yellow);
-    background-color: var(--a11y-light-yellow);
+.ba11y-meta-error .components-text-control__input:focus,
+.ba11y-meta-error .components-textarea-control__input:focus,
+.ba11y-meta-error .components-select-control__input:focus {
+    border: none;
+    border-left: 4px solid var(--a11y-red);
+    box-shadow: 0 0 0 1px var(--a11y-red);
 }
 
-// Input field styling - base states (lower specificity first)
-.meta-field-error .components-base-control__field .components-text-control__input,
-.meta-field-error .components-base-control__field .components-textarea-control__input,
-.meta-field-error .components-base-control__field .components-select-control__input {
-	border-color: var(--a11y-red);
+.ba11y-meta-warning .components-text-control__input:focus,
+.ba11y-meta-warning .components-textarea-control__input:focus,
+.ba11y-meta-warning .components-select-control__input:focus {
+    border: none;
+    border-left: 4px solid var(--a11y-yellow);
+    box-shadow: 0 0 0 1px var(--a11y-yellow);
 }
 
-.meta-field-warning .components-base-control__field .components-text-control__input,
-.meta-field-warning .components-base-control__field .components-textarea-control__input,
-.meta-field-warning .components-base-control__field .components-select-control__input {
-	border-color: var(--a11y-yellow);
+.ba11y-error-text,
+.ba11y-warning-text {
+    display: block;
+    font-weight: 500;
+    margin-top: 4px;
 }
 
-// Input field styling - focus states (higher specificity last)
-.meta-field-error .components-base-control__field .components-text-control__input:focus,
-.meta-field-error .components-base-control__field .components-textarea-control__input:focus,
-.meta-field-error .components-base-control__field .components-select-control__input:focus {
-	border-color: var(--a11y-red);
-	box-shadow: 0 0 0 1px var(--a11y-red);
+.ba11y-error-text {
+    color: var(--a11y-dark-red);
 }
 
-.meta-field-warning .components-base-control__field .components-text-control__input:focus,
-.meta-field-warning .components-base-control__field .components-textarea-control__input:focus,
-.meta-field-warning .components-base-control__field .components-select-control__input:focus {
-	border-color: var(--a11y-yellow);
-	box-shadow: 0 0 0 1px var(--a11y-yellow);
+.ba11y-warning-text {
+    color: var(--a11y-dark-yellow); 
 }
-
-.meta-field-error .components-base-control .components-base-control__help,
-.meta-field-warning .components-base-control .components-base-control__help {
-    color: #636363;
-}
-
-// Validation messages
-.meta-validation-error,
-.meta-validation-warning {
-    font-size: 12px;
-	margin: 4px 0;
-	font-weight: 600;
-	line-height: 1.4;
-	margin-top: 8px;
-}
-
-.meta-validation-error {
-	color: var(--a11y-dark-red);
-}
-
-.meta-validation-warning {
-	color: var(--a11y-dark-yellow);
-}
-
