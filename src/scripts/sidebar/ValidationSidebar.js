@@ -333,14 +333,14 @@ export function ValidationSidebar() {
 								<ul className="ba11y-error-list">
 									{deduplicatedBlockErrors.map((issue, index) => (
 										<li key={`block-error-${index}`}>
-											<strong>{issue.blockName}:</strong> {issue.message}
 											<button
 												type="button"
 												className="ba11y-issue-link"
 												onClick={() => handleBlockClick(issue.clientIds[0])}
 											>
-												{__('View block', 'block-accessibility-checks')}
+												{issue.blockName}
 											</button>
+											: {issue.message}
 										</li>
 									))}
 								</ul>
@@ -414,14 +414,14 @@ export function ValidationSidebar() {
 								<ul className="ba11y-warning-list">
 									{deduplicatedBlockWarnings.map((issue, index) => (
 										<li key={`block-warning-${index}`}>
-											<strong>{issue.blockName}:</strong> {issue.message}
 											<button
 												type="button"
 												className="ba11y-issue-link"
 												onClick={() => handleBlockClick(issue.clientIds[0])}
 											>
-												{__('View block', 'block-accessibility-checks')}
+												{issue.blockName}
 											</button>
+											: {issue.message}
 										</li>
 									))}
 								</ul>
