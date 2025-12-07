@@ -44,14 +44,6 @@
     }
 }
 
-.ba11y-error-group .ba11y-issue-link {
-    color: var(--wp-admin-theme-color);
-}
-
-.ba11y-warning-group .ba11y-issue-link {
-    color: var(--wp-admin-theme-color);
-}
-
 .ba11y-error-group .ba11y-issue-link,
 .ba11y-warning-group .ba11y-issue-link {
     cursor: pointer;
@@ -61,4 +53,9 @@
     margin: 0;
     border: none;
     background: none;
+    color: var(--wp-admin-theme-color);
+
+    &:hover {
+        color: #135e96;
+    }
 }
