@@ -6,6 +6,7 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { getBlockType } from '@wordpress/blocks';
 // import { caution } from '@wordpress/icons';
 
 /**
@@ -15,6 +16,133 @@ import { GetInvalidBlocks } from '../core/utils/getInvalidBlocks';
 import { GetInvalidMeta } from '../core/utils/getInvalidMeta';
 import { GetInvalidEditorChecks } from '../core/utils/getInvalidEditorChecks';
 import { filterIssuesByType, getErrors, getWarnings } from '../core/utils/issueHelpers';
+
+/**
+ * Get display name for a block type
+ *
+ * Uses WordPress getBlockType to get the official block title, with fallback
+ * to a formatted version of the block type name.
+ *
+ * @param {string} blockType - The block type (e.g., 'core/button').
+ * @return {string} The display name for the block.
+ */
+function getBlockDisplayName(blockType) {
+	const blockTypeInfo = getBlockType(blockType);
+	if (blockTypeInfo && blockTypeInfo.title) {
+		return blockTypeInfo.title;
+	}
+
+	// Fallback: format block type name
+	const parts = blockType.split('/');
+	const blockName = parts[1] || blockType;
+	// Convert kebab-case to title case
+	return blockName
+		.split(/[-_]/)
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
+}
+
+/**
+ * Deduplicate block issues by block type and message
+ *
+ * Groups issues by block type + message, collecting all clientIds that have
+ * the same issue. Returns unique issues with block names and clientIds.
+ *
+ * @param {Array}  blocks   - Array of invalid block validation results.
+ * @param {string} severity - The severity to filter by ('error' or 'warning').
+ * @return {Array} Array of deduplicated issues with blockName, message, and clientIds.
+ */
+function deduplicateBlockIssues(blocks, severity) {
+	const issueMap = new Map();
+
+	blocks.forEach(block => {
+		const issues =
+			severity === 'error' ? getErrors(block.issues || []) : getWarnings(block.issues || []);
+
+		issues.forEach(issue => {
+			const message =
+				severity === 'error' ? issue.error_msg : issue.warning_msg || issue.error_msg;
+			const key = `${block.name}|${message}`;
+
+			if (!issueMap.has(key)) {
+				issueMap.set(key, {
+					blockName: getBlockDisplayName(block.name),
+					blockType: block.name,
+					message,
+					clientIds: [],
+				});
+			}
+
+			// Add clientId if not already present
+			if (block.clientId && !issueMap.get(key).clientIds.includes(block.clientId)) {
+				issueMap.get(key).clientIds.push(block.clientId);
+			}
+		});
+	});
+
+	return Array.from(issueMap.values());
+}
+
+/**
+ * Deduplicate meta issues by meta key and message
+ *
+ * Groups issues by meta key + message, returning unique issues.
+ *
+ * @param {Array}  metaArray - Array of invalid meta validation results.
+ * @param {string} severity  - The severity to filter by ('error' or 'warning').
+ * @return {Array} Array of deduplicated issues with metaKey and message.
+ */
+function deduplicateMetaIssues(metaArray, severity) {
+	const issueMap = new Map();
+
+	metaArray.forEach(meta => {
+		const issues =
+			severity === 'error' ? getErrors(meta.issues || []) : getWarnings(meta.issues || []);
+
+		issues.forEach(issue => {
+			const message =
+				severity === 'error' ? issue.error_msg : issue.warning_msg || issue.error_msg;
+			const key = `${meta.metaKey}|${message}`;
+
+			if (!issueMap.has(key)) {
+				issueMap.set(key, {
+					metaKey: meta.metaKey,
+					message,
+				});
+			}
+		});
+	});
+
+	return Array.from(issueMap.values());
+}
+
+/**
+ * Deduplicate editor issues by message
+ *
+ * Groups editor issues by message only, returning unique issues.
+ *
+ * @param {Array}  issues   - Array of editor validation issues.
+ * @param {string} severity - The severity to filter by ('error' or 'warning').
+ * @return {Array} Array of deduplicated issues with message.
+ */
+function deduplicateEditorIssues(issues, severity) {
+	const issueMap = new Map();
+
+	issues.forEach(issue => {
+		const message =
+			severity === 'error' ? issue.error_msg : issue.warning_msg || issue.error_msg;
+		const key = message;
+
+		if (!issueMap.has(key)) {
+			issueMap.set(key, {
+				message,
+				description: issue.description,
+			});
+		}
+	});
+
+	return Array.from(issueMap.values());
+}
 
 /**
  * Unified Validation Sidebar Component
@@ -40,20 +168,34 @@ export function ValidationSidebar() {
 	// Ref to track scroll timeout for cleanup
 	const scrollTimeoutRef = useRef(null);
 
-	// Organize validation issues by type and severity for display
-	const blockErrors = invalidBlocks.filter(block => block.mode === 'error');
-	const blockWarnings = invalidBlocks.filter(block => block.mode === 'warning');
+	// Organize validation issues by type and severity for deduplication
+	const blocksWithErrors = invalidBlocks.filter(block => block.mode === 'error');
+	const blocksWithWarnings = invalidBlocks.filter(block => block.mode === 'warning');
 
 	const editorErrors = filterIssuesByType(invalidEditorChecks, 'error');
 	const editorWarnings = filterIssuesByType(invalidEditorChecks, 'warning');
 
 	// Meta warnings only shown if no errors exist (errors take precedence)
-	const metaErrors = invalidMeta.filter(meta => meta.hasErrors);
-	const metaWarnings = invalidMeta.filter(meta => meta.hasWarnings && !meta.hasErrors);
+	const metaWithErrors = invalidMeta.filter(meta => meta.hasErrors);
+	const metaWithWarnings = invalidMeta.filter(meta => meta.hasWarnings && !meta.hasErrors);
 
-	// Calculate total counts across all validation sources
-	const totalErrors = blockErrors.length + editorErrors.length + metaErrors.length;
-	const totalWarnings = blockWarnings.length + editorWarnings.length + metaWarnings.length;
+	// Deduplicate issues by type and severity
+	const deduplicatedBlockErrors = deduplicateBlockIssues(blocksWithErrors, 'error');
+	const deduplicatedBlockWarnings = deduplicateBlockIssues(blocksWithWarnings, 'warning');
+	const deduplicatedMetaErrors = deduplicateMetaIssues(metaWithErrors, 'error');
+	const deduplicatedMetaWarnings = deduplicateMetaIssues(metaWithWarnings, 'warning');
+	const deduplicatedEditorErrors = deduplicateEditorIssues(editorErrors, 'error');
+	const deduplicatedEditorWarnings = deduplicateEditorIssues(editorWarnings, 'warning');
+
+	// Calculate total counts across all validation sources (using deduplicated counts)
+	const totalErrors =
+		deduplicatedBlockErrors.length +
+		deduplicatedMetaErrors.length +
+		deduplicatedEditorErrors.length;
+	const totalWarnings =
+		deduplicatedBlockWarnings.length +
+		deduplicatedMetaWarnings.length +
+		deduplicatedEditorWarnings.length;
 
 	// Set icon color based on highest severity issue (errors > warnings > none)
 	let iconColor = 'currentColor';
@@ -178,8 +320,8 @@ export function ValidationSidebar() {
 					initialOpen={true}
 					className="ba11y-errors-panel"
 				>
-					{/* Block Errors: Individual block validation issues */}
-					{blockErrors.length > 0 && (
+					{/* Block Errors: Deduplicated block validation issues */}
+					{deduplicatedBlockErrors.length > 0 && (
 						<PanelRow>
 							<div className="ba11y-error-group">
 								<p className="ba11y-error-subheading">
@@ -188,51 +330,50 @@ export function ValidationSidebar() {
 									</strong>
 								</p>
 								<ul className="ba11y-error-list">
-									{blockErrors.map((block, index) => {
-										// Separate errors and warnings for this block
-										const errors = getErrors(block.issues || []);
-										const warnings = getWarnings(block.issues || []);
-
-										return (
-											<li key={`block-error-${block.clientId}-${index}`}>
-												<button
-													type="button"
-													className="ba11y-issue-link"
-													onClick={() => handleBlockClick(block.clientId)}
-												>
-													{errors.map((issue, issueIndex) => (
-														<div key={`error-${issueIndex}`}>
-															<strong>
-																{__(
-																	'Error:',
-																	'block-accessibility-checks'
-																)}
-															</strong>{' '}
-															{issue.error_msg}
-														</div>
-													))}
-													{warnings.map((issue, issueIndex) => (
-														<div key={`warning-${issueIndex}`}>
-															<strong>
-																{__(
-																	'Warning:',
-																	'block-accessibility-checks'
-																)}
-															</strong>{' '}
-															{issue.warning_msg || issue.error_msg}
-														</div>
-													))}
-												</button>
-											</li>
-										);
-									})}
+									{deduplicatedBlockErrors.map((issue, index) => (
+										<li key={`block-error-${index}`}>
+											<button
+												type="button"
+												className="ba11y-issue-link"
+												onClick={() => handleBlockClick(issue.clientIds[0])}
+											>
+												<strong>{issue.blockName}:</strong> {issue.message}
+											</button>
+										</li>
+									))}
 								</ul>
 							</div>
 						</PanelRow>
 					)}
 
-					{/* Editor Errors */}
-					{editorErrors.length > 0 && (
+					{/* Meta Errors: Deduplicated meta field validation issues */}
+					{deduplicatedMetaErrors.length > 0 && (
+						<PanelRow>
+							<div className="ba11y-error-group">
+								<p className="ba11y-error-subheading">
+									<strong>
+										{__('Meta Errors', 'block-accessibility-checks')}
+									</strong>
+								</p>
+								<ul className="ba11y-error-list">
+									{deduplicatedMetaErrors.map((issue, index) => (
+										<li key={`meta-error-${index}`}>
+											<button
+												type="button"
+												className="ba11y-issue-link"
+												onClick={() => handleMetaClick(issue.metaKey)}
+											>
+												<strong>{issue.metaKey}:</strong> {issue.message}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+						</PanelRow>
+					)}
+
+					{/* Editor Errors: Deduplicated editor validation issues */}
+					{deduplicatedEditorErrors.length > 0 && (
 						<PanelRow>
 							<div className="ba11y-error-group">
 								<p className="ba11y-error-subheading">
@@ -241,56 +382,16 @@ export function ValidationSidebar() {
 									</strong>
 								</p>
 								<ul className="ba11y-error-list">
-									{editorErrors.map((check, index) => (
+									{deduplicatedEditorErrors.map((issue, index) => (
 										<li key={`editor-error-${index}`}>
-											<div>
-												<strong>
-													{__('Error:', 'block-accessibility-checks')}
-												</strong>{' '}
-												{check.error_msg}
-											</div>
-											{check.description && (
+											<div>{issue.message}</div>
+											{issue.description && (
 												<div className="ba11y-validation-description">
-													{check.description}
+													{issue.description}
 												</div>
 											)}
 										</li>
 									))}
-								</ul>
-							</div>
-						</PanelRow>
-					)}
-
-					{/* Meta Errors */}
-					{metaErrors.length > 0 && (
-						<PanelRow>
-							<div className="ba11y-error-group">
-								<p className="ba11y-error-subheading">
-									<strong>
-										{__('Meta Field Errors', 'block-accessibility-checks')}
-									</strong>
-								</p>
-								<ul className="ba11y-error-list">
-									{metaErrors.map((meta, index) => {
-										const errors = getErrors(meta.issues || []);
-
-										return (
-											<li key={`meta-error-${meta.metaKey}-${index}`}>
-												<button
-													type="button"
-													className="ba11y-issue-link"
-													onClick={() => handleMetaClick(meta.metaKey)}
-												>
-													<strong>{meta.metaKey}:</strong>{' '}
-													{errors.map((issue, issueIndex) => (
-														<span key={`error-${issueIndex}`}>
-															{issue.error_msg}
-														</span>
-													))}
-												</button>
-											</li>
-										);
-									})}
 								</ul>
 							</div>
 						</PanelRow>
@@ -309,8 +410,8 @@ export function ValidationSidebar() {
 					initialOpen={true}
 					className="ba11y-warnings-panel"
 				>
-					{/* Block Warnings: Individual block validation warnings */}
-					{blockWarnings.length > 0 && (
+					{/* Block Warnings: Deduplicated block validation warnings */}
+					{deduplicatedBlockWarnings.length > 0 && (
 						<PanelRow>
 							<div className="ba11y-warning-group">
 								<p className="ba11y-warning-subheading">
@@ -319,39 +420,50 @@ export function ValidationSidebar() {
 									</strong>
 								</p>
 								<ul className="ba11y-warning-list">
-									{blockWarnings.map((block, index) => {
-										// Extract warnings for this block
-										const warnings = getWarnings(block.issues || []);
-
-										return (
-											<li key={`block-warning-${block.clientId}-${index}`}>
-												<button
-													type="button"
-													className="ba11y-issue-link"
-													onClick={() => handleBlockClick(block.clientId)}
-												>
-													{warnings.map((issue, issueIndex) => (
-														<div key={`warning-${issueIndex}`}>
-															<strong>
-																{__(
-																	'Warning:',
-																	'block-accessibility-checks'
-																)}
-															</strong>{' '}
-															{issue.warning_msg || issue.error_msg}
-														</div>
-													))}
-												</button>
-											</li>
-										);
-									})}
+									{deduplicatedBlockWarnings.map((issue, index) => (
+										<li key={`block-warning-${index}`}>
+											<button
+												type="button"
+												className="ba11y-issue-link"
+												onClick={() => handleBlockClick(issue.clientIds[0])}
+											>
+												<strong>{issue.blockName}:</strong> {issue.message}
+											</button>
+										</li>
+									))}
 								</ul>
 							</div>
 						</PanelRow>
 					)}
 
-					{/* Editor Warnings */}
-					{editorWarnings.length > 0 && (
+					{/* Meta Warnings: Deduplicated meta field validation warnings */}
+					{deduplicatedMetaWarnings.length > 0 && (
+						<PanelRow>
+							<div className="ba11y-warning-group">
+								<p className="ba11y-warning-subheading">
+									<strong>
+										{__('Meta Warnings', 'block-accessibility-checks')}
+									</strong>
+								</p>
+								<ul className="ba11y-warning-list">
+									{deduplicatedMetaWarnings.map((issue, index) => (
+										<li key={`meta-warning-${index}`}>
+											<button
+												type="button"
+												className="ba11y-issue-link"
+												onClick={() => handleMetaClick(issue.metaKey)}
+											>
+												<strong>{issue.metaKey}:</strong> {issue.message}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+						</PanelRow>
+					)}
+
+					{/* Editor Warnings: Deduplicated editor validation warnings */}
+					{deduplicatedEditorWarnings.length > 0 && (
 						<PanelRow>
 							<div className="ba11y-warning-group">
 								<p className="ba11y-warning-subheading">
@@ -360,56 +472,16 @@ export function ValidationSidebar() {
 									</strong>
 								</p>
 								<ul className="ba11y-warning-list">
-									{editorWarnings.map((check, index) => (
+									{deduplicatedEditorWarnings.map((issue, index) => (
 										<li key={`editor-warning-${index}`}>
-											<div>
-												<strong>
-													{__('Warning:', 'block-accessibility-checks')}
-												</strong>{' '}
-												{check.warning_msg || check.error_msg}
-											</div>
-											{check.description && (
+											<div>{issue.message}</div>
+											{issue.description && (
 												<div className="ba11y-validation-description">
-													{check.description}
+													{issue.description}
 												</div>
 											)}
 										</li>
 									))}
-								</ul>
-							</div>
-						</PanelRow>
-					)}
-
-					{/* Meta Warnings */}
-					{metaWarnings.length > 0 && (
-						<PanelRow>
-							<div className="ba11y-warning-group">
-								<p className="ba11y-warning-subheading">
-									<strong>
-										{__('Meta Field Warnings', 'block-accessibility-checks')}
-									</strong>
-								</p>
-								<ul className="ba11y-warning-list">
-									{metaWarnings.map((meta, index) => {
-										const warnings = getWarnings(meta.issues || []);
-
-										return (
-											<li key={`meta-warning-${meta.metaKey}-${index}`}>
-												<button
-													type="button"
-													className="ba11y-issue-link"
-													onClick={() => handleMetaClick(meta.metaKey)}
-												>
-													<strong>{meta.metaKey}:</strong>{' '}
-													{warnings.map((issue, issueIndex) => (
-														<span key={`warning-${issueIndex}`}>
-															{issue.warning_msg || issue.error_msg}
-														</span>
-													))}
-												</button>
-											</li>
-										);
-									})}
 								</ul>
 							</div>
 						</PanelRow>

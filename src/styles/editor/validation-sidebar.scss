@@ -1,132 +1,130 @@
-// Unified Validation Sidebar styles
+// .ba11y-unified-validation-sidebar {
+// 	// Panel body styling
+// 	.components-panel__body {
+// 		margin-bottom: 16px;
+// 	}
 
-.ba11y-unified-validation-sidebar {
-	// Panel body styling
-	.components-panel__body {
-		margin-bottom: 16px;
-	}
+// 	.ba11y-errors-panel {
+// 		.components-panel__body-title {
+// 			color: var(--a11y-dark-red);
+// 			font-weight: 600;
+// 		}
+// 	}
 
-	.ba11y-errors-panel {
-		.components-panel__body-title {
-			color: var(--a11y-dark-red);
-			font-weight: 600;
-		}
-	}
+// 	.ba11y-warnings-panel {
+// 		.components-panel__body-title {
+// 			color: var(--a11y-dark-yellow);
+// 			font-weight: 600;
+// 		}
+// 	}
 
-	.ba11y-warnings-panel {
-		.components-panel__body-title {
-			color: var(--a11y-dark-yellow);
-			font-weight: 600;
-		}
-	}
+// 	.ba11y-error-group {
+// 		background-color: var(--a11y-light-red);
+// 		border-color: var(--a11y-red);
+// 	}
 
-	.ba11y-error-group {
-		background-color: var(--a11y-light-red);
-		border-color: var(--a11y-red);
-	}
+// 	.ba11y-warning-group {
+// 		background-color: var(--a11y-light-yellow);
+// 		border-color: var(--a11y-yellow);
+// 	}
 
-	.ba11y-warning-group {
-		background-color: var(--a11y-light-yellow);
-		border-color: var(--a11y-yellow);
-	}
+// 	// Error and warning groups
+// 	.ba11y-error-group,
+// 	.ba11y-warning-group {
+// 		width: 100%;
+// 		padding: 12px 14px;
+// 		border-left: var(--a11y-border-width);
+// 		border-radius: 2px;
+// 		margin-bottom: 12px;
 
-	// Error and warning groups
-	.ba11y-error-group,
-	.ba11y-warning-group {
-		width: 100%;
-		padding: 12px 14px;
-		border-left: var(--a11y-border-width);
-		border-radius: 2px;
-		margin-bottom: 12px;
+// 		&:last-child {
+// 			margin-bottom: 0;
+// 		}
+// 	}
 
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
+// 	// Subheadings
+// 	.ba11y-error-subheading,
+// 	.ba11y-warning-subheading {
+// 		margin: 0 0 8px 0;
+// 		font-size: 13px;
 
-	// Subheadings
-	.ba11y-error-subheading,
-	.ba11y-warning-subheading {
-		margin: 0 0 8px 0;
-		font-size: 13px;
+// 		strong {
+// 			font-weight: 600;
+// 		}
+// 	}
 
-		strong {
-			font-weight: 600;
-		}
-	}
+// 	.ba11y-error-subheading {
+// 		color: var(--a11y-dark-red);
+// 	}
 
-	.ba11y-error-subheading {
-		color: var(--a11y-dark-red);
-	}
+// 	.ba11y-warning-subheading {
+// 		color: var(--a11y-dark-yellow);
+// 	}
 
-	.ba11y-warning-subheading {
-		color: var(--a11y-dark-yellow);
-	}
+// 	// Lists
+// 	.ba11y-error-list,
+// 	.ba11y-warning-list {
+// 		margin: 0;
+// 		padding: 0;
+// 		list-style: none;
+// 	}
 
-	// Lists
-	.ba11y-error-list,
-	.ba11y-warning-list {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
+// 	.ba11y-error-list li,
+// 	.ba11y-warning-list li {
+// 		margin-bottom: 8px;
+// 		padding: 8px;
+// 		background-color: rgba(255, 255, 255, 0.5);
+// 		border-radius: 2px;
+// 		font-size: 13px;
+// 		line-height: 1.5;
 
-	.ba11y-error-list li,
-	.ba11y-warning-list li {
-		margin-bottom: 8px;
-		padding: 8px;
-		background-color: rgba(255, 255, 255, 0.5);
-		border-radius: 2px;
-		font-size: 13px;
-		line-height: 1.5;
+// 		&:last-child {
+// 			margin-bottom: 0;
+// 		}
+// 	}
 
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
+// 	// Clickable issue links
+// 	.ba11y-issue-link {
+// 		width: 100%;
+// 		text-align: left;
+// 		padding: 0;
+// 		margin: 0;
+// 		background: none;
+// 		border: none;
+// 		cursor: pointer;
+// 		color: inherit;
+// 		text-decoration: none;
+// 		transition: opacity 0.2s ease;
 
-	// Clickable issue links
-	.ba11y-issue-link {
-		width: 100%;
-		text-align: left;
-		padding: 0;
-		margin: 0;
-		background: none;
-		border: none;
-		cursor: pointer;
-		color: inherit;
-		text-decoration: none;
-		transition: opacity 0.2s ease;
+// 		&:hover {
+// 			opacity: 0.8;
+// 		}
 
-		&:hover {
-			opacity: 0.8;
-		}
+// 		&:focus {
+// 			outline: 2px solid var(--wp-admin-theme-color);
+// 			outline-offset: 2px;
+// 		}
 
-		&:focus {
-			outline: 2px solid var(--wp-admin-theme-color);
-			outline-offset: 2px;
-		}
+// 		strong {
+// 			font-weight: 600;
+// 		}
 
-		strong {
-			font-weight: 600;
-		}
+// 		div {
+// 			margin-bottom: 4px;
 
-		div {
-			margin-bottom: 4px;
+// 			&:last-child {
+// 				margin-bottom: 0;
+// 			}
+// 		}
+// 	}
 
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-	}
-
-	// Validation description
-	.ba11y-validation-description {
-		font-size: 12px;
-		line-height: 1.4;
-		margin-top: 6px;
-		color: #636363;
-		font-style: italic;
-	}
-}
+// 	// Validation description
+// 	.ba11y-validation-description {
+// 		font-size: 12px;
+// 		line-height: 1.4;
+// 		margin-top: 6px;
+// 		color: #636363;
+// 		font-style: italic;
+// 	}
+// }
 
