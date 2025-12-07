@@ -1,11 +1,37 @@
-// .has-meta-validation-warnings button[aria-controls="validation-api:unified-validation-sidebar"] {
-//     background-color: var(--a11y-light-yellow);
-// }
+// Base state: is-pressed (lowest specificity)
+.has-meta-validation-warnings button[aria-controls="validation-api:unified-validation-sidebar"].is-pressed {
+    background-color: var(--a11y-light-yellow);
+    transition: background-color 0.2s ease;
+}
 
-// .has-meta-validation-errors button[aria-controls="validation-api:unified-validation-sidebar"] {
-//     background-color: var(--a11y-light-red);
-// }
+.has-meta-validation-errors button[aria-controls="validation-api:unified-validation-sidebar"].is-pressed {
+    background-color: var(--a11y-light-red);
+    transition: background-color 0.2s ease;
+}
+
+// Hover state: is-pressed:hover (higher specificity)
+.has-meta-validation-warnings button[aria-controls="validation-api:unified-validation-sidebar"].is-pressed:hover {
+    background-color: var(--a11y-light-yellow);
+    transition: background-color 0.2s ease;
+}
+
+.has-meta-validation-errors button[aria-controls="validation-api:unified-validation-sidebar"].is-pressed:hover {
+    background-color: var(--a11y-light-red);
+    transition: background-color 0.2s ease;
+}
+
+// Hover state: :hover (highest specificity)
+.has-meta-validation-warnings button[aria-controls="validation-api:unified-validation-sidebar"]:hover {
+    background-color: var(--a11y-light-yellow);
+    transition: background-color 0.2s ease;
+}
+
+.has-meta-validation-errors button[aria-controls="validation-api:unified-validation-sidebar"]:hover {
+    background-color: var(--a11y-light-red);
+    transition: background-color 0.2s ease;
+}
 
 .ba11y-sidebar-icon {
     padding: 2px 0;
 }
+
