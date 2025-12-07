@@ -11,23 +11,34 @@ PHP is used to register meta checks, configure metadata, and integrate with Word
 The easiest way to add meta validation is using the `MetaValidation::required()` helper method:
 
 ```php
-use BlockAccessibility\MetaValidation;
-
 add_action( 'init', function() {
+    // Check if Validator class is available (plugin may be deactivated)
+    $validator_class = '\BlockAccessibility\Meta\Validator';
+    $validator_available = class_exists( $validator_class );
+
     register_post_meta( 'band', 'band_origin', [
         'single'            => true,
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'sanitize_text_field',
-        'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
-            'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
-            'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
-            'description' => __( 'The city where the band originated', 'my-plugin' ),
-            'type'        => 'settings',
-        ]),
+        'validate_callback' => $validator_available
+            ? call_user_func(
+                array( $validator_class, 'required' ),
+                'band',
+                'band_origin',
+                [
+                    'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
+                    'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
+                    'description' => __( 'The city where the band originated', 'my-plugin' ),
+                    'type'        => 'settings',
+                ]
+            )
+            : null,
     ]);
 });
 ```
+
+**Note:** The conditional check ensures your plugin continues to work even if the Block Accessibility Checks plugin is deactivated. The meta field will still be registered, but validation will be disabled.
 
 ### How MetaValidation::required() Works
 
@@ -116,49 +127,77 @@ Meta validation checks appear in the admin settings UI alongside block checks:
 ### Required Field with Settings Control
 
 ```php
-use BlockAccessibility\MetaValidation;
+$validator_class = '\BlockAccessibility\Meta\Validator';
+$validator_available = class_exists( $validator_class );
 
 register_post_meta( 'band', 'band_origin', [
     'single'            => true,
     'type'              => 'string',
     'show_in_rest'      => true,
     'sanitize_callback' => 'sanitize_text_field',
-    'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
-        'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
-        'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
-        'description' => __( 'The city where the band originated', 'my-plugin' ),
-        'type'        => 'settings',
-    ]),
+    'validate_callback' => $validator_available
+        ? call_user_func(
+            array( $validator_class, 'required' ),
+            'band',
+            'band_origin',
+            [
+                'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
+                'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
+                'description' => __( 'The city where the band originated', 'my-plugin' ),
+                'type'        => 'settings',
+            ]
+        )
+        : null,
 ]);
 ```
 
 ### Always an Error (Not Configurable)
 
 ```php
+$validator_class = '\BlockAccessibility\Meta\Validator';
+$validator_available = class_exists( $validator_class );
+
 register_post_meta( 'band', 'band_name', [
     'single'            => true,
     'type'              => 'string',
     'show_in_rest'      => true,
     'sanitize_callback' => 'sanitize_text_field',
-    'validate_callback' => MetaValidation::required( 'band', 'band_name', [
-        'error_msg' => __( 'Band name is required.', 'my-plugin' ),
-        'type'      => 'error',
-    ]),
+    'validate_callback' => $validator_available
+        ? call_user_func(
+            array( $validator_class, 'required' ),
+            'band',
+            'band_name',
+            [
+                'error_msg' => __( 'Band name is required.', 'my-plugin' ),
+                'type'      => 'error',
+            ]
+        )
+        : null,
 ]);
 ```
 
 ### Always a Warning (Not Configurable)
 
 ```php
+$validator_class = '\BlockAccessibility\Meta\Validator';
+$validator_available = class_exists( $validator_class );
+
 register_post_meta( 'band', 'band_website', [
     'single'            => true,
     'type'              => 'string',
     'show_in_rest'      => true,
     'sanitize_callback' => 'esc_url_raw',
-    'validate_callback' => MetaValidation::required( 'band', 'band_website', [
-        'error_msg' => __( 'Band website is recommended.', 'my-plugin' ),
-        'type'      => 'warning',
-    ]),
+    'validate_callback' => $validator_available
+        ? call_user_func(
+            array( $validator_class, 'required' ),
+            'band',
+            'band_website',
+            [
+                'error_msg' => __( 'Band website is recommended.', 'my-plugin' ),
+                'type'      => 'warning',
+            ]
+        )
+        : null,
 ]);
 ```
 

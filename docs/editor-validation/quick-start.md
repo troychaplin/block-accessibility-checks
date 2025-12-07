@@ -61,18 +61,28 @@ Your validation logic must be loaded in the block editor:
 
 ```php
 function my_plugin_enqueue_editor_validation() {
+    $asset_file = include plugin_dir_path( __FILE__ ) . 'build/editor-validation.asset.php';
+    
+    // Start with base dependencies
+    $dependencies = $asset_file['dependencies'];
+    
+    // Only add Block Accessibility Checks plugin as a dependency if it's active.
+    if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+        $dependencies[] = 'block-accessibility-script';
+    }
+
     wp_enqueue_script(
         'my-plugin-editor-validation',
         plugins_url( 'build/editor-validation.js', __FILE__ ),
-        array( 'wp-hooks', 'wp-i18n', 'block-accessibility-script' ),
-        '1.0.0',
+        $dependencies,
+        isset( $asset_file['version'] ) ? $asset_file['version'] : '1.0.0',
         true
     );
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_enqueue_editor_validation' );
 ```
 
-**Important:** Include `'block-accessibility-script'` as a dependency.
+**Important:** Conditionally including the dependency allows your plugin to work even when the Block Accessibility Checks plugin is deactivated.
 
 ## Common Use Cases
 

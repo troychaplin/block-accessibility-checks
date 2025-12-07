@@ -111,19 +111,28 @@ addFilter(
 
 **PHP:**
 ```php
-use BlockAccessibility\MetaValidation;
-
 add_action( 'init', function() {
+    // Check if Validator class is available (plugin may be deactivated)
+    $validator_class = '\BlockAccessibility\Meta\Validator';
+    $validator_available = class_exists( $validator_class );
+
     register_post_meta( 'band', 'band_origin', [
         'single'            => true,
         'type'              => 'string',
         'show_in_rest'      => true,
         'sanitize_callback' => 'sanitize_text_field',
-        'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
-            'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
-            'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
-            'type'        => 'settings',
-        ]),
+        'validate_callback' => $validator_available
+            ? call_user_func(
+                array( $validator_class, 'required' ),
+                'band',
+                'band_origin',
+                [
+                    'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
+                    'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
+                    'type'        => 'settings',
+                ]
+            )
+            : null,
     ]);
 });
 ```
@@ -152,17 +161,25 @@ addFilter(
 
 **PHP:**
 ```php
-use BlockAccessibility\MetaValidation;
+$validator_class = '\BlockAccessibility\Meta\Validator';
+$validator_available = class_exists( $validator_class );
 
 register_post_meta( 'band', 'band_start_date', [
     'single'            => true,
     'type'              => 'string',
     'show_in_rest'      => true,
     'sanitize_callback' => 'sanitize_text_field',
-    'validate_callback' => MetaValidation::required( 'band', 'band_start_date', [
-        'error_msg' => __( 'Start date is required and must be in YYYY-MM-DD format.', 'my-plugin' ),
-        'type'      => 'error',
-    ]),
+    'validate_callback' => $validator_available
+        ? call_user_func(
+            array( $validator_class, 'required' ),
+            'band',
+            'band_start_date',
+            [
+                'error_msg' => __( 'Start date is required and must be in YYYY-MM-DD format.', 'my-plugin' ),
+                'type'      => 'error',
+            ]
+        )
+        : null,
 ]);
 ```
 
@@ -332,8 +349,6 @@ A complete example showing all three validation systems working together:
 
 **PHP:**
 ```php
-use BlockAccessibility\MetaValidation;
-
 // Block check
 add_action( 'ba11yc_ready', function( $registry ) {
     $registry->register_check( 'my-plugin/card', 'has_title', [
@@ -343,11 +358,21 @@ add_action( 'ba11yc_ready', function( $registry ) {
 } );
 
 // Meta check
+$validator_class = '\BlockAccessibility\Meta\Validator';
+$validator_available = class_exists( $validator_class );
+
 register_post_meta( 'post', 'card_category', [
-    'validate_callback' => MetaValidation::required( 'post', 'card_category', [
-        'error_msg' => 'Category is required.',
-        'type'      => 'error',
-    ]),
+    'validate_callback' => $validator_available
+        ? call_user_func(
+            array( $validator_class, 'required' ),
+            'post',
+            'card_category',
+            [
+                'error_msg' => 'Category is required.',
+                'type'      => 'error',
+            ]
+        )
+        : null,
 ] );
 
 // Editor check

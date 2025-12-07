@@ -135,11 +135,22 @@ class MyCustomBlocksIntegration {
     }
 
     public function enqueue_validation_script() {
+        $asset_file = include plugin_dir_path( __FILE__ ) . 'build/validation.asset.php';
+        
+        // Start with base dependencies
+        $dependencies = $asset_file['dependencies'];
+        
+        // Only add Block Accessibility Checks plugin as a dependency if it's active.
+        // This allows your plugin to work even when the Block Accessibility Checks plugin is deactivated.
+        if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+            $dependencies[] = 'block-accessibility-script';
+        }
+
         wp_enqueue_script(
             'my-custom-blocks-validation',
             plugins_url( 'build/validation.js', __FILE__ ),
-            array( 'wp-hooks', 'wp-i18n', 'block-accessibility-script' ),
-            '1.0.0',
+            $dependencies,
+            isset( $asset_file['version'] ) ? $asset_file['version'] : '1.0.0',
             true
         );
     }

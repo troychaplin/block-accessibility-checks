@@ -155,22 +155,33 @@ addFilter(
 
 ## Enqueuing Your Script
 
-Your validation script must be loaded in the block editor with the correct dependencies:
+Your validation script must be loaded in the block editor. For better compatibility, conditionally add the dependency:
 
 ```php
 function my_plugin_enqueue_accessibility_assets() {
+    $asset_file = include plugin_dir_path( __FILE__ ) . 'build/a11y-checks.asset.php';
+    
+    // Start with base dependencies
+    $dependencies = $asset_file['dependencies'];
+    
+    // Only add Block Accessibility Checks plugin as a dependency if it's active.
+    // This allows your plugin to work even when the Block Accessibility Checks plugin is deactivated.
+    if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+        $dependencies[] = 'block-accessibility-script';
+    }
+
     wp_enqueue_script(
         'my-plugin-accessibility-checks',
         plugins_url( 'build/a11y-checks.js', __FILE__ ),
-        array( 'wp-hooks', 'wp-i18n', 'block-accessibility-script' ),
-        '1.0.0',
+        $dependencies,
+        isset( $asset_file['version'] ) ? $asset_file['version'] : '1.0.0',
         true
     );
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_enqueue_accessibility_assets' );
 ```
 
-**Important:** Include `'block-accessibility-script'` as a dependency to ensure the validation system is loaded first.
+**Important:** Include `'block-accessibility-script'` as a dependency (when available) to ensure the validation system is loaded first. If the plugin is not active, your script will still load but validation will not work.
 
 ## How Validation Works
 
