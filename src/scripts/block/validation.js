@@ -22,6 +22,9 @@ import {
  * These checks run automatically in the block editor unless explicitly disabled.
  * Each check defines a type (error/warning), default enabled state, and message.
  * PHP-registered checks from the server will override these defaults if present.
+ *
+ * Note: Heading checks are now handled entirely by PHP (check_heading_rank),
+ * so the default JavaScript check has been removed to respect PHP settings.
  */
 const defaultChecks = {
 	'core/image': {
@@ -43,13 +46,7 @@ const defaultChecks = {
 			message: __('Buttons must have a link', 'block-accessibility-checks'),
 		},
 	},
-	'core/heading': {
-		check_heading_order: {
-			type: 'warning',
-			default: true,
-			message: __('Heading levels should be sequential', 'block-accessibility-checks'),
-		},
-	},
+	// Heading checks removed - handled by PHP (check_heading_rank) to respect settings
 };
 
 /**
@@ -67,12 +64,22 @@ export const validateBlock = block => {
 	const attributes = block.attributes;
 	const issues = [];
 
+	// Get list of block types that PHP has registered checks for
+	// If PHP has registered checks for this block type, only use PHP checks (skip JS defaults)
+	const phpRegisteredTypes = window.BlockAccessibilityChecks?.registeredBlockTypes || [];
+	const phpHasChecks = phpRegisteredTypes.includes(blockType);
+
 	// Merge default JavaScript checks with PHP-registered checks
 	// PHP checks (from blockChecksArray) take precedence over defaults
-	const checks = {
-		...(defaultChecks[blockType] || {}),
-		...(blockChecksArray[blockType] || {}),
-	};
+	// If PHP has registered checks for this block type, skip JavaScript defaults entirely
+	const checks = phpHasChecks
+		? {
+				...(blockChecksArray[blockType] || {}),
+			}
+		: {
+				...(defaultChecks[blockType] || {}),
+				...(blockChecksArray[blockType] || {}),
+			};
 
 	// No checks registered for this block type - return valid
 	if (Object.keys(checks).length === 0) {
@@ -118,7 +125,8 @@ export const validateBlock = block => {
 					isValid = attributes.url !== undefined && attributes.url.trim() !== '';
 					break;
 				case 'check_heading_order':
-					// Heading order validation requires document context (previous headings)
+				case 'check_heading_rank':
+					// Heading order/rank validation requires document context (previous headings)
 					// Handled by the ba11yc/headingRankValidation filter via ba11yc_validate_block
 					// Return true here to defer to the filter for actual validation
 					isValid = true;

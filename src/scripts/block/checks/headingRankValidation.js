@@ -33,7 +33,7 @@ addFilter(
 		}
 
 		// Route to the appropriate validation function based on the check type
-		// 'check_heading_order' is the key in defaultChecks in validation.js
+		// Handles both 'check_heading_order' (legacy) and 'check_heading_rank' (PHP-registered)
 		if (checkName === 'check_heading_order' || checkName === 'check_heading_rank') {
 			// We need the full block object to identify it in the hierarchy
 			if (!block || !block.clientId) {

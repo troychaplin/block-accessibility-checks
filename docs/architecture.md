@@ -223,7 +223,7 @@ Warnings do not lock the post, but are displayed for user feedback.
 - **validateMeta.js** - Meta validation logic
 - **validateEditor.js** - Editor validation logic
 - **validationApi.js** - Coordinates all validation and post locking
-- **UnifiedValidationSidebar.js** - Consolidates all validation issues
+- **ValidationSidebar.js** - Consolidates all validation issues
 - **ValidationHeaderButton.js** - Header toolbar button with issue count
 - **BlockIndicator.js** - Inline indicator for block validation issues
 - **MetaField.js** - UI component for meta field validation display

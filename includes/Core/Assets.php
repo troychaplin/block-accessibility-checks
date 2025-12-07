@@ -143,6 +143,7 @@ class Assets {
 		$validation_rules        = $this->prepare_validation_rules_for_js( $registry );
 		$meta_validation_rules   = $this->prepare_meta_validation_rules_for_js( $meta_registry );
 		$editor_validation_rules = $this->prepare_editor_validation_rules_for_js( $editor_registry );
+		$registered_block_types  = $registry->get_registered_block_types();
 
 		\wp_localize_script(
 			self::SCRIPT_HANDLE,
@@ -152,6 +153,7 @@ class Assets {
 				'validationRules'       => $validation_rules,
 				'metaValidationRules'   => $meta_validation_rules,
 				'editorValidationRules' => $editor_validation_rules,
+				'registeredBlockTypes'  => $registered_block_types,
 			)
 		);
 	}

@@ -31,7 +31,7 @@ Replace the current clunky message display system (PluginDocumentSettingPanel an
 **New Files to Create:**
 
 - `src/scripts/components/ValidationHeaderButton.js` - Header toolbar button with badge
-- `src/scripts/components/UnifiedValidationSidebar.js` - Consolidated sidebar
+- `src/scripts/components/ValidationSidebar.js` - Consolidated sidebar
 - `src/scripts/components/BlockIndicator.js` - Inline block indicator component
 - `src/scripts/components/MetaIndicator.js` - Inline meta field indicator component
 - `src/scripts/components/ValidationTooltip.js` - Tooltip component for indicators
