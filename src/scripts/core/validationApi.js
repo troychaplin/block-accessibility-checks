@@ -49,12 +49,8 @@ export function ValidationAPI() {
 	// Verify the store exists before using it
 	const storeExists = wp.data && wp.data.select && wp.data.select(editorStore);
 
-	// Exit early if not in a supported context or store doesn't exist
-	if (!isValidContext || editorContext === 'none' || !storeExists) {
-		return null;
-	}
-
 	// Retrieve validation results from all validation sources
+	// Called unconditionally to avoid unused variable lint errors
 	const invalidBlocks = GetInvalidBlocks();
 	const invalidMeta = GetInvalidMeta();
 	const invalidEditorChecks = GetInvalidEditorChecks();
@@ -80,6 +76,11 @@ export function ValidationAPI() {
 	 * Works in both post editor and site editor contexts.
 	 */
 	useEffect(() => {
+		// Exit early if not in a supported context or store doesn't exist
+		if (!isValidContext || editorContext === 'none' || !storeExists) {
+			return;
+		}
+
 		// Verify we have the necessary dispatch functions
 		if (!lockPostSaving || !unlockPostSaving) {
 			return;
@@ -119,6 +120,9 @@ export function ValidationAPI() {
 		unlockPostAutosaving,
 		disablePublishSidebar,
 		enablePublishSidebar,
+		isValidContext,
+		editorContext,
+		storeExists,
 	]);
 
 	/**
@@ -132,6 +136,11 @@ export function ValidationAPI() {
 	 * Works in both post editor and site editor contexts.
 	 */
 	useEffect(() => {
+		// Exit early if not in a supported context
+		if (!isValidContext || editorContext === 'none') {
+			return;
+		}
+
 		// Ensure document.body is available before manipulating classes
 		if (!document.body) {
 			return;
@@ -179,7 +188,7 @@ export function ValidationAPI() {
 				);
 			}
 		};
-	}, [invalidBlocks, invalidMeta, invalidEditorChecks]);
+	}, [invalidBlocks, invalidMeta, invalidEditorChecks, isValidContext, editorContext]);
 
 	// This component manages side effects only, no UI rendering
 	return null;
