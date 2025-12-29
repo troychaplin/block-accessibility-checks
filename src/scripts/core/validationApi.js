@@ -16,22 +16,46 @@ import { hasErrors, hasWarnings } from './utils/issueHelpers';
  * Validation API Component
  *
  * Central component that orchestrates validation across blocks, meta fields, and editor checks.
- * Manages post saving restrictions and body classes based on validation results. When errors
- * are detected, prevents post saving/autosaving and disables the publish sidebar to ensure
+ * Manages post/template saving restrictions and body classes based on validation results. When
+ * errors are detected, prevents saving/autosaving and disables the publish sidebar to ensure
  * content meets accessibility requirements before publication.
+ *
+ * Supports multiple editor contexts:
+ * - post-editor: Default post/page editing
+ * - post-editor-template: Post/page editing with template visible
+ * - site-editor: Template editing in site editor
  *
  * This component doesn't render any UI but manages validation state and editor behavior.
  */
 export function ValidationAPI() {
-	// Check if we're in the post editor context (not site editor or other contexts)
-	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
+	// Get the editor context from PHP
+	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
+
+	// Check if we're in a supported editor context
+	const isPostEditor =
+		editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isSiteEditor = editorContext === 'site-editor';
+	const isValidContext = isPostEditor || isSiteEditor;
+
+	// Get dispatch functions based on editor context
+	// IMPORTANT: lockPostSaving/unlockPostSaving are ONLY in 'core/editor'
+	// Even in site editor, we need to use 'core/editor' for locking functionality
+	// The core/edit-site store does not have these methods
+	const editorStore = 'core/editor';
+
+	// Call useDispatch unconditionally (React Hook rules - must be before any early returns)
+	const dispatch = useDispatch(editorStore);
+
+	// Verify the store exists before using it
+	const storeExists = wp.data && wp.data.select && wp.data.select(editorStore);
 
 	// Retrieve validation results from all validation sources
+	// Called unconditionally to avoid unused variable lint errors
 	const invalidBlocks = GetInvalidBlocks();
 	const invalidMeta = GetInvalidMeta();
 	const invalidEditorChecks = GetInvalidEditorChecks();
 
-	// Get dispatch functions for managing post saving state
+	// Destructure functions - these exist in core/editor for both contexts
 	const {
 		lockPostSaving,
 		unlockPostSaving,
@@ -39,19 +63,26 @@ export function ValidationAPI() {
 		unlockPostAutosaving,
 		disablePublishSidebar,
 		enablePublishSidebar,
-	} = useDispatch('core/editor');
+	} = dispatch || {};
 
 	/**
-	 * Manage post saving restrictions based on validation errors
+	 * Manage post/template saving restrictions based on validation errors
 	 *
 	 * Monitors validation results from blocks, meta fields, and editor checks.
-	 * When any errors are detected, locks both manual and automatic post saving
+	 * When any errors are detected, locks both manual and automatic saving
 	 * and disables the publish sidebar. This prevents publishing content with
 	 * accessibility issues. When all errors are resolved, re-enables saving.
+	 *
+	 * Works in both post editor and site editor contexts.
 	 */
 	useEffect(() => {
-		// Only apply restrictions in the post editor context
-		if (!isPostEditor) {
+		// Exit early if not in a supported context or store doesn't exist
+		if (!isValidContext || editorContext === 'none' || !storeExists) {
+			return;
+		}
+
+		// Verify we have the necessary dispatch functions
+		if (!lockPostSaving || !unlockPostSaving) {
 			return;
 		}
 
@@ -62,26 +93,36 @@ export function ValidationAPI() {
 
 		// Lock saving if any validation errors exist
 		if (hasBlockErrors || hasMetaErrors || hasEditorErrors) {
-			lockPostSaving();
-			lockPostAutosaving();
-			disablePublishSidebar();
+			lockPostSaving('block-accessibility-checks');
+			if (lockPostAutosaving) {
+				lockPostAutosaving('block-accessibility-checks');
+			}
+			if (disablePublishSidebar) {
+				disablePublishSidebar();
+			}
 		} else {
 			// Re-enable saving when all errors are resolved
-			unlockPostSaving();
-			unlockPostAutosaving();
-			enablePublishSidebar();
+			unlockPostSaving('block-accessibility-checks');
+			if (unlockPostAutosaving) {
+				unlockPostAutosaving('block-accessibility-checks');
+			}
+			if (enablePublishSidebar) {
+				enablePublishSidebar();
+			}
 		}
 	}, [
 		invalidBlocks,
 		invalidMeta,
 		invalidEditorChecks,
+		lockPostSaving,
+		unlockPostSaving,
+		lockPostAutosaving,
+		unlockPostAutosaving,
 		disablePublishSidebar,
 		enablePublishSidebar,
-		lockPostAutosaving,
-		lockPostSaving,
-		unlockPostAutosaving,
-		unlockPostSaving,
-		isPostEditor,
+		isValidContext,
+		editorContext,
+		storeExists,
 	]);
 
 	/**
@@ -91,10 +132,12 @@ export function ValidationAPI() {
 	 * meta fields, and editor checks. These classes enable theme/plugin developers to
 	 * style the editor interface based on validation state (e.g., highlighting
 	 * areas with issues). Classes are removed when validation passes or component unmounts.
+	 *
+	 * Works in both post editor and site editor contexts.
 	 */
 	useEffect(() => {
-		// Only manage classes in the post editor context
-		if (!isPostEditor) {
+		// Exit early if not in a supported context
+		if (!isValidContext || editorContext === 'none') {
 			return;
 		}
 
@@ -145,7 +188,7 @@ export function ValidationAPI() {
 				);
 			}
 		};
-	}, [invalidBlocks, invalidMeta, invalidEditorChecks, isPostEditor]);
+	}, [invalidBlocks, invalidMeta, invalidEditorChecks, isValidContext, editorContext]);
 
 	// This component manages side effects only, no UI rendering
 	return null;

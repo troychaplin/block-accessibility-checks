@@ -224,7 +224,13 @@ class Plugin {
 			$scripts_styles = $this->get_service( 'scripts_styles' );
 
 			if ( $scripts_styles ) {
+				// enqueue_block_editor_assets: Loads in the main editor window (post editor).
 				\add_action( 'enqueue_block_editor_assets', array( $scripts_styles, 'enqueue_block_assets' ) );
+
+				// enqueue_block_assets: Loads in the editor iframe (site editor) and frontend.
+				// The is_admin() check inside the method prevents loading on frontend.
+				\add_action( 'enqueue_block_assets', array( $scripts_styles, 'enqueue_block_assets' ) );
+
 				\add_action( 'admin_enqueue_scripts', array( $scripts_styles, 'enqueue_admin_assets' ) );
 				$this->log_debug( 'WordPress hooks setup completed.' );
 			} else {

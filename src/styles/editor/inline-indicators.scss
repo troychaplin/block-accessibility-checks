@@ -17,11 +17,11 @@
 }
 
 // Inline block and meta field indicator buttons
-.editor-visual-editor .ba11y-block-indicator-button.components-button,
-.editor-visual-editor .ba11y-meta-indicator-button.components-button {
+.ba11y-block-indicator-button.components-button.has-icon,
+.ba11y-meta-indicator-button.components-button.has-icon {
 	pointer-events: all;
-    position: absolute;
-    min-width: 0;
+	position: absolute;
+	min-width: 0;
 	width: 100%;
 	height: 100%;
 	padding: 0;
@@ -31,39 +31,40 @@
 	transition: all 0.2s ease;
 
 	svg {
-        fill: var(--a11y-dark-red);
+		fill: var(--a11y-dark-red);
 		width: 18px;
 		height: 18px;
 	}
 
 	&:hover {
 		background-color: var(--a11y-red);
-        
-        svg {
-            fill: #fff;
-        }
+
+		svg {
+			fill: #fff;
+		}
 	}
 }
 
 // Inline block and meta field warning buttons
-.editor-visual-editor .ba11y-block-indicator--warning .ba11y-block-indicator-button.components-button,
-.editor-visual-editor .ba11y-meta-indicator--warning .ba11y-meta-indicator-button.components-button {
+.ba11y-block-indicator--warning .ba11y-block-indicator-button.components-button,
+.ba11y-meta-indicator--warning .ba11y-meta-indicator-button.components-button {
 	background-color: var(--a11y-light-yellow);
 	border-color: var(--a11y-yellow);
 	color: var(--a11y-yellow);
 
+	// stylelint-disable-next-line no-descending-specificity
 	svg {
-        fill: var(--a11y-dark-yellow);
-        width: 20px;
-        height: 20px;
+		fill: var(--a11y-dark-yellow);
+		width: 20px;
+		height: 20px;
 	}
 
 	&:hover {
 		background-color: var(--a11y-yellow);
-        border: 1px solid var(--a11y-yellow);
-        
-        svg {
-            fill: #fff;
-        }
+		border: 1px solid var(--a11y-yellow);
+
+		svg {
+			fill: #fff;
+		}
 	}
 }

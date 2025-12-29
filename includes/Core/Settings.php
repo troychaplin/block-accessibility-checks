@@ -133,6 +133,16 @@ class Settings {
 			'block_checks_options_section'
 		);
 
+		// Register site editor validation settings.
+		\register_setting(
+			'block_checks_settings_group',
+			'block_checks_site_editor_options',
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_site_editor_options' ),
+				'default'           => array( 'enabled' => true ),
+			)
+		);
+
 		// Register external plugin settings.
 		$this->register_external_plugin_settings();
 
@@ -364,6 +374,52 @@ class Settings {
 
 		// Set success notice for external plugin settings.
 		\set_transient( 'ba11yc_external_settings_saved', true, 30 );
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize site editor validation options
+	 *
+	 * Handles sanitization of site editor-specific validation settings.
+	 * Currently supports a global enabled/disabled flag. Future versions
+	 * will support per-block-type validation control.
+	 *
+	 * @param mixed $input The input array from the settings form.
+	 * @return array The sanitized options array.
+	 */
+	public function sanitize_site_editor_options( $input ): array {
+		$sanitized = array(
+			'enabled' => true,
+		);
+
+		if ( ! is_array( $input ) ) {
+			return $sanitized;
+		}
+
+		// Sanitize global enabled flag.
+		if ( isset( $input['enabled'] ) ) {
+			$sanitized['enabled'] = (bool) $input['enabled'];
+		}
+
+		// Future: Per-block-type settings will be handled here.
+		// Example structure:
+		// 'block_types' => array(
+		// 'core/heading' => 'error',
+		// 'core/image' => 'warning',
+		// 'core/button' => 'none',
+		// ).
+		if ( isset( $input['block_types'] ) && is_array( $input['block_types'] ) ) {
+			$sanitized['block_types'] = array();
+			foreach ( $input['block_types'] as $block_type => $level ) {
+				if ( in_array( $level, self::VALID_CHECK_VALUES, true ) ) {
+					$sanitized['block_types'][ \sanitize_text_field( $block_type ) ] = \sanitize_text_field( $level );
+				}
+			}
+		}
+
+		// Set success notice for site editor settings.
+		\set_transient( 'ba11yc_site_editor_settings_saved', true, 30 );
 
 		return $sanitized;
 	}
