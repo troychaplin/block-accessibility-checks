@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,8 +32,7 @@ export function ValidationAPI() {
 	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
 
 	// Check if we're in a supported editor context
-	const isPostEditor =
-		editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isPostEditor = editorContext === 'post-editor' || editorContext === 'post-editor-template';
 	const isSiteEditor = editorContext === 'site-editor';
 	const isValidContext = isPostEditor || isSiteEditor;
 
@@ -73,6 +72,9 @@ export function ValidationAPI() {
 		enablePublishSidebar,
 	} = dispatch || {};
 
+	// Track the previous error state to prevent premature unlocking during template loading
+	const previousHadErrors = useRef(false);
+
 	/**
 	 * Manage post/template saving restrictions based on validation errors
 	 *
@@ -93,9 +95,10 @@ export function ValidationAPI() {
 		const hasBlockErrors = invalidBlocks.some(block => block.mode === 'error');
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 		const hasEditorErrors = hasErrors(invalidEditorChecks);
+		const currentHasErrors = hasBlockErrors || hasMetaErrors || hasEditorErrors;
 
 		// Lock saving if any validation errors exist
-		if (hasBlockErrors || hasMetaErrors || hasEditorErrors) {
+		if (currentHasErrors) {
 			lockPostSaving('block-accessibility-checks');
 			if (lockPostAutosaving) {
 				lockPostAutosaving('block-accessibility-checks');
@@ -103,8 +106,20 @@ export function ValidationAPI() {
 			if (disablePublishSidebar) {
 				disablePublishSidebar();
 			}
-		} else {
-			// Re-enable saving when all errors are resolved
+			previousHadErrors.current = true;
+		} else if (!currentHasErrors && previousHadErrors.current) {
+			// Only unlock if we previously had errors and now they're resolved
+			// This prevents unlocking during initial load or template transitions
+			unlockPostSaving('block-accessibility-checks');
+			if (unlockPostAutosaving) {
+				unlockPostAutosaving('block-accessibility-checks');
+			}
+			if (enablePublishSidebar) {
+				enablePublishSidebar();
+			}
+			previousHadErrors.current = false;
+		} else if (!currentHasErrors && !previousHadErrors.current) {
+			// Ensure we're unlocked if there were never any errors
 			unlockPostSaving('block-accessibility-checks');
 			if (unlockPostAutosaving) {
 				unlockPostAutosaving('block-accessibility-checks');
@@ -113,7 +128,19 @@ export function ValidationAPI() {
 				enablePublishSidebar();
 			}
 		}
-	}, [invalidBlocks, invalidMeta, invalidEditorChecks, editorContext, editorStore]);
+	}, [
+		invalidBlocks,
+		invalidMeta,
+		invalidEditorChecks,
+		editorContext,
+		editorStore,
+		lockPostSaving,
+		unlockPostSaving,
+		lockPostAutosaving,
+		unlockPostAutosaving,
+		disablePublishSidebar,
+		enablePublishSidebar,
+	]);
 
 	/**
 	 * Manage body classes for validation state styling
