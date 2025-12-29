@@ -82,8 +82,7 @@ function findPostContentBlock(blocks) {
 export function GetInvalidBlocks() {
 	// Get editor context to determine filtering strategy
 	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
-	const isPostEditor =
-		editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isPostEditor = editorContext === 'post-editor' || editorContext === 'post-editor-template';
 	const isSiteEditor = editorContext === 'site-editor';
 
 	// Retrieve all top-level blocks from the editor store
@@ -94,23 +93,8 @@ export function GetInvalidBlocks() {
 		// IMPORTANT: Calling getBlocks() subscribes to block changes
 		const blocks = blockEditorSelect.getBlocks();
 
-		// DEBUG: Log context and block structure
-		console.log('[BA11YC] Editor Context:', editorContext);
-		console.log('[BA11YC] Total blocks:', blocks.length);
-		console.log(
-			'[BA11YC] Block structure:',
-			blocks.map(b => ({
-				name: b.name,
-				clientId: b.clientId,
-				hasInnerBlocks: b.innerBlocks && b.innerBlocks.length > 0,
-				innerBlockCount: b.innerBlocks ? b.innerBlocks.length : 0,
-				innerBlockNames: b.innerBlocks ? b.innerBlocks.map(ib => ib.name) : [],
-			}))
-		);
-
 		// Site editor: validate all blocks including template parts
 		if (isSiteEditor) {
-			console.log('[BA11YC] Site editor - validating all blocks');
 			return blocks;
 		}
 
@@ -122,68 +106,37 @@ export function GetInvalidBlocks() {
 				// Template is shown - get the actual innerBlocks using getBlock
 				// Note: getBlocks() excludes child blocks of nested inner block controllers
 				// So we need to fetch the block directly by clientId to get its innerBlocks
-				// IMPORTANT: This getBlock call should subscribe to changes in this specific block
 				const fullBlock = blockEditorSelect.getBlock(postContentBlock.clientId);
 
-				// DEBUG: Log the complete block structure to understand what's happening
-				console.log('[BA11YC] POST-CONTENT FULL BLOCK:', fullBlock);
-				console.log('[BA11YC] Found post-content block:', {
-					clientId: postContentBlock.clientId,
-					innerBlocksFromGetBlocks: postContentBlock.innerBlocks?.length || 0,
-					innerBlocksFromGetBlock: fullBlock?.innerBlocks?.length || 0,
-					innerBlocks:
-						fullBlock?.innerBlocks?.map(b => ({
-							name: b.name,
-							clientId: b.clientId,
-						})) || [],
-				});
-
-				// Try an alternative approach - get blocks by client ID from the parent
+				// Get blocks by client ID - this approach works when innerBlocks is empty
+				// but the block order is available (common during template loading)
 				const blockOrder = blockEditorSelect.getBlockOrder(postContentBlock.clientId);
-				console.log('[BA11YC] Block order (child IDs):', blockOrder);
 
-				// Get each child block individually
-				const childBlocks = blockOrder
-					.map(childId => blockEditorSelect.getBlock(childId))
-					.filter(Boolean);
-				console.log(
-					'[BA11YC] Child blocks retrieved:',
-					childBlocks.map(b => ({
-						name: b.name,
-						clientId: b.clientId,
-					}))
-				);
+				// IMPORTANT: Map over block IDs and call getBlock for each to establish
+				// proper subscriptions. This ensures re-renders when template parts finish loading.
+				const childBlocks = blockOrder.map(childId => {
+					const childBlock = blockEditorSelect.getBlock(childId);
+					// Also subscribe to each child's block order to catch nested changes
+					blockEditorSelect.getBlockOrder(childId);
+					return childBlock;
+				}).filter(Boolean);
 
 				// Return whichever has content - fullBlock.innerBlocks or childBlocks
-				const blocksToValidate =
-					fullBlock?.innerBlocks?.length > 0 ? fullBlock.innerBlocks : childBlocks;
-				console.log('[BA11YC] Blocks to validate:', blocksToValidate.length);
+				const blocksToValidate = (fullBlock?.innerBlocks?.length > 0) ? fullBlock.innerBlocks : childBlocks;
 
 				return blocksToValidate;
+			} else {
+				// No template - validate all blocks (normal post editing)
+				return blocks;
 			}
-			// No template - validate all blocks (normal post editing)
-			console.log('[BA11YC] No post-content found, validating all blocks');
-			return blocks;
 		}
 
 		// Fallback for unknown contexts
-		console.log('[BA11YC] Unknown context, returning all blocks');
 		return blocks;
-	}, []);
+	}, [editorContext, isPostEditor, isSiteEditor]);
 
 	// Recursively validate all blocks and their innerBlocks, collecting failures
 	const invalidBlocks = getInvalidBlocksRecursive(allBlocks);
-
-	console.log('[BA11YC] Invalid blocks found:', invalidBlocks.length);
-	console.log(
-		'[BA11YC] Invalid block details:',
-		invalidBlocks.map(b => ({
-			name: b.name,
-			clientId: b.clientId,
-			mode: b.mode,
-			issues: b.issues,
-		}))
-	);
 
 	// Return the array of invalid block validation results
 	// Note: getInvalidBlocksRecursive already filters to only invalid blocks

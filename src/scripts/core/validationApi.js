@@ -32,8 +32,7 @@ export function ValidationAPI() {
 	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
 
 	// Check if we're in a supported editor context
-	const isPostEditor =
-		editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isPostEditor = editorContext === 'post-editor' || editorContext === 'post-editor-template';
 	const isSiteEditor = editorContext === 'site-editor';
 	const isValidContext = isPostEditor || isSiteEditor;
 
@@ -86,7 +85,6 @@ export function ValidationAPI() {
 	useEffect(() => {
 		// Verify we have the necessary dispatch functions
 		if (!lockPostSaving || !unlockPostSaving) {
-			console.log('[BA11YC] Missing lock/unlock functions');
 			return;
 		}
 
@@ -95,25 +93,8 @@ export function ValidationAPI() {
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 		const hasEditorErrors = hasErrors(invalidEditorChecks);
 
-		console.log('[BA11YC] Validation check:', {
-			editorContext,
-			editorStore,
-			hasBlockErrors,
-			hasMetaErrors,
-			hasEditorErrors,
-			invalidBlocksCount: invalidBlocks.length,
-			invalidBlockDetails: invalidBlocks.map(b => ({
-				name: b.name,
-				clientId: b.clientId,
-				mode: b.mode,
-			})),
-		});
-
-		// IMPORTANT: Always lock first, then selectively unlock
-		// This prevents race conditions where template loading momentarily shows no errors
 		// Lock saving if any validation errors exist
 		if (hasBlockErrors || hasMetaErrors || hasEditorErrors) {
-			console.log('[BA11YC] LOCKING saving due to errors');
 			lockPostSaving('block-accessibility-checks');
 			if (lockPostAutosaving) {
 				lockPostAutosaving('block-accessibility-checks');
@@ -123,7 +104,6 @@ export function ValidationAPI() {
 			}
 		} else {
 			// Re-enable saving when all errors are resolved
-			console.log('[BA11YC] UNLOCKING saving - no errors');
 			unlockPostSaving('block-accessibility-checks');
 			if (unlockPostAutosaving) {
 				unlockPostAutosaving('block-accessibility-checks');
@@ -132,7 +112,13 @@ export function ValidationAPI() {
 				enablePublishSidebar();
 			}
 		}
-	}, [invalidBlocks, invalidMeta, invalidEditorChecks, editorContext, editorStore]);
+	}, [
+		invalidBlocks,
+		invalidMeta,
+		invalidEditorChecks,
+		editorContext,
+		editorStore,
+	]);
 
 	/**
 	 * Manage body classes for validation state styling
