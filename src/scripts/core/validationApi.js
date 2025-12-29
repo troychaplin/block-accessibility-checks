@@ -32,7 +32,8 @@ export function ValidationAPI() {
 	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
 
 	// Check if we're in a supported editor context
-	const isPostEditor = editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isPostEditor =
+		editorContext === 'post-editor' || editorContext === 'post-editor-template';
 	const isSiteEditor = editorContext === 'site-editor';
 	const isValidContext = isPostEditor || isSiteEditor;
 
@@ -112,13 +113,7 @@ export function ValidationAPI() {
 				enablePublishSidebar();
 			}
 		}
-	}, [
-		invalidBlocks,
-		invalidMeta,
-		invalidEditorChecks,
-		editorContext,
-		editorStore,
-	]);
+	}, [invalidBlocks, invalidMeta, invalidEditorChecks, editorContext, editorStore]);
 
 	/**
 	 * Manage body classes for validation state styling

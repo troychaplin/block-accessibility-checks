@@ -86,13 +86,18 @@ class Assets {
 	 *
 	 * This method is responsible for enqueueing the necessary scripts and styles for the block.
 	 * It sets up script translations and then calls the methods to enqueue the block scripts and styles.
-	 * Supports all editor contexts: post editor (default and template view) and site editor.
+	 *
+	 * Runs in both editor contexts:
+	 * - enqueue_block_editor_assets: Main editor window
+	 * - enqueue_block_assets: Editor iframe (site editor) and frontend
+	 *
+	 * We only want to load in admin/editor contexts, not on the frontend.
 	 *
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
-		// Only run in supported editor contexts (post editor and site editor).
-		if ( ! $this->should_load_validation() ) {
+		// Only load in admin/editor contexts, not on frontend.
+		if ( ! \is_admin() ) {
 			return;
 		}
 
@@ -184,9 +189,17 @@ class Assets {
 		$warning_icon_url = plugins_url( 'src/assets/universal-access-warning.svg', $this->plugin_file );
 		$error_icon_url   = plugins_url( 'src/assets/universal-access-error.svg', $this->plugin_file );
 
-		// Add the SVG URLs as CSS variables for warning and error icons.
+		// Add the SVG URLs and color variables for the editor.
+		// Color variables are duplicated here to ensure they load in the site editor iframe.
 		$inline_css = sprintf(
 			":root {
+				--a11y-red: #d82000;
+				--a11y-light-red: #ffe4e0;
+				--a11y-dark-red: #a21800;
+				--a11y-yellow: #dbc900;
+				--a11y-light-yellow: #fffde2;
+				--a11y-dark-yellow: #807500;
+				--a11y-border-width: 3px solid;
 				--a11y-warning-icon: url('%s');
 				--a11y-error-icon: url('%s');
 			}",
