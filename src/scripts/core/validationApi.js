@@ -32,19 +32,10 @@ export function ValidationAPI() {
 	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
 
 	// Check if we're in a supported editor context
-	const isPostEditor = editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isPostEditor =
+		editorContext === 'post-editor' || editorContext === 'post-editor-template';
 	const isSiteEditor = editorContext === 'site-editor';
 	const isValidContext = isPostEditor || isSiteEditor;
-
-	// Exit early if not in a supported context
-	if (!isValidContext || editorContext === 'none') {
-		return null;
-	}
-
-	// Retrieve validation results from all validation sources
-	const invalidBlocks = GetInvalidBlocks();
-	const invalidMeta = GetInvalidMeta();
-	const invalidEditorChecks = GetInvalidEditorChecks();
 
 	// Get dispatch functions based on editor context
 	// IMPORTANT: lockPostSaving/unlockPostSaving are ONLY in 'core/editor'
@@ -52,15 +43,21 @@ export function ValidationAPI() {
 	// The core/edit-site store does not have these methods
 	const editorStore = 'core/editor';
 
+	// Call useDispatch unconditionally (React Hook rules - must be before any early returns)
+	const dispatch = useDispatch(editorStore);
+
 	// Verify the store exists before using it
 	const storeExists = wp.data && wp.data.select && wp.data.select(editorStore);
 
-	if (!storeExists) {
-		console.log('[BA11YC] core/editor store not available');
+	// Exit early if not in a supported context or store doesn't exist
+	if (!isValidContext || editorContext === 'none' || !storeExists) {
 		return null;
 	}
 
-	const dispatch = useDispatch(editorStore);
+	// Retrieve validation results from all validation sources
+	const invalidBlocks = GetInvalidBlocks();
+	const invalidMeta = GetInvalidMeta();
+	const invalidEditorChecks = GetInvalidEditorChecks();
 
 	// Destructure functions - these exist in core/editor for both contexts
 	const {

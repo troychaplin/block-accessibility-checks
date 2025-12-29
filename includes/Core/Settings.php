@@ -390,7 +390,7 @@ class Settings {
 	 */
 	public function sanitize_site_editor_options( $input ): array {
 		$sanitized = array(
-			'enabled' => true, // Default to enabled
+			'enabled' => true,
 		);
 
 		if ( ! is_array( $input ) ) {
@@ -405,10 +405,10 @@ class Settings {
 		// Future: Per-block-type settings will be handled here.
 		// Example structure:
 		// 'block_types' => array(
-		//     'core/heading' => 'error',
-		//     'core/image' => 'warning',
-		//     'core/button' => 'none',
-		// )
+		// 'core/heading' => 'error',
+		// 'core/image' => 'warning',
+		// 'core/button' => 'none',
+		// ).
 		if ( isset( $input['block_types'] ) && is_array( $input['block_types'] ) ) {
 			$sanitized['block_types'] = array();
 			foreach ( $input['block_types'] as $block_type => $level ) {

@@ -82,60 +82,66 @@ function findPostContentBlock(blocks) {
 export function GetInvalidBlocks() {
 	// Get editor context to determine filtering strategy
 	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
-	const isPostEditor = editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isPostEditor =
+		editorContext === 'post-editor' || editorContext === 'post-editor-template';
 	const isSiteEditor = editorContext === 'site-editor';
 
 	// Retrieve all top-level blocks from the editor store
-	const allBlocks = useSelect(select => {
-		const blockEditorSelect = select('core/block-editor');
+	const allBlocks = useSelect(
+		select => {
+			const blockEditorSelect = select('core/block-editor');
 
-		// Get all blocks from the editor
-		// IMPORTANT: Calling getBlocks() subscribes to block changes
-		const blocks = blockEditorSelect.getBlocks();
+			// Get all blocks from the editor
+			// IMPORTANT: Calling getBlocks() subscribes to block changes
+			const blocks = blockEditorSelect.getBlocks();
 
-		// Site editor: validate all blocks including template parts
-		if (isSiteEditor) {
-			return blocks;
-		}
+			// Site editor: validate all blocks including template parts
+			if (isSiteEditor) {
+				return blocks;
+			}
 
-		// Post editor: search for core/post-content block to determine if template is shown
-		if (isPostEditor) {
-			const postContentBlock = findPostContentBlock(blocks);
+			// Post editor: search for core/post-content block to determine if template is shown
+			if (isPostEditor) {
+				const postContentBlock = findPostContentBlock(blocks);
 
-			if (postContentBlock) {
-				// Template is shown - get the actual innerBlocks using getBlock
-				// Note: getBlocks() excludes child blocks of nested inner block controllers
-				// So we need to fetch the block directly by clientId to get its innerBlocks
-				const fullBlock = blockEditorSelect.getBlock(postContentBlock.clientId);
+				if (postContentBlock) {
+					// Template is shown - get the actual innerBlocks using getBlock
+					// Note: getBlocks() excludes child blocks of nested inner block controllers
+					// So we need to fetch the block directly by clientId to get its innerBlocks
+					const fullBlock = blockEditorSelect.getBlock(postContentBlock.clientId);
 
-				// Get blocks by client ID - this approach works when innerBlocks is empty
-				// but the block order is available (common during template loading)
-				const blockOrder = blockEditorSelect.getBlockOrder(postContentBlock.clientId);
+					// Get blocks by client ID - this approach works when innerBlocks is empty
+					// but the block order is available (common during template loading)
+					const blockOrder = blockEditorSelect.getBlockOrder(postContentBlock.clientId);
 
-				// IMPORTANT: Map over block IDs and call getBlock for each to establish
-				// proper subscriptions. This ensures re-renders when template parts finish loading.
-				const childBlocks = blockOrder.map(childId => {
-					const childBlock = blockEditorSelect.getBlock(childId);
-					// Also subscribe to each child's block order to catch nested changes
-					blockEditorSelect.getBlockOrder(childId);
-					return childBlock;
-				}).filter(Boolean);
+					// IMPORTANT: Map over block IDs and call getBlock for each to establish
+					// proper subscriptions. This ensures re-renders when template parts finish loading.
+					const childBlocks = blockOrder
+						.map(childId => {
+							const childBlock = blockEditorSelect.getBlock(childId);
+							// Also subscribe to each child's block order to catch nested changes
+							blockEditorSelect.getBlockOrder(childId);
+							return childBlock;
+						})
+						.filter(Boolean);
 
-				// Use childBlocks if available, otherwise use fullBlock.innerBlocks
-				// During template loading, childBlocks will be populated via getBlock calls
-				// even if fullBlock.innerBlocks is temporarily empty
-				const blocksToValidate = childBlocks.length > 0 ? childBlocks : (fullBlock?.innerBlocks || []);
+					// Use childBlocks if available, otherwise use fullBlock.innerBlocks
+					// During template loading, childBlocks will be populated via getBlock calls
+					// even if fullBlock.innerBlocks is temporarily empty
+					const blocksToValidate =
+						childBlocks.length > 0 ? childBlocks : fullBlock?.innerBlocks || [];
 
-				return blocksToValidate;
-			} else {
+					return blocksToValidate;
+				}
 				// No template - validate all blocks (normal post editing)
 				return blocks;
 			}
-		}
 
-		// Fallback for unknown contexts
-		return blocks;
-	}, [editorContext, isPostEditor, isSiteEditor]);
+			// Fallback for unknown contexts
+			return blocks;
+		},
+		[isPostEditor, isSiteEditor]
+	);
 
 	// Recursively validate all blocks and their innerBlocks, collecting failures
 	const invalidBlocks = getInvalidBlocksRecursive(allBlocks);

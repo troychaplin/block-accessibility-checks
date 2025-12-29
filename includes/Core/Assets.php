@@ -140,8 +140,8 @@ class Assets {
 		);
 
 		// Get block checks options for JavaScript.
-		$block_checks_options      = get_option( 'block_checks_options', array() );
-		$site_editor_options       = get_option( 'block_checks_site_editor_options', array( 'enabled' => true ) );
+		$block_checks_options = get_option( 'block_checks_options', array() );
+		$site_editor_options  = get_option( 'block_checks_site_editor_options', array( 'enabled' => true ) );
 
 		// Get the block checks registry to expose validation rules to JavaScript.
 		$registry                = BlockChecksRegistry::get_instance();
