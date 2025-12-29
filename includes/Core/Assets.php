@@ -86,12 +86,13 @@ class Assets {
 	 *
 	 * This method is responsible for enqueueing the necessary scripts and styles for the block.
 	 * It sets up script translations and then calls the methods to enqueue the block scripts and styles.
+	 * Supports all editor contexts: post editor (default and template view) and site editor.
 	 *
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
-		// Only run in content editor (all post types except Site Editor).
-		if ( ! $this->is_content_editor() ) {
+		// Only run in supported editor contexts (post editor and site editor).
+		if ( ! $this->should_load_validation() ) {
 			return;
 		}
 
@@ -134,7 +135,8 @@ class Assets {
 		);
 
 		// Get block checks options for JavaScript.
-		$block_checks_options = get_option( 'block_checks_options', array() );
+		$block_checks_options      = get_option( 'block_checks_options', array() );
+		$site_editor_options       = get_option( 'block_checks_site_editor_options', array( 'enabled' => true ) );
 
 		// Get the block checks registry to expose validation rules to JavaScript.
 		$registry                = BlockChecksRegistry::get_instance();
@@ -149,7 +151,9 @@ class Assets {
 			self::SCRIPT_HANDLE,
 			'BlockAccessibilityChecks',
 			array(
+				'editorContext'         => $this->get_editor_context(),
 				'blockChecksOptions'    => $block_checks_options,
+				'siteEditorOptions'     => $site_editor_options,
 				'validationRules'       => $validation_rules,
 				'metaValidationRules'   => $meta_validation_rules,
 				'editorValidationRules' => $editor_validation_rules,

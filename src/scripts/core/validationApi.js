@@ -16,22 +16,54 @@ import { hasErrors, hasWarnings } from './utils/issueHelpers';
  * Validation API Component
  *
  * Central component that orchestrates validation across blocks, meta fields, and editor checks.
- * Manages post saving restrictions and body classes based on validation results. When errors
- * are detected, prevents post saving/autosaving and disables the publish sidebar to ensure
+ * Manages post/template saving restrictions and body classes based on validation results. When
+ * errors are detected, prevents saving/autosaving and disables the publish sidebar to ensure
  * content meets accessibility requirements before publication.
+ *
+ * Supports multiple editor contexts:
+ * - post-editor: Default post/page editing
+ * - post-editor-template: Post/page editing with template visible
+ * - site-editor: Template editing in site editor
  *
  * This component doesn't render any UI but manages validation state and editor behavior.
  */
 export function ValidationAPI() {
-	// Check if we're in the post editor context (not site editor or other contexts)
-	const isPostEditor = wp.data && wp.data.select && wp.data.select('core/editor');
+	// Get the editor context from PHP
+	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
+
+	// Check if we're in a supported editor context
+	const isPostEditor =
+		editorContext === 'post-editor' || editorContext === 'post-editor-template';
+	const isSiteEditor = editorContext === 'site-editor';
+	const isValidContext = isPostEditor || isSiteEditor;
+
+	// Exit early if not in a supported context
+	if (!isValidContext || editorContext === 'none') {
+		return null;
+	}
 
 	// Retrieve validation results from all validation sources
 	const invalidBlocks = GetInvalidBlocks();
 	const invalidMeta = GetInvalidMeta();
 	const invalidEditorChecks = GetInvalidEditorChecks();
 
-	// Get dispatch functions for managing post saving state
+	// Get dispatch functions based on editor context
+	// IMPORTANT: lockPostSaving/unlockPostSaving are ONLY in 'core/editor'
+	// Even in site editor, we need to use 'core/editor' for locking functionality
+	// The core/edit-site store does not have these methods
+	const editorStore = 'core/editor';
+
+	// Verify the store exists before using it
+	const storeExists = wp.data && wp.data.select && wp.data.select(editorStore);
+
+	if (!storeExists) {
+		console.log('[BA11YC] core/editor store not available');
+		return null;
+	}
+
+	const dispatch = useDispatch(editorStore);
+
+	// Destructure functions - these exist in core/editor for both contexts
 	const {
 		lockPostSaving,
 		unlockPostSaving,
@@ -39,19 +71,22 @@ export function ValidationAPI() {
 		unlockPostAutosaving,
 		disablePublishSidebar,
 		enablePublishSidebar,
-	} = useDispatch('core/editor');
+	} = dispatch || {};
 
 	/**
-	 * Manage post saving restrictions based on validation errors
+	 * Manage post/template saving restrictions based on validation errors
 	 *
 	 * Monitors validation results from blocks, meta fields, and editor checks.
-	 * When any errors are detected, locks both manual and automatic post saving
+	 * When any errors are detected, locks both manual and automatic saving
 	 * and disables the publish sidebar. This prevents publishing content with
 	 * accessibility issues. When all errors are resolved, re-enables saving.
+	 *
+	 * Works in both post editor and site editor contexts.
 	 */
 	useEffect(() => {
-		// Only apply restrictions in the post editor context
-		if (!isPostEditor) {
+		// Verify we have the necessary dispatch functions
+		if (!lockPostSaving || !unlockPostSaving) {
+			console.log('[BA11YC] Missing lock/unlock functions');
 			return;
 		}
 
@@ -60,29 +95,44 @@ export function ValidationAPI() {
 		const hasMetaErrors = invalidMeta.some(meta => meta.hasErrors);
 		const hasEditorErrors = hasErrors(invalidEditorChecks);
 
+		console.log('[BA11YC] Validation check:', {
+			editorContext,
+			editorStore,
+			hasBlockErrors,
+			hasMetaErrors,
+			hasEditorErrors,
+			invalidBlocksCount: invalidBlocks.length,
+			invalidBlockDetails: invalidBlocks.map(b => ({
+				name: b.name,
+				clientId: b.clientId,
+				mode: b.mode,
+			})),
+		});
+
+		// IMPORTANT: Always lock first, then selectively unlock
+		// This prevents race conditions where template loading momentarily shows no errors
 		// Lock saving if any validation errors exist
 		if (hasBlockErrors || hasMetaErrors || hasEditorErrors) {
-			lockPostSaving();
-			lockPostAutosaving();
-			disablePublishSidebar();
+			console.log('[BA11YC] LOCKING saving due to errors');
+			lockPostSaving('block-accessibility-checks');
+			if (lockPostAutosaving) {
+				lockPostAutosaving('block-accessibility-checks');
+			}
+			if (disablePublishSidebar) {
+				disablePublishSidebar();
+			}
 		} else {
 			// Re-enable saving when all errors are resolved
-			unlockPostSaving();
-			unlockPostAutosaving();
-			enablePublishSidebar();
+			console.log('[BA11YC] UNLOCKING saving - no errors');
+			unlockPostSaving('block-accessibility-checks');
+			if (unlockPostAutosaving) {
+				unlockPostAutosaving('block-accessibility-checks');
+			}
+			if (enablePublishSidebar) {
+				enablePublishSidebar();
+			}
 		}
-	}, [
-		invalidBlocks,
-		invalidMeta,
-		invalidEditorChecks,
-		disablePublishSidebar,
-		enablePublishSidebar,
-		lockPostAutosaving,
-		lockPostSaving,
-		unlockPostAutosaving,
-		unlockPostSaving,
-		isPostEditor,
-	]);
+	}, [invalidBlocks, invalidMeta, invalidEditorChecks, editorContext, editorStore]);
 
 	/**
 	 * Manage body classes for validation state styling
@@ -91,13 +141,10 @@ export function ValidationAPI() {
 	 * meta fields, and editor checks. These classes enable theme/plugin developers to
 	 * style the editor interface based on validation state (e.g., highlighting
 	 * areas with issues). Classes are removed when validation passes or component unmounts.
+	 *
+	 * Works in both post editor and site editor contexts.
 	 */
 	useEffect(() => {
-		// Only manage classes in the post editor context
-		if (!isPostEditor) {
-			return;
-		}
-
 		// Ensure document.body is available before manipulating classes
 		if (!document.body) {
 			return;
@@ -145,7 +192,7 @@ export function ValidationAPI() {
 				);
 			}
 		};
-	}, [invalidBlocks, invalidMeta, invalidEditorChecks, isPostEditor]);
+	}, [invalidBlocks, invalidMeta, invalidEditorChecks]);
 
 	// This component manages side effects only, no UI rendering
 	return null;
