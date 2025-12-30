@@ -444,14 +444,18 @@ class Registry {
 	}
 
 	/**
-	 * Register a check with automatic plugin detection
+	 * Register a block accessibility check with automatic plugin detection
 	 *
-	 * @param string $block_type Block type (e.g., 'core/image').
+	 * Convenience method for external plugins to register block validation checks
+	 * without manually providing plugin information. Plugin details are automatically
+	 * detected and used for proper admin interface grouping.
+	 *
+	 * @param string $block_type Block type (e.g., 'my-plugin/card-block').
 	 * @param string $check_name Unique check name.
 	 * @param array  $check_args Check configuration.
 	 * @return bool True on success, false on failure.
 	 */
-	public function register_check_with_plugin_detection( string $block_type, string $check_name, array $check_args ): bool {
+	public function register_block_check( string $block_type, string $check_name, array $check_args ): bool {
 		// Automatically detect plugin information.
 		$plugin_info = $this->detect_plugin_info();
 

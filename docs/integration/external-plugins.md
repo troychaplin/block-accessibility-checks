@@ -15,7 +15,7 @@ External plugins can register their own validation checks for custom blocks. The
 // In your plugin's main file or integration class
 add_action( 'ba11yc_ready', function( $registry ) {
     // Use the simplified registration method with automatic plugin detection
-    $registry->register_check_with_plugin_detection(
+    $registry->register_block_check(
         'your-plugin/your-block',
         'check_name',
         array(
@@ -75,7 +75,7 @@ Checks registered with `'type' => 'settings'` will:
 
 ## Automatic Plugin Detection
 
-The `register_check_with_plugin_detection()` method automatically:
+The `register_block_check()` method automatically:
 
 1. Detects which plugin is registering the check
 2. Extracts plugin name, version, and file path
@@ -109,7 +109,7 @@ class MyCustomBlocksIntegration {
 
     public function register_checks( $registry ) {
         // Card block checks
-        $registry->register_check_with_plugin_detection(
+        $registry->register_block_check(
             'my-custom-blocks/card',
             'check_title',
             array(
@@ -121,7 +121,7 @@ class MyCustomBlocksIntegration {
             )
         );
 
-        $registry->register_check_with_plugin_detection(
+        $registry->register_block_check(
             'my-custom-blocks/card',
             'check_image_alt',
             array(
@@ -231,7 +231,7 @@ Use a consistent namespace for all blocks from your plugin:
 
 ### Plugin Not Appearing in Settings
 
-1. Ensure you're using `register_check_with_plugin_detection()`
+1. Ensure you're using `register_block_check()`
 2. Check that your plugin file has a proper plugin header
 3. Verify that at least one check has `'type' => 'settings'`
 
@@ -245,7 +245,7 @@ Use a consistent namespace for all blocks from your plugin:
 
 1. Use the same namespace for all blocks from your plugin
 2. Avoid using different namespaces for blocks from the same plugin
-3. Use `register_check_with_plugin_detection()` for automatic grouping
+3. Use `register_block_check()` for automatic grouping
 
 ## See Also
 

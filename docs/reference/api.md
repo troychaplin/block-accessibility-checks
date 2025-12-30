@@ -6,14 +6,15 @@ This document provides comprehensive API documentation for all registry methods 
 
 Use `BlockChecksRegistry::get_instance()` to access the block checks registry.
 
-### `register_check( $block_type, $check_name, $check_args )`
+### `register_check( $block_type, $check_name, $check_args, $plugin_info = [] )`
 
-Register a new accessibility check for a block type.
+Register a new accessibility check for a block type with optional manual plugin information.
 
 **Parameters:**
 - `$block_type` (string): Block type (e.g., 'core/image', 'my-plugin/custom-block')
 - `$check_name` (string): Unique check name within the block type
 - `$check_args` (array): Check configuration
+- `$plugin_info` (array): Optional plugin information for manual grouping
 
 **Returns:**
 - `bool`: True on success, false on failure
@@ -29,6 +30,37 @@ $check_args = array(
     'priority'    => 10,         // Lower = earlier, default: 10                // Optional
     'enabled'     => true,       // Whether check is enabled (default: true)     // Optional
 );
+```
+
+### `register_block_check( $block_type, $check_name, $check_args )`
+
+**Recommended for External Plugins** - Register a block accessibility check with automatic plugin detection.
+
+This is a convenience method that automatically detects your plugin's information (name, version, file path) and properly groups all your blocks together in the admin settings interface.
+
+**Parameters:**
+- `$block_type` (string): Block type (e.g., 'my-plugin/card-block')
+- `$check_name` (string): Unique check name within the block type
+- `$check_args` (array): Check configuration (same as `register_check`)
+
+**Returns:**
+- `bool`: True on success, false on failure
+
+**Example:**
+```php
+add_action( 'ba11yc_ready', function( $registry ) {
+    $registry->register_block_check(
+        'my-plugin/card-block',
+        'card_title_required',
+        array(
+            'error_msg'   => __( 'Card title is required', 'my-plugin' ),
+            'warning_msg' => __( 'Card title is recommended', 'my-plugin' ),
+            'description' => __( 'Card title validation', 'my-plugin' ),
+            'type'        => 'settings',
+            'category'    => 'accessibility',
+        )
+    );
+});
 ```
 
 ### `unregister_check( $block_type, $check_name )`
