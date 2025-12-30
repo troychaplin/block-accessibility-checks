@@ -229,6 +229,77 @@ const MyMetaPanel = () => {
 
 ## Editor Validation Examples
 
+### Example: Post/Page Title Required (Built-in Core Check)
+
+This example shows how the built-in post title validation works. It's included with the plugin and demonstrates real-time title validation.
+
+**PHP Registration:**
+```php
+// Already registered in the plugin core
+// See includes/Editor/CoreChecks.php for implementation
+add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
+    // Register for post type
+    $registry->register_editor_check(
+        'post',
+        'post_title_required',
+        array(
+            'error_msg'   => __( 'A post title is required for accessibility and SEO.', 'block-accessibility-checks' ),
+            'warning_msg' => __( 'Consider adding a post title for better accessibility and SEO.', 'block-accessibility-checks' ),
+            'description' => __( 'Ensures posts have a descriptive title.', 'block-accessibility-checks' ),
+            'type'        => 'settings', // Configurable in admin
+            'priority'    => 5,
+        )
+    );
+
+    // Register for page type
+    $registry->register_editor_check(
+        'page',
+        'post_title_required',
+        array(
+            'error_msg'   => __( 'A page title is required for accessibility and SEO.', 'block-accessibility-checks' ),
+            'warning_msg' => __( 'Consider adding a page title for better accessibility and SEO.', 'block-accessibility-checks' ),
+            'description' => __( 'Ensures pages have a descriptive title.', 'block-accessibility-checks' ),
+            'type'        => 'settings', // Configurable in admin
+            'priority'    => 5,
+        )
+    );
+} );
+```
+
+**JavaScript Validation:**
+```javascript
+import { addFilter } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
+
+addFilter(
+    'ba11yc_validate_editor',
+    'ba11yc/post-title-validation',
+    (isValid, blocks, postType, checkName) => {
+        // Only handle the post_title_required check
+        if (checkName !== 'post_title_required') {
+            return isValid;
+        }
+
+        // Get the current post title from the editor
+        const title = select('core/editor')?.getEditedPostAttribute('title');
+
+        // Validation fails if title is empty or only whitespace
+        if (!title || title.trim().length === 0) {
+            return false;
+        }
+
+        // Title exists and has content
+        return true;
+    }
+);
+```
+
+**Key Features:**
+- Validates in real-time as user types in the title field
+- Prevents publishing content without a title
+- Configurable independently for posts and pages at **Block Checks → Editor Validation**
+- Can be set to Error (prevents publishing), Warning (allows with notice), or None (disabled)
+
 ### Example: First Block Must Be Heading
 
 **PHP:**

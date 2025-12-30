@@ -45,6 +45,12 @@ The plugin includes built-in accessibility checks for WordPress core blocks:
 
 ### Additional Validation Systems
 
+**Post & Page Title Validation:**
+- Ensures posts and pages have a title set for accessibility and SEO
+- Validates in real-time as users type in the title field
+- Prevents publishing content without a title
+- Configurable independently for posts and pages
+
 **Post Meta Field Validation:**
 - Validate required custom fields with real-time feedback
 - Automatic post locking when meta validation fails
@@ -183,9 +189,17 @@ The plugin provides granular control over accessibility checks for each core blo
 - **Table Block:** Control header and caption requirements
 - **Heading Block:** Select which heading levels to restrict in the editor (H1, H5, H6 can be disabled)
 
+### Post & Page Validation Settings
+
+Configure editor-level validation for posts and pages at **Block Checks → Editor Validation**:
+
+- **Post Title Validation:** Ensure posts and pages have a title set
+- Configure validation level (error/warning/disabled) independently for posts and pages
+- Real-time validation as users type in the title field
+
 ### Post Meta Settings
 
-Configure validation for required post meta fields at **Block Checks → Meta Field Checks**:
+Configure validation for required post meta fields at **Block Checks → Meta Field Checks** (if any registered):
 
 - Enable or disable validation for each registered meta field
 - Set validation level (error/warning/disabled) per field
