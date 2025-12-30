@@ -18,17 +18,6 @@ export const filterIssuesByType = (issues, type) => {
 };
 
 /**
- * Check if any issues of a specific type exist
- *
- * @param {Array}  issues - Array of issue objects.
- * @param {string} type   - The issue type to check for (e.g., 'error', 'warning').
- * @return {boolean} True if any issues of the type exist, false otherwise.
- */
-export const hasIssuesOfType = (issues, type) => {
-	return issues.some(issue => issue.type === type);
-};
-
-/**
  * Get all error issues
  *
  * @param {Array} issues - Array of issue objects.
@@ -55,7 +44,7 @@ export const getWarnings = issues => {
  * @return {boolean} True if any errors exist, false otherwise.
  */
 export const hasErrors = issues => {
-	return hasIssuesOfType(issues, 'error');
+	return issues.some(issue => issue.type === 'error');
 };
 
 /**
@@ -65,53 +54,7 @@ export const hasErrors = issues => {
  * @return {boolean} True if any warnings exist, false otherwise.
  */
 export const hasWarnings = issues => {
-	return hasIssuesOfType(issues, 'warning');
-};
-
-/**
- * Filter issues by category (accessibility, validation, etc.)
- *
- * @param {Array}  issues   - Array of issue objects.
- * @param {string} category - The category to filter by (e.g., 'accessibility', 'validation').
- * @return {Array} Filtered array of issues matching the category.
- */
-export const filterIssuesByCategory = (issues, category) => {
-	return issues.filter(issue => issue.category === category);
-};
-
-/**
- * Extract issue messages from config with proper fallbacks
- *
- * Handles message extraction with priority: type-specific message > generic message > default.
- * Works with config objects from any source (PHP, block.json, etc.).
- *
- * @param {Object} config         - Configuration object with message properties.
- * @param {string} defaultMessage - Default message to use if none provided.
- * @return {Object} Object containing message, error_msg, and warning_msg.
- */
-export const extractIssueMessages = (config, defaultMessage = '') => {
-	const message = config.message || defaultMessage;
-	return {
-		message,
-		error_msg: config.error_msg || message,
-		warning_msg: config.warning_msg || config.error_msg || message,
-	};
-};
-
-/**
- * Get priority number based on issue type
- *
- * @param {string} type - The issue type ('error', 'warning', or other).
- * @return {number} Priority number (error=1, warning=2, other=3).
- */
-export const getIssuePriority = type => {
-	if (type === 'error') {
-		return 1;
-	}
-	if (type === 'warning') {
-		return 2;
-	}
-	return 3;
+	return issues.some(issue => issue.type === 'warning');
 };
 
 /**
@@ -148,10 +91,23 @@ export const isCheckEnabled = config => {
  * @return {Object} Standardized issue object.
  */
 export const createIssue = (config, checkName, additionalFields = {}) => {
-	const messages = extractIssueMessages(config);
+	// Extract messages with proper fallbacks
+	const message = config.message || '';
+	const errorMsg = config.error_msg || message;
+	const warningMsg = config.warning_msg || config.error_msg || message;
+
 	const type = config.type || 'error';
 	const category = config.category || 'accessibility';
-	const priority = getIssuePriority(type);
+
+	// Calculate priority based on type
+	let priority;
+	if (type === 'error') {
+		priority = 1;
+	} else if (type === 'warning') {
+		priority = 2;
+	} else {
+		priority = 3;
+	}
 
 	return {
 		check: checkName,
@@ -159,7 +115,9 @@ export const createIssue = (config, checkName, additionalFields = {}) => {
 		type,
 		category,
 		priority,
-		...messages,
+		message,
+		errorMsg,
+		warningMsg,
 		...additionalFields,
 	};
 };
