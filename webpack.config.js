@@ -7,6 +7,7 @@ module.exports = {
 		...defaultConfig.entry,
 		'block-checks': [path.resolve(__dirname, 'src/script.js')],
 		'block-admin': [path.resolve(__dirname, 'src/admin.js')],
+		'settings-demo': [path.resolve(__dirname, 'src/settings-demo.js')],
 	},
 	output: {
 		...defaultConfig.output,
