@@ -14,6 +14,7 @@ use BlockAccessibility\Core\Traits\Logger;
 use BlockAccessibility\Block\Registry as BlockChecksRegistry;
 use BlockAccessibility\Block\HeadingLevels;
 use BlockAccessibility\Editor\Registry as EditorChecksRegistry;
+use BlockAccessibility\Editor\CoreChecks as EditorCoreChecks;
 
 /**
  * Plugin Initializer Class
@@ -206,6 +207,12 @@ class Plugin {
 			$editor_checks_registry                   = EditorChecksRegistry::get_instance();
 			$this->services['editor_checks_registry'] = $editor_checks_registry;
 			$this->log_debug( 'Editor checks registry service initialized.' );
+
+			// Register core editor checks.
+			$editor_core_checks = new EditorCoreChecks( $editor_checks_registry );
+			$editor_core_checks->register_default_checks();
+			$this->services['editor_core_checks'] = $editor_core_checks;
+			$this->log_debug( 'Core editor checks registered.' );
 		} catch ( \Exception $e ) {
 			$this->log_error( 'Failed to initialize editor checks registry: ' . $e->getMessage() );
 			throw $e;

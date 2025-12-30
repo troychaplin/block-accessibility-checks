@@ -12,6 +12,12 @@ import './scripts/block/checks/headingRankValidation';
 import './scripts/block/checks/imageValidation';
 import './scripts/block/checks/tableValidation';
 
+// Validate editor
+import './scripts/editor/validation';
+
+// Editor Checks
+import './scripts/editor/checks/postTitleValidation';
+
 // Block Modifications
 import './scripts/block/modifications/imageAttributes';
 

@@ -129,8 +129,11 @@ function deduplicateEditorIssues(issues, severity) {
 	const issueMap = new Map();
 
 	issues.forEach(issue => {
+		// Handle both camelCase (errorMsg) and snake_case (error_msg) for compatibility
 		const message =
-			severity === 'error' ? issue.error_msg : issue.warning_msg || issue.error_msg;
+			severity === 'error'
+				? issue.errorMsg || issue.error_msg
+				: issue.warningMsg || issue.warning_msg || issue.errorMsg || issue.error_msg;
 		const key = message;
 
 		if (!issueMap.has(key)) {

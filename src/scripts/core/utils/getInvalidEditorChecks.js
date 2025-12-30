@@ -19,7 +19,8 @@ import { validateEditor } from '../../editor/validation';
  * @return {Array} Array of validation issues for editor-level checks that failed.
  */
 export function GetInvalidEditorChecks() {
-	// Retrieve current post type and all blocks from the editor store
+	// Retrieve current post type, blocks, and title from the editor store
+	// Including title ensures validation updates in real-time as user types
 	const { blocks, postType } = useSelect(select => {
 		const editor = select('core/editor');
 		const blockEditor = select('core/block-editor');
@@ -27,6 +28,7 @@ export function GetInvalidEditorChecks() {
 		return {
 			postType: editor.getCurrentPostType(),
 			blocks: blockEditor.getBlocks(),
+			title: editor.getEditedPostAttribute('title'),
 		};
 	}, []);
 
@@ -36,6 +38,7 @@ export function GetInvalidEditorChecks() {
 	}
 
 	// Run editor-level validation for the current post type and blocks
+	// The title dependency ensures this re-runs when title changes
 	const validation = validateEditor(postType, blocks);
 
 	// Return only the issues array from the validation result
