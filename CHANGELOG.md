@@ -17,6 +17,32 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+#### Validation API Documentation
+- Comprehensive quick start guides for all three validation types:
+  - Block Attributes Validation guide with filter parameters, switch statements, inner blocks, and optional attributes
+  - Post Meta Validation guide with `register_meta()` integration and `ba11yc_validate_meta` filter
+  - General Editor Validation guide with `ba11yc_validate_editor` filter and document-level checks
+- Core Concepts guide covering checks, registry types, severity levels, categories, and plugin integration
+- Best Practices guide with optimization tips, common patterns, and troubleshooting solutions
+- Streamlined API Overview with clear navigation to all documentation resources
+
+**Documentation Features:**
+- Working code examples matching actual implementation patterns
+- Performance optimization guidance
+- i18n support examples
+- Troubleshooting sections for common issues
+- Progressive structure from overview to implementation
+- Cross-references between related documentation
+
+### Changed
+
+- Reorganized documentation from single long page into focused, digestible guides
+- Updated all code examples to use correct API method names (`register_block_check()`, `register_editor_check()`)
+- Updated JavaScript filter hooks to use correct naming (`ba11yc_validate_block`, `ba11yc_validate_meta`, `ba11yc_validate_editor`)
+- Consolidated repetitive content in Core Concepts guide (35% reduction in length)
+
 ## [2.3.0]
 
 ### Added
