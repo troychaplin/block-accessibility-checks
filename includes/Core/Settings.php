@@ -89,8 +89,8 @@ class Settings {
 		// Add Core Block Checks submenu.
 		\add_submenu_page(
 			'block-a11y-checks',
-			\esc_html__( 'Core Validations', 'block-accessibility-checks' ),
-			\esc_html__( 'Core Validations', 'block-accessibility-checks' ),
+			\esc_html__( 'Core Block Validations', 'block-accessibility-checks' ),
+			\esc_html__( 'Core Block Validations', 'block-accessibility-checks' ),
 			'manage_options',
 			'block-a11y-checks',
 			array( $this, 'settings_page_layout' )
@@ -133,8 +133,8 @@ class Settings {
 		if ( $has_core_meta_checks || $has_core_editor_checks ) {
 			\add_submenu_page(
 				'block-a11y-checks',
-				\esc_html__( 'Post & Page Validation', 'block-accessibility-checks' ),
-				\esc_html__( 'Post & Page Validation', 'block-accessibility-checks' ),
+				\esc_html__( 'Editor Validation', 'block-accessibility-checks' ),
+				\esc_html__( 'Editor Validation', 'block-accessibility-checks' ),
 				'manage_options',
 				'block-a11y-checks-post-page',
 				array( $this, 'post_page_validation_settings_page' )
@@ -170,9 +170,8 @@ class Settings {
 		// Display success notices.
 		$this->display_settings_notices();
 
-		// We need to handle both post and page option groups.
-		\settings_fields( 'block_checks_meta_post_group' );
-		\settings_fields( 'block_checks_meta_page_group' );
+		// Use unified option group for post and page settings.
+		\settings_fields( 'block_checks_post_page_group' );
 
 		// Render content.
 		$this->render_post_page_validation_content();
@@ -720,16 +719,31 @@ class Settings {
 	 * @return void
 	 */
 	private function register_post_type_settings( string $post_type ): void {
-		$option_group = 'block_checks_meta_' . $post_type . '_group';
-		$option_name  = 'block_checks_meta_' . $post_type;
+		$core_post_types = array( 'post', 'page' );
 
-		\register_setting(
-			$option_group,
-			$option_name,
-			array(
-				'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
-			)
-		);
+		// For core post types (post and page), use a unified option group.
+		if ( in_array( $post_type, $core_post_types, true ) ) {
+			// Register unified option group once (will only run once due to WordPress check).
+			\register_setting(
+				'block_checks_post_page_group',
+				'block_checks_meta_' . $post_type,
+				array(
+					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
+				)
+			);
+		} else {
+			// For other post types, use individual option groups.
+			$option_group = 'block_checks_meta_' . $post_type . '_group';
+			$option_name  = 'block_checks_meta_' . $post_type;
+
+			\register_setting(
+				$option_group,
+				$option_name,
+				array(
+					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
+				)
+			);
+		}
 	}
 
 	/**
@@ -747,6 +761,9 @@ class Settings {
 				$sanitized[ $key ] = $value;
 			}
 		}
+
+		// Set success notice for post/page settings.
+		\set_transient( 'ba11yc_post_page_settings_saved', true, 30 );
 
 		return $sanitized;
 	}
@@ -1015,6 +1032,14 @@ class Settings {
 			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
 			echo '</div>' . "\n";
 		}
+
+		// Check for post/page settings success notice.
+		if ( \get_transient( 'ba11yc_post_page_settings_saved' ) ) {
+			\delete_transient( 'ba11yc_post_page_settings_saved' );
+			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
+			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
+			echo '</div>' . "\n";
+		}
 	}
 
 	/**
@@ -1246,7 +1271,7 @@ class Settings {
 	private function render_check_setting( string $field_name, string $description, array $check, string $option_name ): void {
 		$options  = \get_option( $option_name, array() );
 		$value    = $options[ $field_name ] ?? 'error';
-		$label_id = \sanitize_title( $field_name ) . '-label';
+		$label_id = \sanitize_title( $option_name . '_' . $field_name ) . '-label';
 
 		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
 		echo '<div class="ba11y-field-group">';
@@ -1261,18 +1286,21 @@ class Settings {
 		echo '</div>';
 		echo '<div class="ba11y-field-controls ba11y-field-controls--radio">';
 
+		// Create unique IDs by combining option_name and field_name.
+		$unique_prefix = \sanitize_title( $option_name . '_' . $field_name );
+
 		// Error option.
-		$error_id = \esc_attr( $field_name . '_error' );
+		$error_id = \esc_attr( $unique_prefix . '_error' );
 		echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
 		echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
 
 		// Warning option.
-		$warning_id = \esc_attr( $field_name . '_warning' );
+		$warning_id = \esc_attr( $unique_prefix . '_warning' );
 		echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
 		echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
 
 		// None option.
-		$none_id = \esc_attr( $field_name . '_none' );
+		$none_id = \esc_attr( $unique_prefix . '_none' );
 		echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
 		echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
 
