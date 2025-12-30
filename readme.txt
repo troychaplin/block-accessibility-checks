@@ -18,20 +18,26 @@ Unlike reactive accessibility tools that scan published content, this plugin cat
 
 Whether you're a content creator ensuring your posts are accessible, a developer building accessible blocks, or an organization maintaining compliance standards, Block Accessibility Checks provides the tools you need to create inclusive content effortlessly.
 
-**Key Features:**
+**Features for Content Creators & Editors:**
 
-* **Three-Tier Validation System** - Validates blocks, post meta fields, and editor-level concerns (like heading hierarchy) with unified error handling
-* **Real-time Visual Feedback** - See accessibility issues instantly with color-coded borders around problematic blocks and detailed error messages in the block inspector panel
-* **Smart Publishing Control** - Prevents publication of content with critical accessibility errors in blocks, meta fields, or document structure while allowing warnings with user awareness
-* **Comprehensive Block Coverage** - Built-in checks for images, buttons, tables, headings, and galleries with multiple validation rules per block type
-* **Post Meta Validation** - Validate required post meta fields with real-time feedback, automatic post locking for errors, and seamless integration with block validation
-* **Advanced Heading Validation** - Document-wide hierarchy checking prevents skipped heading levels and ensures proper content structure across your entire post
+* **Real-time Visual Feedback** - See accessibility issues instantly with color-coded borders (red for errors, yellow for warnings) around problematic blocks and detailed error messages in the block inspector panel
+* **Smart Publishing Control** - Critical accessibility errors prevent publishing until resolved, while warnings allow publication with user awareness
+* **Comprehensive Block Coverage** - Built-in validation for images, buttons, tables, headings, and galleries with clear guidance on how to fix issues
+* **Document-Wide Validation** - Advanced heading hierarchy checking prevents skipped heading levels and ensures proper content structure across your entire post
+* **Title Validation** - Ensures posts and pages have a title set for accessibility and SEO, validates in real-time as you type
 * **Intelligent URL Validation** - Real TLD validation using the Public Suffix List ensures only legitimate domains are accepted in button links
-* **Configurable Settings** - Granular control over each check's severity (error/warning/disabled) with an intuitive admin interface for blocks, meta fields, and site editor
-* **Issue Categorization** - Clear distinction between accessibility issues and validation errors for better understanding and prioritization
-* **Developer-Friendly API** - Comprehensive hooks and filters system for registering custom accessibility checks for blocks, post meta fields, and editor-level validation
-* **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes, with automatic settings page generation per plugin
-* **Multi-Context Support** - Unified validation works in both post editor and site editor with separate configurable settings for each context
+* **Configurable Settings** - Control which checks are errors (prevent publishing), warnings (allow with notice), or disabled through an intuitive admin interface
+* **Grouped Error Display** - All accessibility issues shown at once in organized groups, eliminating the "fix one, see another" frustration
+* **Works Everywhere** - Validation runs in both the post editor and site editor (templates/template parts) with separate configurable settings
+
+**Features for Developers & Plugin Authors:**
+
+* **Three-Tier Validation API** - Register custom checks for block attributes, post meta fields, and editor-level validation using comprehensive hooks and filters
+* **JavaScript-Only Validation** - All validation logic runs in JavaScript for real-time editor feedback without server round-trips
+* **Automatic Settings Integration** - External plugins automatically get their own settings pages under the Block Checks menu
+* **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes
+* **Extensive Hook System** - 20+ action and filter hooks for complete customization of registration, validation, and display behavior
+* **Well-Documented API** - Complete developer documentation with quick start guides and working code examples
 
 **How It Works:**
 
@@ -50,6 +56,7 @@ When accessibility issues are detected, they are highlighted with visual indicat
 * **Table Blocks** - Requires proper headers or captions for screen reader navigation
 * **Heading Blocks** - Validates proper heading hierarchy across entire document (prevents skipped levels), ensures appropriate first heading level (H2 recommended, H1 allowed with warnings), and provides configurable heading level restrictions (H1, H5, H6 can be disabled)
 * **Gallery Blocks** - Applies comprehensive image accessibility checks to all gallery items (alt text, length, patterns, caption duplication)
+* **Post & Page Title Validation** - Ensures posts and pages have a title set for accessibility and SEO, validates in real-time as users type, prevents publishing content without a title, configurable independently for posts and pages
 * **Post Meta Fields** - Validate required custom fields with real-time validation, automatic post locking for errors, and seamless integration with block validation system
 
 **Perfect For:**
@@ -60,18 +67,9 @@ When accessibility issues are detected, they are highlighted with visual indicat
 * Developers building accessible WordPress themes and plugins
 * Content teams who want accessibility guidance built into their workflow
 
-**Developer API:**
+**Developer Resources:**
 
-Extend the plugin with <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">custom accessibility checks</a> for blocks, post meta fields, or editor-level validation. The robust three-tier API includes:
-
-* **Block Validation API** - Register custom checks for any block type with the `ba11yc_register_checks` action hook
-* **Meta Validation API** - Register custom meta field validation with the `ba11yc_register_meta_checks` action hook
-* **Editor Validation API** - Register document-wide validation with the `ba11yc_register_editor_checks` action hook
-* **JavaScript Validation Filters** - Implement validation logic using `ba11yc_validate_block`, `ba11yc_validate_meta`, and `ba11yc_validate_editor` filters
-* **Automatic Settings Integration** - External plugins automatically get their own settings pages under the Block Checks menu
-* **20+ Hooks and Filters** - Complete customization of registration, validation, and display behavior
-
-Perfect for plugin developers who want to add accessibility validation to their custom blocks, ensure required meta fields are properly validated, or implement document-wide accessibility rules.
+Extend the plugin with <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">custom accessibility checks</a> using the comprehensive validation API. See the complete <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">developer documentation</a> for quick start guides, API reference, code examples, and a <a href="https://github.com/troychaplin/block-check-integration-example">working example plugin</a>.
 
 == Installation ==
  
@@ -89,7 +87,8 @@ Perfect for plugin developers who want to add accessibility validation to their 
 **After Installation:**
 The plugin works immediately after activation with sensible defaults. You can customize settings at:
 
-* **Block Checks → Core Block Checks** - Configure core WordPress block validation
+* **Block Checks → Core Block Validations** - Configure core WordPress block validation
+* **Block Checks → Editor Validation** - Configure post/page title validation
 * **Block Checks → Meta Field Checks** - Configure post meta field validation (if any registered)
 * **Block Checks → Site Editor Checks** - Configure validation for site editor (templates/template parts)
 * **Block Checks → [External Plugin Name]** - Configure validation for external plugin blocks (automatically created)
