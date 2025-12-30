@@ -89,15 +89,153 @@ class Settings {
 		// Add Core Block Checks submenu.
 		\add_submenu_page(
 			'block-a11y-checks',
-			\esc_html__( 'Core Validations', 'block-accessibility-checks' ),
-			\esc_html__( 'Core Validations', 'block-accessibility-checks' ),
+			\esc_html__( 'Core Block Validations', 'block-accessibility-checks' ),
+			\esc_html__( 'Core Block Validations', 'block-accessibility-checks' ),
 			'manage_options',
 			'block-a11y-checks',
 			array( $this, 'settings_page_layout' )
 		);
 
+		// Add Post & Page Validation submenu if there are any meta or editor checks.
+		$this->add_post_page_validation_menu();
+
 		// Add external plugin submenus.
 		$this->add_external_plugin_menus();
+	}
+
+	/**
+	 * Add Post & Page Validation submenu if there are checks
+	 *
+	 * @return void
+	 */
+	private function add_post_page_validation_menu(): void {
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$editor_registry = EditorChecksRegistry::get_instance();
+
+		$all_meta_checks   = $meta_registry->get_all_meta_checks();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		// Check if there are any meta or editor checks for core post types (post, page).
+		$core_post_types        = array( 'post', 'page' );
+		$has_core_meta_checks   = false;
+		$has_core_editor_checks = false;
+
+		foreach ( $core_post_types as $post_type ) {
+			if ( ! empty( $all_meta_checks[ $post_type ] ) ) {
+				$has_core_meta_checks = true;
+			}
+			if ( ! empty( $all_editor_checks[ $post_type ] ) ) {
+				$has_core_editor_checks = true;
+			}
+		}
+
+		// Only add menu if there are checks to display.
+		if ( $has_core_meta_checks || $has_core_editor_checks ) {
+			\add_submenu_page(
+				'block-a11y-checks',
+				\esc_html__( 'Editor Validation', 'block-accessibility-checks' ),
+				\esc_html__( 'Editor Validation', 'block-accessibility-checks' ),
+				'manage_options',
+				'block-a11y-checks-post-page',
+				array( $this, 'post_page_validation_settings_page' )
+			);
+		}
+	}
+
+	/**
+	 * Render Post & Page Validation settings page
+	 *
+	 * @return void
+	 */
+	public function post_page_validation_settings_page(): void {
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
+		}
+
+		// Permission check.
+		echo '<div class="ba11y-settings">' . "\n";
+		echo '<div class="ba11y-settings-container">' . "\n";
+
+		echo '<header class="ba11y-settings-header">' . "\n";
+		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
+		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
+		echo '</header>' . "\n";
+
+		echo '<section class="ba11y-settings-section">' . "\n";
+		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
+		echo '<div class="ba11y-settings-plugin-header">' . "\n";
+		echo '<h2>' . \esc_html__( 'Post & Page Validation', 'block-accessibility-checks' ) . '</h2>' . "\n";
+		echo '</div>' . "\n";
+
+		// Display success notices.
+		$this->display_settings_notices();
+
+		// Use unified option group for post and page settings.
+		\settings_fields( 'block_checks_post_page_group' );
+
+		// Render content.
+		$this->render_post_page_validation_content();
+
+		echo '<div class="ba11y-settings-submit">' . "\n";
+		\submit_button();
+		echo '</div>' . "\n";
+
+		echo '</form>' . "\n";
+		echo '</section>' . "\n";
+		echo '</div>' . "\n";
+		echo '</div>' . "\n";
+	}
+
+	/**
+	 * Render Post & Page Validation content
+	 *
+	 * @return void
+	 */
+	private function render_post_page_validation_content(): void {
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$editor_registry = EditorChecksRegistry::get_instance();
+
+		$all_meta_checks   = $meta_registry->get_all_meta_checks();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		$core_post_types = array( 'post', 'page' );
+
+		foreach ( $core_post_types as $post_type ) {
+			$has_meta   = ! empty( $all_meta_checks[ $post_type ] );
+			$has_editor = ! empty( $all_editor_checks[ $post_type ] );
+
+			if ( ! $has_meta && ! $has_editor ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+
+			echo '<div class="ba11y-settings-plugin-header">' . "\n";
+			echo '<h2>' . \esc_html( $post_type_label ) . '</h2>';
+			echo '</div>' . "\n";
+
+			// Render editor checks for this post type.
+			if ( $has_editor ) {
+				echo '<article class="ba11y-block-options ba11y-editor-options ba11y-editor-options-' . \esc_attr( $post_type ) . '">';
+				echo '<h3>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h3>';
+
+				$this->render_editor_checks_options( $post_type, $all_editor_checks[ $post_type ], '' );
+
+				echo '</article>';
+			}
+
+			// Render meta checks for this post type.
+			if ( $has_meta ) {
+				echo '<article class="ba11y-block-options ba11y-meta-options ba11y-meta-options-' . \esc_attr( $post_type ) . '">';
+				echo '<h3>' . \esc_html__( 'Post Meta Validation', 'block-accessibility-checks' ) . '</h3>';
+
+				foreach ( $all_meta_checks[ $post_type ] as $meta_key => $checks ) {
+					$this->render_meta_field_checks( $post_type, $meta_key, $checks, '' );
+				}
+
+				echo '</article>';
+			}
+		}
 	}
 
 	/**
@@ -581,16 +719,31 @@ class Settings {
 	 * @return void
 	 */
 	private function register_post_type_settings( string $post_type ): void {
-		$option_group = 'block_checks_meta_' . $post_type . '_group';
-		$option_name  = 'block_checks_meta_' . $post_type;
+		$core_post_types = array( 'post', 'page' );
 
-		\register_setting(
-			$option_group,
-			$option_name,
-			array(
-				'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
-			)
-		);
+		// For core post types (post and page), use a unified option group.
+		if ( in_array( $post_type, $core_post_types, true ) ) {
+			// Register unified option group once (will only run once due to WordPress check).
+			\register_setting(
+				'block_checks_post_page_group',
+				'block_checks_meta_' . $post_type,
+				array(
+					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
+				)
+			);
+		} else {
+			// For other post types, use individual option groups.
+			$option_group = 'block_checks_meta_' . $post_type . '_group';
+			$option_name  = 'block_checks_meta_' . $post_type;
+
+			\register_setting(
+				$option_group,
+				$option_name,
+				array(
+					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
+				)
+			);
+		}
 	}
 
 	/**
@@ -608,6 +761,9 @@ class Settings {
 				$sanitized[ $key ] = $value;
 			}
 		}
+
+		// Set success notice for post/page settings.
+		\set_transient( 'ba11yc_post_page_settings_saved', true, 30 );
 
 		return $sanitized;
 	}
@@ -876,6 +1032,14 @@ class Settings {
 			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
 			echo '</div>' . "\n";
 		}
+
+		// Check for post/page settings success notice.
+		if ( \get_transient( 'ba11yc_post_page_settings_saved' ) ) {
+			\delete_transient( 'ba11yc_post_page_settings_saved' );
+			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
+			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
+			echo '</div>' . "\n";
+		}
 	}
 
 	/**
@@ -895,8 +1059,15 @@ class Settings {
 			return;
 		}
 
-		// Render meta checks for each post type.
+		$core_post_types = array( 'post', 'page' );
+
+		// Render meta checks for each post type, excluding core post types.
 		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+			// Skip core post types - they have their own settings page.
+			if ( in_array( $post_type, $core_post_types, true ) ) {
+				continue;
+			}
+
 			if ( empty( $meta_fields ) ) {
 				continue;
 			}
@@ -944,12 +1115,32 @@ class Settings {
 			return;
 		}
 
+		$core_post_types     = array( 'post', 'page' );
+		$has_non_core_checks = false;
+
+		// Check if there are any editor checks for non-core post types.
+		foreach ( $all_editor_checks as $post_type => $checks ) {
+			if ( ! in_array( $post_type, $core_post_types, true ) && ! empty( $checks ) ) {
+				$has_non_core_checks = true;
+				break;
+			}
+		}
+
+		if ( ! $has_non_core_checks ) {
+			return;
+		}
+
 		echo '<div class="ba11y-settings-plugin-header">' . "\n";
 		echo '<h2>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h2>';
 		echo '</div>' . "\n";
 
-		// Render editor checks for each post type.
+		// Render editor checks for each post type, excluding core post types.
 		foreach ( $all_editor_checks as $post_type => $checks ) {
+			// Skip core post types - they have their own settings page.
+			if ( in_array( $post_type, $core_post_types, true ) ) {
+				continue;
+			}
+
 			if ( empty( $checks ) ) {
 				continue;
 			}
@@ -995,6 +1186,38 @@ class Settings {
 		}
 
 		echo '</article>';
+	}
+
+	/**
+	 * Render editor checks options (without wrapper article)
+	 *
+	 * @param string $post_type   The post type.
+	 * @param array  $checks      The checks.
+	 * @param string $plugin_slug Optional plugin slug for external plugins.
+	 * @return void
+	 */
+	private function render_editor_checks_options( string $post_type, array $checks, string $plugin_slug = '' ): void {
+		// Use external plugin option name if provided, otherwise use post type option.
+		if ( ! empty( $plugin_slug ) ) {
+			$option_name = 'block_checks_external_' . $plugin_slug;
+		} else {
+			$option_name = 'block_checks_meta_' . $post_type;
+		}
+
+		foreach ( $checks as $check_name => $check ) {
+			// Only render settings-based checks.
+			if ( 'settings' !== $check['type'] ) {
+				continue;
+			}
+
+			$field_name  = 'editor_' . $check_name;
+			$description = $check['description'] ?? $check['error_msg'];
+
+			// Prepend context.
+			$description = '<strong>' . \esc_html__( 'Editor Check', 'block-accessibility-checks' ) . ':</strong> ' . $description;
+
+			$this->render_check_setting( $field_name, $description, $check, $option_name );
+		}
 	}
 
 	/**
@@ -1048,7 +1271,7 @@ class Settings {
 	private function render_check_setting( string $field_name, string $description, array $check, string $option_name ): void {
 		$options  = \get_option( $option_name, array() );
 		$value    = $options[ $field_name ] ?? 'error';
-		$label_id = \sanitize_title( $field_name ) . '-label';
+		$label_id = \sanitize_title( $option_name . '_' . $field_name ) . '-label';
 
 		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
 		echo '<div class="ba11y-field-group">';
@@ -1063,18 +1286,21 @@ class Settings {
 		echo '</div>';
 		echo '<div class="ba11y-field-controls ba11y-field-controls--radio">';
 
+		// Create unique IDs by combining option_name and field_name.
+		$unique_prefix = \sanitize_title( $option_name . '_' . $field_name );
+
 		// Error option.
-		$error_id = \esc_attr( $field_name . '_error' );
+		$error_id = \esc_attr( $unique_prefix . '_error' );
 		echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
 		echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
 
 		// Warning option.
-		$warning_id = \esc_attr( $field_name . '_warning' );
+		$warning_id = \esc_attr( $unique_prefix . '_warning' );
 		echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
 		echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
 
 		// None option.
-		$none_id = \esc_attr( $field_name . '_none' );
+		$none_id = \esc_attr( $unique_prefix . '_none' );
 		echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
 		echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
 
