@@ -154,14 +154,4 @@ trait EditorDetection {
 		$context = $this->get_editor_context();
 		return in_array( $context, array( 'post-editor', 'post-editor-template', 'site-editor' ), true );
 	}
-
-	/**
-	 * Check if we're in the content editor (legacy method for backward compatibility).
-	 *
-	 * @deprecated Use get_editor_context() or is_post_editor() instead.
-	 * @return bool True if in content editor, false otherwise.
-	 */
-	private function is_content_editor(): bool {
-		return $this->is_post_editor();
-	}
 }
