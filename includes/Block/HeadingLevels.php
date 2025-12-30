@@ -101,7 +101,7 @@ class HeadingLevels {
 		}
 
 		// Only apply restrictions when we're in a content editor context.
-		if ( ! $this->is_content_editor() ) {
+		if ( ! $this->is_post_editor() ) {
 			return $args;
 		}
 

@@ -27,5 +27,3 @@ if (typeof window.BlockAccessibilityChecks === 'undefined') {
 }
 
 window.BlockAccessibilityChecks.useMetaField = useMetaField;
-// Alias for backwards compatibility during refactor
-window.BlockAccessibilityChecks.useMetaValidationProps = useMetaField;

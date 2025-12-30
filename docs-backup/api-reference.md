@@ -233,14 +233,6 @@ register_post_meta( 'band', 'band_origin', [
 
 ---
 
-### `MetaValidation::detect_post_type_from_context()`
-Detect post type from the current request context.
-
-**Returns:**
-- `string|false`: Post type or false if not detected
-
----
-
 ## See Also
 - [Post Meta Validation](./meta-validation.md)
 - [Hooks Reference](./hooks.md)
