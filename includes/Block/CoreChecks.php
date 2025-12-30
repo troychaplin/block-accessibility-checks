@@ -164,16 +164,4 @@ class CoreChecks {
 
 		return $this->definitions_cache;
 	}
-
-	/**
-	 * Get supported core block types
-	 *
-	 * Returns an array of core block types that have accessibility checks.
-	 * Derived dynamically from the check definitions for single source of truth.
-	 *
-	 * @return array Array of supported core block types.
-	 */
-	public function get_supported_core_block_types(): array {
-		return \array_keys( $this->get_core_block_check_definitions() );
-	}
 }
