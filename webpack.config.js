@@ -8,15 +8,15 @@ module.exports = {
 		'block-checks': [path.resolve(__dirname, 'src/script.js')],
 		'block-admin': [path.resolve(__dirname, 'src/admin.js')],
 		'settings-core-blocks': [
-			path.resolve(__dirname, 'src/settings-core-blocks.js'),
+			path.resolve(__dirname, 'src/admin/pages/CoreBlocks/index.js'),
 			path.resolve(__dirname, 'src/settings.scss'),
 		],
 		'settings-editor-validation': [
-			path.resolve(__dirname, 'src/settings-editor-validation.js'),
+			path.resolve(__dirname, 'src/admin/pages/EditorValidation/index.js'),
 			path.resolve(__dirname, 'src/settings.scss'),
 		],
 		'settings-external-plugins': [
-			path.resolve(__dirname, 'src/settings-external-plugins.js'),
+			path.resolve(__dirname, 'src/admin/pages/ExternalPlugins/index.js'),
 			path.resolve(__dirname, 'src/settings.scss'),
 		],
 	},
@@ -24,5 +24,15 @@ module.exports = {
 		...defaultConfig.output,
 		path: path.resolve(__dirname, 'build'),
 		filename: '[name].js',
+	},
+	resolve: {
+		...defaultConfig.resolve,
+		alias: {
+			...defaultConfig.resolve.alias,
+			'@': path.resolve(__dirname, 'src/'),
+			'@editor': path.resolve(__dirname, 'src/editor/'),
+			'@admin': path.resolve(__dirname, 'src/admin/'),
+			'@shared': path.resolve(__dirname, 'src/shared/'),
+		},
 	},
 };

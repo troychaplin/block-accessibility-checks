@@ -244,8 +244,10 @@ class Registry {
 	 * @return string The check level from settings.
 	 */
 	private function get_editor_check_level_from_settings( string $post_type, string $check_name ): string {
-		// Field name format: editor_check_name.
-		$field_name = 'editor_' . $check_name;
+		// Field name format: editor_{post_type}_{check_name} for external plugins
+		// Field name format: editor_check_name for core post types
+		$external_field_name = 'editor_' . $post_type . '_' . $check_name;
+		$core_field_name     = 'editor_' . $check_name;
 
 		// Try to find this in external plugin settings first
 		// by checking all external plugin options.
@@ -253,8 +255,9 @@ class Registry {
 		foreach ( $all_options as $option_name => $option_value ) {
 			if ( strpos( $option_name, 'block_checks_external_' ) === 0 ) {
 				$options = \get_option( $option_name, array() );
-				if ( isset( $options[ $field_name ] ) ) {
-					return $options[ $field_name ];
+				// Check with external field name format first
+				if ( isset( $options[ $external_field_name ] ) ) {
+					return $options[ $external_field_name ];
 				}
 			}
 		}
@@ -263,6 +266,6 @@ class Registry {
 		$option_name = 'block_checks_meta_' . $post_type;
 		$options     = \get_option( $option_name, array() );
 
-		return $options[ $field_name ] ?? 'error';
+		return $options[ $core_field_name ] ?? 'error';
 	}
 }
