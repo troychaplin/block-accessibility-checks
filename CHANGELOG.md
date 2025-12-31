@@ -36,12 +36,52 @@ Prefix the change with one of these keywords:
 - Progressive structure from overview to implementation
 - Cross-references between related documentation
 
+#### Validation Sidebar Features
+- Occurrence counts display for validation issues (e.g., "x3" for 3 instances of the same error)
+- Warnings now display alongside errors in the sidebar instead of being hidden
+
 ### Changed
 
 - Reorganized documentation from single long page into focused, digestible guides
 - Updated all code examples to use correct API method names (`register_block_check()`, `register_editor_check()`)
 - Updated JavaScript filter hooks to use correct naming (`ba11yc_validate_block`, `ba11yc_validate_meta`, `ba11yc_validate_editor`)
 - Consolidated repetitive content in Core Concepts guide (35% reduction in length)
+
+#### Code Organization & Architecture
+- **Complete folder structure reorganization** from `src/scripts/` to domain-based organization:
+  - `src/editor/` - All editor-related code (validation, components, HOCs, modifications)
+  - `src/admin/` - Settings pages and admin components
+  - `src/shared/` - Utilities and helpers shared across contexts
+- **Webpack path aliases** for cleaner imports:
+  - `@editor` - Editor domain code
+  - `@admin` - Admin domain code
+  - `@shared` - Shared utilities
+  - `@` - Root src directory
+- **Barrel exports** implemented throughout codebase for simplified imports
+- Updated all 50+ import statements across the codebase to use new structure
+
+#### Validation System
+- Sidebar deduplication logic now processes all invalid blocks regardless of mode, enabling warnings to show when errors are present in the same block
+
+### Improved
+
+- **Developer Experience**:
+  - Cleaner import statements using path aliases
+  - Better code organization with clear separation of concerns
+  - Simplified component discovery through barrel exports
+  - Easier navigation of codebase with domain-based structure
+
+### Fixed
+
+- Validation messages now display correctly instead of showing generic "Accessibility issue found" text
+  - Fixed compatibility between PHP snake_case properties (error_msg, warning_msg) and JavaScript camelCase (errorMsg, warningMsg)
+  - Updated `createIssue()` helper in `src/shared/utils/validation/issueHelpers.js` to support both naming conventions
+- External plugin settings page now loads correctly after folder reorganization
+  - Fixed DOM element ID mismatch in `src/admin/pages/ExternalPlugins/index.js`
+- Meta and editor validation settings now apply correctly from external plugin settings page
+  - Fixed field name mismatch between save format (`meta_{post_type}_{meta_key}_{check_name}`) and retrieval format
+  - Updated `includes/Meta/Registry.php` and `includes/Editor/Registry.php` to check external plugin format first, then fall back to core format
+  - Settings now properly respect configured priority levels (error, warning, info, disabled)
 
 ## [2.3.0]
 
