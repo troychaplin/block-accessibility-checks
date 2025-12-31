@@ -22,7 +22,7 @@ export const COLUMNS = [
 	{
 		id: 'check',
 		header: __('Validation Check', 'block-accessibility-checks'),
-		width: '1fr',
+		width: '3fr',
 		minWidth: '300px',
 		enableSorting: true,
 		primary: true, // Primary column gets bold treatment
@@ -30,19 +30,25 @@ export const COLUMNS = [
 	{
 		id: 'block',
 		header: __('Block', 'block-accessibility-checks'),
-		width: '180px',
+		// width: '180px',
+		width: '1fr',
+		minWidth: '180px',
 		enableSorting: true,
 	},
 	{
 		id: 'category',
 		header: __('Category', 'block-accessibility-checks'),
-		width: '140px',
+		// width: '140px',
+		width: '1fr',
+		minWidth: '140px',
 		enableSorting: true,
 	},
 	{
 		id: 'level',
 		header: __('Level', 'block-accessibility-checks'),
-		width: '240px',
+		// width: '240px',
+		width: '1fr',
+		minWidth: '240px',
 		align: 'right',
 	},
 ];

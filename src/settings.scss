@@ -349,7 +349,7 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 
 	.ba11y-unsaved-notice {
 		font-size: 13px;
-		color: #d63638;
+		color: var(--a11y-dark-red);
 		font-style: italic;
 	}
 }
