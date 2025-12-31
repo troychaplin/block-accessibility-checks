@@ -174,10 +174,10 @@ class Plugin {
 			$this->services['settings_page'] = $settings_page;
 			$this->log_debug( 'Settings page service initialized.' );
 
-			// Initialize demo settings page (proof-of-concept).
-			$demo_settings                   = new DemoSettings();
-			$this->services['demo_settings'] = $demo_settings;
-			$this->log_debug( 'Demo settings page service initialized.' );
+			// Initialize Settings REST API.
+			$settings_api                   = new SettingsAPI();
+			$this->services['settings_api'] = $settings_api;
+			$this->log_debug( 'Settings API service initialized.' );
 		} catch ( \Exception $e ) {
 			$this->log_error( 'Failed to initialize settings page: ' . $e->getMessage() );
 			throw $e;

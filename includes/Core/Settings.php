@@ -145,45 +145,33 @@ class Settings {
 	/**
 	 * Render Post & Page Validation settings page
 	 *
+	 * Uses React app instead of PHP-rendered form.
+	 *
 	 * @return void
 	 */
 	public function post_page_validation_settings_page(): void {
+		// Permission check.
 		if ( ! \current_user_can( 'manage_options' ) ) {
 			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
 		}
 
-		// Permission check.
-		echo '<div class="ba11y-settings">' . "\n";
-		echo '<div class="ba11y-settings-container">' . "\n";
+		// Enqueue React app.
+		$this->enqueue_react_editor_validation_app();
 
-		echo '<header class="ba11y-settings-header">' . "\n";
-		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
-		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
-		echo '</header>' . "\n";
+		// Get settings data to pass to React.
+		$settings_data = $this->get_editor_validation_settings_data();
 
-		echo '<section class="ba11y-settings-section">' . "\n";
-		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="ba11y-settings-plugin-header">' . "\n";
-		echo '<h2>' . \esc_html__( 'Post & Page Validation', 'block-accessibility-checks' ) . '</h2>' . "\n";
-		echo '</div>' . "\n";
+		// Render React root.
+		echo '<div class="wrap">';
+		echo '<div id="ba11y-editor-validation-settings-root"></div>';
+		echo '</div>';
 
-		// Display success notices.
-		$this->display_settings_notices();
-
-		// Use unified option group for post and page settings.
-		\settings_fields( 'block_checks_post_page_group' );
-
-		// Render content.
-		$this->render_post_page_validation_content();
-
-		echo '<div class="ba11y-settings-submit">' . "\n";
-		\submit_button();
-		echo '</div>' . "\n";
-
-		echo '</form>' . "\n";
-		echo '</section>' . "\n";
-		echo '</div>' . "\n";
-		echo '</div>' . "\n";
+		// Pass data to JavaScript.
+		\wp_add_inline_script(
+			'ba11y-settings-editor-validation-script',
+			'window.ba11yEditorValidationSettings = ' . \wp_json_encode( $settings_data ) . ';',
+			'before'
+		);
 	}
 
 	/**
@@ -294,14 +282,32 @@ class Settings {
 	/**
 	 * Renders the settings page layout for core blocks.
 	 *
+	 * Uses React app instead of PHP-rendered form.
+	 *
 	 * @return void
 	 */
 	public function settings_page_layout(): void {
-		$this->render_settings_page(
-			\get_admin_page_title(),
-			'block_checks_settings_group',
-			'',
-			array( $this, 'render_core_settings_content' )
+		// Permission check.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
+		}
+
+		// Enqueue React app.
+		$this->enqueue_react_settings_app();
+
+		// Get settings data to pass to React.
+		$settings_data = $this->get_core_blocks_settings_data();
+
+		// Render React root.
+		echo '<div class="wrap">';
+		echo '<div id="ba11y-core-blocks-settings-root"></div>';
+		echo '</div>';
+
+		// Pass data to JavaScript.
+		\wp_add_inline_script(
+			'ba11y-settings-core-blocks-script',
+			'window.ba11yCoreBlockSettings = ' . \wp_json_encode( $settings_data ) . ';',
+			'before'
 		);
 	}
 
@@ -1339,5 +1345,201 @@ class Settings {
 		$label = ucwords( str_replace( array( '_', '-' ), ' ', $label ) );
 
 		return $label;
+	}
+
+	/**
+	 * Enqueue React settings app
+	 *
+	 * @return void
+	 */
+	private function enqueue_react_settings_app(): void {
+		$script_path  = 'build/settings-core-blocks.js';
+		$style_path   = 'build/settings-core-blocks.css';
+		$asset_file   = dirname( __DIR__, 2 ) . '/build/settings-core-blocks.asset.php';
+		$dependencies = array();
+		$version      = BA11YC_VERSION;
+
+		if ( file_exists( $asset_file ) ) {
+			$asset        = require $asset_file;
+			$dependencies = $asset['dependencies'] ?? array();
+			$version      = $asset['version'] ?? $version;
+		}
+
+		\wp_enqueue_script(
+			'ba11y-settings-core-blocks-script',
+			\plugins_url( $script_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			$dependencies,
+			$version,
+			true
+		);
+
+		\wp_enqueue_style(
+			'ba11y-settings-core-blocks-style',
+			\plugins_url( $style_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			array( 'wp-components' ),
+			$version
+		);
+	}
+
+	/**
+	 * Get core blocks settings data for React app
+	 *
+	 * @return array Settings data array.
+	 */
+	private function get_core_blocks_settings_data(): array {
+		$all_checks = $this->registry->get_all_checks();
+		$options    = \get_option( 'block_checks_options', array() );
+		$blocks     = array();
+
+		foreach ( $all_checks as $block_type => $checks ) {
+			// Only process core blocks.
+			if ( strpos( $block_type, 'core/' ) !== 0 ) {
+				continue;
+			}
+
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$block_label  = $this->get_core_block_label( $block_type );
+			$block_checks = array();
+
+			foreach ( $checks as $check_name => $check_config ) {
+				// Only include checks that are using settings (not forced).
+				if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
+					continue;
+				}
+
+				$field_name = $block_type . '_' . $check_name;
+				$value      = $options[ $field_name ] ?? 'error';
+
+				$block_checks[] = array(
+					'name'        => $check_name,
+					'fieldName'   => $field_name,
+					'description' => $check_config['description'],
+					'category'    => $check_config['category'] ?? 'accessibility',
+					'value'       => $value,
+				);
+			}
+
+			$blocks[] = array(
+				'blockType' => $block_type,
+				'label'     => $block_label,
+				'checks'    => $block_checks,
+			);
+		}
+
+		// Get heading levels.
+		$heading_levels = $options['core_heading_levels'] ?? array();
+
+		return array(
+			'success'  => true,
+			'settings' => array(
+				'blocks'        => $blocks,
+				'headingLevels' => $heading_levels,
+			),
+		);
+	}
+
+	/**
+	 * Enqueue React editor validation app
+	 *
+	 * @return void
+	 */
+	private function enqueue_react_editor_validation_app(): void {
+		$script_path  = 'build/settings-editor-validation.js';
+		$style_path   = 'build/settings-editor-validation.css';
+		$asset_file   = dirname( __DIR__, 2 ) . '/build/settings-editor-validation.asset.php';
+		$dependencies = array();
+		$version      = BA11YC_VERSION;
+
+		if ( file_exists( $asset_file ) ) {
+			$asset        = require $asset_file;
+			$dependencies = $asset['dependencies'] ?? array();
+			$version      = $asset['version'] ?? $version;
+		}
+
+		\wp_enqueue_script(
+			'ba11y-settings-editor-validation-script',
+			\plugins_url( $script_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			$dependencies,
+			$version,
+			true
+		);
+
+		\wp_enqueue_style(
+			'ba11y-settings-editor-validation-style',
+			\plugins_url( $style_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			array( 'wp-components' ),
+			$version
+		);
+	}
+
+	/**
+	 * Get editor validation settings data for React app
+	 *
+	 * @return array Settings data array.
+	 */
+	private function get_editor_validation_settings_data(): array {
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$editor_registry = EditorChecksRegistry::get_instance();
+
+		$all_meta_checks   = $meta_registry->get_all_meta_checks();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		$core_post_types = array( 'post', 'page' );
+		$post_types      = array();
+
+		foreach ( $core_post_types as $post_type ) {
+			$has_meta   = ! empty( $all_meta_checks[ $post_type ] );
+			$has_editor = ! empty( $all_editor_checks[ $post_type ] );
+
+			if ( ! $has_meta && ! $has_editor ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+			$checks          = array();
+
+			// Get editor checks for this post type.
+			if ( $has_editor ) {
+				$option_name = 'block_checks_meta_' . $post_type;
+				$options     = \get_option( $option_name, array() );
+
+				foreach ( $all_editor_checks[ $post_type ] as $check_name => $check ) {
+					// Only include settings-based checks.
+					if ( 'settings' !== $check['type'] ) {
+						continue;
+					}
+
+					$field_name  = 'editor_' . $check_name;
+					$description = $check['description'] ?? $check['error_msg'];
+					$value       = $options[ $field_name ] ?? 'error';
+
+					$checks[] = array(
+						'name'        => $check_name,
+						'fieldName'   => $field_name,
+						'postType'    => $post_type,
+						'description' => $description,
+						'category'    => 'validation',
+						'value'       => $value,
+					);
+				}
+			}
+
+			// Add post type to the array.
+			$post_types[] = array(
+				'postType' => $post_type,
+				'label'    => $post_type_label,
+				'checks'   => $checks,
+			);
+		}
+
+		return array(
+			'success'  => true,
+			'settings' => array(
+				'postTypes' => $post_types,
+			),
+		);
 	}
 }

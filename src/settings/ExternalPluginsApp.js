@@ -1,19 +1,19 @@
 /**
- * Demo Settings App
+ * External Plugins Settings App
  *
- * Main React component for the demo settings page.
- * Uses ToggleGroupControl for a clean, table-like interface.
+ * Main React component for external plugin settings pages.
+ * This is a dynamic component that works for any external plugin.
  */
 
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import SettingsHeader from './components/SettingsHeader';
 import SettingsTable from './components/SettingsTable';
 
-export default function DemoSettingsApp() {
-	const initialData = window.ba11yDemoSettings || {};
+export default function ExternalPluginsApp() {
+	const initialData = window.ba11yExternalPluginSettings || {};
 	const [settings, setSettings] = useState(() => {
 		// Convert blocks array to settings object
 		const settingsObj = {};
@@ -27,10 +27,13 @@ export default function DemoSettingsApp() {
 		return settingsObj;
 	});
 	const [isSaving, setIsSaving] = useState(false);
-	const [notice, setNotice] = useState(null);
+	const [notice, setNotice] = useState(false);
 	const [hasChanges, setHasChanges] = useState(false);
 
 	const blocks = initialData.settings?.blocks || [];
+	const pluginName =
+		initialData.pluginName || __('External Plugin', 'block-accessibility-checks');
+	const pluginSlug = initialData.pluginSlug || '';
 
 	/**
 	 * Handle setting change
@@ -55,7 +58,7 @@ export default function DemoSettingsApp() {
 
 		try {
 			const response = await apiFetch({
-				path: '/block-accessibility/v1/demo-settings',
+				path: `/block-accessibility/v1/external-plugin-settings/${pluginSlug}`,
 				method: 'POST',
 				data: {
 					settings,
@@ -84,25 +87,35 @@ export default function DemoSettingsApp() {
 		}
 	};
 
+	// Auto-dismiss success notices after 5 seconds
+	useEffect(() => {
+		if (notice?.status === 'success') {
+			const timer = setTimeout(() => {
+				setNotice(null);
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [notice]);
+
 	if (!blocks.length) {
 		return (
-			<div className="ba11y-demo-wrapper">
+			<div className="ba11y-settings-wrapper">
 				<Spinner />
 			</div>
 		);
 	}
 
 	return (
-		<div className="ba11y-demo-wrapper">
+		<div className="ba11y-settings-wrapper">
 			<SettingsHeader
-				title={__('Demo Settings (React POC)', 'block-accessibility-checks')}
+				title={pluginName}
 				description={__(
-					'This is a proof-of-concept demo using ToggleGroupControl for a clean, table-like interface.',
+					'Configure accessibility checks and validations for this plugin',
 					'block-accessibility-checks'
 				)}
 			/>
 
-			<div className="ba11y-demo-content">
+			<div className="ba11y-settings-content">
 				{notice && (
 					<Notice
 						status={notice.status}
@@ -119,7 +132,7 @@ export default function DemoSettingsApp() {
 					onSettingChange={handleSettingChange}
 				/>
 
-				<div className="ba11y-demo-actions">
+				<div className="ba11y-settings-actions">
 					<Button
 						variant="primary"
 						onClick={handleSave}

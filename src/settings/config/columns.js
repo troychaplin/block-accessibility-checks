@@ -1,14 +1,14 @@
 /**
- * Column Configuration
+ * Column Configuration for Core Block Settings
  *
- * Defines the table columns for the settings page.
+ * Defines the table columns for the core blocks settings page.
  * Easy to extend with new columns in the future.
  */
 
 import { __ } from '@wordpress/i18n';
 
 /**
- * Column definitions for the settings table
+ * Column definitions for the core block settings table
  *
  * Each column should have:
  * - id: Unique identifier
@@ -53,15 +53,3 @@ export const COLUMNS = [
 export function getGridTemplate() {
 	return COLUMNS.map(col => col.width).join(' ');
 }
-
-/**
- * Future: Add new columns easily
- *
- * Example:
- * {
- *   id: 'status',
- *   header: __('Status', 'block-accessibility-checks'),
- *   width: '120px',
- *   enableSorting: true,
- * }
- */

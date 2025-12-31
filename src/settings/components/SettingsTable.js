@@ -2,6 +2,7 @@
  * Settings Table Component
  *
  * DataViews-style table with extensible column architecture.
+ * Handles both regular validation checks and heading level configuration.
  */
 
 import { __ } from '@wordpress/i18n';
@@ -9,11 +10,36 @@ import { COLUMNS, getGridTemplate } from '../config/columns';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 
-export default function SettingsTable({ blocks, settings, onSettingChange }) {
+export default function SettingsTable({
+	blocks,
+	settings,
+	headingLevels,
+	onSettingChange,
+	onHeadingLevelChange,
+}) {
 	// Flatten all checks from all blocks for table display
 	const rows = [];
 
 	blocks.forEach(block => {
+		// Special handling for heading block - add heading levels row first
+		if (block.blockType === 'core/heading' && typeof onHeadingLevelChange === 'function') {
+			rows.push({
+				id: 'heading_levels_config',
+				blockType: 'core/heading',
+				blockLabel: block.label,
+				isHeadingLevels: true,
+				headingLevels,
+				check: {
+					description: __(
+						'Select which heading levels you want to remove from the editor. H2, H3 and H4 are always available.',
+						'block-accessibility-checks'
+					),
+					category: 'validation',
+					fieldName: 'heading_levels',
+				},
+			});
+		}
+
 		block.checks.forEach(check => {
 			rows.push({
 				id: check.fieldName,
@@ -21,6 +47,7 @@ export default function SettingsTable({ blocks, settings, onSettingChange }) {
 				blockLabel: block.label,
 				check,
 				value: settings[check.fieldName] || 'error',
+				isHeadingLevels: false,
 			});
 		});
 	});
@@ -50,6 +77,7 @@ export default function SettingsTable({ blocks, settings, onSettingChange }) {
 									columns={COLUMNS}
 									gridTemplate={gridTemplate}
 									onSettingChange={onSettingChange}
+									onHeadingLevelChange={onHeadingLevelChange}
 								/>
 							))
 						)}

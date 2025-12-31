@@ -1,20 +1,27 @@
 /**
- * Demo Settings Styles
+ * Production Settings Styles
  *
  * DataViews-inspired table layout with extensible column architecture.
+ * Used across all settings pages (Core Blocks, Editor Validation, External Plugins).
  */
 
 // Admin page background
-body.accessibility-validation_page_block-a11y-checks-demo {
+body.toplevel_page_block-a11y-checks,
+body.accessibility-validation_page_block-a11y-checks-post-page {
 	background-color: #f0f0f1;
 
 	#wpcontent {
 		padding-left: 0;
 	}
+
+	// Remove default WordPress .wrap margin
+	.wrap {
+		margin: 0;
+	}
 }
 
 // Main wrapper
-.ba11y-demo-wrapper {
+.ba11y-settings-wrapper {
 	max-width: 1600px;
 	margin: 0 auto;
 	padding: 0;
@@ -22,8 +29,8 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 	min-height: 100vh;
 }
 
-// Header section
-.ba11y-demo-header {
+// Header section (React)
+.ba11y-settings-header-react {
 	padding: 32px 32px 24px 32px;
 	border-bottom: 1px solid #dcdcde;
 	background: #fff;
@@ -44,7 +51,7 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 }
 
 // Content area
-.ba11y-demo-content {
+.ba11y-settings-content {
 	padding: 0;
 
 	.components-notice {
@@ -148,12 +155,6 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 	}
 }
 
-.ba11y-dataview-cell-content {
-	width: 100%;
-	display: flex;
-	align-items: center;
-}
-
 // Check description
 .ba11y-check-description {
 	color: #1d2327;
@@ -191,13 +192,28 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 	font-size: 11px;
 	color: #50575e;
 	font-weight: 500;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
 	white-space: nowrap;
 }
 
 // Level control
-.ba11y-level-control {
+.ba11y-level-control.components-base-control {
+	margin-bottom: 0;
+
+	// Visually hide the empty label to fix contrast issues
+	.components-base-control__label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border-width: 0;
+	}
+}
+
+.ba11y-dataview-cell-level {
 	justify-content: flex-end;
 
 	.components-toggle-group-control {
@@ -248,6 +264,30 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 	}
 }
 
+// Heading levels checkboxes
+.ba11y-heading-levels-checkboxes {
+	display: flex;
+	gap: 16px;
+	justify-content: flex-end;
+
+	.components-base-control {
+		margin-bottom: 0;
+	}
+
+	.components-checkbox-control__input-container {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.components-checkbox-control__label {
+		font-size: 12px;
+		font-weight: 500;
+		color: #1d2327;
+		text-transform: uppercase;
+	}
+}
+
 // No results state
 .ba11y-dataview-no-results {
 	padding: 48px 32px;
@@ -257,7 +297,7 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 }
 
 // Actions footer
-.ba11y-demo-actions {
+.ba11y-settings-actions {
 	display: flex;
 	align-items: center;
 	gap: 16px;
@@ -289,11 +329,11 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 
 // Responsive adjustments
 @media (max-width: 960px) {
-	.ba11y-demo-header {
+	.ba11y-settings-header-react {
 		padding: 24px 16px 16px 16px;
 	}
 
-	.ba11y-demo-content .components-notice {
+	.ba11y-settings-content .components-notice {
 		margin: 16px 16px;
 	}
 
@@ -317,7 +357,7 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 		}
 	}
 
-	.ba11y-demo-actions {
+	.ba11y-settings-actions {
 		padding: 16px;
 	}
 }
@@ -357,27 +397,21 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 		}
 	}
 
-	.ba11y-dataview-cell-content {
-		width: 100%;
-	}
-
 	// Mobile labels
 	.ba11y-dataview-cell-block,
 	.ba11y-dataview-cell-category {
-		.ba11y-dataview-cell-content {
-			&::before {
-				content: attr(data-label);
-				display: inline-block;
-				font-weight: 600;
-				margin-right: 8px;
-				font-size: 11px;
-				color: #646970;
-				text-transform: uppercase;
-			}
+		&::before {
+			content: attr(data-label);
+			display: inline-block;
+			font-weight: 600;
+			margin-right: 8px;
+			font-size: 11px;
+			color: #646970;
+			text-transform: uppercase;
 		}
 	}
 
-	.ba11y-level-control {
+	.ba11y-dataview-cell-level {
 		justify-content: flex-start;
 
 		.components-toggle-group-control {
@@ -385,7 +419,11 @@ body.accessibility-validation_page_block-a11y-checks-demo {
 		}
 	}
 
-	.ba11y-demo-actions {
+	.ba11y-heading-levels-checkboxes {
+		justify-content: flex-start;
+	}
+
+	.ba11y-settings-actions {
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 12px;

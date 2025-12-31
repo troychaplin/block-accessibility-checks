@@ -6,7 +6,7 @@
 
 export default function SettingsHeader({ title, description }) {
 	return (
-		<header className="ba11y-demo-header">
+		<header className="ba11y-settings-header-react">
 			<h1>{title}</h1>
 			{description && <p>{description}</p>}
 		</header>
