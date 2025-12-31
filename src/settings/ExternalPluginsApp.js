@@ -105,6 +105,13 @@ export default function ExternalPluginsApp() {
 		);
 	}
 
+	// Group blocks by type (block checks, meta checks, editor checks)
+	const blockChecks = blocks.filter(
+		block => !block.blockType.startsWith('meta_') && !block.blockType.startsWith('editor_')
+	);
+	const metaChecks = blocks.filter(block => block.blockType.startsWith('meta_'));
+	const editorChecks = blocks.filter(block => block.blockType.startsWith('editor_'));
+
 	return (
 		<div className="ba11y-settings-wrapper">
 			<SettingsHeader
@@ -126,11 +133,32 @@ export default function ExternalPluginsApp() {
 					</Notice>
 				)}
 
-				<SettingsTable
-					blocks={blocks}
-					settings={settings}
-					onSettingChange={handleSettingChange}
-				/>
+				{blockChecks.length > 0 && (
+					<SettingsTable
+						blocks={blockChecks}
+						settings={settings}
+						onSettingChange={handleSettingChange}
+						checkHeaderLabel={__('Block Validation', 'block-accessibility-checks')}
+					/>
+				)}
+
+				{metaChecks.length > 0 && (
+					<SettingsTable
+						blocks={metaChecks}
+						settings={settings}
+						onSettingChange={handleSettingChange}
+						checkHeaderLabel={__('Post Meta Validation', 'block-accessibility-checks')}
+					/>
+				)}
+
+				{editorChecks.length > 0 && (
+					<SettingsTable
+						blocks={editorChecks}
+						settings={settings}
+						onSettingChange={handleSettingChange}
+						checkHeaderLabel={__('Editor Validation', 'block-accessibility-checks')}
+					/>
+				)}
 
 				<div className="ba11y-settings-actions">
 					<Button

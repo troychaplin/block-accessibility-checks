@@ -60,9 +60,29 @@ body.accessibility-validation_page_block-a11y-checks-post-page {
 	}
 }
 
+// Section header
+.ba11y-settings-section-header {
+	padding: 24px 32px 16px 32px;
+	border-bottom: 1px solid #dcdcde;
+	background: #f6f7f7;
+
+	h2 {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 600;
+		color: #1d2327;
+		line-height: 1.4;
+	}
+}
+
 // DataView container
 .ba11y-dataview {
 	background: #fff;
+}
+
+// Add spacing between multiple tables
+.ba11y-dataview + .ba11y-dataview {
+	margin-top: 32px;
 }
 
 .ba11y-dataview-wrapper {
@@ -88,6 +108,11 @@ body.accessibility-validation_page_block-a11y-checks-post-page {
 .ba11y-dataview-row-header {
 	border-bottom: 1px solid #e0e0e0;
 	background: #fff;
+}
+
+// Add top border to tables that follow another table
+.ba11y-dataview + .ba11y-dataview .ba11y-dataview-row-header {
+	border-top: 1px solid #dcdcde;
 }
 
 .ba11y-dataview-th {
@@ -127,12 +152,12 @@ body.accessibility-validation_page_block-a11y-checks-post-page {
 	background: #fff;
 	transition: background-color 0.1s ease;
 
-	&:hover {
-		background: #f6f7f7;
-	}
-
 	&:last-child {
 		border-bottom: none;
+	}
+
+	&:not(.ba11y-dataview-row-header):hover {
+		background: #f6f7f7;
 	}
 }
 

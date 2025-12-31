@@ -16,6 +16,7 @@ export default function SettingsTable({
 	headingLevels,
 	onSettingChange,
 	onHeadingLevelChange,
+	checkHeaderLabel,
 }) {
 	// Flatten all checks from all blocks for table display
 	const rows = [];
@@ -54,6 +55,11 @@ export default function SettingsTable({
 
 	const gridTemplate = getGridTemplate();
 
+	// Create custom columns with dynamic header
+	const customColumns = checkHeaderLabel
+		? COLUMNS.map(col => (col.id === 'check' ? { ...col, header: checkHeaderLabel } : col))
+		: COLUMNS;
+
 	return (
 		<div className="ba11y-dataview">
 			<div className="ba11y-dataview-wrapper">
@@ -62,7 +68,7 @@ export default function SettingsTable({
 					role="table"
 					aria-label={__('Validation checks settings', 'block-accessibility-checks')}
 				>
-					<TableHeader columns={COLUMNS} gridTemplate={gridTemplate} />
+					<TableHeader columns={customColumns} gridTemplate={gridTemplate} />
 
 					<div className="ba11y-dataview-tbody" role="rowgroup">
 						{rows.length === 0 ? (
@@ -74,7 +80,7 @@ export default function SettingsTable({
 								<TableRow
 									key={row.id}
 									row={row}
-									columns={COLUMNS}
+									columns={customColumns}
 									gridTemplate={gridTemplate}
 									onSettingChange={onSettingChange}
 									onHeadingLevelChange={onHeadingLevelChange}

@@ -15,6 +15,10 @@ module.exports = {
 			path.resolve(__dirname, 'src/settings-editor-validation.js'),
 			path.resolve(__dirname, 'src/settings.scss'),
 		],
+		'settings-external-plugins': [
+			path.resolve(__dirname, 'src/settings-external-plugins.js'),
+			path.resolve(__dirname, 'src/settings.scss'),
+		],
 	},
 	output: {
 		...defaultConfig.output,

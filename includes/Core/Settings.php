@@ -403,15 +403,22 @@ class Settings {
 			\wp_die( \esc_html__( 'Plugin settings not found.', 'block-accessibility-checks' ) );
 		}
 
-		$option_group = 'block_checks_external_' . $plugin_slug . '_group';
-		$option_name  = 'block_checks_external_' . $plugin_slug;
+		// Enqueue React app.
+		$this->enqueue_react_external_plugin_app();
 
-		$this->render_settings_page(
-			$plugin_data['name'],
-			$option_group,
-			$plugin_data['version'] ?? '',
-			array( $this, 'render_external_plugin_settings_content' ),
-			array( $plugin_data, $plugin_slug )
+		// Get settings data to pass to React.
+		$settings_data = $this->get_external_plugin_settings_data( $plugin_slug, $plugin_data );
+
+		// Render React root.
+		echo '<div class="wrap">';
+		echo '<div id="ba11y-external-plugin-settings-root"></div>';
+		echo '</div>';
+
+		// Pass data to JavaScript.
+		\wp_add_inline_script(
+			'ba11y-settings-external-plugins-script',
+			'window.ba11yExternalPluginSettings = ' . \wp_json_encode( $settings_data ) . ';',
+			'before'
 		);
 	}
 
@@ -1541,5 +1548,199 @@ class Settings {
 				'postTypes' => $post_types,
 			),
 		);
+	}
+
+	/**
+	 * Enqueue React external plugin settings app
+	 *
+	 * @return void
+	 */
+	private function enqueue_react_external_plugin_app(): void {
+		$asset_file = plugin_dir_path( dirname( __DIR__ ) ) . 'build/settings-external-plugins.asset.php';
+		$asset      = file_exists( $asset_file ) ? require $asset_file : array(
+			'dependencies' => array(),
+			'version'      => '1.0.0',
+		);
+
+		\wp_enqueue_script(
+			'ba11y-settings-external-plugins-script',
+			plugins_url( 'build/settings-external-plugins.js', dirname( __DIR__ ) ),
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		\wp_enqueue_style(
+			'ba11y-settings-external-plugins-style',
+			plugins_url( 'build/settings-external-plugins.css', dirname( __DIR__ ) ),
+			array( 'wp-components' ),
+			$asset['version']
+		);
+	}
+
+	/**
+	 * Get external plugin settings data for React app
+	 *
+	 * @param string $plugin_slug Plugin slug.
+	 * @param array  $plugin_data Plugin data from registry.
+	 * @return array Settings data formatted for React.
+	 */
+	private function get_external_plugin_settings_data( string $plugin_slug, array $plugin_data ): array {
+		$option_name = 'block_checks_external_' . $plugin_slug;
+		$options     = \get_option( $option_name, array() );
+		$blocks      = array();
+
+		// Get block checks.
+		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$block_label  = $this->get_block_label( $block_type );
+			$block_checks = array();
+
+			foreach ( $checks as $check_name => $check_config ) {
+				// Only include checks that are using settings (not forced).
+				if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
+					continue;
+				}
+
+				$field_name = $block_type . '_' . $check_name;
+				$value      = $options[ $field_name ] ?? 'error';
+
+				$block_checks[] = array(
+					'name'        => $check_name,
+					'fieldName'   => $field_name,
+					'description' => $check_config['description'],
+					'category'    => $check_config['category'] ?? 'accessibility',
+					'value'       => $value,
+				);
+			}
+
+			if ( ! empty( $block_checks ) ) {
+				$blocks[] = array(
+					'blockType' => $block_type,
+					'label'     => $block_label,
+					'checks'    => $block_checks,
+				);
+			}
+		}
+
+		// Get meta checks for non-core post types.
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$all_meta_checks = $meta_registry->get_all_meta_checks();
+		$core_post_types = array( 'post', 'page' );
+
+		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+			// Skip core post types.
+			if ( in_array( $post_type, $core_post_types, true ) ) {
+				continue;
+			}
+
+			if ( empty( $meta_fields ) ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+
+			foreach ( $meta_fields as $meta_key => $checks ) {
+				foreach ( $checks as $check_name => $check ) {
+					// Only include settings-based checks.
+					if ( 'settings' !== $check['type'] ) {
+						continue;
+					}
+
+					$field_name = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
+					$value      = $options[ $field_name ] ?? 'error';
+
+					$block_label = $post_type_label . ' - ' . ucwords( str_replace( array( '-', '_' ), ' ', $meta_key ) );
+
+					$blocks[] = array(
+						'blockType' => 'meta_' . $post_type . '_' . $meta_key,
+						'label'     => $block_label,
+						'checks'    => array(
+							array(
+								'name'        => $check_name,
+								'fieldName'   => $field_name,
+								'description' => $check['description'] ?? $check['error_msg'],
+								'category'    => 'validation',
+								'value'       => $value,
+							),
+						),
+					);
+				}
+			}
+		}
+
+		// Get editor checks for non-core post types.
+		$editor_registry   = EditorChecksRegistry::get_instance();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		foreach ( $all_editor_checks as $post_type => $checks ) {
+			// Skip core post types.
+			if ( in_array( $post_type, $core_post_types, true ) ) {
+				continue;
+			}
+
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+
+			foreach ( $checks as $check_name => $check ) {
+				// Only include settings-based checks.
+				if ( 'settings' !== $check['type'] ) {
+					continue;
+				}
+
+				$field_name = 'editor_' . $post_type . '_' . $check_name;
+				$value      = $options[ $field_name ] ?? 'error';
+
+				$blocks[] = array(
+					'blockType' => 'editor_' . $post_type,
+					'label'     => $post_type_label . ' - Editor',
+					'checks'    => array(
+						array(
+							'name'        => $check_name,
+							'fieldName'   => $field_name,
+							'description' => $check['description'] ?? $check['error_msg'],
+							'category'    => 'validation',
+							'value'       => $value,
+						),
+					),
+				);
+			}
+		}
+
+		return array(
+			'success'    => true,
+			'pluginName' => $plugin_data['name'] ?? '',
+			'pluginSlug' => $plugin_slug,
+			'settings'   => array(
+				'blocks' => $blocks,
+			),
+		);
+	}
+
+	/**
+	 * Get display label for a block type
+	 *
+	 * @param string $block_type The block type.
+	 * @return string The display label.
+	 */
+	private function get_block_label( string $block_type ): string {
+		// Try to get the block title from WordPress.
+		$block_registry = \WP_Block_Type_Registry::get_instance();
+		$block          = $block_registry->get_registered( $block_type );
+
+		if ( $block && ! empty( $block->title ) ) {
+			return $block->title;
+		}
+
+		// Fallback: Convert block type to display name.
+		$parts      = explode( '/', $block_type );
+		$block_name = $parts[1] ?? $block_type;
+		return ucwords( str_replace( array( '-', '_' ), ' ', $block_name ) );
 	}
 }
