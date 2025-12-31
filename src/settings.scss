@@ -6,8 +6,10 @@
  */
 
 // Admin page background
+// Applied to all settings pages (core blocks, editor validation, external plugins)
 body.toplevel_page_block-a11y-checks,
-body.accessibility-validation_page_block-a11y-checks-post-page {
+body.accessibility-validation_page_block-a11y-checks-post-page,
+body[class*='accessibility-validation_page_block-a11y-checks-'] {
 	background-color: #f0f0f1;
 
 	#wpcontent {

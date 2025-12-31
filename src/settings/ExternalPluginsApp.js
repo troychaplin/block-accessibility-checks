@@ -27,7 +27,7 @@ export default function ExternalPluginsApp() {
 		return settingsObj;
 	});
 	const [isSaving, setIsSaving] = useState(false);
-	const [notice, setNotice] = useState(false);
+	const [notice, setNotice] = useState(null);
 	const [hasChanges, setHasChanges] = useState(false);
 
 	const blocks = initialData.settings?.blocks || [];
