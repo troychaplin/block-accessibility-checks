@@ -148,6 +148,7 @@ export default function ExternalPluginsApp() {
 						settings={settings}
 						onSettingChange={handleSettingChange}
 						checkHeaderLabel={__('Post Meta Validation', 'block-accessibility-checks')}
+						blockHeaderLabel={__('Meta Field', 'block-accessibility-checks')}
 					/>
 				)}
 
@@ -157,6 +158,7 @@ export default function ExternalPluginsApp() {
 						settings={settings}
 						onSettingChange={handleSettingChange}
 						checkHeaderLabel={__('Editor Validation', 'block-accessibility-checks')}
+						blockHeaderLabel={__('Post Type', 'block-accessibility-checks')}
 					/>
 				)}
 

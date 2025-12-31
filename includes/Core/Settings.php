@@ -1653,7 +1653,7 @@ class Settings {
 					$field_name = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
 					$value      = $options[ $field_name ] ?? 'error';
 
-					$block_label = $post_type_label . ' - ' . ucwords( str_replace( array( '-', '_' ), ' ', $meta_key ) );
+					$block_label = ucwords( str_replace( array( '-', '_' ), ' ', $meta_key ) );
 
 					$blocks[] = array(
 						'blockType' => 'meta_' . $post_type . '_' . $meta_key,
@@ -1699,7 +1699,7 @@ class Settings {
 
 				$blocks[] = array(
 					'blockType' => 'editor_' . $post_type,
-					'label'     => $post_type_label . ' - Editor',
+					'label'     => $post_type_label,
 					'checks'    => array(
 						array(
 							'name'        => $check_name,

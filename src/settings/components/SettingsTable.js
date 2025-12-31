@@ -17,6 +17,7 @@ export default function SettingsTable({
 	onSettingChange,
 	onHeadingLevelChange,
 	checkHeaderLabel,
+	blockHeaderLabel,
 }) {
 	// Flatten all checks from all blocks for table display
 	const rows = [];
@@ -55,10 +56,16 @@ export default function SettingsTable({
 
 	const gridTemplate = getGridTemplate();
 
-	// Create custom columns with dynamic header
-	const customColumns = checkHeaderLabel
-		? COLUMNS.map(col => (col.id === 'check' ? { ...col, header: checkHeaderLabel } : col))
-		: COLUMNS;
+	// Create custom columns with dynamic headers
+	const customColumns = COLUMNS.map(col => {
+		if (col.id === 'check' && checkHeaderLabel) {
+			return { ...col, header: checkHeaderLabel };
+		}
+		if (col.id === 'block' && blockHeaderLabel) {
+			return { ...col, header: blockHeaderLabel };
+		}
+		return col;
+	});
 
 	return (
 		<div className="ba11y-dataview">
