@@ -116,8 +116,11 @@ export const createIssue = (config, checkName, additionalFields = {}) => {
 		category,
 		priority,
 		message,
+		// Support both camelCase and snake_case for compatibility
 		errorMsg,
 		warningMsg,
+		error_msg: errorMsg,
+		warning_msg: warningMsg,
 		...additionalFields,
 	};
 };

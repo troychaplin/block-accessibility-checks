@@ -172,21 +172,18 @@ export function ValidationSidebar() {
 	const scrollTimeoutRef = useRef(null);
 
 	// Organize validation issues by type and severity for deduplication
-	const blocksWithErrors = invalidBlocks.filter(block => block.mode === 'error');
-	const blocksWithWarnings = invalidBlocks.filter(block => block.mode === 'warning');
-
+	// Note: Pass all invalid blocks to deduplication functions, not just those with matching mode
+	// A block can have both errors AND warnings in its issues array, even if mode is 'error'
 	const editorErrors = filterIssuesByType(invalidEditorChecks, 'error');
 	const editorWarnings = filterIssuesByType(invalidEditorChecks, 'warning');
 
-	// Meta warnings only shown if no errors exist (errors take precedence)
-	const metaWithErrors = invalidMeta.filter(meta => meta.hasErrors);
-	const metaWithWarnings = invalidMeta.filter(meta => meta.hasWarnings && !meta.hasErrors);
-
 	// Deduplicate issues by type and severity
-	const deduplicatedBlockErrors = deduplicateBlockIssues(blocksWithErrors, 'error');
-	const deduplicatedBlockWarnings = deduplicateBlockIssues(blocksWithWarnings, 'warning');
-	const deduplicatedMetaErrors = deduplicateMetaIssues(metaWithErrors, 'error');
-	const deduplicatedMetaWarnings = deduplicateMetaIssues(metaWithWarnings, 'warning');
+	// Extract errors and warnings from all blocks, regardless of their mode
+	const deduplicatedBlockErrors = deduplicateBlockIssues(invalidBlocks, 'error');
+	const deduplicatedBlockWarnings = deduplicateBlockIssues(invalidBlocks, 'warning');
+	// Extract errors and warnings from all meta, regardless of primary severity
+	const deduplicatedMetaErrors = deduplicateMetaIssues(invalidMeta, 'error');
+	const deduplicatedMetaWarnings = deduplicateMetaIssues(invalidMeta, 'warning');
 	const deduplicatedEditorErrors = deduplicateEditorIssues(editorErrors, 'error');
 	const deduplicatedEditorWarnings = deduplicateEditorIssues(editorWarnings, 'warning');
 
@@ -334,18 +331,25 @@ export function ValidationSidebar() {
 									</strong>
 								</p>
 								<ul className="ba11y-error-list">
-									{deduplicatedBlockErrors.map((issue, index) => (
-										<li key={`block-error-${index}`}>
-											<button
-												type="button"
-												className="ba11y-issue-link"
-												onClick={() => handleBlockClick(issue.clientIds[0])}
-											>
-												{issue.blockName}
-											</button>
-											: {issue.message}
-										</li>
-									))}
+									{deduplicatedBlockErrors.map((issue, index) => {
+										const count = issue.clientIds.length;
+										const countDisplay = count > 1 ? ` (x${count})` : '';
+										return (
+											<li key={`block-error-${index}`}>
+												<button
+													type="button"
+													className="ba11y-issue-link"
+													onClick={() =>
+														handleBlockClick(issue.clientIds[0])
+													}
+												>
+													{issue.blockName}
+												</button>
+												: {issue.message}
+												{countDisplay}
+											</li>
+										);
+									})}
 								</ul>
 							</div>
 						</PanelRow>
@@ -413,18 +417,25 @@ export function ValidationSidebar() {
 									</strong>
 								</p>
 								<ul className="ba11y-warning-list">
-									{deduplicatedBlockWarnings.map((issue, index) => (
-										<li key={`block-warning-${index}`}>
-											<button
-												type="button"
-												className="ba11y-issue-link"
-												onClick={() => handleBlockClick(issue.clientIds[0])}
-											>
-												{issue.blockName}
-											</button>
-											: {issue.message}
-										</li>
-									))}
+									{deduplicatedBlockWarnings.map((issue, index) => {
+										const count = issue.clientIds.length;
+										const countDisplay = count > 1 ? ` (x${count})` : '';
+										return (
+											<li key={`block-warning-${index}`}>
+												<button
+													type="button"
+													className="ba11y-issue-link"
+													onClick={() =>
+														handleBlockClick(issue.clientIds[0])
+													}
+												>
+													{issue.blockName}
+												</button>
+												: {issue.message}
+												{countDisplay}
+											</li>
+										);
+									})}
 								</ul>
 							</div>
 						</PanelRow>
