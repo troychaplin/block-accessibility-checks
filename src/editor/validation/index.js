@@ -6,5 +6,4 @@
 
 export * from './blocks';
 export * from './editor';
-export * from './meta';
 export { ValidationAPI } from './ValidationAPI';
