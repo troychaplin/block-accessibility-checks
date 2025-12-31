@@ -9,7 +9,7 @@ import { error, caution } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { hasErrors, getErrors, getWarnings } from '@shared/utils/validation';
+import { hasErrors, getErrors, getWarnings } from '../../shared/utils/validation';
 
 /**
  * Block Indicator Component

@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { validateAllMetaChecks } from '@editor/validation/meta/validateMeta';
+import { validateAllMetaChecks } from '../../../editor/validation/meta/validateMeta';
 
 /**
  * React hook that retrieves all invalid meta field validations for the current post.

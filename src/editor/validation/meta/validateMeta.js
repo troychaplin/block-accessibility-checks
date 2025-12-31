@@ -6,7 +6,11 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { isCheckEnabled, createIssue, createValidationResult } from '@shared/utils/validation';
+import {
+	isCheckEnabled,
+	createIssue,
+	createValidationResult,
+} from '../../../shared/utils/validation';
 
 /**
  * Meta validation rules configuration from PHP

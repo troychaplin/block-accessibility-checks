@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { validateBlock } from '@editor/validation/blocks';
+import { validateBlock } from '../../../editor/validation/blocks';
 
 /**
  * Recursively retrieves invalid blocks from a block tree.

@@ -239,7 +239,7 @@ class Registry {
 	 */
 	private function get_meta_check_level_from_settings( string $post_type, string $meta_key, string $check_name ): string {
 		// Field name format: meta_{post_type}_{meta_key}_{check_name} for external plugins
-		// Field name format: meta_key_check_name for core post types
+		// Field name format: meta_key_check_name for core post types.
 		$external_field_name = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
 		$core_field_name     = $meta_key . '_' . $check_name;
 
@@ -249,7 +249,7 @@ class Registry {
 		foreach ( $all_options as $option_name => $option_value ) {
 			if ( strpos( $option_name, 'block_checks_external_' ) === 0 ) {
 				$options = \get_option( $option_name, array() );
-				// Check with external field name format first
+				// Check with external field name format first.
 				if ( isset( $options[ $external_field_name ] ) ) {
 					return $options[ $external_field_name ];
 				}

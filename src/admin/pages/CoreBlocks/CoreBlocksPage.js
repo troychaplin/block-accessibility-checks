@@ -9,7 +9,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Spinner, Notice } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
-import { SettingsHeader, SettingsTable } from '@admin/components';
+import { SettingsHeader, SettingsTable } from '../../components';
 
 export default function CoreBlocksPage() {
 	const initialData = window.ba11yCoreBlockSettings || {};

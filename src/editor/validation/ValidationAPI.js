@@ -13,7 +13,7 @@ import {
 	GetInvalidEditorChecks,
 	hasErrors,
 	hasWarnings,
-} from '@shared/utils/validation';
+} from '../../shared/utils/validation';
 
 /**
  * Validation API Component

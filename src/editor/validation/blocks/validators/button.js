@@ -6,7 +6,7 @@
  */
 
 import { addFilter } from '@wordpress/hooks';
-import { isValidUrl } from '@shared/utils';
+import { isValidUrl } from '../../../../shared/utils';
 
 addFilter(
 	'ba11yc_validate_block',

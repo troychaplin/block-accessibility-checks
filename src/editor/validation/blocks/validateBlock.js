@@ -14,7 +14,7 @@ import {
 	hasErrors,
 	hasWarnings,
 	createValidationResult,
-} from '@shared/utils/validation';
+} from '../../../shared/utils/validation';
 
 /**
  * Default client-side validation checks for core WordPress blocks.

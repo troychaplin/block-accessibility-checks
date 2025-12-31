@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { validateEditor } from '@editor/validation/editor';
+import { validateEditor } from '../../../editor/validation/editor';
 
 /**
  * React hook that retrieves all invalid editor-level validation checks.

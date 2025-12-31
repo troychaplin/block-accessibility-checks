@@ -7,7 +7,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
-// import { caution } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,7 +18,7 @@ import {
 	filterIssuesByType,
 	getErrors,
 	getWarnings,
-} from '@shared/utils/validation';
+} from '../../shared/utils/validation';
 
 /**
  * Get display name for a block type
