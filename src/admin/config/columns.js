@@ -22,33 +22,30 @@ export const COLUMNS = [
 	{
 		id: 'check',
 		header: __('Validation Check', 'block-accessibility-checks'),
-		width: '3fr',
-		minWidth: '300px',
+		width: '2fr',
+		minWidth: '200px',
 		enableSorting: true,
 		primary: true, // Primary column gets bold treatment
 	},
 	{
 		id: 'block',
 		header: __('Block', 'block-accessibility-checks'),
-		// width: '180px',
 		width: '1fr',
-		minWidth: '180px',
+		minWidth: '150px',
 		enableSorting: true,
 	},
 	{
 		id: 'category',
 		header: __('Category', 'block-accessibility-checks'),
-		// width: '140px',
 		width: '1fr',
-		minWidth: '140px',
+		minWidth: '120px',
 		enableSorting: true,
 	},
 	{
 		id: 'level',
 		header: __('Level', 'block-accessibility-checks'),
-		// width: '240px',
 		width: '1fr',
-		minWidth: '240px',
+		minWidth: '200px',
 		align: 'right',
 	},
 ];
