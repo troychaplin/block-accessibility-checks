@@ -1,7 +1,6 @@
-@use "styles/variables";
-
-@use './styles/editor/editor-validation';
-@use './styles/editor/inline-indicators';
-@use './styles/editor/inline-modal';
-@use './styles/editor/meta-validation';
-@use './styles/editor/validation-sidebar';
+@use "./styles/variables";
+@use './styles/editor-validation';
+@use './styles/inline-indicators';
+@use './styles/inline-modal';
+@use './styles/meta-validation';
+@use './styles/validation-sidebar';

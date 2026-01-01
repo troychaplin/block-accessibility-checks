@@ -22,7 +22,7 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 }
 
 // Header section (React)
-.ba11y-settings-header-react {
+.ba11y-settings-header {
 	padding: var(--a11y-settings-space);
 	border-bottom: 1px solid var(--a11y-light-grey);
 	background: #fff;
@@ -46,7 +46,10 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 // Save notifications
 .ba11y-settings-content .components-notice {
     margin: calc(var(--a11y-settings-space) / 1.5) var(--a11y-settings-space);
-    border-radius: 2px;
+    background-color: var(--a11y-lightest-green);
+    border: 1px solid var(--a11y-green);
+    border-left: 5px solid var(--a11y-dark-green);
+    border-radius: 4px;
 }
 
 // DataView container
@@ -119,14 +122,14 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 // Block badge
 .ba11y-block-badge,
 .ba11y-category-badge {
-	display: inline-flex;
-	padding: 2px 5px;
-	background: var(--a11y-lightest-grey);
-    border: 1px solid var(--a11y-light-grey);
-	border-radius: 2px;
-	font-size: 12px;
-	color: #1d2327;
-	font-weight: 500;
+	// display: inline-flex;
+	// padding: 2px 5px;
+	// background: var(--a11y-lightest-grey);
+    // border: 1px solid var(--a11y-light-grey);
+	// border-radius: 2px;
+	font-size: var(--a11y-font-small);
+	color: var(--a11y-black);
+	font-weight: 400;
 	white-space: nowrap;
 }
 
