@@ -1,12 +1,25 @@
-@use './styles/admin/body-classes';
-@use './styles/admin/settings';
+// Plugin Sidebar Icon Styles
 
-:root {
-	--a11y-light-blue: #dfe9ee;
-	--a11y-blue: #507a96;
-	--a11y-black: #1d2327;
-	--a11y-lightest-grey: #f0f0f1;
-	--a11y-light-grey: #dadada;
-	--a11y-medium-grey: #666;
-    --a11y-red: #d82000;
+.has-meta-validation-warnings button[aria-controls="validation-api:validation-sidebar"].is-pressed {
+    background-color: var(--a11y-light-yellow);
+    transition: background-color 0.2s ease;
+}
+
+.has-meta-validation-errors button[aria-controls="validation-api:validation-sidebar"].is-pressed {
+    background-color: var(--a11y-light-red);
+    transition: background-color 0.2s ease;
+}
+
+.has-meta-validation-warnings button[aria-controls="validation-api:validation-sidebar"].is-pressed:hover {
+    background-color: var(--a11y-light-yellow);
+    transition: background-color 0.2s ease;
+}
+
+.has-meta-validation-errors button[aria-controls="validation-api:validation-sidebar"].is-pressed:hover {
+    background-color: var(--a11y-light-red);
+    transition: background-color 0.2s ease;
+}
+
+.ba11y-sidebar-icon {
+    padding: 2px 0;
 }

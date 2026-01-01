@@ -24,8 +24,8 @@ Replace the current clunky message display system (PluginDocumentSettingPanel an
 - `src/scripts/components/EditorValidationDisplay.js` - Remove/replace PluginDocumentSettingPanel
 - `src/scripts/validation/blockErrorComponent.js` - Update block indicator positioning
 - `src/scripts/validation/ValidationDisplay.js` - Add meta field indicators
-- `src/styles/editor/block-icon.scss` - Redesign block indicators (move inside, smaller)
-- `src/styles/editor/meta-validation.scss` - Add meta field indicators
+- `src/styles/block-icon.scss` - Redesign block indicators (move inside, smaller)
+- `src/styles/meta-validation.scss` - Add meta field indicators
 - `src/scripts/registerPlugin.js` - Add new unified sidebar component
 
 **New Files to Create:**
@@ -35,9 +35,9 @@ Replace the current clunky message display system (PluginDocumentSettingPanel an
 - `src/scripts/components/BlockIndicator.js` - Inline block indicator component
 - `src/scripts/components/MetaIndicator.js` - Inline meta field indicator component
 - `src/scripts/components/ValidationTooltip.js` - Tooltip component for indicators
-- `src/styles/editor/validation-header.scss` - Header button styles
-- `src/styles/editor/unified-sidebar.scss` - Unified sidebar styles
-- `src/styles/editor/inline-indicators.scss` - Inline indicator styles
+- `src/styles/validation-header.scss` - Header button styles
+- `src/styles/unified-sidebar.scss` - Unified sidebar styles
+- `src/styles/inline-indicators.scss` - Inline indicator styles
 
 ## Implementation Steps
 

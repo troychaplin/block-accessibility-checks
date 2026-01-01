@@ -62,7 +62,6 @@ class Settings {
 	public function __construct() {
 		$this->registry = BlockChecksRegistry::get_instance();
 		\add_action( 'admin_menu', array( $this, 'block_check_admin_menu' ) );
-		\add_action( 'admin_init', array( $this, 'init_settings' ) );
 	}
 
 	/**
@@ -145,234 +144,65 @@ class Settings {
 	/**
 	 * Render Post & Page Validation settings page
 	 *
+	 * Uses React app instead of PHP-rendered form.
+	 *
 	 * @return void
 	 */
 	public function post_page_validation_settings_page(): void {
+		// Permission check.
 		if ( ! \current_user_can( 'manage_options' ) ) {
 			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
 		}
 
-		// Permission check.
-		echo '<div class="ba11y-settings">' . "\n";
-		echo '<div class="ba11y-settings-container">' . "\n";
+		// Enqueue React app.
+		$this->enqueue_react_editor_validation_app();
 
-		echo '<header class="ba11y-settings-header">' . "\n";
-		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
-		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
-		echo '</header>' . "\n";
+		// Get settings data to pass to React.
+		$settings_data = $this->get_editor_validation_settings_data();
 
-		echo '<section class="ba11y-settings-section">' . "\n";
-		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="ba11y-settings-plugin-header">' . "\n";
-		echo '<h2>' . \esc_html__( 'Post & Page Validation', 'block-accessibility-checks' ) . '</h2>' . "\n";
-		echo '</div>' . "\n";
+		// Render React root.
+		echo '<div class="wrap">';
+		echo '<div id="ba11y-editor-validation-settings-root"></div>';
+		echo '</div>';
 
-		// Display success notices.
-		$this->display_settings_notices();
-
-		// Use unified option group for post and page settings.
-		\settings_fields( 'block_checks_post_page_group' );
-
-		// Render content.
-		$this->render_post_page_validation_content();
-
-		echo '<div class="ba11y-settings-submit">' . "\n";
-		\submit_button();
-		echo '</div>' . "\n";
-
-		echo '</form>' . "\n";
-		echo '</section>' . "\n";
-		echo '</div>' . "\n";
-		echo '</div>' . "\n";
-	}
-
-	/**
-	 * Render Post & Page Validation content
-	 *
-	 * @return void
-	 */
-	private function render_post_page_validation_content(): void {
-		$meta_registry   = MetaChecksRegistry::get_instance();
-		$editor_registry = EditorChecksRegistry::get_instance();
-
-		$all_meta_checks   = $meta_registry->get_all_meta_checks();
-		$all_editor_checks = $editor_registry->get_all_editor_checks();
-
-		$core_post_types = array( 'post', 'page' );
-
-		foreach ( $core_post_types as $post_type ) {
-			$has_meta   = ! empty( $all_meta_checks[ $post_type ] );
-			$has_editor = ! empty( $all_editor_checks[ $post_type ] );
-
-			if ( ! $has_meta && ! $has_editor ) {
-				continue;
-			}
-
-			$post_type_label = $this->get_post_type_label( $post_type );
-
-			echo '<div class="ba11y-settings-plugin-header">' . "\n";
-			echo '<h2>' . \esc_html( $post_type_label ) . '</h2>';
-			echo '</div>' . "\n";
-
-			// Render editor checks for this post type.
-			if ( $has_editor ) {
-				echo '<article class="ba11y-block-options ba11y-editor-options ba11y-editor-options-' . \esc_attr( $post_type ) . '">';
-				echo '<h3>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h3>';
-
-				$this->render_editor_checks_options( $post_type, $all_editor_checks[ $post_type ], '' );
-
-				echo '</article>';
-			}
-
-			// Render meta checks for this post type.
-			if ( $has_meta ) {
-				echo '<article class="ba11y-block-options ba11y-meta-options ba11y-meta-options-' . \esc_attr( $post_type ) . '">';
-				echo '<h3>' . \esc_html__( 'Post Meta Validation', 'block-accessibility-checks' ) . '</h3>';
-
-				foreach ( $all_meta_checks[ $post_type ] as $meta_key => $checks ) {
-					$this->render_meta_field_checks( $post_type, $meta_key, $checks, '' );
-				}
-
-				echo '</article>';
-			}
-		}
-	}
-
-	/**
-	 * Initializes the settings for the plugin.
-	 *
-	 * This method is responsible for registering the settings and adding
-	 * the settings section and fields to the WordPress admin.
-	 *
-	 * @return void
-	 */
-	public function init_settings(): void {
-		// Register core block settings.
-		\register_setting(
-			'block_checks_settings_group',
-			'block_checks_options',
-			array(
-				'sanitize_callback' => array( $this, 'sanitize_options' ),
-			)
+		// Pass data to JavaScript.
+		\wp_add_inline_script(
+			'ba11y-settings-editor-validation-script',
+			'window.ba11yEditorValidationSettings = ' . \wp_json_encode( $settings_data ) . ';',
+			'before'
 		);
-
-		\add_settings_section(
-			'block_checks_options_section',
-			'',
-			false,
-			'block_checks_options'
-		);
-
-		\add_settings_field(
-			'core_heading_levels',
-			'Heading Block',
-			array( $this, 'render_core_heading_options' ),
-			'block_checks_options',
-			'block_checks_options_section'
-		);
-
-		// Register site editor validation settings.
-		\register_setting(
-			'block_checks_settings_group',
-			'block_checks_site_editor_options',
-			array(
-				'sanitize_callback' => array( $this, 'sanitize_site_editor_options' ),
-				'default'           => array( 'enabled' => true ),
-			)
-		);
-
-		// Register external plugin settings.
-		$this->register_external_plugin_settings();
-
-		// Register meta check settings.
-		$this->register_meta_check_settings();
-
-		// Register editor check settings.
-		$this->register_editor_check_settings();
 	}
 
 	/**
 	 * Renders the settings page layout for core blocks.
 	 *
+	 * Uses React app instead of PHP-rendered form.
+	 *
 	 * @return void
 	 */
 	public function settings_page_layout(): void {
-		$this->render_settings_page(
-			\get_admin_page_title(),
-			'block_checks_settings_group',
-			'',
-			array( $this, 'render_core_settings_content' )
+		// Permission check.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
+		}
+
+		// Enqueue React app.
+		$this->enqueue_react_settings_app();
+
+		// Get settings data to pass to React.
+		$settings_data = $this->get_core_blocks_settings_data();
+
+		// Render React root.
+		echo '<div class="wrap">';
+		echo '<div id="ba11y-core-blocks-settings-root"></div>';
+		echo '</div>';
+
+		// Pass data to JavaScript.
+		\wp_add_inline_script(
+			'ba11y-settings-core-blocks-script',
+			'window.ba11yCoreBlockSettings = ' . \wp_json_encode( $settings_data ) . ';',
+			'before'
 		);
-	}
-
-	/**
-	 * Renders the core heading options for the settings page.
-	 *
-	 * This method is responsible for outputting the HTML or other content
-	 * necessary to display the core heading options in the plugin's settings page.
-	 *
-	 * @return void
-	 */
-	public function render_core_heading_options() {
-		$options        = \get_option( 'block_checks_options' );
-		$heading_levels = $options['core_heading_levels'] ?? array();
-
-		$this->render_heading_checkboxes( $heading_levels, false );
-	}
-
-	/**
-	 * Renders heading level checkboxes
-	 *
-	 * Shared method to render heading level checkbox options with optional description.
-	 *
-	 * @param array $heading_levels Currently selected heading levels.
-	 * @param bool  $include_description Whether to include the description label.
-	 * @return void
-	 */
-	private function render_heading_checkboxes( array $heading_levels, bool $include_description = false ): void {
-		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="heading-levels-label">';
-		echo '<div class="ba11y-field-group">';
-
-		if ( $include_description ) {
-			echo '<div class="ba11y-field-label">';
-			echo '<p id="heading-levels-label">' . \esc_html__( 'Select which heading levels you want to remove from the editor. H2, H3 and H4 are always available.', 'block-accessibility-checks' ) . '</p>';
-			echo '</div>';
-		}
-
-		echo '<div class="ba11y-field-controls ba11y-field-controls--checkbox">';
-
-		// Only allow removal of H1, H5, and H6 levels.
-		foreach ( self::REMOVABLE_HEADING_LEVELS as $level ) {
-			$level_num = intval( substr( $level, 1 ) );
-			$checked   = in_array( $level, $heading_levels, true ) ? 'checked' : '';
-			echo '<div class="ba11y-checkbox-item">';
-			echo '<input type="checkbox" 
-						 id="' . \esc_attr( 'heading-level-' . $level_num ) . '" 
-						 name="block_checks_options[core_heading_levels][]" 
-						 value="' . \esc_attr( $level ) . '" 
-						 ' . ( $checked ? 'checked="checked"' : '' ) . '>';
-			echo '<label for="' . \esc_attr( 'heading-level-' . $level_num ) . '">' . \esc_html( strtoupper( $level ) ) . '</label>';
-			echo '</div>';
-		}
-
-		echo '</div>';
-		echo '</div>';
-		echo '</div>';
-	}
-
-	/**
-	 * Renders the heading level options within the heading block section.
-	 *
-	 * This method renders the heading level checkboxes directly within the
-	 * heading block options, positioned above the individual check settings.
-	 *
-	 * @return void
-	 */
-	private function render_heading_level_options(): void {
-		$options        = \get_option( 'block_checks_options' );
-		$heading_levels = $options['core_heading_levels'] ?? array();
-
-		$this->render_heading_checkboxes( $heading_levels, true );
 	}
 
 	/**
@@ -397,31 +227,23 @@ class Settings {
 			\wp_die( \esc_html__( 'Plugin settings not found.', 'block-accessibility-checks' ) );
 		}
 
-		$option_group = 'block_checks_external_' . $plugin_slug . '_group';
-		$option_name  = 'block_checks_external_' . $plugin_slug;
+		// Enqueue React app.
+		$this->enqueue_react_external_plugin_app();
 
-		$this->render_settings_page(
-			$plugin_data['name'],
-			$option_group,
-			$plugin_data['version'] ?? '',
-			array( $this, 'render_external_plugin_settings_content' ),
-			array( $plugin_data, $plugin_slug )
+		// Get settings data to pass to React.
+		$settings_data = $this->get_external_plugin_settings_data( $plugin_slug, $plugin_data );
+
+		// Render React root.
+		echo '<div class="wrap">';
+		echo '<div id="ba11y-external-plugin-settings-root"></div>';
+		echo '</div>';
+
+		// Pass data to JavaScript.
+		\wp_add_inline_script(
+			'ba11y-settings-external-plugins-script',
+			'window.ba11yExternalPluginSettings = ' . \wp_json_encode( $settings_data ) . ';',
+			'before'
 		);
-	}
-
-	/**
-	 * Render external block options
-	 *
-	 * @param array $args Arguments containing block_type, plugin_slug, and checks.
-	 * @return void
-	 */
-	public function render_external_block_options( array $args ): void {
-		$block_type  = $args['block_type'] ?? '';
-		$plugin_slug = $args['plugin_slug'] ?? '';
-		$checks      = $args['checks'] ?? array();
-
-		$option_name = 'block_checks_external_' . $plugin_slug;
-		$this->render_block_options( $block_type, $checks, $option_name );
 	}
 
 	/**
@@ -639,114 +461,6 @@ class Settings {
 	}
 
 	/**
-	 * Register settings for external plugins
-	 *
-	 * @return void
-	 */
-	private function register_external_plugin_settings(): void {
-		$external_plugins = $this->get_external_plugins_with_settings();
-
-		foreach ( $external_plugins as $plugin_slug => $plugin_data ) {
-			$option_group = 'block_checks_external_' . $plugin_slug . '_group';
-			$option_name  = 'block_checks_external_' . $plugin_slug;
-
-			\register_setting(
-				$option_group,
-				$option_name,
-				array(
-					'sanitize_callback' => array( $this, 'sanitize_external_options' ),
-				)
-			);
-
-			\add_settings_section(
-				$option_name . '_section',
-				'',
-				false,
-				$option_name
-			);
-
-			foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
-				$block_name = $this->get_block_display_name( $block_type );
-
-				\add_settings_field(
-					str_replace( array( '/', '-' ), '_', $block_type ),
-					$block_name,
-					array( $this, 'render_external_block_options' ),
-					$option_name,
-					$option_name . '_section',
-					array(
-						'block_type'  => $block_type,
-						'plugin_slug' => $plugin_slug,
-						'checks'      => $checks,
-					)
-				);
-			}
-		}
-	}
-
-	/**
-	 * Register meta check settings for all post types
-	 *
-	 * @return void
-	 */
-	private function register_meta_check_settings(): void {
-		$meta_registry   = MetaChecksRegistry::get_instance();
-		$all_meta_checks = $meta_registry->get_all_meta_checks();
-
-		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
-			$this->register_post_type_settings( $post_type );
-		}
-	}
-
-	/**
-	 * Register editor check settings for all post types
-	 *
-	 * @return void
-	 */
-	private function register_editor_check_settings(): void {
-		$editor_registry   = EditorChecksRegistry::get_instance();
-		$all_editor_checks = $editor_registry->get_all_editor_checks();
-
-		foreach ( $all_editor_checks as $post_type => $checks ) {
-			$this->register_post_type_settings( $post_type );
-		}
-	}
-
-	/**
-	 * Helper to register settings for a post type (shared by meta and editor checks)
-	 *
-	 * @param string $post_type The post type.
-	 * @return void
-	 */
-	private function register_post_type_settings( string $post_type ): void {
-		$core_post_types = array( 'post', 'page' );
-
-		// For core post types (post and page), use a unified option group.
-		if ( in_array( $post_type, $core_post_types, true ) ) {
-			// Register unified option group once (will only run once due to WordPress check).
-			\register_setting(
-				'block_checks_post_page_group',
-				'block_checks_meta_' . $post_type,
-				array(
-					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
-				)
-			);
-		} else {
-			// For other post types, use individual option groups.
-			$option_group = 'block_checks_meta_' . $post_type . '_group';
-			$option_name  = 'block_checks_meta_' . $post_type;
-
-			\register_setting(
-				$option_group,
-				$option_name,
-				array(
-					'sanitize_callback' => array( $this, 'sanitize_meta_check_options' ),
-				)
-			);
-		}
-	}
-
-	/**
 	 * Sanitize meta check options
 	 *
 	 * @param array $options The options to sanitize.
@@ -766,212 +480,6 @@ class Settings {
 		\set_transient( 'ba11yc_post_page_settings_saved', true, 30 );
 
 		return $sanitized;
-	}
-
-	/**
-	 * Render core settings content
-	 *
-	 * @return void
-	 */
-	private function render_core_settings_content(): void {
-		// Render core block checks with individual check settings.
-		$this->render_core_block_checks();
-	}
-
-	/**
-	 * Render core block checks with individual check settings
-	 *
-	 * Derives the list of core blocks from the registry to ensure automatic
-	 * synchronization when new core blocks are added to CoreBlockChecks.
-	 *
-	 * @return void
-	 */
-	private function render_core_block_checks(): void {
-		// Get all checks from registry - single source of truth.
-		$all_checks = $this->registry->get_all_checks();
-
-		foreach ( $all_checks as $block_type => $checks ) {
-			// Only process core blocks.
-			if ( strpos( $block_type, 'core/' ) !== 0 ) {
-				continue;
-			}
-
-			if ( empty( $checks ) ) {
-				continue;
-			}
-
-			$block_label = $this->get_core_block_label( $block_type );
-			$block_slug  = str_replace( '/', '-', $block_type );
-
-			echo '<article class="ba11y-block-options ba11y-block-options-' . \esc_attr( $block_slug ) . '">';
-			echo '<h2>' . \esc_html( $block_label ) . '</h2>';
-
-			// Special handling for heading block - render heading level options first.
-			if ( 'core/heading' === $block_type ) {
-				$this->render_heading_level_options();
-			}
-
-			$this->render_core_block_options( $block_type, $checks );
-
-			echo '</article>';
-		}
-	}
-
-	/**
-	 * Render core block options with individual check settings
-	 *
-	 * @param string $block_type The block type.
-	 * @param array  $checks     The checks for this block.
-	 * @return void
-	 */
-	private function render_core_block_options( string $block_type, array $checks ): void {
-		$this->render_block_options( $block_type, $checks, 'block_checks_options' );
-	}
-
-	/**
-	 * Render external plugin settings content
-	 *
-	 * @param array  $plugin_data Plugin data array.
-	 * @param string $plugin_slug Plugin slug.
-	 * @return void
-	 */
-	private function render_external_plugin_settings_content( array $plugin_data, string $plugin_slug ): void {
-
-		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
-			$block_name = $this->get_block_display_name( $block_type );
-			$block_slug = str_replace( '/', '-', $block_type );
-			echo '<article class="ba11y-block-options ba11y-block-options-' . \esc_attr( $block_slug ) . '">';
-			echo '<h2>' . \esc_html( $block_name ) . '</h2>';
-
-			$this->render_external_block_options(
-				array(
-					'block_type'  => $block_type,
-					'plugin_slug' => $plugin_slug,
-					'checks'      => $checks,
-				)
-			);
-
-			echo '</article>';
-		}
-
-		// Render meta checks for this plugin if any exist.
-		$this->render_meta_checks_for_plugin( $plugin_slug );
-
-		// Render editor checks for this plugin if any exist.
-		$this->render_editor_checks_for_plugin( $plugin_slug );
-	}
-
-	/**
-	 * Unified settings page layout handler
-	 *
-	 * This method provides a single point for rendering all settings pages,
-	 * reducing code duplication and making maintenance easier.
-	 *
-	 * @param string        $title Page title.
-	 * @param string        $option_group Settings option group name.
-	 * @param string        $version Optional version string.
-	 * @param callable|null $content_renderer Callback function to render page content.
-	 * @param array         $callback_args Optional arguments to pass to the content renderer.
-	 * @return void
-	 */
-	private function render_settings_page( string $title, string $option_group, string $version = '', ?callable $content_renderer = null, array $callback_args = array() ): void {
-		// Permission check.
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
-		}
-
-		echo '<div class="ba11y-settings">' . "\n";
-		echo '<div class="ba11y-settings-container">' . "\n";
-
-		echo '<header class="ba11y-settings-header">' . "\n";
-		echo '<h1>Block Accessibility & Validation Checks</h1>' . "\n";
-		echo '<p>Configure accessibility checks and validations for block attributes and meta fields</p>' . "\n";
-		echo '</header>' . "\n";
-
-		echo '<section class="ba11y-settings-section">' . "\n";
-		echo '<form class="ba11y-settings-form" action="options.php" method="post">' . "\n";
-		echo '<div class="ba11y-settings-plugin-header">' . "\n";
-		echo '<h2>' . \esc_html( $title ) . '</h2>' . "\n";
-		// Display plugin version if available.
-		if ( ! empty( $version ) ) {
-			echo '<p class="plugin-version">' . \esc_html__( 'Version:', 'block-accessibility-checks' ) . ' ' . \esc_html( $version ) . '</p>' . "\n";
-		}
-		echo '</div>' . "\n";
-
-		// Display success notices after plugin header.
-		$this->display_settings_notices();
-
-		\settings_fields( $option_group );
-
-		// Render page-specific content.
-		if ( is_callable( $content_renderer ) ) {
-			if ( ! empty( $callback_args ) ) {
-				call_user_func_array( $content_renderer, $callback_args );
-			} else {
-				call_user_func( $content_renderer );
-			}
-		}
-
-		echo '<div class="ba11y-settings-submit">' . "\n";
-		\submit_button();
-		echo '</div>' . "\n";
-
-		echo '</form>' . "\n";
-		echo '</section>' . "\n";
-		echo '</div>' . "\n";
-		echo '</div>' . "\n";
-	}
-
-	/**
-	 * Render block options with individual check settings (shared method)
-	 *
-	 * @param string $block_type The block type.
-	 * @param array  $checks     The checks for this block.
-	 * @param string $option_name The option name to get/set values.
-	 * @return void
-	 */
-	private function render_block_options( string $block_type, array $checks, string $option_name ): void {
-		$options = \get_option( $option_name, array() );
-
-		foreach ( $checks as $check_name => $check_config ) {
-			// Only show checks that are using settings (not forced).
-			if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
-				continue;
-			}
-
-			$field_name = $block_type . '_' . $check_name;
-			$value      = $options[ $field_name ] ?? 'error';
-
-			// Generate a user-friendly label for the check.
-			$desc     = $check_config['description'];
-			$label_id = \sanitize_title( $field_name ) . '-label';
-
-			echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
-			echo '<div class="ba11y-field-group">';
-			echo '<div class="ba11y-field-label">';
-			echo '<p id="' . \esc_attr( $label_id ) . '">' . \esc_html( $desc ) . '</p>';
-			echo '</div>';
-			echo '<div class="ba11y-field-controls ba11y-field-controls--radio">';
-
-			// Error option.
-			$error_id = \esc_attr( $field_name . '_error' );
-			echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
-			echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
-
-			// Warning option.
-			$warning_id = \esc_attr( $field_name . '_warning' );
-			echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
-			echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
-
-			// None option.
-			$none_id = \esc_attr( $field_name . '_none' );
-			echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
-			echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
-
-			echo '</div>';
-			echo '</div>';
-			echo '</div>';
-		}
 	}
 
 	/**
@@ -1009,307 +517,6 @@ class Settings {
 	}
 
 	/**
-	 * Display settings notices within the settings page
-	 *
-	 * Shows success notices when settings are saved successfully.
-	 * This method is called from within the settings page layout.
-	 *
-	 * @return void
-	 */
-	private function display_settings_notices(): void {
-		// Check for core settings success notice.
-		if ( \get_transient( 'ba11yc_core_settings_saved' ) ) {
-			\delete_transient( 'ba11yc_core_settings_saved' );
-			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
-			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
-			echo '</div>' . "\n";
-		}
-
-		// Check for external plugin settings success notice.
-		if ( \get_transient( 'ba11yc_external_settings_saved' ) ) {
-			\delete_transient( 'ba11yc_external_settings_saved' );
-			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
-			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
-			echo '</div>' . "\n";
-		}
-
-		// Check for post/page settings success notice.
-		if ( \get_transient( 'ba11yc_post_page_settings_saved' ) ) {
-			\delete_transient( 'ba11yc_post_page_settings_saved' );
-			echo '<div class="notice notice-success is-dismissible ba11y-settings-notice">' . "\n";
-			echo '<p><strong>' . \esc_html__( 'Settings saved successfully!', 'block-accessibility-checks' ) . '</strong></p>' . "\n";
-			echo '</div>' . "\n";
-		}
-	}
-
-	/**
-	 * Render meta checks for a specific plugin
-	 *
-	 * This method renders all meta checks associated with a plugin's post types.
-	 * Meta checks are grouped by post type and meta key.
-	 *
-	 * @param string $plugin_slug The plugin slug.
-	 * @return void
-	 */
-	private function render_meta_checks_for_plugin( string $plugin_slug ): void {
-		$meta_registry   = MetaChecksRegistry::get_instance();
-		$all_meta_checks = $meta_registry->get_all_meta_checks();
-
-		if ( empty( $all_meta_checks ) ) {
-			return;
-		}
-
-		$core_post_types = array( 'post', 'page' );
-
-		// Render meta checks for each post type, excluding core post types.
-		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
-			// Skip core post types - they have their own settings page.
-			if ( in_array( $post_type, $core_post_types, true ) ) {
-				continue;
-			}
-
-			if ( empty( $meta_fields ) ) {
-				continue;
-			}
-
-			$this->render_meta_checks_for_post_type( $post_type, $meta_fields, $plugin_slug );
-		}
-	}
-
-	/**
-	 * Render meta checks for a specific post type
-	 *
-	 * @param string $post_type   The post type.
-	 * @param array  $meta_fields The meta fields with checks.
-	 * @param string $plugin_slug The plugin slug.
-	 * @return void
-	 */
-	private function render_meta_checks_for_post_type( string $post_type, array $meta_fields, string $plugin_slug ): void {
-		$post_type_label = $this->get_post_type_label( $post_type );
-
-		echo '<div class="ba11y-settings-plugin-header">' . "\n";
-		echo '<h2>' . \esc_html__( 'Post Meta Validation', 'block-accessibility-checks' ) . '</h2>';
-		echo '</div>' . "\n";
-
-		echo '<article class="ba11y-block-options ba11y-meta-options ba11y-meta-options-' . \esc_attr( $post_type ) . '">';
-		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Post Type', 'block-accessibility-checks' ) . '</h2>';
-
-		foreach ( $meta_fields as $meta_key => $checks ) {
-			$this->render_meta_field_checks( $post_type, $meta_key, $checks, $plugin_slug );
-		}
-
-		echo '</article>';
-	}
-
-	/**
-	 * Render editor checks for a specific plugin
-	 *
-	 * @param string $plugin_slug The plugin slug.
-	 * @return void
-	 */
-	private function render_editor_checks_for_plugin( string $plugin_slug ): void {
-		$editor_registry   = EditorChecksRegistry::get_instance();
-		$all_editor_checks = $editor_registry->get_all_editor_checks();
-
-		if ( empty( $all_editor_checks ) ) {
-			return;
-		}
-
-		$core_post_types     = array( 'post', 'page' );
-		$has_non_core_checks = false;
-
-		// Check if there are any editor checks for non-core post types.
-		foreach ( $all_editor_checks as $post_type => $checks ) {
-			if ( ! in_array( $post_type, $core_post_types, true ) && ! empty( $checks ) ) {
-				$has_non_core_checks = true;
-				break;
-			}
-		}
-
-		if ( ! $has_non_core_checks ) {
-			return;
-		}
-
-		echo '<div class="ba11y-settings-plugin-header">' . "\n";
-		echo '<h2>' . \esc_html__( 'Editor Validation', 'block-accessibility-checks' ) . '</h2>';
-		echo '</div>' . "\n";
-
-		// Render editor checks for each post type, excluding core post types.
-		foreach ( $all_editor_checks as $post_type => $checks ) {
-			// Skip core post types - they have their own settings page.
-			if ( in_array( $post_type, $core_post_types, true ) ) {
-				continue;
-			}
-
-			if ( empty( $checks ) ) {
-				continue;
-			}
-
-			$this->render_editor_checks_for_post_type( $post_type, $checks, $plugin_slug );
-		}
-	}
-
-	/**
-	 * Render editor checks for a specific post type
-	 *
-	 * @param string $post_type   The post type.
-	 * @param array  $checks      The checks.
-	 * @param string $plugin_slug The plugin slug.
-	 * @return void
-	 */
-	private function render_editor_checks_for_post_type( string $post_type, array $checks, string $plugin_slug ): void {
-		$post_type_label = $this->get_post_type_label( $post_type );
-
-		echo '<article class="ba11y-block-options ba11y-editor-options ba11y-editor-options-' . \esc_attr( $post_type ) . '">';
-		echo '<h2>' . \esc_html( $post_type_label ) . ' ' . \esc_html__( 'Post Type', 'block-accessibility-checks' ) . '</h2>';
-
-		// Use external plugin option name if provided, otherwise use post type option.
-		if ( ! empty( $plugin_slug ) ) {
-			$option_name = 'block_checks_external_' . $plugin_slug;
-		} else {
-			$option_name = 'block_checks_meta_' . $post_type;
-		}
-
-		foreach ( $checks as $check_name => $check ) {
-			// Only render settings-based checks.
-			if ( 'settings' !== $check['type'] ) {
-				continue;
-			}
-
-			$field_name  = 'editor_' . $check_name;
-			$description = $check['description'] ?? $check['error_msg'];
-
-			// Prepend context.
-			$description = '<strong>' . \esc_html__( 'Editor Check', 'block-accessibility-checks' ) . ':</strong> ' . $description;
-
-			$this->render_check_setting( $field_name, $description, $check, $option_name );
-		}
-
-		echo '</article>';
-	}
-
-	/**
-	 * Render editor checks options (without wrapper article)
-	 *
-	 * @param string $post_type   The post type.
-	 * @param array  $checks      The checks.
-	 * @param string $plugin_slug Optional plugin slug for external plugins.
-	 * @return void
-	 */
-	private function render_editor_checks_options( string $post_type, array $checks, string $plugin_slug = '' ): void {
-		// Use external plugin option name if provided, otherwise use post type option.
-		if ( ! empty( $plugin_slug ) ) {
-			$option_name = 'block_checks_external_' . $plugin_slug;
-		} else {
-			$option_name = 'block_checks_meta_' . $post_type;
-		}
-
-		foreach ( $checks as $check_name => $check ) {
-			// Only render settings-based checks.
-			if ( 'settings' !== $check['type'] ) {
-				continue;
-			}
-
-			$field_name  = 'editor_' . $check_name;
-			$description = $check['description'] ?? $check['error_msg'];
-
-			// Prepend context.
-			$description = '<strong>' . \esc_html__( 'Editor Check', 'block-accessibility-checks' ) . ':</strong> ' . $description;
-
-			$this->render_check_setting( $field_name, $description, $check, $option_name );
-		}
-	}
-
-	/**
-	 * Render checks for a specific meta field
-	 *
-	 * @param string $post_type   The post type.
-	 * @param string $meta_key    The meta key.
-	 * @param array  $checks      The checks for this meta field.
-	 * @param string $plugin_slug Optional plugin slug for external plugins.
-	 * @return void
-	 */
-	private function render_meta_field_checks( string $post_type, string $meta_key, array $checks, string $plugin_slug = '' ): void {
-		$meta_label = $this->format_meta_key_label( $meta_key );
-
-		// Use external plugin option name if provided, otherwise use post type option.
-		if ( ! empty( $plugin_slug ) ) {
-			$option_name = 'block_checks_external_' . $plugin_slug;
-		} else {
-			$option_name = 'block_checks_meta_' . $post_type;
-		}
-
-		echo '<div class="ba11y-meta-field">';
-
-		foreach ( $checks as $check_name => $check ) {
-			// Only render settings-based checks (not forced error/warning).
-			if ( 'settings' !== $check['type'] ) {
-				continue;
-			}
-
-			$field_name  = $meta_key . '_' . $check_name;
-			$description = $check['description'] ?? $check['error_msg'];
-
-			// Prepend meta label to description with strong tag.
-			$description = '<strong>' . $meta_label . ':</strong> ' . $description;
-
-			$this->render_check_setting( $field_name, $description, $check, $option_name );
-		}
-
-		echo '</div>';
-	}
-
-	/**
-	 * Render a single check setting field
-	 *
-	 * @param string $field_name  The field name.
-	 * @param string $description The check description.
-	 * @param array  $check       The check configuration.
-	 * @param string $option_name The option name for this group.
-	 * @return void
-	 */
-	private function render_check_setting( string $field_name, string $description, array $check, string $option_name ): void {
-		$options  = \get_option( $option_name, array() );
-		$value    = $options[ $field_name ] ?? 'error';
-		$label_id = \sanitize_title( $option_name . '_' . $field_name ) . '-label';
-
-		echo '<div class="ba11y-block-single-option" role="group" aria-labelledby="' . \esc_attr( $label_id ) . '">';
-		echo '<div class="ba11y-field-group">';
-		echo '<div class="ba11y-field-label">';
-		echo '<p id="' . \esc_attr( $label_id ) . '">' . \wp_kses(
-			$description,
-			array(
-				'strong' => array(),
-				'em'     => array(),
-			)
-		) . '</p>';
-		echo '</div>';
-		echo '<div class="ba11y-field-controls ba11y-field-controls--radio">';
-
-		// Create unique IDs by combining option_name and field_name.
-		$unique_prefix = \sanitize_title( $option_name . '_' . $field_name );
-
-		// Error option.
-		$error_id = \esc_attr( $unique_prefix . '_error' );
-		echo '<input type="radio" id="' . \esc_attr( $error_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="error" ' . \checked( $value, 'error', false ) . '>';
-		echo '<label for="' . \esc_attr( $error_id ) . '" class="ba11y-button">' . \esc_html__( 'Error', 'block-accessibility-checks' ) . '</label>';
-
-		// Warning option.
-		$warning_id = \esc_attr( $unique_prefix . '_warning' );
-		echo '<input type="radio" id="' . \esc_attr( $warning_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="warning" ' . \checked( $value, 'warning', false ) . '>';
-		echo '<label for="' . \esc_attr( $warning_id ) . '" class="ba11y-button">' . \esc_html__( 'Warning', 'block-accessibility-checks' ) . '</label>';
-
-		// None option.
-		$none_id = \esc_attr( $unique_prefix . '_none' );
-		echo '<input type="radio" id="' . \esc_attr( $none_id ) . '" name="' . \esc_attr( $option_name ) . '[' . \esc_attr( $field_name ) . ']" value="none" ' . \checked( $value, 'none', false ) . '>';
-		echo '<label for="' . \esc_attr( $none_id ) . '" class="ba11y-button">' . \esc_html__( 'None', 'block-accessibility-checks' ) . '</label>';
-
-		echo '</div>';
-		echo '</div>';
-		echo '</div>';
-	}
-
-	/**
 	 * Get display label for a post type
 	 *
 	 * @param string $post_type The post type.
@@ -1339,5 +546,397 @@ class Settings {
 		$label = ucwords( str_replace( array( '_', '-' ), ' ', $label ) );
 
 		return $label;
+	}
+
+	/**
+	 * Enqueue React settings app
+	 *
+	 * @return void
+	 */
+	private function enqueue_react_settings_app(): void {
+		$script_path  = 'build/settings-core-blocks.js';
+		$style_path   = 'build/settings-core-blocks.css';
+		$asset_file   = dirname( __DIR__, 2 ) . '/build/settings-core-blocks.asset.php';
+		$dependencies = array();
+		$version      = BA11YC_VERSION;
+
+		if ( file_exists( $asset_file ) ) {
+			$asset        = require $asset_file;
+			$dependencies = $asset['dependencies'] ?? array();
+			$version      = $asset['version'] ?? $version;
+		}
+
+		\wp_enqueue_script(
+			'ba11y-settings-core-blocks-script',
+			\plugins_url( $script_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			$dependencies,
+			$version,
+			true
+		);
+
+		\wp_enqueue_style(
+			'ba11y-settings-core-blocks-style',
+			\plugins_url( $style_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			array( 'wp-components' ),
+			$version
+		);
+	}
+
+	/**
+	 * Get core blocks settings data for React app
+	 *
+	 * @return array Settings data array.
+	 */
+	private function get_core_blocks_settings_data(): array {
+		$all_checks = $this->registry->get_all_checks();
+		$options    = \get_option( 'block_checks_options', array() );
+		$blocks     = array();
+
+		foreach ( $all_checks as $block_type => $checks ) {
+			// Only process core blocks.
+			if ( strpos( $block_type, 'core/' ) !== 0 ) {
+				continue;
+			}
+
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$block_label  = $this->get_core_block_label( $block_type );
+			$block_checks = array();
+
+			foreach ( $checks as $check_name => $check_config ) {
+				// Only include checks that are using settings (not forced).
+				if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
+					continue;
+				}
+
+				$field_name = $block_type . '_' . $check_name;
+				$value      = $options[ $field_name ] ?? 'error';
+
+				$block_checks[] = array(
+					'name'        => $check_name,
+					'fieldName'   => $field_name,
+					'description' => $check_config['description'],
+					'category'    => $check_config['category'] ?? 'accessibility',
+					'value'       => $value,
+				);
+			}
+
+			$blocks[] = array(
+				'blockType' => $block_type,
+				'label'     => $block_label,
+				'checks'    => $block_checks,
+			);
+		}
+
+		// Get heading levels.
+		$heading_levels = $options['core_heading_levels'] ?? array();
+
+		return array(
+			'success'  => true,
+			'settings' => array(
+				'blocks'        => $blocks,
+				'headingLevels' => $heading_levels,
+			),
+		);
+	}
+
+	/**
+	 * Enqueue React editor validation app
+	 *
+	 * @return void
+	 */
+	private function enqueue_react_editor_validation_app(): void {
+		$script_path  = 'build/settings-editor-validation.js';
+		$style_path   = 'build/settings-editor-validation.css';
+		$asset_file   = dirname( __DIR__, 2 ) . '/build/settings-editor-validation.asset.php';
+		$dependencies = array();
+		$version      = BA11YC_VERSION;
+
+		if ( file_exists( $asset_file ) ) {
+			$asset        = require $asset_file;
+			$dependencies = $asset['dependencies'] ?? array();
+			$version      = $asset['version'] ?? $version;
+		}
+
+		\wp_enqueue_script(
+			'ba11y-settings-editor-validation-script',
+			\plugins_url( $script_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			$dependencies,
+			$version,
+			true
+		);
+
+		\wp_enqueue_style(
+			'ba11y-settings-editor-validation-style',
+			\plugins_url( $style_path, dirname( __DIR__, 2 ) . '/block-accessibility-checks.php' ),
+			array( 'wp-components' ),
+			$version
+		);
+	}
+
+	/**
+	 * Get editor validation settings data for React app
+	 *
+	 * @return array Settings data array.
+	 */
+	private function get_editor_validation_settings_data(): array {
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$editor_registry = EditorChecksRegistry::get_instance();
+
+		$all_meta_checks   = $meta_registry->get_all_meta_checks();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		$core_post_types = array( 'post', 'page' );
+		$post_types      = array();
+
+		foreach ( $core_post_types as $post_type ) {
+			$has_meta   = ! empty( $all_meta_checks[ $post_type ] );
+			$has_editor = ! empty( $all_editor_checks[ $post_type ] );
+
+			if ( ! $has_meta && ! $has_editor ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+			$checks          = array();
+
+			// Get editor checks for this post type.
+			if ( $has_editor ) {
+				$option_name = 'block_checks_meta_' . $post_type;
+				$options     = \get_option( $option_name, array() );
+
+				foreach ( $all_editor_checks[ $post_type ] as $check_name => $check ) {
+					// Only include settings-based checks.
+					if ( 'settings' !== $check['type'] ) {
+						continue;
+					}
+
+					$field_name  = 'editor_' . $check_name;
+					$description = $check['description'] ?? $check['error_msg'];
+					$value       = $options[ $field_name ] ?? 'error';
+
+					$checks[] = array(
+						'name'        => $check_name,
+						'fieldName'   => $field_name,
+						'postType'    => $post_type,
+						'description' => $description,
+						'category'    => 'validation',
+						'value'       => $value,
+					);
+				}
+			}
+
+			// Add post type to the array.
+			$post_types[] = array(
+				'postType' => $post_type,
+				'label'    => $post_type_label,
+				'checks'   => $checks,
+			);
+		}
+
+		return array(
+			'success'  => true,
+			'settings' => array(
+				'postTypes' => $post_types,
+			),
+		);
+	}
+
+	/**
+	 * Enqueue React external plugin settings app
+	 *
+	 * @return void
+	 */
+	private function enqueue_react_external_plugin_app(): void {
+		$asset_file = plugin_dir_path( dirname( __DIR__ ) ) . 'build/settings-external-plugins.asset.php';
+		$asset      = file_exists( $asset_file ) ? require $asset_file : array(
+			'dependencies' => array(),
+			'version'      => '1.0.0',
+		);
+
+		\wp_enqueue_script(
+			'ba11y-settings-external-plugins-script',
+			plugins_url( 'build/settings-external-plugins.js', dirname( __DIR__ ) ),
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		\wp_enqueue_style(
+			'ba11y-settings-external-plugins-style',
+			plugins_url( 'build/settings-external-plugins.css', dirname( __DIR__ ) ),
+			array( 'wp-components' ),
+			$asset['version']
+		);
+	}
+
+	/**
+	 * Get external plugin settings data for React app
+	 *
+	 * @param string $plugin_slug Plugin slug.
+	 * @param array  $plugin_data Plugin data from registry.
+	 * @return array Settings data formatted for React.
+	 */
+	private function get_external_plugin_settings_data( string $plugin_slug, array $plugin_data ): array {
+		$option_name = 'block_checks_external_' . $plugin_slug;
+		$options     = \get_option( $option_name, array() );
+		$blocks      = array();
+
+		// Get block checks.
+		foreach ( $plugin_data['blocks'] as $block_type => $checks ) {
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$block_label  = $this->get_block_label( $block_type );
+			$block_checks = array();
+
+			foreach ( $checks as $check_name => $check_config ) {
+				// Only include checks that are using settings (not forced).
+				if ( isset( $check_config['type'] ) && 'settings' !== $check_config['type'] ) {
+					continue;
+				}
+
+				$field_name = $block_type . '_' . $check_name;
+				$value      = $options[ $field_name ] ?? 'error';
+
+				$block_checks[] = array(
+					'name'        => $check_name,
+					'fieldName'   => $field_name,
+					'description' => $check_config['description'],
+					'category'    => $check_config['category'] ?? 'accessibility',
+					'value'       => $value,
+				);
+			}
+
+			if ( ! empty( $block_checks ) ) {
+				$blocks[] = array(
+					'blockType' => $block_type,
+					'label'     => $block_label,
+					'checks'    => $block_checks,
+				);
+			}
+		}
+
+		// Get meta checks for non-core post types.
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$all_meta_checks = $meta_registry->get_all_meta_checks();
+		$core_post_types = array( 'post', 'page' );
+
+		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+			// Skip core post types.
+			if ( in_array( $post_type, $core_post_types, true ) ) {
+				continue;
+			}
+
+			if ( empty( $meta_fields ) ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+
+			foreach ( $meta_fields as $meta_key => $checks ) {
+				foreach ( $checks as $check_name => $check ) {
+					// Only include settings-based checks.
+					if ( 'settings' !== $check['type'] ) {
+						continue;
+					}
+
+					$field_name = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
+					$value      = $options[ $field_name ] ?? 'error';
+
+					$block_label = ucwords( str_replace( array( '-', '_' ), ' ', $meta_key ) );
+
+					$blocks[] = array(
+						'blockType'     => 'meta_' . $post_type . '_' . $meta_key,
+						'label'         => $block_label,
+						'postType'      => $post_type,
+						'postTypeLabel' => $post_type_label,
+						'checks'        => array(
+							array(
+								'name'        => $check_name,
+								'fieldName'   => $field_name,
+								'description' => $check['description'] ?? $check['error_msg'],
+								'category'    => 'validation',
+								'value'       => $value,
+							),
+						),
+					);
+				}
+			}
+		}
+
+		// Get editor checks for non-core post types.
+		$editor_registry   = EditorChecksRegistry::get_instance();
+		$all_editor_checks = $editor_registry->get_all_editor_checks();
+
+		foreach ( $all_editor_checks as $post_type => $checks ) {
+			// Skip core post types.
+			if ( in_array( $post_type, $core_post_types, true ) ) {
+				continue;
+			}
+
+			if ( empty( $checks ) ) {
+				continue;
+			}
+
+			$post_type_label = $this->get_post_type_label( $post_type );
+
+			foreach ( $checks as $check_name => $check ) {
+				// Only include settings-based checks.
+				if ( 'settings' !== $check['type'] ) {
+					continue;
+				}
+
+				$field_name = 'editor_' . $post_type . '_' . $check_name;
+				$value      = $options[ $field_name ] ?? 'error';
+
+				$blocks[] = array(
+					'blockType' => 'editor_' . $post_type,
+					'label'     => $post_type_label,
+					'checks'    => array(
+						array(
+							'name'        => $check_name,
+							'fieldName'   => $field_name,
+							'description' => $check['description'] ?? $check['error_msg'],
+							'category'    => 'validation',
+							'value'       => $value,
+						),
+					),
+				);
+			}
+		}
+
+		return array(
+			'success'    => true,
+			'pluginName' => $plugin_data['name'] ?? '',
+			'pluginSlug' => $plugin_slug,
+			'settings'   => array(
+				'blocks' => $blocks,
+			),
+		);
+	}
+
+	/**
+	 * Get display label for a block type
+	 *
+	 * @param string $block_type The block type.
+	 * @return string The display label.
+	 */
+	private function get_block_label( string $block_type ): string {
+		// Try to get the block title from WordPress.
+		$block_registry = \WP_Block_Type_Registry::get_instance();
+		$block          = $block_registry->get_registered( $block_type );
+
+		if ( $block && ! empty( $block->title ) ) {
+			return $block->title;
+		}
+
+		// Fallback: Convert block type to display name.
+		$parts      = explode( '/', $block_type );
+		$block_name = $parts[1] ?? $block_type;
+		return ucwords( str_replace( array( '-', '_' ), ' ', $block_name ) );
 	}
 }
