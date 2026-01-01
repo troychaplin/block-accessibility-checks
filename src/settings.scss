@@ -107,27 +107,27 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 
 	// Set fixed widths for consistent column sizing across all tables
 	.ba11y-dataview-th-block {
-		min-width: 110px;
+		min-width: 90px;
         width: 10%;
 	}
 
 	.ba11y-dataview-th-category {
-		min-width: 110px;
+		min-width: 90px;
         width: 10%;
 	}
 
 	.ba11y-dataview-th-level {
-		min-width: 240px;
-        width: 240px;
+		min-width: 220px;
+        width: 220px;
 	}
 
 	.ba11y-dataview-th-siteEditor {
-		width: 110px;
+		width: 90px;
 	}
 
 	// First column (check) will auto-fill remaining space
 	.ba11y-dataview-th-check {
-		min-width: 260px;
+		min-width: 180px;
 		width: auto;
 	}
 }
@@ -160,14 +160,14 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 // Block badge
 .ba11y-block-badge,
 .ba11y-category-badge {
-	// display: inline-flex;
-	// padding: 2px 5px;
-	// background: var(--a11y-lightest-grey);
-    // border: 1px solid var(--a11y-light-grey);
-	// border-radius: 2px;
-	font-size: var(--a11y-font-small);
+	display: inline-flex;
+	padding: 2px 8px;
+	background: var(--a11y-lightest-grey);
+    border: 1px solid var(--a11y-light-grey);
+	border-radius: 2px;
+	font-size: 0.65rem;
 	color: var(--a11y-black);
-	font-weight: 400;
+	font-weight: 500;
 	white-space: nowrap;
 }
 
