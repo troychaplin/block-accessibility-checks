@@ -17,6 +17,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [3.0.0]
+
 ### Breaking Changes
 
 #### API Method Renaming
