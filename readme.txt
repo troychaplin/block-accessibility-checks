@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
 Tested up to: 6.9
-Stable tag: 2.3.0
+Stable tag: 3.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -158,13 +158,11 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
 
 == Screenshots ==
 
-1. **Block Error Validation** - Button block showing accessibility error with red border and detailed error message preventing publication, also demonstrates multiple errors in a grouped display
-2. **Visual Warning System** - Image block displaying accessibility warning with clear explanation in the block inspector panel, also demonstrates multiple warnings in a grouped display
-3. **Heading Level Management** - Customized heading level restrictions maintaining proper content hierarchy in the editor
-4. **Table Header Validation** - Table block showing accessibility error with red border and detailed error message preventing publication
-5. **Comprehensive Settings Panel** - Plugin configuration page with granular control over accessibility check severity levels
-6. **External Block Validation** -- A custom external card block leveraging the block checks system
-7. **External Block Settings Panel** -- A custom external card block leveraging the block checks system
+1. **Validation Sidebar** - A custom sidebar displays error and warning messages that link to blocks in the content area
+2. **Validation Popover** - Blocks with issues have an inline indicator that trigger an information popover on click
+3. **Comprehensive Settings Panel** - Plugin configuration page with granular control over accessibility check severity levels
+4. **External Plugin Validation** -- An external plugin with a Band custom post type, card block and post meta that leverage the Validation API
+5. **External Plugin Settings Panel** -- An external plugin integrated into the settings page grouped by block, post meta and editor validation options
  
 == Changelog ==
 
