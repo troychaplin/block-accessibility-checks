@@ -101,7 +101,7 @@ export default function TableRow({
 
 				return (
 					<ToggleControl
-						label={__('Enable in Editor', 'block-accessibility-checks')}
+						label={__('Enabled', 'block-accessibility-checks')}
 						checked={siteEditorEnabled}
 						onChange={checked => {
 							if (onSiteEditorChange) {
@@ -120,24 +120,20 @@ export default function TableRow({
 	};
 
 	return (
-		<div
+		<tr
 			className={`ba11y-dataview-row ${row.isHeadingLevels ? 'ba11y-dataview-row-heading-levels' : ''}`}
-			role="row"
 		>
 			{columns.map(column => (
-				<div
+				<td
 					key={column.id}
-					className={`ba11y-dataview-cell ba11y-dataview-cell-${column.id} ${
+					className={`ba11y-dataview-cell ba11y-dataview-td ba11y-dataview-td-${column.id} ${
 						column.primary ? 'ba11y-dataview-cell-primary' : ''
 					}`}
-					role="cell"
-					style={{
-						textAlign: column.align || 'left',
-					}}
+					data-colname={column.header}
 				>
 					{renderCell(column)}
-				</div>
+				</td>
 			))}
-		</div>
+		</tr>
 	);
 }

@@ -7,21 +7,17 @@
 
 export default function TableHeader({ columns }) {
 	return (
-		<div className="ba11y-dataview-thead" role="rowgroup">
-			<div className="ba11y-dataview-row ba11y-dataview-row-header" role="row">
+		<thead className="ba11y-dataview-thead">
+			<tr className="ba11y-dataview-row ba11y-dataview-row-header">
 				{columns.map(column => (
-					<div
+					<th
 						key={column.id}
 						className={`ba11y-dataview-th ba11y-dataview-th-${column.id}`}
-						role="columnheader"
-						style={{
-							textAlign: column.align || 'left',
-						}}
 					>
 						<span className="ba11y-dataview-th-content">{column.header}</span>
-					</div>
+					</th>
 				))}
-			</div>
-		</div>
+			</tr>
+		</thead>
 	);
 }

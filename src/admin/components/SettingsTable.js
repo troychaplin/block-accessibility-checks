@@ -6,7 +6,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-import { COLUMNS, getGridTemplate } from '../config/columns';
+import { COLUMNS } from '../config/columns';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 
@@ -60,8 +60,6 @@ export default function SettingsTable({
 		});
 	});
 
-	const gridTemplate = getGridTemplate();
-
 	// Create custom columns with dynamic headers
 	const customColumns = COLUMNS.map(col => {
 		if (col.id === 'check' && checkHeaderLabel) {
@@ -79,19 +77,22 @@ export default function SettingsTable({
 	return (
 		<div className="ba11y-dataview">
 			<div className="ba11y-dataview-wrapper">
-				<div
-					className="ba11y-dataview-table"
-					role="table"
-					aria-label={__('Validation checks settings', 'block-accessibility-checks')}
-					style={{ gridTemplateColumns: gridTemplate }}
-				>
+				<table className="ba11y-dataview-table widefat">
 					<TableHeader columns={customColumns} />
 
-					<div className="ba11y-dataview-tbody" role="rowgroup">
+					<tbody className="ba11y-dataview-tbody">
 						{rows.length === 0 ? (
-							<div className="ba11y-dataview-no-results">
-								{__('No validation checks found.', 'block-accessibility-checks')}
-							</div>
+							<tr>
+								<td
+									colSpan={customColumns.length}
+									className="ba11y-dataview-no-results"
+								>
+									{__(
+										'No validation checks found.',
+										'block-accessibility-checks'
+									)}
+								</td>
+							</tr>
 						) : (
 							rows.map(row => (
 								<TableRow
@@ -104,8 +105,8 @@ export default function SettingsTable({
 								/>
 							))
 						)}
-					</div>
-				</div>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	);
