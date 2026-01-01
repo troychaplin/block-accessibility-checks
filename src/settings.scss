@@ -70,11 +70,11 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 }
 
 .ba11y-dataview-th {
-	font-size: 0.8rem;
+	font-size: var(--a11y-font-small);
 	font-weight: 500;
 	padding: calc(var(--a11y-settings-space) / 2);
 	color: var(--a11y-black);
-    border-bottom: 1px solid var(--a11y-medium-grey);
+    border-bottom: 1px solid var(--a11y-light-grey);
 	align-items: center;
 }
 
@@ -97,7 +97,7 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 .ba11y-dataview-cell {
 	display: flex;
 	align-items: center;
-	font-size: 13px;
+	font-size: var(--a11y-font-small);
 	color: var(--a11y-black);
 	padding: calc(var(--a11y-settings-space) / 2);
 	border-bottom: 1px solid var(--a11y-light-grey);
