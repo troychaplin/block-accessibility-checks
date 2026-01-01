@@ -92,11 +92,25 @@ export const validateBlock = block => {
 		};
 	}
 
+	// Get editor context and options
+	const editorContext = window.BlockAccessibilityChecks?.editorContext || 'none';
+	const isSiteEditor = editorContext === 'site-editor';
+	const options = window.BlockAccessibilityChecks?.blockChecksOptions || {};
+
 	// Run each registered check for this block type
 	Object.entries(checks).forEach(([checkName, checkConfig]) => {
 		// Skip checks that have been explicitly disabled
 		if (!isCheckEnabled(checkConfig)) {
 			return;
+		}
+
+		// Skip check if in site editor and it's disabled for site editor
+		if (isSiteEditor) {
+			const siteEditorKey = `${blockType}_${checkName}_site_editor`;
+			const siteEditorEnabled = options[siteEditorKey] ?? true;
+			if (!siteEditorEnabled) {
+				return;
+			}
 		}
 
 		let isValid = true;

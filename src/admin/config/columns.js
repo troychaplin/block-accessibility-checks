@@ -13,46 +13,32 @@ import { __ } from '@wordpress/i18n';
  * Each column should have:
  * - id: Unique identifier
  * - header: Display name for column header
- * - width: CSS width value (optional)
- * - minWidth: Minimum width (optional)
  * - enableSorting: Whether column can be sorted (optional)
- * - renderCell: Function to render cell content
+ * - primary: Whether this is the primary column (optional)
  */
 export const COLUMNS = [
 	{
 		id: 'check',
 		header: __('Validation Check', 'block-accessibility-checks'),
-		width: '2fr',
-		minWidth: '200px',
 		enableSorting: true,
 		primary: true, // Primary column gets bold treatment
 	},
 	{
 		id: 'block',
 		header: __('Block', 'block-accessibility-checks'),
-		width: '1fr',
-		minWidth: '150px',
 		enableSorting: true,
 	},
 	{
 		id: 'category',
 		header: __('Category', 'block-accessibility-checks'),
-		width: '1fr',
-		minWidth: '120px',
 		enableSorting: true,
 	},
 	{
 		id: 'level',
 		header: __('Priority Level', 'block-accessibility-checks'),
-		width: '1fr',
-		minWidth: '200px',
-		align: 'right',
+	},
+	{
+		id: 'siteEditor',
+		header: __('Site Editor', 'block-accessibility-checks'),
 	},
 ];
-
-/**
- * Get grid template columns string for CSS Grid
- */
-export function getGridTemplate() {
-	return COLUMNS.map(col => col.width).join(' ');
-}

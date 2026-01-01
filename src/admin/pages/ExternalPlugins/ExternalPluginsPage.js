@@ -25,6 +25,19 @@ export default function ExternalPluginsPage() {
 		}
 		return settingsObj;
 	});
+	const [siteEditorSettings, setSiteEditorSettings] = useState(() => {
+		// Convert blocks array to site editor settings object
+		const siteEditorObj = {};
+		if (initialData.settings?.blocks) {
+			initialData.settings.blocks.forEach(block => {
+				block.checks.forEach(check => {
+					const siteEditorFieldName = check.fieldName + '_site_editor';
+					siteEditorObj[siteEditorFieldName] = check.siteEditorEnabled ?? true;
+				});
+			});
+		}
+		return siteEditorObj;
+	});
 	const [isSaving, setIsSaving] = useState(false);
 	const [notice, setNotice] = useState(null);
 	const [hasChanges, setHasChanges] = useState(false);
@@ -49,6 +62,21 @@ export default function ExternalPluginsPage() {
 	};
 
 	/**
+	 * Handle site editor toggle change
+	 *
+	 * @param {string}  fieldName - The field name to update.
+	 * @param {boolean} enabled   - Whether site editor is enabled.
+	 */
+	const handleSiteEditorChange = (fieldName, enabled) => {
+		const siteEditorFieldName = fieldName + '_site_editor';
+		setSiteEditorSettings(prev => ({
+			...prev,
+			[siteEditorFieldName]: enabled,
+		}));
+		setHasChanges(true);
+	};
+
+	/**
 	 * Save settings
 	 */
 	const handleSave = async () => {
@@ -61,6 +89,7 @@ export default function ExternalPluginsPage() {
 				method: 'POST',
 				data: {
 					settings,
+					siteEditorSettings,
 				},
 			});
 
@@ -136,7 +165,9 @@ export default function ExternalPluginsPage() {
 					<SettingsTable
 						blocks={blockChecks}
 						settings={settings}
+						siteEditorSettings={siteEditorSettings}
 						onSettingChange={handleSettingChange}
+						onSiteEditorChange={handleSiteEditorChange}
 						checkHeaderLabel={__('Block Validation', 'block-accessibility-checks')}
 					/>
 				)}
@@ -145,7 +176,9 @@ export default function ExternalPluginsPage() {
 					<SettingsTable
 						blocks={metaChecks}
 						settings={settings}
+						siteEditorSettings={siteEditorSettings}
 						onSettingChange={handleSettingChange}
+						onSiteEditorChange={handleSiteEditorChange}
 						checkHeaderLabel={__('Post Meta Validation', 'block-accessibility-checks')}
 						blockHeaderLabel={__('Meta Field', 'block-accessibility-checks')}
 						categoryHeaderLabel={__('Post Type', 'block-accessibility-checks')}
@@ -156,7 +189,9 @@ export default function ExternalPluginsPage() {
 					<SettingsTable
 						blocks={editorChecks}
 						settings={settings}
+						siteEditorSettings={siteEditorSettings}
 						onSettingChange={handleSettingChange}
+						onSiteEditorChange={handleSiteEditorChange}
 						checkHeaderLabel={__('Editor Validation', 'block-accessibility-checks')}
 						blockHeaderLabel={__('Post Type', 'block-accessibility-checks')}
 					/>

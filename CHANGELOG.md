@@ -17,7 +17,52 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Breaking Changes
+
+#### API Method Renaming
+External plugins using the validation API must update their function calls:
+
+**Block Validation:**
+- `register_check_with_plugin_detection()` → `register_block_check()`
+  ```php
+  // Old (deprecated)
+  $registry->register_check_with_plugin_detection( 'my-plugin/block', 'check_name', $args );
+
+  // New
+  $registry->register_block_check( 'my-plugin/block', 'check_name', $args );
+  ```
+
+**Migration Impact:**
+- External plugins using `register_check_with_plugin_detection()` will no longer work and should update to the new method name
+- The new name better reflects the method's purpose (registering block-specific checks)
+
 ### Added
+
+#### Site Editor Validation Controls
+- Site Editor toggle column in settings tables for granular control over validation enforcement
+- Ability to enable/disable individual validation checks specifically in the site editor
+- Site Editor toggle automatically grays out when Priority Level is set to "None"
+- All validation checks now support separate configuration for post editor vs. site editor contexts
+- Site editor validation logic integrated into core validation pipeline
+
+**Settings Features:**
+- New "Site Editor" column in all settings tables (Core Blocks, External Plugins, Meta, Editor)
+- Per-check toggle controls for site editor validation
+- State persistence for site editor settings across all validation types
+- Automatic dependency handling (toggles disabled when check is set to "None")
+
+**Server-Side Implementation:**
+- `{field_name}_site_editor` storage pattern for site editor settings
+- PHP sanitization and validation for boolean site editor settings
+- Settings data preparation includes `siteEditorEnabled` flag for each check
+- REST API endpoints updated to handle site editor settings
+
+**Client-Side Implementation:**
+- React state management for site editor settings
+- WordPress ToggleControl component integration
+- Editor context detection (`post-editor` vs `site-editor`)
+- Validation skip logic for disabled site editor checks
+- Settings page UI updates for all validation types
 
 #### Validation API Documentation
 - Comprehensive quick start guides for all three validation types:
@@ -41,6 +86,22 @@ Prefix the change with one of these keywords:
 - Warnings now display alongside errors in the sidebar instead of being hidden
 
 ### Changed
+
+#### Settings Page UI Overhaul
+- Refactored settings tables from CSS Grid to semantic HTML `<table>` elements
+- Implemented WordPress responsive table patterns with mobile card layout at 782px breakpoint
+- Unified table styling across Core Blocks, External Plugins, Meta, and Editor settings pages
+- Removed striped table rows for cleaner, more consistent appearance
+- All table content now left-aligned and vertically centered
+- Consistent column widths across all settings tables (Block: 10%, Category: 10%, Priority Level: 220px, Site Editor: 90px)
+- Badge styling added for Block and Category columns with subtle background and borders
+
+**Table Architecture:**
+- Proper `<thead>`, `<tbody>`, `<tr>`, `<th>`, `<td>` HTML structure
+- WordPress `.widefat` class integration
+- Responsive design with stacked card layout on mobile devices
+- Column header configuration simplified (removed unused width/align properties)
+- Removed deprecated `getGridTemplate()` function
 
 - Reorganized documentation from single long page into focused, digestible guides
 - Updated all code examples to use correct API method names (`register_block_check()`, `register_editor_check()`)
@@ -70,6 +131,17 @@ Prefix the change with one of these keywords:
   - Better code organization with clear separation of concerns
   - Simplified component discovery through barrel exports
   - Easier navigation of codebase with domain-based structure
+
+- **Settings Page Performance**:
+  - Simplified table rendering with native HTML elements
+  - Removed unnecessary CSS Grid calculations
+  - More efficient mobile responsive behavior
+
+- **User Experience**:
+  - Clearer visual hierarchy in settings tables
+  - Improved mobile usability with card-based layout
+  - Consistent table styling across all settings pages
+  - Better accessibility with semantic HTML table structure
 
 ### Fixed
 

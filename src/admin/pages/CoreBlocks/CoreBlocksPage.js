@@ -25,6 +25,19 @@ export default function CoreBlocksPage() {
 		}
 		return settingsObj;
 	});
+	const [siteEditorSettings, setSiteEditorSettings] = useState(() => {
+		// Convert blocks array to site editor settings object
+		const siteEditorObj = {};
+		if (initialData.settings?.blocks) {
+			initialData.settings.blocks.forEach(block => {
+				block.checks.forEach(check => {
+					const siteEditorFieldName = check.fieldName + '_site_editor';
+					siteEditorObj[siteEditorFieldName] = check.siteEditorEnabled ?? true;
+				});
+			});
+		}
+		return siteEditorObj;
+	});
 	const [headingLevels, setHeadingLevels] = useState(() => {
 		return initialData.settings?.headingLevels || [];
 	});
@@ -44,6 +57,21 @@ export default function CoreBlocksPage() {
 		setSettings(prev => ({
 			...prev,
 			[fieldName]: value,
+		}));
+		setHasChanges(true);
+	};
+
+	/**
+	 * Handle site editor toggle change
+	 *
+	 * @param {string}  fieldName - The field name to update.
+	 * @param {boolean} enabled   - Whether site editor is enabled.
+	 */
+	const handleSiteEditorChange = (fieldName, enabled) => {
+		const siteEditorFieldName = fieldName + '_site_editor';
+		setSiteEditorSettings(prev => ({
+			...prev,
+			[siteEditorFieldName]: enabled,
 		}));
 		setHasChanges(true);
 	};
@@ -80,6 +108,7 @@ export default function CoreBlocksPage() {
 				data: {
 					settings,
 					headingLevels,
+					siteEditorSettings,
 				},
 			});
 
@@ -148,8 +177,10 @@ export default function CoreBlocksPage() {
 					blocks={blocks}
 					settings={settings}
 					headingLevels={headingLevels}
+					siteEditorSettings={siteEditorSettings}
 					onSettingChange={handleSettingChange}
 					onHeadingLevelChange={handleHeadingLevelChange}
+					onSiteEditorChange={handleSiteEditorChange}
 				/>
 
 				<div className="ba11y-settings-actions">

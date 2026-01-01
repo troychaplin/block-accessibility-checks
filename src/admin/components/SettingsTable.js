@@ -6,7 +6,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-import { COLUMNS, getGridTemplate } from '../config/columns';
+import { COLUMNS } from '../config/columns';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 
@@ -14,8 +14,10 @@ export default function SettingsTable({
 	blocks,
 	settings,
 	headingLevels,
+	siteEditorSettings,
 	onSettingChange,
 	onHeadingLevelChange,
+	onSiteEditorChange,
 	checkHeaderLabel,
 	blockHeaderLabel,
 	categoryHeaderLabel,
@@ -44,6 +46,7 @@ export default function SettingsTable({
 		}
 
 		block.checks.forEach(check => {
+			const siteEditorFieldName = check.fieldName + '_site_editor';
 			rows.push({
 				id: check.fieldName,
 				blockType: block.blockType,
@@ -51,12 +54,11 @@ export default function SettingsTable({
 				postTypeLabel: block.postTypeLabel,
 				check,
 				value: settings[check.fieldName] || 'error',
+				siteEditorEnabled: siteEditorSettings?.[siteEditorFieldName] ?? true,
 				isHeadingLevels: false,
 			});
 		});
 	});
-
-	const gridTemplate = getGridTemplate();
 
 	// Create custom columns with dynamic headers
 	const customColumns = COLUMNS.map(col => {
@@ -75,32 +77,36 @@ export default function SettingsTable({
 	return (
 		<div className="ba11y-dataview">
 			<div className="ba11y-dataview-wrapper">
-				<div
-					className="ba11y-dataview-table"
-					role="table"
-					aria-label={__('Validation checks settings', 'block-accessibility-checks')}
-				>
-					<TableHeader columns={customColumns} gridTemplate={gridTemplate} />
+				<table className="ba11y-dataview-table widefat">
+					<TableHeader columns={customColumns} />
 
-					<div className="ba11y-dataview-tbody" role="rowgroup">
+					<tbody className="ba11y-dataview-tbody">
 						{rows.length === 0 ? (
-							<div className="ba11y-dataview-no-results">
-								{__('No validation checks found.', 'block-accessibility-checks')}
-							</div>
+							<tr>
+								<td
+									colSpan={customColumns.length}
+									className="ba11y-dataview-no-results"
+								>
+									{__(
+										'No validation checks found.',
+										'block-accessibility-checks'
+									)}
+								</td>
+							</tr>
 						) : (
 							rows.map(row => (
 								<TableRow
 									key={row.id}
 									row={row}
 									columns={customColumns}
-									gridTemplate={gridTemplate}
 									onSettingChange={onSettingChange}
 									onHeadingLevelChange={onHeadingLevelChange}
+									onSiteEditorChange={onSiteEditorChange}
 								/>
 							))
 						)}
-					</div>
-				</div>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	);

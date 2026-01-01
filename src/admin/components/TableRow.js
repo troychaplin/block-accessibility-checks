@@ -9,15 +9,16 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	CheckboxControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function TableRow({
 	row,
 	columns,
-	gridTemplate,
 	onSettingChange,
 	onHeadingLevelChange,
+	onSiteEditorChange,
 }) {
 	/**
 	 * Render cell content based on column ID
@@ -88,31 +89,51 @@ export default function TableRow({
 					</ToggleGroupControl>
 				);
 
+			case 'siteEditor':
+				// Skip site editor toggle for heading levels row
+				if (row.isHeadingLevels) {
+					return null;
+				}
+
+				// Determine if toggle should be disabled (when priority level is 'none')
+				const isDisabled = row.value === 'none';
+				const siteEditorEnabled = row.siteEditorEnabled ?? true;
+
+				return (
+					<ToggleControl
+						label={__('Enabled', 'block-accessibility-checks')}
+						checked={siteEditorEnabled}
+						onChange={checked => {
+							if (onSiteEditorChange) {
+								onSiteEditorChange(row.check.fieldName, checked);
+							}
+						}}
+						disabled={isDisabled}
+						__nextHasNoMarginBottom
+						aria-label={__('Enable in site editor', 'block-accessibility-checks')}
+					/>
+				);
+
 			default:
 				return null;
 		}
 	};
 
 	return (
-		<div
+		<tr
 			className={`ba11y-dataview-row ${row.isHeadingLevels ? 'ba11y-dataview-row-heading-levels' : ''}`}
-			role="row"
-			style={{ gridTemplateColumns: gridTemplate }}
 		>
 			{columns.map(column => (
-				<div
+				<td
 					key={column.id}
-					className={`ba11y-dataview-cell ba11y-dataview-cell-${column.id} ${
+					className={`ba11y-dataview-cell ba11y-dataview-td ba11y-dataview-td-${column.id} ${
 						column.primary ? 'ba11y-dataview-cell-primary' : ''
 					}`}
-					role="cell"
-					style={{
-						textAlign: column.align || 'left',
-					}}
+					data-colname={column.header}
 				>
 					{renderCell(column)}
-				</div>
+				</td>
 			))}
-		</div>
+		</tr>
 	);
 }

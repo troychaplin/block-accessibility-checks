@@ -168,15 +168,18 @@ class SettingsAPI {
 					continue;
 				}
 
-				$field_name = $block_type . '_' . $check_name;
-				$value      = $options[ $field_name ] ?? 'error';
+				$field_name             = $block_type . '_' . $check_name;
+				$value                  = $options[ $field_name ] ?? 'error';
+				$site_editor_field_name = $field_name . '_site_editor';
+				$site_editor_enabled    = $options[ $site_editor_field_name ] ?? true;
 
 				$block_checks[] = array(
-					'name'        => $check_name,
-					'fieldName'   => $field_name,
-					'description' => $check_config['description'],
-					'category'    => $check_config['category'] ?? 'accessibility',
-					'value'       => $value,
+					'name'              => $check_name,
+					'fieldName'         => $field_name,
+					'description'       => $check_config['description'],
+					'category'          => $check_config['category'] ?? 'accessibility',
+					'value'             => $value,
+					'siteEditorEnabled' => $site_editor_enabled,
 				);
 			}
 
@@ -209,8 +212,9 @@ class SettingsAPI {
 	 * @return \WP_REST_Response Response object.
 	 */
 	public function save_core_block_settings( \WP_REST_Request $request ): \WP_REST_Response {
-		$settings       = $request->get_param( 'settings' );
-		$heading_levels = $request->get_param( 'headingLevels' );
+		$settings             = $request->get_param( 'settings' );
+		$heading_levels       = $request->get_param( 'headingLevels' );
+		$site_editor_settings = $request->get_param( 'siteEditorSettings' );
 
 		// Get existing options to preserve other settings.
 		$existing_options = \get_option( 'block_checks_options', array() );
@@ -219,6 +223,13 @@ class SettingsAPI {
 		foreach ( $settings as $field_name => $value ) {
 			if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
 				$existing_options[ $field_name ] = $value;
+			}
+		}
+
+		// Update site editor settings.
+		if ( is_array( $site_editor_settings ) ) {
+			foreach ( $site_editor_settings as $field_name => $enabled ) {
+				$existing_options[ $field_name ] = (bool) $enabled;
 			}
 		}
 
@@ -341,8 +352,9 @@ class SettingsAPI {
 	 * @return \WP_REST_Response Response object.
 	 */
 	public function save_external_plugin_settings( \WP_REST_Request $request ): \WP_REST_Response {
-		$plugin_slug = $request->get_param( 'plugin_slug' );
-		$settings    = $request->get_param( 'settings' );
+		$plugin_slug          = $request->get_param( 'plugin_slug' );
+		$settings             = $request->get_param( 'settings' );
+		$site_editor_settings = $request->get_param( 'siteEditorSettings' );
 
 		$option_name      = 'block_checks_external_' . $plugin_slug;
 		$existing_options = \get_option( $option_name, array() );
@@ -351,6 +363,13 @@ class SettingsAPI {
 		foreach ( $settings as $field_name => $value ) {
 			if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
 				$existing_options[ $field_name ] = $value;
+			}
+		}
+
+		// Update site editor settings.
+		if ( is_array( $site_editor_settings ) ) {
+			foreach ( $site_editor_settings as $field_name => $enabled ) {
+				$existing_options[ $field_name ] = (bool) $enabled;
 			}
 		}
 
