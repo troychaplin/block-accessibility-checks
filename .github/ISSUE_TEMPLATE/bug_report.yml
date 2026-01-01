@@ -7,66 +7,26 @@ body:
     - type: markdown
       attributes:
           value: |
-              Thanks for taking the time to report a bug! Please provide as much detail as possible to help us reproduce and fix the issue.
+              Thanks for reporting a bug! Please provide the key details to help us fix the issue.
 
     - type: checkboxes
-      id: terms
+      id: prerequisites
       attributes:
           label: Prerequisites
-          description: Please confirm the following before submitting your bug report
+          description: Please confirm before submitting
           options:
-              - label: I have searched existing issues to ensure this bug hasn't been reported already
+              - label: I have searched existing issues to ensure this hasn't been reported already
                 required: true
               - label: I have tested with the latest version of the plugin
                 required: true
-              - label: I have disabled other plugins to rule out conflicts
-                required: false
 
     - type: textarea
-      id: bug-details
+      id: bug-description
       attributes:
-          label: Bug Details
-          description: What did you expect to happen, and what actually happened?
-          placeholder: Describe the issue, expected and actual behavior...
-      validations:
-          required: true
-
-    - type: dropdown
-      id: block-type
-      attributes:
-          label: Block Type Affected
-          description: Which block type is experiencing the issue?
-          options:
-              - Core WordPress Block (Button, Image, Heading, etc.)
-              - Custom/Third-party Block
-              - Multiple Block Types
-              - All Blocks
-              - Not block-specific
-      validations:
-          required: true
-
-    - type: input
-      id: specific-block
-      attributes:
-          label: Specific Block Name
-          description: If applicable, what's the exact block name? (e.g., core/image, create-block/my-custom-block)
-          placeholder: core/image
-
-    - type: dropdown
-      id: issue-type
-      attributes:
-          label: Issue Category
-          description: What type of issue is this?
-          options:
-              - Validation Logic Error
-              - Visual Display Issue
-              - Publishing Prevention Problem
-              - Settings Page Issue
-              - Performance Issue
-              - JavaScript Console Error
-              - PHP Error/Warning
-              - Integration with Custom Blocks
-              - Other
+          label: What happened?
+          description: Describe the issue and what you expected to happen
+          placeholder: |
+              Example: When I add an image block without alt text, I expect to see a warning, but nothing appears.
       validations:
           required: true
 
@@ -74,27 +34,22 @@ body:
       id: steps-to-reproduce
       attributes:
           label: Steps to Reproduce
-          description: How can we reproduce the bug?
-          placeholder: 1. ...
+          description: How can we reproduce this bug?
+          placeholder: |
+              1. Go to...
+              2. Add a...
+              3. Notice that...
       validations:
           required: true
 
     - type: textarea
-      id: supporting-info
+      id: additional-info
       attributes:
-          label: Supporting Info (optional)
-          description: Add any error messages, screenshots, or videos that help illustrate the issue
-          placeholder: You can paste error messages, images, or links here...
-
-    - type: textarea
-      id: environment
-      attributes:
-          label: Environment (optional)
-          description: WordPress, PHP, browser, plugin version, etc.
-          placeholder: Any relevant environment info...
-
-    - type: textarea
-      id: additional-context
-      attributes:
-          label: Additional Context (optional)
-          description: Anything else that might help
+          label: Additional Information (optional)
+          description: Include anything else that might help
+          placeholder: |
+              - Affected blocks (e.g., core/image, custom/my-block)
+              - Error messages or screenshots
+              - WordPress version, PHP version, browser
+              - Environment details
+              - Any other context
