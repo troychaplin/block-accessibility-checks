@@ -130,241 +130,80 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 	white-space: nowrap;
 }
 
-// // Level control
-// .ba11y-level-control.components-base-control {
-// 	margin-bottom: 0;
+.ba11y-dataview-cell-level {
+    .components-base-control {
+        width: 100%;
+    }
 
-// 	// Visually hide the empty label to fix contrast issues
-// 	.components-base-control__label {
-// 		position: absolute;
-// 		width: 1px;
-// 		height: 1px;
-// 		padding: 0;
-// 		margin: -1px;
-// 		overflow: hidden;
-// 		clip: rect(0, 0, 0, 0);
-// 		white-space: nowrap;
-// 		border-width: 0;
-// 	}
-// }
+	.components-toggle-group-control {
+		border: 1px solid var(--a11y-grey);
+		background: #fff;
 
-// .ba11y-dataview-cell-level {
-// 	justify-content: flex-end;
+		.components-toggle-group-control-option-base {
+            color: var(--a11y-black);
+			background: #fff;
 
-// 	.components-toggle-group-control {
-// 		width: auto;
-// 		border: 1px solid #dcdcde;
-// 		background: #fff;
-// 		border-radius: 2px;
+			&:focus {
+				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px #2271b1;
+				z-index: 1;
+				position: relative;
+			}
 
-// 		.components-toggle-group-control-option-base {
-// 			font-size: 12px;
-// 			padding: 4px 12px;
-// 			min-height: 30px;
-// 			background: #fff;
-// 			color: #1d2327;
-// 			border: none;
-// 			border-right: 1px solid #dcdcde;
-// 			border-radius: 0;
+			&:hover:not([aria-checked='true']) {
+				background: var(--a11y-lightest-grey);
+			}
 
-// 			&:first-child {
-// 				border-radius: 2px 0 0 2px;
-// 			}
-
-// 			&:last-child {
-// 				border-right: none;
-// 				border-radius: 0 2px 2px 0;
-// 			}
-
-// 			&:focus {
-// 				box-shadow: inset 0 0 0 1px #fff, 0 0 0 1.5px #2271b1;
-// 				z-index: 1;
-// 				position: relative;
-// 			}
-
-// 			&:hover:not([aria-checked='true']) {
-// 				background: #f6f7f7;
-// 			}
-
-// 			&[aria-checked='true'] {
-// 				background: #2271b1;
-// 				color: #fff;
-// 				font-weight: 500;
-
-// 				&:hover {
-// 					background: #135e96;
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+			&[aria-checked='true'] {
+				background: var(--wp-admin-theme-color);
+				color: #fff;
+			}
+		}
+	}
+}
 
 // // Heading levels checkboxes
-// .ba11y-heading-levels-checkboxes {
-// 	display: flex;
-// 	gap: 16px;
-// 	justify-content: flex-end;
+.ba11y-heading-levels-checkboxes {
+	display: flex;
+	gap: 20px;
+	justify-content: flex-end;
 
-// 	.components-base-control {
-// 		margin-bottom: 0;
-// 	}
+	// .components-base-control {
+	// 	margin-bottom: 0;
+	// }
 
-// 	.components-checkbox-control__input-container {
-// 		display: flex;
-// 		align-items: center;
-// 		gap: 8px;
-// 	}
+	// .components-checkbox-control__input-container {
+	// 	display: flex;
+	// 	align-items: center;
+	// 	gap: 28px;
+	// }
 
-// 	.components-checkbox-control__label {
-// 		font-size: 12px;
-// 		font-weight: 500;
-// 		color: #1d2327;
-// 		text-transform: uppercase;
-// 	}
-// }
-
-// // No results state
-// .ba11y-dataview-no-results {
-// 	padding: 48px 32px;
-// 	text-align: center;
-// 	color: #646970;
-// 	font-size: 14px;
-// }
+	.components-checkbox-control__label {
+		font-size: var(--a11y-font-small);
+		font-weight: 500;
+		color: var(--a11y-black);
+	}
+}
 
 // // Actions footer
-// .ba11y-settings-actions {
-// 	display: flex;
-// 	align-items: center;
-// 	gap: 16px;
-// 	padding: 24px 32px;
-// 	border-top: 1px solid #dcdcde;
-// 	background: #f6f7f7;
+.ba11y-settings-actions {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 0 var(--a11y-settings-space);
 
-// 	.components-button.is-primary {
-// 		min-height: 36px;
-// 		padding: 0 24px;
+	.components-button.is-primary:not(:disabled) {
+        background-color: #2271b1;
+        border-color: #2271b1;
 
-// 		&:not(:disabled) {
-// 			background-color: #2271b1;
-// 			border-color: #2271b1;
+        &:hover {
+            background-color: var(--wp-admin-theme-color);
+            border-color: var(--wp-admin-theme-color);
+        }
+    }
 
-// 			&:hover {
-// 				background-color: #135e96;
-// 				border-color: #135e96;
-// 			}
-// 		}
-// 	}
-
-// 	.ba11y-unsaved-notice {
-// 		font-size: 13px;
-// 		color: var(--a11y-dark-red);
-// 		font-style: italic;
-// 	}
-// }
-
-// // Responsive adjustments
-// @media (max-width: 960px) {
-// 	.ba11y-settings-header-react {
-// 		padding: 24px 16px 16px 16px;
-// 	}
-
-// 	.ba11y-settings-content .components-notice {
-// 		margin: 16px 16px;
-// 	}
-
-// 	.ba11y-dataview-th {
-// 		&:first-child {
-// 			padding-left: 16px;
-// 		}
-
-// 		&:last-child {
-// 			padding-right: 16px;
-// 		}
-// 	}
-
-// 	.ba11y-dataview-cell {
-// 		&:first-child {
-// 			padding-left: 16px;
-// 		}
-
-// 		&:last-child {
-// 			padding-right: 16px;
-// 		}
-// 	}
-
-// 	.ba11y-settings-actions {
-// 		padding: 16px;
-// 	}
-// }
-
-// // Mobile responsive (stack columns)
-// @media (max-width: 782px) {
-// 	.ba11y-dataview-wrapper {
-// 		overflow-x: visible;
-// 	}
-
-// 	.ba11y-dataview-thead {
-// 		display: none;
-// 	}
-
-// 	.ba11y-dataview-row {
-// 		display: flex;
-// 		flex-direction: column;
-// 		gap: 12px;
-// 		padding: 16px;
-// 		border: 1px solid #dcdcde;
-// 		border-radius: 2px;
-// 		margin: 0 16px 8px 16px;
-
-// 		&:hover {
-// 			background: #fff;
-// 			border-color: #757575;
-// 		}
-// 	}
-
-// 	.ba11y-dataview-cell {
-// 		padding: 0;
-// 		min-height: auto;
-
-// 		&:first-child,
-// 		&:last-child {
-// 			padding: 0;
-// 		}
-// 	}
-
-// 	// Mobile labels
-// 	.ba11y-dataview-cell-block,
-// 	.ba11y-dataview-cell-category {
-// 		&::before {
-// 			content: attr(data-label);
-// 			display: inline-block;
-// 			font-weight: 600;
-// 			margin-right: 8px;
-// 			font-size: 11px;
-// 			color: #646970;
-// 			text-transform: uppercase;
-// 		}
-// 	}
-
-// 	.ba11y-dataview-cell-level {
-// 		justify-content: flex-start;
-
-// 		.components-toggle-group-control {
-// 			width: 100%;
-// 		}
-// 	}
-
-// 	.ba11y-heading-levels-checkboxes {
-// 		justify-content: flex-start;
-// 	}
-
-// 	.ba11y-settings-actions {
-// 		flex-direction: column;
-// 		align-items: flex-start;
-// 		gap: 12px;
-
-// 		.components-button {
-// 			width: 100%;
-// 		}
-// 	}
-// }
+	.ba11y-unsaved-notice {
+		font-size: var(--a11y-font-small);
+		color: var(--a11y-dark-red);
+		font-style: italic;
+	}
+}

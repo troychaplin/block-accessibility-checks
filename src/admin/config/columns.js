@@ -43,7 +43,7 @@ export const COLUMNS = [
 	},
 	{
 		id: 'level',
-		header: __('Level', 'block-accessibility-checks'),
+		header: __('Priority Level', 'block-accessibility-checks'),
 		width: '1fr',
 		minWidth: '200px',
 		align: 'right',
