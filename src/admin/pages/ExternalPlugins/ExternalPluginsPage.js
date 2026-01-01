@@ -148,6 +148,7 @@ export default function ExternalPluginsPage() {
 						onSettingChange={handleSettingChange}
 						checkHeaderLabel={__('Post Meta Validation', 'block-accessibility-checks')}
 						blockHeaderLabel={__('Meta Field', 'block-accessibility-checks')}
+						categoryHeaderLabel={__('Post Type', 'block-accessibility-checks')}
 					/>
 				)}
 

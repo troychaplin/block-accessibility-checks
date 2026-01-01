@@ -850,9 +850,11 @@ class Settings {
 					$block_label = ucwords( str_replace( array( '-', '_' ), ' ', $meta_key ) );
 
 					$blocks[] = array(
-						'blockType' => 'meta_' . $post_type . '_' . $meta_key,
-						'label'     => $block_label,
-						'checks'    => array(
+						'blockType'     => 'meta_' . $post_type . '_' . $meta_key,
+						'label'         => $block_label,
+						'postType'      => $post_type,
+						'postTypeLabel' => $post_type_label,
+						'checks'        => array(
 							array(
 								'name'        => $check_name,
 								'fieldName'   => $field_name,

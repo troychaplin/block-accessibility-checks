@@ -34,6 +34,10 @@ export default function TableRow({
 				return <span className="ba11y-block-badge">{row.blockLabel}</span>;
 
 			case 'category':
+				// For meta checks, show post type instead of category
+				if (row.postTypeLabel) {
+					return <span className="ba11y-category-badge">{row.postTypeLabel}</span>;
+				}
 				return (
 					<span className="ba11y-category-badge">
 						{row.check.category === 'accessibility'

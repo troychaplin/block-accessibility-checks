@@ -18,6 +18,7 @@ export default function SettingsTable({
 	onHeadingLevelChange,
 	checkHeaderLabel,
 	blockHeaderLabel,
+	categoryHeaderLabel,
 }) {
 	// Flatten all checks from all blocks for table display
 	const rows = [];
@@ -47,6 +48,7 @@ export default function SettingsTable({
 				id: check.fieldName,
 				blockType: block.blockType,
 				blockLabel: block.label,
+				postTypeLabel: block.postTypeLabel,
 				check,
 				value: settings[check.fieldName] || 'error',
 				isHeadingLevels: false,
@@ -63,6 +65,9 @@ export default function SettingsTable({
 		}
 		if (col.id === 'block' && blockHeaderLabel) {
 			return { ...col, header: blockHeaderLabel };
+		}
+		if (col.id === 'category' && categoryHeaderLabel) {
+			return { ...col, header: categoryHeaderLabel };
 		}
 		return col;
 	});
