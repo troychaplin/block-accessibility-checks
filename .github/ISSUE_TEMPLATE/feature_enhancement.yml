@@ -1,0 +1,72 @@
+name: 💡 Feature Request or Enhancement
+description: Suggest a new feature, enhancement, or provide feedback
+title: '[Feature]: '
+labels: ['enhancement']
+assignees: ['troychaplin']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for your suggestion! Your ideas and feedback help make Block Accessibility Checks better.
+
+    - type: checkboxes
+      id: prerequisites
+      attributes:
+          label: Prerequisites
+          description: Please confirm before submitting
+          options:
+              - label: I have searched existing issues to ensure this hasn't been suggested already
+                required: true
+
+    - type: dropdown
+      id: request-type
+      attributes:
+          label: What type of request is this?
+          description: Select the category that best fits your request
+          options:
+              - New Accessibility Check
+              - Improve Existing Check
+              - Developer API Enhancement
+              - User Interface Improvement
+              - Settings/Configuration Option
+              - Performance Enhancement
+              - Developer Experience/Feedback
+              - Other
+      validations:
+          required: true
+
+    - type: textarea
+      id: description
+      attributes:
+          label: Description
+          description: Describe your feature request, enhancement, or feedback
+          placeholder: |
+              Be as specific as possible:
+              - What would you like to see added or improved?
+              - What problem does this solve?
+              - How would this help you or other users?
+      validations:
+          required: true
+
+    - type: textarea
+      id: use-case
+      attributes:
+          label: Use Case or Example (optional)
+          description: Provide a specific example of when this would be useful
+          placeholder: |
+              Example scenario:
+              - When a content editor adds a video block...
+              - When a developer creates a custom block...
+              - When working with...
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional Context (optional)
+          description: Add any other information that might help
+          placeholder: |
+              - WCAG guidelines this relates to
+              - Examples from other tools
+              - Alternative approaches considered
+              - Links or screenshots
+              - Technical details

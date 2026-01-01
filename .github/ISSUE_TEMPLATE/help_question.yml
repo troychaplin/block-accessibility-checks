@@ -1,0 +1,74 @@
+name: ❓ Help or Question
+description: Get help with integration, documentation questions, or general support
+title: '[Help]: '
+labels: ['question']
+assignees: []
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Need help? I'll do my best to assist, though response times may vary.
+
+    - type: checkboxes
+      id: prerequisites
+      attributes:
+          label: Prerequisites
+          description: Please confirm before requesting help
+          options:
+              - label: I have checked the documentation
+                required: true
+              - label: I have searched existing issues for similar questions
+                required: true
+
+    - type: dropdown
+      id: help-type
+      attributes:
+          label: What do you need help with?
+          description: Select the area you need assistance with
+          options:
+              - Getting Started - Basic setup
+              - Custom Block Integration
+              - Developer API Usage
+              - Documentation Question
+              - Troubleshooting an Issue
+              - Best Practices
+              - Other
+      validations:
+          required: true
+
+    - type: textarea
+      id: question
+      attributes:
+          label: Your Question
+          description: What do you need help with? Be as specific as possible
+          placeholder: |
+              Describe:
+              - What you're trying to accomplish
+              - What you're stuck on
+              - What you've already tried
+      validations:
+          required: true
+
+    - type: textarea
+      id: code-or-details
+      attributes:
+          label: Relevant Code or Details (optional)
+          description: Share any code, error messages, or configuration details
+          placeholder: |
+              Include:
+              - Block registration code
+              - Error messages
+              - Your current setup
+              - Which blocks you're working with
+          render: javascript
+
+    - type: textarea
+      id: additional-context
+      attributes:
+          label: Additional Context (optional)
+          description: Any other information that might be helpful
+          placeholder: |
+              - WordPress/PHP/Node versions
+              - Build tools you're using
+              - Screenshots or examples
+              - Links to related resources
