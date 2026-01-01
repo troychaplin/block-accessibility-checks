@@ -289,8 +289,12 @@ class Settings {
 						$this->log_error( 'Heading levels input is not an array. Skipping.' );
 					}
 				} elseif ( 'core_heading_levels' !== $key ) {
-					// Handle individual check settings.
-					if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
+					// Handle site editor settings (boolean values).
+					if ( strpos( $key, '_site_editor' ) !== false ) {
+						$sanitized[ \sanitize_text_field( $key ) ] = (bool) $value;
+						$this->log_debug( "Sanitized site editor setting {$key}: " . ( $value ? 'true' : 'false' ) );
+					} elseif ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
+						// Handle individual check settings.
 						$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
 						$this->log_debug( "Sanitized {$key}: {$value}" );
 					} else {
@@ -327,7 +331,11 @@ class Settings {
 		}
 
 		foreach ( $input as $key => $value ) {
-			if ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
+			// Handle site editor settings (boolean values).
+			if ( strpos( $key, '_site_editor' ) !== false ) {
+				$sanitized[ \sanitize_text_field( $key ) ] = (bool) $value;
+			} elseif ( in_array( $value, self::VALID_CHECK_VALUES, true ) ) {
+				// Handle individual check settings.
 				$sanitized[ \sanitize_text_field( $key ) ] = \sanitize_text_field( $value );
 			}
 		}
@@ -611,15 +619,18 @@ class Settings {
 					continue;
 				}
 
-				$field_name = $block_type . '_' . $check_name;
-				$value      = $options[ $field_name ] ?? 'error';
+				$field_name             = $block_type . '_' . $check_name;
+				$value                  = $options[ $field_name ] ?? 'error';
+				$site_editor_field_name = $field_name . '_site_editor';
+				$site_editor_enabled    = $options[ $site_editor_field_name ] ?? true;
 
 				$block_checks[] = array(
-					'name'        => $check_name,
-					'fieldName'   => $field_name,
-					'description' => $check_config['description'],
-					'category'    => $check_config['category'] ?? 'accessibility',
-					'value'       => $value,
+					'name'              => $check_name,
+					'fieldName'         => $field_name,
+					'description'       => $check_config['description'],
+					'category'          => $check_config['category'] ?? 'accessibility',
+					'value'             => $value,
+					'siteEditorEnabled' => $site_editor_enabled,
 				);
 			}
 
@@ -799,15 +810,18 @@ class Settings {
 					continue;
 				}
 
-				$field_name = $block_type . '_' . $check_name;
-				$value      = $options[ $field_name ] ?? 'error';
+				$field_name             = $block_type . '_' . $check_name;
+				$value                  = $options[ $field_name ] ?? 'error';
+				$site_editor_field_name = $field_name . '_site_editor';
+				$site_editor_enabled    = $options[ $site_editor_field_name ] ?? true;
 
 				$block_checks[] = array(
-					'name'        => $check_name,
-					'fieldName'   => $field_name,
-					'description' => $check_config['description'],
-					'category'    => $check_config['category'] ?? 'accessibility',
-					'value'       => $value,
+					'name'              => $check_name,
+					'fieldName'         => $field_name,
+					'description'       => $check_config['description'],
+					'category'          => $check_config['category'] ?? 'accessibility',
+					'value'             => $value,
+					'siteEditorEnabled' => $site_editor_enabled,
 				);
 			}
 
@@ -844,8 +858,10 @@ class Settings {
 						continue;
 					}
 
-					$field_name = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
-					$value      = $options[ $field_name ] ?? 'error';
+					$field_name             = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
+					$value                  = $options[ $field_name ] ?? 'error';
+					$site_editor_field_name = $field_name . '_site_editor';
+					$site_editor_enabled    = $options[ $site_editor_field_name ] ?? true;
 
 					$block_label = ucwords( str_replace( array( '-', '_' ), ' ', $meta_key ) );
 
@@ -856,11 +872,12 @@ class Settings {
 						'postTypeLabel' => $post_type_label,
 						'checks'        => array(
 							array(
-								'name'        => $check_name,
-								'fieldName'   => $field_name,
-								'description' => $check['description'] ?? $check['error_msg'],
-								'category'    => 'validation',
-								'value'       => $value,
+								'name'              => $check_name,
+								'fieldName'         => $field_name,
+								'description'       => $check['description'] ?? $check['error_msg'],
+								'category'          => 'validation',
+								'value'             => $value,
+								'siteEditorEnabled' => $site_editor_enabled,
 							),
 						),
 					);
@@ -890,19 +907,22 @@ class Settings {
 					continue;
 				}
 
-				$field_name = 'editor_' . $post_type . '_' . $check_name;
-				$value      = $options[ $field_name ] ?? 'error';
+				$field_name             = 'editor_' . $post_type . '_' . $check_name;
+				$value                  = $options[ $field_name ] ?? 'error';
+				$site_editor_field_name = $field_name . '_site_editor';
+				$site_editor_enabled    = $options[ $site_editor_field_name ] ?? true;
 
 				$blocks[] = array(
 					'blockType' => 'editor_' . $post_type,
 					'label'     => $post_type_label,
 					'checks'    => array(
 						array(
-							'name'        => $check_name,
-							'fieldName'   => $field_name,
-							'description' => $check['description'] ?? $check['error_msg'],
-							'category'    => 'validation',
-							'value'       => $value,
+							'name'              => $check_name,
+							'fieldName'         => $field_name,
+							'description'       => $check['description'] ?? $check['error_msg'],
+							'category'          => 'validation',
+							'value'             => $value,
+							'siteEditorEnabled' => $site_editor_enabled,
 						),
 					),
 				);

@@ -14,8 +14,10 @@ export default function SettingsTable({
 	blocks,
 	settings,
 	headingLevels,
+	siteEditorSettings,
 	onSettingChange,
 	onHeadingLevelChange,
+	onSiteEditorChange,
 	checkHeaderLabel,
 	blockHeaderLabel,
 	categoryHeaderLabel,
@@ -44,6 +46,7 @@ export default function SettingsTable({
 		}
 
 		block.checks.forEach(check => {
+			const siteEditorFieldName = check.fieldName + '_site_editor';
 			rows.push({
 				id: check.fieldName,
 				blockType: block.blockType,
@@ -51,6 +54,7 @@ export default function SettingsTable({
 				postTypeLabel: block.postTypeLabel,
 				check,
 				value: settings[check.fieldName] || 'error',
+				siteEditorEnabled: siteEditorSettings?.[siteEditorFieldName] ?? true,
 				isHeadingLevels: false,
 			});
 		});
@@ -79,8 +83,9 @@ export default function SettingsTable({
 					className="ba11y-dataview-table"
 					role="table"
 					aria-label={__('Validation checks settings', 'block-accessibility-checks')}
+					style={{ gridTemplateColumns: gridTemplate }}
 				>
-					<TableHeader columns={customColumns} gridTemplate={gridTemplate} />
+					<TableHeader columns={customColumns} />
 
 					<div className="ba11y-dataview-tbody" role="rowgroup">
 						{rows.length === 0 ? (
@@ -93,9 +98,9 @@ export default function SettingsTable({
 									key={row.id}
 									row={row}
 									columns={customColumns}
-									gridTemplate={gridTemplate}
 									onSettingChange={onSettingChange}
 									onHeadingLevelChange={onHeadingLevelChange}
+									onSiteEditorChange={onSiteEditorChange}
 								/>
 							))
 						)}

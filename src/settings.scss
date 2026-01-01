@@ -59,10 +59,9 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
     border-radius: 4px;
 }
 
-// Table container - set grid template here for consistent column widths
+// Table container - grid template set dynamically via inline style from JS
 .ba11y-dataview-table {
 	display: grid;
-	grid-template-columns: 2fr 1fr 1fr 1fr;
 	width: 100%;
 }
 
@@ -77,7 +76,7 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 	font-weight: 500;
 	padding: calc(var(--a11y-settings-space) / 2);
 	color: var(--a11y-black);
-    border-bottom: 1px solid var(--a11y-light-grey);
+    border-bottom: 1px solid var(--a11y-grey);
 	align-items: center;
 }
 
@@ -141,6 +140,10 @@ body[class*='accessibility-validation_page_block-a11y-checks-'] {
 	.components-toggle-group-control {
 		border: 1px solid var(--a11y-grey);
 		background: #fff;
+
+        &::before {
+            display: none;
+        }
 
 		.components-toggle-group-control-option-base {
             color: var(--a11y-black);

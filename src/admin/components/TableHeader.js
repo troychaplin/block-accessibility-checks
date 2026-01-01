@@ -5,14 +5,10 @@
  * Supports sorting indicators (future feature).
  */
 
-export default function TableHeader({ columns, gridTemplate }) {
+export default function TableHeader({ columns }) {
 	return (
 		<div className="ba11y-dataview-thead" role="rowgroup">
-			<div
-				className="ba11y-dataview-row ba11y-dataview-row-header"
-				role="row"
-				style={{ gridTemplateColumns: gridTemplate }}
-			>
+			<div className="ba11y-dataview-row ba11y-dataview-row-header" role="row">
 				{columns.map(column => (
 					<div
 						key={column.id}
