@@ -3,20 +3,21 @@
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { validateBlock } from '../validation/blocks';
 import { BlockIndicator as Indicator } from '../components/BlockIndicator';
+import { useDebouncedValidation } from '../../shared/hooks';
 
 /**
  * Higher-order component that adds validation indicators to blocks.
  *
  * Wraps the block editor component to display validation errors and warnings
- * based on registered block validation rules. Invalid blocks are wrapped in
- * a container with visual indicators showing the validation issues.
+ * based on registered block validation rules. Uses debounced validation to
+ * prevent focus loss during typing. Always renders the same DOM structure
+ * to avoid React unmount/remount cycles.
  */
 const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 	return props => {
@@ -31,45 +32,43 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 			[clientId] // Dependencies: only clientId needed as attributes from props trigger re-render
 		);
 
-		// Store validation state for this block instance
-		const [validationResult, setValidationResult] = useState({
-			isValid: true,
-			issues: [],
-			mode: 'none',
-		});
-
-		// Run validation whenever the block or its attributes change
-		useEffect(() => {
-			if (block) {
-				// Use attributes from props for immediate validation responsiveness
-				// Props attributes update before the store, ensuring real-time feedback
+		// Debounced validation prevents rapid re-renders during typing.
+		// Runs immediately on mount, then debounces subsequent changes.
+		const validationResult = useDebouncedValidation(
+			() => {
+				if (!block) {
+					return { isValid: true, issues: [], mode: 'none' };
+				}
+				// Use attributes from props for validation responsiveness.
+				// Props attributes update before the store.
 				const blockToValidate = {
 					...block,
 					attributes: attributes || block.attributes,
 				};
-				const result = validateBlock(blockToValidate);
-				setValidationResult(result);
-			}
-		}, [block, attributes]);
+				return validateBlock(blockToValidate);
+			},
+			[block, attributes],
+			{ delay: 300 }
+		);
 
-		// Render block normally without wrapper if validation passes
-		if (validationResult.isValid) {
-			return <BlockEdit {...props} />;
-		}
-
-		// Build wrapper classes based on validation severity
+		// Always render the same DOM structure to prevent focus loss.
+		// Toggling between <BlockEdit /> and <div><BlockEdit /></div> causes
+		// React to unmount and remount BlockEdit, stealing keyboard focus.
 		let wrapperClass = 'ba11y-block-wrapper';
-		if (validationResult.mode === 'error') {
-			wrapperClass += ' ba11y-block-error';
-		} else if (validationResult.mode === 'warning') {
-			wrapperClass += ' ba11y-block-warning';
+		if (!validationResult.isValid) {
+			if (validationResult.mode === 'error') {
+				wrapperClass += ' ba11y-block-error';
+			} else if (validationResult.mode === 'warning') {
+				wrapperClass += ' ba11y-block-warning';
+			}
 		}
 
-		// Wrap invalid blocks with validation indicator
 		return (
 			<div className={wrapperClass}>
 				<BlockEdit {...props} />
-				<Indicator mode={validationResult.mode} issues={validationResult.issues} />
+				{!validationResult.isValid && (
+					<Indicator mode={validationResult.mode} issues={validationResult.issues} />
+				)}
 			</div>
 		);
 	};
