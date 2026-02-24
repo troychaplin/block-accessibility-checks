@@ -4,4 +4,5 @@
  * Barrel export for all shared code (utilities, components, hooks, constants).
  */
 
+export * from './hooks';
 export * from './utils';
