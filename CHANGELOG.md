@@ -17,6 +17,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [3.0.1]
+
 ### Fixed
 
 - Prevented focus change when adding image alt text
