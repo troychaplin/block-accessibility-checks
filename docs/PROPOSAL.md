@@ -283,11 +283,10 @@ A Validation API in core would enable a wide range of applications beyond access
 
 ## Open Questions
 
-1. **Naming** -- Should this be called "Validation API," "Content Checks API," "Block Validation API," or something else?
-2. **Data store** -- Should validation results live in a dedicated `@wordpress/data` store (e.g., `core/validation`) for better state management and cross-plugin coordination?
-3. **Async validation** -- Should the filter hooks support async validation for server-side checks (e.g., link checking, content analysis)?
-4. **Block.json integration** -- Could validation rules be declared in `block.json` for simple checks (e.g., `"required": true` on attributes), with JavaScript filters for complex logic?
-5. **Core checks** -- Should WordPress ship with any default validation checks (e.g., image alt text), or should all checks come from plugins?
+1. **Data store** -- Should validation results live in a dedicated `@wordpress/data` store (e.g., `core/validation`) for better state management and cross-plugin coordination?
+2. **Async validation** -- Should the filter hooks support async validation for server-side checks (e.g., link checking, content analysis)?
+3. **Block.json integration** -- Could validation rules be declared in `block.json` for simple checks (e.g., `"required": true` on attributes), with JavaScript filters for complex logic?
+4. **Core checks** -- Should WordPress ship with any default validation checks (e.g., image alt text), or should all checks come from plugins?
 
 ## Next Steps
 
@@ -302,3 +301,4 @@ A Validation API in core would enable a wide range of applications beyond access
 - **Source Code:** [GitHub Repository](https://github.com/troychaplin/block-accessibility-checks)
 - **Documentation:** [blockaccessibilitychecks.com](https://blockaccessibilitychecks.com/validation-api/)
 - **Example Integration:** [block-check-integration-example](https://github.com/troychaplin/block-check-integration-example)
+- **Demo Video:** [Pantheon Live](https://www.youtube.com/watch?v=mLsC2tDcdL8)
