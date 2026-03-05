@@ -213,6 +213,12 @@ The [Block Accessibility Checks](https://github.com/troychaplin/block-accessibil
 - **Configuration Export** -- PHP configuration is passed to JavaScript via `wp_localize_script`, creating a global `window.BlockAccessibilityChecks` object.
 - **Post Locking** -- The [`ValidationAPI`](https://github.com/troychaplin/block-accessibility-checks/blob/main/src/editor/validation/ValidationAPI.js) component coordinates validation results and manages `lockPostSaving`/`unlockPostSaving`.
 
+### Video Demo
+
+A live walkthrough of the plugin's validation system in action is available from a Pantheon live stream:
+
+- [Block Accessibility Checks Demo (Pantheon Live)](https://www.youtube.com/watch?v=mLsC2tDcdL8)
+
 ### External Plugin Integration
 
 The API is already extensible. External plugins register checks using action hooks, and validation logic is added via JavaScript filters. The reference implementation automatically creates dedicated settings pages for external plugins that register checks, grouping them by plugin name.
