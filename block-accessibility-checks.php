@@ -28,13 +28,24 @@ require_once __DIR__ . '/vendor/autoload.php';
 // Imports the necessary classes for the plugin.
 use BlockAccessibility\Core\Plugin;
 
-// Global variables for the plugin.
-$ba11yc_plugin_file = __FILE__;
-$ba11yc_text_domain = 'block-accessibility-checks';
+/**
+ * Returns the shared Plugin instance, constructing it on first call.
+ *
+ * Using a static singleton avoids relying on a file-scope variable, which
+ * breaks under WP-CLI because plugin files are included from inside a method
+ * (WP_CLI\Runner::load_wordpress) rather than true global scope.
+ *
+ * @return Plugin
+ */
+function ba11yc_plugin() {
+	static $plugin = null;
 
-// Initialize the Plugin immediately (before 'init' hook).
-// This is required for HeadingLevels to register its filter early enough.
-$ba11yc_plugin_initializer = new Plugin( $ba11yc_plugin_file, $ba11yc_text_domain );
+	if ( null === $plugin ) {
+		$plugin = new Plugin( __FILE__, 'block-accessibility-checks' );
+	}
+
+	return $plugin;
+}
 
 /**
  * Initializes the Block Accessibility Checks plugin services.
@@ -45,9 +56,11 @@ $ba11yc_plugin_initializer = new Plugin( $ba11yc_plugin_file, $ba11yc_text_domai
  * @return void
  */
 function ba11yc_init_plugin() {
-	global $ba11yc_plugin_initializer;
-
 	// Complete plugin initialization (HeadingLevels already initialized in constructor).
-	$ba11yc_plugin_initializer->init();
+	ba11yc_plugin()->init();
 }
+
+// Construct the Plugin immediately (before 'init' hook).
+// This is required for HeadingLevels to register its filter early enough.
+ba11yc_plugin();
 add_action( 'init', 'ba11yc_init_plugin' );
