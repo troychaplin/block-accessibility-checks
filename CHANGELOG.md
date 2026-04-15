@@ -17,6 +17,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed fatal error under WP-CLI caused by relying on a file-scope variable for the plugin instance; the instance is now held in a static singleton (`ba11yc_plugin()`) so it survives when WordPress is loaded from inside a method scope
+
 ## [3.0.1]
 
 ### Fixed
