@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\ExpandRulesetReferenceInternalTest
  */
 
-namespace Fixtures\Internal\Sniffs.alid;
+namespace Fixtures\Internal.niffs.alid;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;

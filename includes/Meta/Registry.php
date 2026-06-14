@@ -10,16 +10,14 @@
 
 namespace BlockAccessibility\Meta;
 
-use BlockAccessibility\Core\Traits\Logger;
+use BlockAccessibility\AbstractRegistry;
 
 /**
  * Meta Checks Registry Class
  *
  * Manages registration and execution of validation checks for post meta fields.
  */
-class Registry {
-
-	use Logger;
+class Registry extends AbstractRegistry {
 
 	/**
 	 * Registered meta checks
@@ -51,20 +49,7 @@ class Registry {
 	/**
 	 * Constructor
 	 */
-	private function __construct() {
-		// Private constructor for singleton pattern.
-	}
-
-	/**
-	 * Sort checks by priority
-	 *
-	 * @param array $a First check.
-	 * @param array $b Second check.
-	 * @return int Comparison result.
-	 */
-	private function sort_checks_by_priority( $a, $b ) {
-		return $a['priority'] - $b['priority'];
-	}
+	private function __construct() {}
 
 	/**
 	 * Register a meta check
@@ -77,54 +62,26 @@ class Registry {
 	 */
 	public function register_meta_check( string $post_type, string $meta_key, string $check_name, array $check_args ): bool {
 		try {
-			// Validate input parameters.
-			if ( empty( $post_type ) || ! is_string( $post_type ) ) {
+			if ( empty( $post_type ) ) {
 				$this->log_error( "Invalid post type provided: {$post_type}" );
 				return false;
 			}
 
-			if ( empty( $meta_key ) || ! is_string( $meta_key ) ) {
+			if ( empty( $meta_key ) ) {
 				$this->log_error( "Invalid meta key provided: {$meta_key}" );
 				return false;
 			}
 
-			if ( empty( $check_name ) || ! is_string( $check_name ) ) {
+			if ( empty( $check_name ) ) {
 				$this->log_error( "Invalid check name provided: {$check_name}" );
 				return false;
 			}
 
-			if ( ! is_array( $check_args ) ) {
-				$this->log_error( "Check arguments must be an array for {$post_type}/{$meta_key}/{$check_name}" );
+			$context_label = "{$post_type}/{$meta_key}/{$check_name}";
+			$check_args    = $this->normalize_args( $check_args, $context_label );
+
+			if ( false === $check_args ) {
 				return false;
-			}
-
-			$defaults = array(
-				'error_msg'   => '',
-				'warning_msg' => '',
-				'type'        => 'settings',
-				'priority'    => 10,
-				'enabled'     => true,
-				'description' => '',
-			);
-
-			$check_args = \wp_parse_args( $check_args, $defaults );
-
-			// Validate required parameters.
-			if ( empty( $check_args['error_msg'] ) ) {
-				$this->log_error( "error_msg is required for {$post_type}/{$meta_key}/{$check_name}" );
-				return false;
-			}
-
-			// Fallback for warning_msg to error_msg.
-			if ( empty( $check_args['warning_msg'] ) ) {
-				$check_args['warning_msg'] = $check_args['error_msg'];
-			}
-
-			// Validate type parameter.
-			$valid_types = array( 'error', 'warning', 'settings', 'none' );
-			if ( ! in_array( $check_args['type'], $valid_types, true ) ) {
-				$this->log_error( "Invalid type '{$check_args['type']}' for {$post_type}/{$meta_key}/{$check_name}. Using 'settings'." );
-				$check_args['type'] = 'settings';
 			}
 
 			// Allow developers to filter check arguments before registration.
@@ -132,30 +89,27 @@ class Registry {
 
 			// Allow developers to prevent specific checks from being registered.
 			if ( ! \apply_filters( 'ba11yc_should_register_meta_check', true, $post_type, $meta_key, $check_name, $check_args ) ) {
-				$this->log_debug( "Meta check registration prevented by filter: {$post_type}/{$meta_key}/{$check_name}" );
+				$this->log_debug( "Meta check registration prevented by filter: {$context_label}" );
 				return false;
 			}
 
-			// Initialize post type array if needed.
 			if ( ! isset( $this->meta_checks[ $post_type ] ) ) {
 				$this->meta_checks[ $post_type ] = array();
 			}
 
-			// Initialize meta key array if needed.
 			if ( ! isset( $this->meta_checks[ $post_type ][ $meta_key ] ) ) {
 				$this->meta_checks[ $post_type ][ $meta_key ] = array();
 			}
 
-			// Store the check.
+			$check_args = $this->stamp_namespace( $check_args );
+
 			$this->meta_checks[ $post_type ][ $meta_key ][ $check_name ] = $check_args;
 
-			// Sort checks by priority.
-			\uasort( $this->meta_checks[ $post_type ][ $meta_key ], array( $this, 'sort_checks_by_priority' ) );
+			$this->sort_by_priority( $this->meta_checks[ $post_type ][ $meta_key ] );
 
-			// Action hook for developers to know when a check is registered.
 			\do_action( 'ba11yc_meta_check_registered', $post_type, $meta_key, $check_name, $check_args );
 
-			$this->log_debug( "Successfully registered meta check: {$post_type}/{$meta_key}/{$check_name}" );
+			$this->log_debug( "Successfully registered meta check: {$context_label}" );
 			return true;
 
 		} catch ( \Exception $e ) {
@@ -202,9 +156,6 @@ class Registry {
 	/**
 	 * Get the effective check level for a specific meta check
 	 *
-	 * This method determines the actual check level by considering both
-	 * the check configuration and user settings.
-	 *
 	 * @param string $post_type  The post type.
 	 * @param string $meta_key   The meta key.
 	 * @param string $check_name The check name.
@@ -217,49 +168,16 @@ class Registry {
 			return 'none';
 		}
 
-		$check      = $meta_checks[ $meta_key ][ $check_name ];
-		$check_type = $check['type'] ?? 'settings';
+		$registered_level = $meta_checks[ $meta_key ][ $check_name ]['level'] ?? 'error';
 
-		// If the check has a forced type (not 'settings'), use it directly.
-		if ( 'settings' !== $check_type ) {
-			return $check_type;
-		}
-
-		// For settings-based checks, get the user's preference.
-		return $this->get_meta_check_level_from_settings( $post_type, $meta_key, $check_name );
-	}
-
-	/**
-	 * Get meta check level from user settings
-	 *
-	 * @param string $post_type  The post type.
-	 * @param string $meta_key   The meta key.
-	 * @param string $check_name The check name.
-	 * @return string The check level from settings.
-	 */
-	private function get_meta_check_level_from_settings( string $post_type, string $meta_key, string $check_name ): string {
-		// Field name format: meta_{post_type}_{meta_key}_{check_name} for external plugins
-		// Field name format: meta_key_check_name for core post types.
-		$external_field_name = 'meta_' . $post_type . '_' . $meta_key . '_' . $check_name;
-		$core_field_name     = $meta_key . '_' . $check_name;
-
-		// Try to find this in external plugin settings first
-		// by checking all external plugin options.
-		$all_options = \wp_load_alloptions();
-		foreach ( $all_options as $option_name => $option_value ) {
-			if ( strpos( $option_name, 'block_checks_external_' ) === 0 ) {
-				$options = \get_option( $option_name, array() );
-				// Check with external field name format first.
-				if ( isset( $options[ $external_field_name ] ) ) {
-					return $options[ $external_field_name ];
-				}
-			}
-		}
-
-		// Fallback to post-type-specific option (for core post types).
-		$option_name = 'block_checks_meta_' . $post_type;
-		$options     = \get_option( $option_name, array() );
-
-		return $options[ $core_field_name ] ?? 'error';
+		return $this->apply_level_filter(
+			$registered_level,
+			array(
+				'scope'      => 'meta',
+				'post_type'  => $post_type,
+				'meta_key'   => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- not a DB query, this is filter context data.
+				'check_name' => $check_name,
+			)
+		);
 	}
 }

@@ -10,7 +10,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core.okenizers;
+namespace PHP_CodeSniffer\Tests.ore.okenizers;
 
 use PHP_CodeSniffer\Files\DummyFile;
 use PHP_CodeSniffer\Ruleset;

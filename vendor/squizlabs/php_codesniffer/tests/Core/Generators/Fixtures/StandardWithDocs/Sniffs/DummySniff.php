@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Generators\GeneratorTest
  */
 
-namespace Fixtures\StandardWithDocs.niffs;
+namespace Fixtures.tandardWithDocs.niffs;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;

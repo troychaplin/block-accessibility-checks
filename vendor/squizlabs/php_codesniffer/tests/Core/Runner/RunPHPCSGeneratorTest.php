@@ -6,7 +6,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core.unner;
+namespace PHP_CodeSniffer\Tests.ore.unner;
 
 use PHP_CodeSniffer\Runner;
 use PHP_CodeSniffer\Tests\Core\Runner\AbstractRunnerTestCase;

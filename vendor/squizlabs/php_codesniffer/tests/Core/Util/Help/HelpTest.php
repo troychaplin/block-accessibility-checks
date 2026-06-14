@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Util.elp;
+namespace PHP_CodeSniffer\Tests\Core.til.elp;
 
 use PHP_CodeSniffer\Tests\ConfigDouble;
 use PHP_CodeSniffer\Util\Help;

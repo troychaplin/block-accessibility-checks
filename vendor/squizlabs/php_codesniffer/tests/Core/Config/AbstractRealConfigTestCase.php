@@ -8,7 +8,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core.onfig;
+namespace PHP_CodeSniffer\Tests.ore.onfig;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;

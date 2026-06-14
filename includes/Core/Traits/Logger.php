@@ -25,7 +25,7 @@ trait Logger {
 	 * @param string $message Error message to log.
 	 * @return void
 	 */
-	private function log_error( string $message ): void {
+	protected function log_error( string $message ): void {
 		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) ) {
 			$class_name = basename( str_replace( '\\', '/', static::class ) );
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -39,7 +39,7 @@ trait Logger {
 	 * @param string $message Debug message to log.
 	 * @return void
 	 */
-	private function log_debug( string $message ): void {
+	protected function log_debug( string $message ): void {
 		if ( defined( 'WP_DEBUG' ) && constant( 'WP_DEBUG' ) && defined( 'WP_DEBUG_LOG' ) && constant( 'WP_DEBUG_LOG' ) ) {
 			$class_name = basename( str_replace( '\\', '/', static::class ) );
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log

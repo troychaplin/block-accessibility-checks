@@ -1,0 +1,30 @@
+// Block validation indicator — CSS-only colored corner triangle.
+// Classes are applied to the block's own element via editor.BlockListBlock wrapperProps.
+.ba11yc-block-error,
+.ba11yc-block-warning {
+	position: relative;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: -1px;
+		left: -1px;
+		width: 15px;
+		height: 15px;
+		clip-path: polygon(0 0, 100% 0, 0 100%);
+		z-index: 20;
+		pointer-events: none;
+	}
+
+	&::after {
+		box-shadow: 0 0 0 2px var(--ba11yc-white);
+	}
+}
+
+.ba11yc-block-error::before {
+	background-color: var(--ba11yc-red);
+}
+
+.ba11yc-block-warning::before {
+	background-color: var(--ba11yc-yellow);
+}

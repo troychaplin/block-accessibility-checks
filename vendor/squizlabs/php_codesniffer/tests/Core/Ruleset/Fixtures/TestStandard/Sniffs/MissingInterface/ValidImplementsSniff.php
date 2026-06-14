@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\RegisterSniffsMissingInterfaceTest
  */
 
-namespace Fixtures\TestStandard\Sniffs.issingInterface;
+namespace Fixtures\TestStandard.niffs.issingInterface;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;

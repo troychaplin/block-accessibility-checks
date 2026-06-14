@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\RulesetPopulateTokenListenersNamingConventionsTest
  */
 
-namespace BrokenNamingConventions\Sniffs.ategory;
+namespace BrokenNamingConventions.niffs.ategory;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff as PHPCS_Sniff;

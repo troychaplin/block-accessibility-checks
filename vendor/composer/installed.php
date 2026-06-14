@@ -3,7 +3,7 @@
         'name' => 'troychaplin/block-accessibility-checks',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b778897c593303abbdc4875db4ab6b6c3d88b353',
+        'reference' => 'd913d07038ea9da022054ec2750b25052172929c',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'dealerdirect/phpcodesniffer-composer-installer' => array(
-            'pretty_version' => 'v1.2.0',
-            'version' => '1.2.0.0',
-            'reference' => '845eb62303d2ca9b289ef216356568ccc075ffd1',
+            'pretty_version' => 'v1.2.1',
+            'version' => '1.2.1.0',
+            'reference' => '963f0c67bffde0eac41b56be71ac0e8ba132f0bd',
             'type' => 'composer-plugin',
             'install_path' => __DIR__ . '/../dealerdirect/phpcodesniffer-composer-installer',
             'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => true,
         ),
         'phpcsstandards/phpcsutils' => array(
-            'pretty_version' => '1.2.1',
-            'version' => '1.2.1.0',
-            'reference' => 'd71128c702c180ca3b27c761b6773f883394f162',
+            'pretty_version' => '1.2.2',
+            'version' => '1.2.2.0',
+            'reference' => 'c216317e96c8b3f5932808f9b0f1f7a14e3bbf55',
             'type' => 'phpcodesniffer-standard',
             'install_path' => __DIR__ . '/../phpcsstandards/phpcsutils',
             'aliases' => array(),
@@ -49,7 +49,7 @@
         'troychaplin/block-accessibility-checks' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b778897c593303abbdc4875db4ab6b6c3d88b353',
+            'reference' => 'd913d07038ea9da022054ec2750b25052172929c',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
