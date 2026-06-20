@@ -4,7 +4,7 @@ This guide provides a fast path for developers to add validation to WordPress po
 
 ## Overview
 
-Post meta validation allows you to validate WordPress post meta fields with the same error/warning system used for block validation. The system provides automatic UI components and integrates with WordPress's built-in validation system.
+Post meta validation allows you to validate WordPress post meta fields with the same error/warning system used for block validation. The system integrates with WordPress's built-in validation system and provides real-time feedback in the block editor.
 
 ## Quick Start
 
@@ -27,8 +27,9 @@ add_action( 'init', function() {
                 'band',
                 'band_origin',
                 [
+                    'namespace' => 'my-plugin',
                     'error_msg' => __( 'City of Origin is required.', 'my-plugin' ),
-                    'type'      => 'settings',
+                    'level'     => 'error',
                 ]
             )
             : null,
@@ -39,57 +40,38 @@ add_action( 'init', function() {
 **Note:** The conditional check ensures your plugin continues to work even if the Block Accessibility Checks plugin is deactivated.
 
 That's it! The `Validator::required()` method handles:
-- ✅ Registering the validation check
-- ✅ Integrating with settings UI
-- ✅ Server-side validation
-- ✅ Client-side validation sync
+- Registering the validation check
+- Integrating with the DataViews settings table
+- Server-side validation
+- Client-side validation sync
 
-## Using UI Components
+## Using the `useMetaField` Hook
 
-The plugin provides wrapper components to automatically display validation errors and warnings:
-
-### MetaField Component
-
-Wrap any WordPress component with `MetaField`:
+The plugin exports a `useMetaField` hook for integrating validation state into your meta fields. Import it from the plugin's entry point:
 
 ```javascript
-import { TextControl } from '@wordpress/components';
-const { MetaField } = window.BlockAccessibilityChecks || {};
+import { useMetaField } from '@block-accessibility-checks/editor';
 
-<MetaField metaKey="band_origin">
-    <TextControl
-        label="City of Origin"
-        value={meta.band_origin || ''}
-        onChange={value => editPost({ meta: { band_origin: value } })}
-    />
-</MetaField>
+const BandOriginField = () => {
+    const { meta, updateMeta, helpText, hasError } = useMetaField('band_origin');
+
+    return (
+        <TextControl
+            label="City of Origin"
+            value={meta.band_origin || ''}
+            onChange={value => updateMeta('band_origin', value)}
+            help={helpText}
+            className={hasError ? 'has-error' : ''}
+        />
+    );
+};
 ```
 
-### ValidatedToolsPanelItem Component
-
-Replace `ToolsPanelItem` with `ValidatedToolsPanelItem`:
-
-```javascript
-const { ValidatedToolsPanelItem } = window.BlockAccessibilityChecks || {};
-
-<ValidatedToolsPanelItem
-    metaKey="band_origin"
-    hasValue={() => meta.band_origin !== ''}
-    label="City of Origin"
-    onDeselect={() => updateMeta('band_origin', '')}
->
-    <TextControl
-        label="City of Origin"
-        value={meta.band_origin || ''}
-        onChange={value => updateMeta('band_origin', value)}
-    />
-</ValidatedToolsPanelItem>
-```
+**Note:** If the Block Accessibility Checks plugin is not active, the hook falls back gracefully and validation state is not applied.
 
 ## Next Steps
 
 - **[PHP Integration →](./php.md)** - Detailed PHP registration guide
-- **[JavaScript Integration →](./javascript.md)** - Detailed JavaScript validation and UI components
+- **[JavaScript Integration →](./javascript.md)** - Detailed JavaScript validation guide
 - **[API Reference →](../reference/api.md)** - Complete API documentation
 - **[Hooks Reference →](../reference/hooks.md)** - All available hooks
-

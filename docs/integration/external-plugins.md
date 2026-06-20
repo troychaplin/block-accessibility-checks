@@ -1,173 +1,47 @@
 # External Plugin Integration
 
-This guide explains how to integrate external plugins and custom blocks with the Block Accessibility Checks Validation API, enabling dedicated accessibility validation and settings for your blocks.
+This guide explains how to integrate external plugins and custom blocks with the Block Accessibility Checks Validation API, enabling dedicated accessibility validation for your blocks.
+
+> **Upgrading from v3?** The registration API changed significantly in v4.0.0. Jump to [Upgrading from v3](#upgrading-from-v3) for a complete before/after reference.
 
 ## Overview
 
-External plugins can register their own validation checks for custom blocks. The Block Accessibility Checks API automatically creates a dedicated settings page for your plugin, allowing site admins to configure validation levels and enable/disable checks.
+External plugins register validation checks in PHP (configuration) and implement the validation logic in JavaScript (real-time feedback). Registered checks automatically appear in the unified Block Accessibility Checks settings table, attributed to your plugin via the required `namespace` field.
 
 ## Quick Start
 
-### 1. Basic Integration with Automatic Plugin Detection
+### 1. Register Checks in PHP
+
+Use `ba11yc_register_block_check()` inside the `ba11yc_ready` action. The `namespace` and `name` keys are required:
 
 ```php
 <?php
-// In your plugin's main file or integration class
-add_action( 'ba11yc_ready', function( $registry ) {
-    // Use the simplified registration method with automatic plugin detection
-    $registry->register_block_check(
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check(
         'your-plugin/your-block',
-        'check_name',
         array(
-            'error_msg'   => __( 'Error message', 'your-text-domain' ),
-            'warning_msg' => __( 'Warning message', 'your-text-domain' ),
-            'description' => __( 'Check description', 'your-text-domain' ),
-            'type'        => 'settings', // or 'error', 'warning', 'none'
-            'category'    => 'accessibility', // or 'validation'
+            'namespace'    => 'your-plugin',
+            'name'         => 'check_name',
+            'error_msg'    => __( 'Error message', 'your-text-domain' ),
+            'warning_msg'  => __( 'Warning message', 'your-text-domain' ),
+            'description'  => __( 'Check description', 'your-text-domain' ),
+            'level'        => 'error',   // default severity: 'error', 'warning', or 'none'
+            'configurable' => true,      // true = admin can change the level in settings
+            'category'     => 'accessibility', // 'accessibility' or 'validation'
         )
     );
-});
+} );
 ```
 
-### 2. Advanced Integration with Manual Plugin Info
+### 2. Implement Validation in JavaScript
 
-```php
-<?php
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_check(
-        'your-plugin/your-block',
-        'check_name',
-        array(
-            'error_msg'   => __( 'Error message', 'your-text-domain' ),
-            'warning_msg' => __( 'Warning message', 'your-text-domain' ),
-            'description' => __( 'Check description', 'your-text-domain' ),
-            'type'        => 'settings',
-            'category'    => 'accessibility',
-        ),
-        array(
-            'name'    => 'Your Plugin Name',
-            'version' => '1.0.0',
-            'file'    => __FILE__,
-            'slug'    => 'your-plugin-slug',
-        )
-    );
-});
-```
-
-## Automatic Settings Integration
-
-Checks registered with `'type' => 'settings'` will:
-- Appear in a dedicated submenu under the Block Accessibility Checks menu, named after your plugin
-- Allow site admins to set each check to Error, Warning, or Disabled
-- Integrate with the block editor for real-time feedback
-
-## Check Types
-
-- `'settings'` - User can configure the check level (Error/Warning/None) in admin
-- `'error'` - Always shows as an error
-- `'warning'` - Always shows as a warning
-- `'none'` - Disabled check
-
-## Check Categories
-
-- `'accessibility'` - WCAG compliance and accessibility standards
-- `'validation'` - Content validation and quality checks
-
-## Automatic Plugin Detection
-
-The `register_block_check()` method automatically:
-
-1. Detects which plugin is registering the check
-2. Extracts plugin name, version, and file path
-3. Groups all blocks from the same plugin together in settings
-4. Displays plugin information in the admin interface
-
-## Settings Page Integration
-
-When you use the automatic detection, your plugin will appear in the Block Checks admin menu with:
-
-- Plugin name as the submenu title
-- Plugin version (if available)
-- All your blocks grouped together
-- Individual check settings for each block
-
-## Complete Integration Example
-
-```php
-<?php
-/**
- * Plugin Name: My Custom Blocks
- * Version: 1.0.0
- * Text Domain: my-custom-blocks
- */
-
-class MyCustomBlocksIntegration {
-    public function __construct() {
-        add_action( 'ba11yc_ready', array( $this, 'register_checks' ) );
-        add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_validation_script' ) );
-    }
-
-    public function register_checks( $registry ) {
-        // Card block checks
-        $registry->register_block_check(
-            'my-custom-blocks/card',
-            'check_title',
-            array(
-                'error_msg'   => __( 'Card title is required.', 'my-custom-blocks' ),
-                'warning_msg' => __( 'Consider adding a title for better accessibility.', 'my-custom-blocks' ),
-                'description' => __( 'Card title validation', 'my-custom-blocks' ),
-                'type'        => 'settings',
-                'category'    => 'accessibility',
-            )
-        );
-
-        $registry->register_block_check(
-            'my-custom-blocks/card',
-            'check_image_alt',
-            array(
-                'error_msg'   => __( 'Card image requires alt text.', 'my-custom-blocks' ),
-                'warning_msg' => __( 'Alt text is recommended for card images.', 'my-custom-blocks' ),
-                'description' => __( 'Image alt text validation', 'my-custom-blocks' ),
-                'type'        => 'settings',
-                'category'    => 'accessibility',
-            )
-        );
-    }
-
-    public function enqueue_validation_script() {
-        $asset_file = include plugin_dir_path( __FILE__ ) . 'build/validation.asset.php';
-        
-        // Start with base dependencies
-        $dependencies = $asset_file['dependencies'];
-        
-        // Only add Block Accessibility Checks plugin as a dependency if it's active.
-        // This allows your plugin to work even when the Block Accessibility Checks plugin is deactivated.
-        if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
-            $dependencies[] = 'block-accessibility-script';
-        }
-
-        wp_enqueue_script(
-            'my-custom-blocks-validation',
-            plugins_url( 'build/validation.js', __FILE__ ),
-            $dependencies,
-            isset( $asset_file['version'] ) ? $asset_file['version'] : '1.0.0',
-            true
-        );
-    }
-}
-
-new MyCustomBlocksIntegration();
-```
-
-## JavaScript Validation
-
-Implement validation logic for your custom blocks:
+All validation logic runs in JavaScript for real-time feedback. Use the `ba11yc.validateBlock` filter:
 
 ```javascript
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/card-block') {
@@ -185,67 +59,273 @@ addFilter(
 );
 ```
 
+## Check Configuration
+
+### Required Keys
+
+- **`namespace`** (string) — Your plugin's identifier. Used to attribute checks to your plugin in the DataViews settings table.
+- **`name`** (string) — Unique check name within the block type.
+- **`error_msg`** (string) — Message shown when the check fails.
+
+### Optional Keys
+
+- **`warning_msg`** (string) — Warning message (defaults to `error_msg`).
+- **`description`** (string) — Description shown in the settings UI.
+- **`level`** (string) — Default severity: `'error'`, `'warning'`, or `'none'`. Default: `'error'`.
+- **`configurable`** (bool) — Whether the admin can change the level in settings. Default: `true`.
+- **`category`** (string) — `'accessibility'` or `'validation'`. Used as a filter in the settings table.
+- **`priority`** (int) — Execution order (lower = earlier). Default: `10`.
+- **`enabled`** (bool) — Whether the check is active. Default: `true`.
+
+### `level` and `configurable` Together
+
+| Goal | `level` | `configurable` |
+|---|---|---|
+| User-configurable check (starts as error) | `'error'` | `true` |
+| User-configurable check (starts as warning) | `'warning'` | `true` |
+| Fixed error, not configurable | `'error'` | `false` |
+| Fixed warning, not configurable | `'warning'` | `false` |
+| Disabled by default | `'none'` | `true` |
+
+Checks with `configurable: false` are omitted from the settings table (they cannot be changed).
+
+## Settings Integration
+
+Checks with `'configurable' => true` appear in the unified DataViews settings table under **Block Accessibility Checks**. Admins can filter by your `namespace` to see only your plugin's checks. There are no per-plugin submenus — all plugins share the single table.
+
+## Complete Integration Example
+
+```php
+<?php
+/**
+ * Plugin Name: My Custom Blocks
+ * Version: 1.0.0
+ * Text Domain: my-custom-blocks
+ */
+
+class MyCustomBlocksIntegration {
+    public function __construct() {
+        add_action( 'ba11yc_ready', array( $this, 'register_checks' ) );
+        add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_validation_script' ) );
+    }
+
+    public function register_checks() {
+        // Card block — title check
+        ba11yc_register_block_check(
+            'my-custom-blocks/card',
+            array(
+                'namespace'    => 'my-custom-blocks',
+                'name'         => 'check_title',
+                'error_msg'    => __( 'Card title is required.', 'my-custom-blocks' ),
+                'warning_msg'  => __( 'Consider adding a title for better accessibility.', 'my-custom-blocks' ),
+                'description'  => __( 'Card title validation', 'my-custom-blocks' ),
+                'level'        => 'error',
+                'configurable' => true,
+                'category'     => 'accessibility',
+            )
+        );
+
+        // Card block — image alt text check
+        ba11yc_register_block_check(
+            'my-custom-blocks/card',
+            array(
+                'namespace'    => 'my-custom-blocks',
+                'name'         => 'check_image_alt',
+                'error_msg'    => __( 'Card image requires alt text.', 'my-custom-blocks' ),
+                'warning_msg'  => __( 'Alt text is recommended for card images.', 'my-custom-blocks' ),
+                'description'  => __( 'Image alt text validation', 'my-custom-blocks' ),
+                'level'        => 'warning',
+                'configurable' => true,
+                'category'     => 'accessibility',
+            )
+        );
+    }
+
+    public function enqueue_validation_script() {
+        $asset_file = include plugin_dir_path( __FILE__ ) . 'build/validation.asset.php';
+
+        // Start with base dependencies.
+        $dependencies = $asset_file['dependencies'];
+
+        // Only add Block Accessibility Checks as a dependency if it's active.
+        // This allows your plugin to work even when BAC is deactivated.
+        if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
+            $dependencies[] = 'block-accessibility-script';
+        }
+
+        wp_enqueue_script(
+            'my-custom-blocks-validation',
+            plugins_url( 'build/validation.js', __FILE__ ),
+            $dependencies,
+            isset( $asset_file['version'] ) ? $asset_file['version'] : '1.0.0',
+            true
+        );
+    }
+}
+
+new MyCustomBlocksIntegration();
+```
+
+```javascript
+// build/validation.js (src)
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+    'ba11yc.validateBlock',
+    'my-custom-blocks/validation',
+    (isValid, blockType, attributes, checkName) => {
+        if (blockType !== 'my-custom-blocks/card') {
+            return isValid;
+        }
+        switch (checkName) {
+            case 'check_title':
+                return !!(attributes.title && attributes.title.trim());
+            case 'check_image_alt':
+                return !!(attributes.imageAlt && attributes.imageAlt.trim());
+            default:
+                return isValid;
+        }
+    }
+);
+```
+
 ## User Interface
 
-Your registered checks will automatically appear in the block editor in the following places:
+Registered checks automatically appear in the block editor:
 
-- **Unified Sidebar** - A dedicated sidebar consolidating all validation issues (click the accessibility icon in the header).
-- **Block Indicators** - Blocks with issues will display a small icon/badge. Clicking this badge shows a popover with error details.
-- **Header Badge** - The total count of errors/warnings is shown in the editor toolbar.
-
+- **Unified Sidebar** — All validation issues consolidated in one panel (click the accessibility icon in the toolbar).
+- **Block Indicators** — Blocks with issues display a badge. Clicking it shows a popover with details.
+- **Header Badge** — Total error/warning count shown in the editor toolbar.
+- **Post Locking** — Checks resolving to `'error'` level prevent publishing until resolved.
 
 ## Block Naming Convention
 
 Use a consistent namespace for all blocks from your plugin:
 
 ```php
-// Good: Consistent namespace
+// Good: consistent namespace
 'your-plugin/block-one'
 'your-plugin/block-two'
-'your-plugin/block-three'
 
-// Avoid: Inconsistent namespaces
+// Avoid: inconsistent namespaces — they appear as separate plugins in the settings table
 'plugin1/block-one'
 'plugin2/block-two'
-'plugin3/block-three'
 ```
-
-## Benefits
-
-1. **Automatic Plugin Detection** - No need to manually specify plugin information
-2. **Consistent Grouping** - All blocks from the same plugin are grouped together
-3. **Future-Ready** - Plugin information is stored for future features
-4. **Simplified Integration** - One method call handles everything
-5. **Backward Compatible** - Existing integrations continue to work
 
 ## Best Practices
 
-- Use unique block type and check names to avoid conflicts
-- Register checks in the `ba11yc_ready` action for compatibility
-- Provide clear error and warning messages for each check
-- Test your integration in the block editor to ensure real-time feedback
-- Use consistent block namespaces for all blocks from your plugin
-- Ensure your plugin file has a proper plugin header for automatic detection
+- Use unique block type and check names to avoid conflicts with other plugins.
+- Register checks in the `ba11yc_ready` action.
+- Provide clear, actionable error and warning messages.
+- Keep your JavaScript validation logic simple and fast.
+- Use the same `namespace` value for every check in your plugin so they group together in the settings table.
+
+## Upgrading from v3
+
+v4.0.0 is a clean-break release. There are no compatibility shims — all integrations must update.
+
+### 1. PHP Registration Function
+
+The `$registry->register_block_check()` method called on the `$registry` passed to `ba11yc_ready` is replaced by the global `ba11yc_register_block_check()` function. The check name moves from its own parameter into `$args['name']`.
+
+**Before (v3):**
+```php
+add_action( 'ba11yc_ready', function( $registry ) {
+    $registry->register_block_check(
+        'my-plugin/card',
+        'check_title',           // second positional param
+        array(
+            'error_msg'  => 'Title required.',
+            'type'       => 'settings',
+            'category'   => 'accessibility',
+        )
+        // optional 4th $plugin_info array was here
+    );
+} );
+```
+
+**After (v4):**
+```php
+add_action( 'ba11yc_ready', function() {  // $registry param no longer needed
+    ba11yc_register_block_check(
+        'my-plugin/card',
+        array(
+            'namespace'    => 'my-plugin',   // required
+            'name'         => 'check_title', // moved into $args
+            'error_msg'    => 'Title required.',
+            'level'        => 'error',       // replaces 'type'
+            'configurable' => true,          // replaces type:'settings'
+            'category'     => 'accessibility',
+        )
+    );
+} );
+```
+
+### 2. `type` → `level` + `configurable`
+
+The `'type'` key is removed. Replace it with `'level'` (default severity) and `'configurable'` (whether the admin can change it).
+
+| v3 `type` | v4 `level` | v4 `configurable` |
+|---|---|---|
+| `'settings'` | `'error'` | `true` |
+| `'error'` | `'error'` | `false` |
+| `'warning'` | `'warning'` | `false` |
+| `'none'` | `'none'` | `false` |
+
+### 3. JavaScript Filter Hook Name
+
+**Before (v3):**
+```javascript
+addFilter(
+    'ba11yc_validate_block',   // underscore-separated
+    'my-plugin/validation',
+    (isValid, blockType, attributes, checkName) => { /* ... */ }
+);
+```
+
+**After (v4):**
+```javascript
+addFilter(
+    'ba11yc.validateBlock',    // dot-separated camelCase
+    'my-plugin/validation',
+    (isValid, blockType, attributes, checkName) => { /* ... */ }
+);
+```
+
+### 4. Editor Config Global Removed
+
+**Before (v3):**
+```javascript
+const rules = window.BlockAccessibilityChecks?.validationRules || {};
+```
+
+**After (v4):**
+```javascript
+import { select } from '@wordpress/data';
+const { blockA11yChecks } = select( 'core/editor' ).getEditorSettings();
+```
+
+### 5. Per-Plugin Submenus Removed
+
+Previously, each plugin with `type: 'settings'` checks got an auto-generated submenu page under the Block Accessibility Checks admin menu. Those submenus are gone. Your checks now appear in the unified DataViews settings table alongside all other plugins' checks. Filter by your `namespace` to see only your checks.
+
+No code change is required for this — it's purely a UI change. If you had bookmarked URLs pointing to old submenu slugs (`block-a11y-checks-{your-slug}`), they redirect to the unified page.
 
 ## Troubleshooting
 
-### Plugin Not Appearing in Settings
+### Checks Not Appearing in the Settings Table
 
-1. Ensure you're using `register_block_check()`
-2. Check that your plugin file has a proper plugin header
-3. Verify that at least one check has `'type' => 'settings'`
+1. Confirm `ba11yc_register_block_check()` is called inside `ba11yc_ready`.
+2. Ensure `'namespace'`, `'name'`, and `'error_msg'` are all present in `$args`.
+3. Checks with `'configurable' => false` are intentionally excluded from the table.
 
-### Incorrect Plugin Name
+### Incorrect Plugin Attribution
 
-1. Make sure your plugin file has a `Plugin Name:` header
-2. Use consistent block namespaces for all blocks from your plugin
-3. Check that the plugin file is in the correct location
+All checks from your plugin should share the same `namespace` value. If they appear under different groups, different `namespace` values are being passed.
 
-### Multiple Plugin Entries
+### Validation Not Running
 
-1. Use the same namespace for all blocks from your plugin
-2. Avoid using different namespaces for blocks from the same plugin
-3. Use `register_block_check()` for automatic grouping
+Ensure your JavaScript file is enqueued on `enqueue_block_editor_assets` and includes `block-accessibility-script` as a dependency (when registered).
 
 ## See Also
 
@@ -254,4 +334,3 @@ Use a consistent namespace for all blocks from your plugin:
 - [Editor Validation](../editor-validation/quick-start.md)
 - [API Reference](../reference/api.md)
 - [Hooks Reference](../reference/hooks.md)
-

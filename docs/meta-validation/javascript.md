@@ -66,17 +66,19 @@ If you don't add a JavaScript filter, the default `required` validation checks t
 
 ## Accessing Validation Rules
 
-All registered meta validation rules are exposed to JavaScript:
+Meta check configurations are available via the editor settings object:
 
 ```javascript
-const metaRules = window.BlockAccessibilityChecks?.metaValidationRules || {};
-const bandRules = metaRules.band || {};
+import { select } from '@wordpress/data';
+
+const { blockA11yChecks } = select( 'core/editor' ).getEditorSettings();
+const bandRules = blockA11yChecks?.meta?.band || {};
 const originRules = bandRules.band_origin || {};
 const requiredRule = originRules.required;
 
 console.log(requiredRule.error_msg);   // Error message
 console.log(requiredRule.warning_msg); // Warning message
-console.log(requiredRule.type);        // 'error', 'warning', or 'none'
+console.log(requiredRule.level);       // 'error', 'warning', or 'none'
 ```
 
 ## UI Integration
@@ -110,30 +112,20 @@ wp_enqueue_script(
 
 **Note:** If the Block Accessibility Checks plugin is not active, validation will not work, but your UI components (like sidebars) will still function. The `useMetaField` hook includes a fallback that works without the plugin.
 
-Then access the hook with a defensive check:
-
-```javascript
-const { useMetaField } = window.BlockAccessibilityChecks || {};
-```
-
 ### Using `useMetaField` Hook
 
-The `useMetaField` hook returns props that can be spread directly onto standard WordPress components like `TextControl`.
+The `useMetaField` hook returns props that can be spread directly onto standard WordPress components like `TextControl`. Import it from the plugin's module:
 
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { TextControl, SelectControl } from '@wordpress/components';
-
-// Import the hook (or use the shim)
-const { useMetaField } = window.BlockAccessibilityChecks || {};
+import { useMetaField } from '@block-accessibility-checks/editor';
 
 const MyMetaPanel = () => {
     // 1. Get props for each field
     const originProps = useMetaField('band_origin', __('Enter the city of origin', 'text-domain'));
     const genreProps = useMetaField('band_genre', __('Select a genre', 'text-domain'));
-
-    if (!originProps || !genreProps) return null; // Defensive check
 
     return (
         <PluginDocumentSettingPanel name="my-meta" title="My Meta">
@@ -207,20 +199,9 @@ const originProps = useMetaField('band_origin');
 3. **Validation** - When meta fields change, `validateMetaField()` is called
 4. **Filter Application** - The `ba11yc_validate_meta` filter is applied for each registered check
 5. **UI Update** - The hook automatically updates props with validation results, and errors are also collected in the Unified Sidebar
-6. **Post Locking** - If any checks fail with `type: 'error'`, post saving is locked
+6. **Post Locking** - If any checks resolve to level `'error'`, post saving is locked
 
 ## Best Practices
-
-### Defensive Access
-
-Always check for hook availability:
-
-```javascript
-const { useMetaField } = window.BlockAccessibilityChecks || {};
-if (!useMetaField) {
-    // Fallback or use the shim helper provided in the integration guide
-}
-```
 
 ### Early Returns
 
@@ -253,11 +234,6 @@ addFilter(
 ### Filter Hook
 
 - **`ba11yc_validate_meta`** - Main validation filter for post meta
-
-### Global Object
-
-- **`window.BlockAccessibilityChecks.metaValidationRules`** - All registered meta checks
-- **`window.BlockAccessibilityChecks.useMetaField`** - The main validation hook
 
 ### Filter Signature
 

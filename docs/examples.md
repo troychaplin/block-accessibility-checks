@@ -8,12 +8,15 @@ This guide provides real-world code examples for all three validation systems.
 
 **PHP:**
 ```php
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_check( 'my-plugin/card-block', 'card_title_required', [
-        'error_msg'   => __( 'Card title is required.', 'my-plugin' ),
-        'warning_msg' => __( 'Card title is recommended.', 'my-plugin' ),
-        'type'        => 'settings',
-        'category'    => 'validation',
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check( 'my-plugin/card-block', [
+        'namespace'    => 'my-plugin',
+        'name'         => 'card_title_required',
+        'error_msg'    => __( 'Card title is required.', 'my-plugin' ),
+        'warning_msg'  => __( 'Card title is recommended.', 'my-plugin' ),
+        'level'        => 'error',
+        'configurable' => true,
+        'category'     => 'validation',
     ] );
 } );
 ```
@@ -23,7 +26,7 @@ add_action( 'ba11yc_ready', function( $registry ) {
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/card-block-validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/card-block') {
@@ -41,12 +44,15 @@ addFilter(
 
 **PHP:**
 ```php
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_check( 'my-plugin/card-block', 'content_length', [
-        'error_msg'   => __( 'Content is too long (max 500 characters).', 'my-plugin' ),
-        'warning_msg' => __( 'Content is long (consider shortening).', 'my-plugin' ),
-        'type'        => 'settings',
-        'category'    => 'validation',
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check( 'my-plugin/card-block', [
+        'namespace'    => 'my-plugin',
+        'name'         => 'content_length',
+        'error_msg'    => __( 'Content is too long (max 500 characters).', 'my-plugin' ),
+        'warning_msg'  => __( 'Content is long (consider shortening).', 'my-plugin' ),
+        'level'        => 'error',
+        'configurable' => true,
+        'category'     => 'validation',
     ] );
 } );
 ```
@@ -54,7 +60,7 @@ add_action( 'ba11yc_ready', function( $registry ) {
 **JavaScript:**
 ```javascript
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/content-length',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/card-block' || checkName !== 'content_length') {
@@ -70,15 +76,21 @@ addFilter(
 
 **PHP:**
 ```php
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_check( 'my-plugin/card-block', 'title_required', [
-        'error_msg' => __( 'Title is required.', 'my-plugin' ),
-        'type'      => 'error',
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check( 'my-plugin/card-block', [
+        'namespace'    => 'my-plugin',
+        'name'         => 'title_required',
+        'error_msg'    => __( 'Title is required.', 'my-plugin' ),
+        'level'        => 'error',
+        'configurable' => false,
     ] );
-    
-    $registry->register_check( 'my-plugin/card-block', 'image_alt_required', [
-        'error_msg' => __( 'Image alt text is required.', 'my-plugin' ),
-        'type'      => 'error',
+
+    ba11yc_register_block_check( 'my-plugin/card-block', [
+        'namespace'    => 'my-plugin',
+        'name'         => 'image_alt_required',
+        'error_msg'    => __( 'Image alt text is required.', 'my-plugin' ),
+        'level'        => 'error',
+        'configurable' => false,
     ] );
 } );
 ```
@@ -86,13 +98,13 @@ add_action( 'ba11yc_ready', function( $registry ) {
 **JavaScript:**
 ```javascript
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/multiple-checks',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/card-block') {
             return isValid;
         }
-        
+
         switch (checkName) {
             case 'title_required':
                 return !!(attributes.title && attributes.title.trim());
@@ -112,8 +124,7 @@ addFilter(
 **PHP:**
 ```php
 add_action( 'init', function() {
-    // Check if Validator class is available (plugin may be deactivated)
-    $validator_class = '\BlockAccessibility\Meta\Validator';
+    $validator_class     = '\BlockAccessibility\Meta\Validator';
     $validator_available = class_exists( $validator_class );
 
     register_post_meta( 'band', 'band_origin', [
@@ -127,9 +138,11 @@ add_action( 'init', function() {
                 'band',
                 'band_origin',
                 [
-                    'error_msg'   => __( 'City of Origin is required.', 'my-plugin' ),
-                    'warning_msg' => __( 'City of Origin is recommended.', 'my-plugin' ),
-                    'type'        => 'settings',
+                    'namespace'    => 'my-plugin',
+                    'error_msg'    => __( 'City of Origin is required.', 'my-plugin' ),
+                    'warning_msg'  => __( 'City of Origin is recommended.', 'my-plugin' ),
+                    'level'        => 'error',
+                    'configurable' => true,
                 ]
             )
             : null,
@@ -137,10 +150,8 @@ add_action( 'init', function() {
 });
 ```
 
-**JavaScript (Optional - uses default validation):**
+**JavaScript (Optional - custom validation):**
 ```javascript
-// Default validation checks if value is not empty
-// Custom validation example:
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
@@ -161,26 +172,30 @@ addFilter(
 
 **PHP:**
 ```php
-$validator_class = '\BlockAccessibility\Meta\Validator';
-$validator_available = class_exists( $validator_class );
+add_action( 'init', function() {
+    $validator_class     = '\BlockAccessibility\Meta\Validator';
+    $validator_available = class_exists( $validator_class );
 
-register_post_meta( 'band', 'band_start_date', [
-    'single'            => true,
-    'type'              => 'string',
-    'show_in_rest'      => true,
-    'sanitize_callback' => 'sanitize_text_field',
-    'validate_callback' => $validator_available
-        ? call_user_func(
-            array( $validator_class, 'required' ),
-            'band',
-            'band_start_date',
-            [
-                'error_msg' => __( 'Start date is required and must be in YYYY-MM-DD format.', 'my-plugin' ),
-                'type'      => 'error',
-            ]
-        )
-        : null,
-]);
+    register_post_meta( 'band', 'band_start_date', [
+        'single'            => true,
+        'type'              => 'string',
+        'show_in_rest'      => true,
+        'sanitize_callback' => 'sanitize_text_field',
+        'validate_callback' => $validator_available
+            ? call_user_func(
+                array( $validator_class, 'required' ),
+                'band',
+                'band_start_date',
+                [
+                    'namespace'    => 'my-plugin',
+                    'error_msg'    => __( 'Start date is required and must be in YYYY-MM-DD format.', 'my-plugin' ),
+                    'level'        => 'error',
+                    'configurable' => false,
+                ]
+            )
+            : null,
+    ]);
+});
 ```
 
 **JavaScript:**
@@ -192,39 +207,9 @@ addFilter(
         if (postType !== 'band' || metaKey !== 'band_start_date' || checkName !== 'required') {
             return isValid;
         }
-        // Validate date format
         return /^\d{4}-\d{2}-\d{2}$/.test(value);
     }
 );
-```
-
-### Example: Using UI Components
-
-**JavaScript:**
-```javascript
-import { PluginDocumentSettingPanel } from '@wordpress/editor';
-import { TextControl } from '@wordpress/components';
-const { MetaField } = window.BlockAccessibilityChecks || {};
-
-const MyMetaPanel = () => {
-    const { meta } = useSelect(select => ({
-        meta: select('core/editor').getEditedPostAttribute('meta') || {},
-    }));
-    
-    const { editPost } = useDispatch('core/editor');
-    
-    return (
-        <PluginDocumentSettingPanel name="band-info" title="Band Information">
-            <MetaField metaKey="band_origin">
-                <TextControl
-                    label="City of Origin"
-                    value={meta.band_origin || ''}
-                    onChange={value => editPost({ meta: { band_origin: value } })}
-                />
-            </MetaField>
-        </PluginDocumentSettingPanel>
-    );
-};
 ```
 
 ## Editor Validation Examples
@@ -235,34 +220,28 @@ This example shows how the built-in post title validation works. It's included w
 
 **PHP Registration:**
 ```php
-// Already registered in the plugin core
-// See includes/Editor/CoreChecks.php for implementation
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    // Register for post type
-    $registry->register_editor_check(
-        'post',
-        'post_title_required',
-        array(
-            'error_msg'   => __( 'A post title is required for accessibility and SEO.', 'block-accessibility-checks' ),
-            'warning_msg' => __( 'Consider adding a post title for better accessibility and SEO.', 'block-accessibility-checks' ),
-            'description' => __( 'Ensures posts have a descriptive title.', 'block-accessibility-checks' ),
-            'type'        => 'settings', // Configurable in admin
-            'priority'    => 5,
-        )
-    );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace'    => 'block-accessibility-checks',
+        'name'         => 'post_title_required',
+        'error_msg'    => __( 'A post title is required for accessibility and SEO.', 'block-accessibility-checks' ),
+        'warning_msg'  => __( 'Consider adding a post title for better accessibility and SEO.', 'block-accessibility-checks' ),
+        'description'  => __( 'Ensures posts have a descriptive title.', 'block-accessibility-checks' ),
+        'level'        => 'error',
+        'configurable' => true,
+        'priority'     => 5,
+    ) );
 
-    // Register for page type
-    $registry->register_editor_check(
-        'page',
-        'post_title_required',
-        array(
-            'error_msg'   => __( 'A page title is required for accessibility and SEO.', 'block-accessibility-checks' ),
-            'warning_msg' => __( 'Consider adding a page title for better accessibility and SEO.', 'block-accessibility-checks' ),
-            'description' => __( 'Ensures pages have a descriptive title.', 'block-accessibility-checks' ),
-            'type'        => 'settings', // Configurable in admin
-            'priority'    => 5,
-        )
-    );
+    ba11yc_register_editor_check( 'page', array(
+        'namespace'    => 'block-accessibility-checks',
+        'name'         => 'post_title_required',
+        'error_msg'    => __( 'A page title is required for accessibility and SEO.', 'block-accessibility-checks' ),
+        'warning_msg'  => __( 'Consider adding a page title for better accessibility and SEO.', 'block-accessibility-checks' ),
+        'description'  => __( 'Ensures pages have a descriptive title.', 'block-accessibility-checks' ),
+        'level'        => 'error',
+        'configurable' => true,
+        'priority'     => 5,
+    ) );
 } );
 ```
 
@@ -275,43 +254,30 @@ addFilter(
     'ba11yc_validate_editor',
     'ba11yc/post-title-validation',
     (isValid, blocks, postType, checkName) => {
-        // Only handle the post_title_required check
         if (checkName !== 'post_title_required') {
             return isValid;
         }
 
-        // Get the current post title from the editor
         const title = select('core/editor')?.getEditedPostAttribute('title');
-
-        // Validation fails if title is empty or only whitespace
-        if (!title || title.trim().length === 0) {
-            return false;
-        }
-
-        // Title exists and has content
-        return true;
+        return !!(title && title.trim().length > 0);
     }
 );
 ```
-
-**Key Features:**
-- Validates in real-time as user types in the title field
-- Prevents publishing content without a title
-- Configurable independently for posts and pages at **Block Checks → Editor Validation**
-- Can be set to Error (prevents publishing), Warning (allows with notice), or None (disabled)
 
 ### Example: First Block Must Be Heading
 
 **PHP:**
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check_for_post_types(
+add_action( 'ba11yc_editor_checks_ready', function() {
+    \BlockAccessibility\Editor\Registry::get_instance()->register_editor_check_for_post_types(
         array( 'post', 'page' ),
         'first_block_heading',
         array(
-            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
-            'type'        => 'error',
-            'description' => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'namespace'    => 'my-plugin',
+            'error_msg'    => __( 'The first block must be a Heading.', 'text-domain' ),
+            'description'  => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'level'        => 'error',
+            'configurable' => false,
         )
     );
 } );
@@ -342,16 +308,15 @@ addFilter(
 
 **PHP:**
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check(
-        'post',
-        'max_paragraphs',
-        array(
-            'warning_msg' => __( 'Consider using fewer paragraphs for brevity.', 'text-domain' ),
-            'type'        => 'warning',
-            'description' => __( 'Warns if there are more than 3 paragraphs.', 'text-domain' ),
-        )
-    );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace'    => 'my-plugin',
+        'name'         => 'max_paragraphs',
+        'warning_msg'  => __( 'Consider using fewer paragraphs for brevity.', 'text-domain' ),
+        'description'  => __( 'Warns if there are more than 3 paragraphs.', 'text-domain' ),
+        'level'        => 'warning',
+        'configurable' => true,
+    ) );
 } );
 ```
 
@@ -378,15 +343,14 @@ addFilter(
 
 **PHP:**
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check(
-        'post',
-        'image_followed_by_text',
-        array(
-            'error_msg' => __( 'Images must be followed by a text description.', 'text-domain' ),
-            'type'      => 'error',
-        )
-    );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace'    => 'my-plugin',
+        'name'         => 'image_followed_by_text',
+        'error_msg'    => __( 'Images must be followed by a text description.', 'text-domain' ),
+        'level'        => 'error',
+        'configurable' => false,
+    ) );
 } );
 ```
 
@@ -421,36 +385,39 @@ A complete example showing all three validation systems working together:
 **PHP:**
 ```php
 // Block check
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_check( 'my-plugin/card', 'has_title', [
-        'error_msg' => 'Card title is required.',
-        'type'      => 'error',
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check( 'my-plugin/card', [
+        'namespace'    => 'my-plugin',
+        'name'         => 'has_title',
+        'error_msg'    => 'Card title is required.',
+        'level'        => 'error',
+        'configurable' => false,
     ] );
 } );
 
 // Meta check
-$validator_class = '\BlockAccessibility\Meta\Validator';
-$validator_available = class_exists( $validator_class );
-
-register_post_meta( 'post', 'card_category', [
-    'validate_callback' => $validator_available
-        ? call_user_func(
-            array( $validator_class, 'required' ),
-            'post',
-            'card_category',
-            [
-                'error_msg' => 'Category is required.',
-                'type'      => 'error',
-            ]
-        )
-        : null,
-] );
+add_action( 'init', function() {
+    $validator_class = '\BlockAccessibility\Meta\Validator';
+    if ( class_exists( $validator_class ) ) {
+        register_post_meta( 'post', 'card_category', [
+            'validate_callback' => $validator_class::required( 'post', 'card_category', [
+                'namespace'    => 'my-plugin',
+                'error_msg'    => 'Category is required.',
+                'level'        => 'error',
+                'configurable' => false,
+            ] ),
+        ] );
+    }
+} );
 
 // Editor check
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check( 'post', 'has_first_card', [
-        'error_msg' => 'First block must be a card.',
-        'type'      => 'error',
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', [
+        'namespace'    => 'my-plugin',
+        'name'         => 'has_first_card',
+        'error_msg'    => 'First block must be a card.',
+        'level'        => 'error',
+        'configurable' => false,
     ] );
 } );
 ```
@@ -461,7 +428,7 @@ import { addFilter } from '@wordpress/hooks';
 
 // Block validation
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/block-validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType === 'my-plugin/card' && checkName === 'has_title') {

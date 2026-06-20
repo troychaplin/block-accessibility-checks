@@ -31,13 +31,18 @@ add_action( 'ba11yc_plugin_initialized', function( $plugin_initializer ) {
 Fired when the plugin is ready for developer interaction. Use this to register block checks.
 
 **Parameters:**
-- `$registry` (BlockChecksRegistry) - The block checks registry instance
-- `$plugin_initializer` (PluginInitializer) - The plugin initializer instance
+- `$registry` (Block\Registry) - The block checks registry instance (optional — prefer the global function)
+- `$plugin_initializer` - The plugin initializer instance
 
 **Example:**
 ```php
-add_action( 'ba11yc_ready', function( $registry, $plugin_initializer ) {
-    $registry->register_check( 'my-block/type', 'check_name', $args );
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check( 'my-plugin/block', array(
+        'namespace' => 'my-plugin',
+        'name'      => 'check_name',
+        'error_msg' => 'Error message.',
+        'level'     => 'error',
+    ) );
 } );
 ```
 
@@ -46,27 +51,32 @@ add_action( 'ba11yc_ready', function( $registry, $plugin_initializer ) {
 Fired when the editor checks registry is ready. Use this to register editor checks.
 
 **Parameters:**
-- `$registry` (EditorChecksRegistry) - The editor checks registry instance
-- `$plugin_initializer` (PluginInitializer) - The plugin initializer instance
+- `$registry` (Editor\Registry) - The editor checks registry instance
 
 **Example:**
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry, $plugin_initializer ) {
-    $registry->register_editor_check( 'post', 'check_name', $args );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace' => 'my-plugin',
+        'name'      => 'check_name',
+        'error_msg' => 'Error message.',
+        'level'     => 'error',
+    ) );
 } );
 ```
 
 #### `ba11yc_register_checks`
 
-Fired during check registration phase. Use this to register custom block checks.
-
-**Parameters:**
-- `$registry` (BlockChecksRegistry) - The block checks registry instance
+Alternative action fired during the check registration phase. Use this to register custom block checks.
 
 **Example:**
 ```php
-add_action( 'ba11yc_register_checks', function( $registry ) {
-    $registry->register_check( 'my-block/type', 'check_name', $args );
+add_action( 'ba11yc_register_checks', function() {
+    ba11yc_register_block_check( 'my-plugin/block', array(
+        'namespace' => 'my-plugin',
+        'name'      => 'check_name',
+        'error_msg' => 'Error message.',
+    ) );
 } );
 ```
 
@@ -346,7 +356,7 @@ add_filter( 'ba11yc_editor_check_args', function( $check_args, $post_type, $chec
 
 ### Block Validation
 
-#### `ba11yc_validate_block`
+#### `ba11yc.validateBlock`
 
 Implement validation logic for block attributes.
 
@@ -366,7 +376,7 @@ Implement validation logic for block attributes.
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/custom-block') {
@@ -459,18 +469,33 @@ addFilter(
 
 ```php
 // Block checks
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_check( 'my-block/type', 'check_name', $args );
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check( 'my-plugin/block', array(
+        'namespace' => 'my-plugin',
+        'name'      => 'check_name',
+        'error_msg' => 'Error message.',
+        'level'     => 'error',
+    ) );
 } );
 
 // Editor checks
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check( 'post', 'check_name', $args );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace' => 'my-plugin',
+        'name'      => 'check_name',
+        'error_msg' => 'Error message.',
+        'level'     => 'error',
+    ) );
 } );
 
-// Meta checks (via MetaValidation helper)
+// Meta checks (via Validator helper)
+use BlockAccessibility\Meta\Validator;
 register_post_meta( 'post_type', 'meta_key', [
-    'validate_callback' => MetaValidation::required( 'post_type', 'meta_key', $args ),
+    'validate_callback' => Validator::required( 'post_type', 'meta_key', array(
+        'namespace' => 'my-plugin',
+        'error_msg' => 'This field is required.',
+        'level'     => 'error',
+    ) ),
 ] );
 ```
 
