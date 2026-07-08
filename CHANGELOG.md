@@ -17,6 +17,87 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [4.0.0]
+
+> **Developer note:** This release contains breaking changes to the registration API and JavaScript filter hooks. End users are not affected — settings migrate automatically on first load after upgrading. See [docs/upgrade-to-v4.md](docs/upgrade-to-v4.md) for a full migration checklist.
+
+### Breaking Changes
+
+#### PHP Registration API
+
+The registry-method approach for registering checks has been replaced with top-level functions. The `$plugin_info` array parameter is gone; plugin attribution now uses a required `namespace` key inside `$args`. The `'type'` key is replaced with two explicit keys: `'level'` (default severity: `error`, `warning`, or `none`) and `'configurable'` (whether the admin can change it in the settings UI).
+
+| v3 | v4 |
+|---|---|
+| `$registry->register_check( $block_type, $name, $args, $plugin_info )` on `ba11yc_ready` | `ba11yc_register_block_check( $block_type, $args )` on `ba11yc_ready` |
+| `$registry->register_meta_check( ... )` | `ba11yc_register_meta_check( $post_type, $args )` |
+| `$registry->register_editor_check( ... )` on `ba11yc_editor_checks_ready` | `ba11yc_register_editor_check( $post_type, $args )` on `ba11yc_editor_checks_ready` |
+| `'type' => 'settings'` | `'level' => 'error', 'configurable' => true` |
+| `'type' => 'error'` | `'level' => 'error', 'configurable' => false` |
+| `'type' => 'warning'` | `'level' => 'warning', 'configurable' => false` |
+
+#### JavaScript Filter Hooks
+
+Filter names changed to dot notation. Arguments are identical — this is a find-and-replace:
+
+| v3 | v4 |
+|---|---|
+| `ba11yc_validate_block` | `ba11yc.validateBlock` |
+| `ba11yc_validate_editor` | `ba11yc.validateEditor` |
+| `ba11yc_validate_meta` | `ba11yc.validateMeta` |
+
+Hooks registered on the old names are silently ignored: every check passes without error. Always verify that your integration actually flags invalid content after updating.
+
+#### JavaScript Global Removed
+
+`window.BlockAccessibilityChecks` is gone. Read check configuration from the editor settings and validation state from the WordPress data store:
+
+```javascript
+// Check configuration
+const config = select( 'core/editor' ).getEditorSettings().blockA11yChecks;
+
+// Validation state
+const invalidBlocks = useSelect(
+    ( select ) => select( 'block-accessibility-checks' )?.getInvalidBlocks(),
+    []
+);
+```
+
+#### REST API Namespace
+
+Changed from `block-accessibility/v1` to `block-accessibility-checks/v1`. The new namespace exposes `GET /checks` and `GET|POST /settings`. The v3 routes no longer exist.
+
+#### Settings Pages
+
+External plugins no longer receive their own submenu page. All configurable checks from all plugins appear in the single unified settings table, filterable by plugin. Bookmarked `block-a11y-checks-*` subpages redirect to the unified page automatically.
+
+### Added
+
+- `ba11yc_register_block_check()`, `ba11yc_register_meta_check()`, `ba11yc_register_editor_check()` global functions as the new registration API
+- `ba11yc_check_level` filter for overriding a check's effective severity at runtime without touching saved settings
+- `block-accessibility-checks` WordPress data store with `getInvalidBlocks()`, `getInvalidMeta()`, and `getInvalidEditorChecks()` selectors
+- REST API at `block-accessibility-checks/v1`: `GET /checks` exposes all registered checks with plugin attribution; `GET|POST /settings` reads and writes all configurable settings
+- `AbstractRegistry` base class shared by block, meta, and editor registries
+- Automatic one-time migration of v3 settings (multiple flat options) into the unified `ba11yc_settings` option; v3 options are preserved so downgrading is safe
+- Legacy `block-a11y-checks-*` submenu slugs redirect to the unified settings page
+- WordPress Playground blueprint for Live Preview on wordpress.org (`assets/blueprints/blueprint.json`)
+- Upgrade guide (`docs/upgrade-to-v4.md`) with migration checklist and before/after examples
+
+### Changed
+
+- Settings UI rebuilt as a single unified DataViews table, replacing the four separate submenu pages (Core Blocks, External Plugins, Meta Field Checks, Editor Validation)
+- Settings storage consolidated into a single `ba11yc_settings` option (previously multiple flat per-check options)
+- `ba11yc_plugin()` singleton function is now the canonical plugin accessor; replaces the file-scope variable that broke under WP-CLI
+- All documentation updated to reflect the new API, with before/after examples throughout
+
+### Removed
+
+- `includes/Core/SettingsAPI.php` — replaced by `Rest/ChecksController.php` and `Rest/SettingsController.php`
+- Separate per-page settings JavaScript bundles — replaced by a single unified `settings.js`
+- Automatic external plugin detection (`$plugin_info` parameter) — replaced by the required `namespace` key in `$args`
+
+## [3.0.2]
+
 ### Fixed
 
 - Fixed fatal error under WP-CLI caused by relying on a file-scope variable for the plugin instance; the instance is now held in a static singleton (`ba11yc_plugin()`) so it survives when WordPress is loaded from inside a method scope
