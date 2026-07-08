@@ -222,7 +222,7 @@ Use a consistent namespace for all blocks from your plugin:
 
 ## Upgrading from v3
 
-v4.0.0 is a clean-break release. There are no compatibility shims — all integrations must update.
+v4.0.0 is a clean-break release. There are no compatibility shims — all integrations must update. This section covers block checks; for the complete migration reference (meta and editor checks, the data store, REST changes, and the settings migration), see the **[Upgrading to v4.0 guide](../upgrade-to-v4.md)**.
 
 ### 1. PHP Registration Function
 
