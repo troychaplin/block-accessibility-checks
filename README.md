@@ -253,6 +253,22 @@ The plugin validates blocks as you type and edit:
 
 If you would like to get involved and help make this plugin better that would be awesome! We all win with more accessible content.
 
+### Try It with WordPress Playground
+
+You can spin up a local demo environment using the included blueprint — no Docker, no database setup required.
+
+**Requirements:** Node.js 18, 20, or 22 (not 21). Check your version with `node -v`, and switch with `nvm use 20` if needed.
+
+```bash
+# Production blueprint (installs BAC from wordpress.org — requires v4 to be released)
+npx @wp-playground/cli server --blueprint=./assets/blueprints/blueprint.json
+
+# Local testing blueprint (installs BAC from GitHub main — use this before v4 ships)
+npx @wp-playground/cli server --blueprint=./assets/blueprints/blueprint-local.json
+```
+
+The server prints a localhost URL. Open it in your browser to explore the demo environment, then press `Ctrl+C` to shut it down.
+
 ### Get Started
 
 To get started do the following:
