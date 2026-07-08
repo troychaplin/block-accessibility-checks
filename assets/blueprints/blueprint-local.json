@@ -1,0 +1,80 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Block Accessibility Checks Demo",
+    "author": "troychaplin",
+    "description": "Block Accessibility Checks with an external integration example plugin, sample page, and Band custom post type content."
+  },
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "latest"
+  },
+  "landingPage": "/",
+  "steps": [
+    {
+      "step": "login"
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/troychaplin/block-accessibility-checks",
+        "ref": "main",
+        "refType": "branch",
+        "path": "/"
+      },
+      "options": {
+        "activate": true,
+        "targetFolderName": "block-accessibility-checks"
+      },
+      "progress": {
+        "caption": "Installing Block Accessibility Checks"
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "git:directory",
+        "url": "https://github.com/troychaplin/block-accessibility-checks-integration-example",
+        "ref": "main",
+        "refType": "branch",
+        "path": "/"
+      },
+      "options": {
+        "activate": false,
+        "targetFolderName": "block-accessibility-checks-integration-example"
+      },
+      "progress": {
+        "caption": "Installing integration example plugin"
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nrequire_once '/wordpress/wp-admin/includes/plugin.php';\n$result = activate_plugin( 'block-accessibility-checks-integration-example/plugin.php' );\nif ( is_wp_error( $result ) ) {\n\tthrow new Exception( $result->get_error_message() );\n}\n",
+      "progress": {
+        "caption": "Activating integration example plugin"
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n$content = <<<'HTML'\n<!-- wp:paragraph -->\n<p><strong>Block Accessibility Checks</strong> helps you catch common accessibility issues directly in the WordPress block editor, before content ever reaches your visitors. This demo environment has the plugin installed and activated alongside an integration example that registers custom blocks and a Band post type \u2014 giving you a realistic look at how checks surface across different content types.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li><a href=\"/validation-page-example/\">View a page example</a> \u2014 contains validations for core blocks and custom blocks </li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li><a href=\"/band/the-midnight-ramblers/\">View a custom post type example</a> \u2014 contains validations for core blocks, custom blocks and post meta</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li><a href=\"/wp-admin/admin.php?page=block-a11y-checks\">View the plugin settings page</a> \u2014 uses DataViews and integrates with external block plugins</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->\nHTML;\n$id = wp_insert_post(\n\tarray(\n\t\t'post_type'    => 'page',\n\t\t'post_status'  => 'publish',\n\t\t'post_title'   => 'Block Accessibility Checks Demo',\n\t\t'post_name'    => 'demo',\n\t\t'post_content' => $content,\n\t),\n\ttrue\n);\nif ( is_wp_error( $id ) ) {\n\tthrow new Exception( $id->get_error_message() );\n}\nupdate_option( 'show_on_front', 'page' );\nupdate_option( 'page_on_front', $id );\n",
+      "progress": {
+        "caption": "Creating front page"
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n$content = <<<'HTML'\n<!-- wp:paragraph -->\n<p>This is an example page. It's different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:validation-api-example/card-grid -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid\"><!-- wp:validation-api-example/album-card {\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card -->\n<div class=\"wp-block-validation-api-example-album-card\"><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:validation-api-example/card-grid {\"align\":\"wide\"} -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid alignwide\"><!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:validation-api-example/card-grid {\"align\":\"full\"} -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid alignfull\"><!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:validation-api-example/card-grid {\"align\":\"full\"} -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid alignfull\"><!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\",\"releaseDate\":\"1986-02-15\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><p>1986-02-15</p><!-- wp:paragraph -->\n<p>aasfas</p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\",\"releaseDate\":\"2000-04-15\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><p>2000-04-15</p><!-- wp:paragraph -->\n<p>asfasfas</p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:paragraph -->\n<p>As a new WordPress user, you should go to <a href=\"/wp-admin/\">your dashboard</a> to delete this page and create new pages for your content. Have fun!</p>\n<!-- /wp:paragraph -->\nHTML;\n$result = wp_insert_post(\n\tarray(\n\t\t'post_type'    => 'page',\n\t\t'post_status'  => 'publish',\n\t\t'post_title'   => 'Validation Page Example',\n\t\t'post_content' => $content,\n\t),\n\ttrue\n);\nif ( is_wp_error( $result ) ) {\n\terror_log( 'Failed to create sample page: ' . $result->get_error_message() );\n}\n",
+      "progress": {
+        "caption": "Creating validation page example"
+      }
+    },
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n$content = <<<'HTML'\n<!-- wp:paragraph -->\n<p>This is an example page. It's different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:validation-api-example/card-grid -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid\"><!-- wp:validation-api-example/album-card {\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card -->\n<div class=\"wp-block-validation-api-example-album-card\"><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:validation-api-example/card-grid {\"align\":\"wide\"} -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid alignwide\"><!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:validation-api-example/card-grid {\"align\":\"full\"} -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid alignfull\"><!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><!-- wp:paragraph -->\n<p></p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:validation-api-example/card-grid {\"align\":\"full\"} -->\n<div style=\"--validation-api-example-card-grid-cols:2;--validation-api-example-card-grid-gap:25px;--validation-api-example-card-grid-radius:6px\" class=\"wp-block-validation-api-example-card-grid alignfull\"><!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\",\"releaseDate\":\"1986-02-15\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><p>1986-02-15</p><!-- wp:paragraph -->\n<p>aasfas</p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card -->\n\n<!-- wp:validation-api-example/album-card {\"headingText\":\"asfas\",\"sourceUrl\":\"#\",\"releaseDate\":\"2000-04-15\"} -->\n<div class=\"wp-block-validation-api-example-album-card\"><h2>asfas</h2><p>2000-04-15</p><!-- wp:paragraph -->\n<p>asfasfas</p>\n<!-- /wp:paragraph --><p><a href=\"#\">#</a></p></div>\n<!-- /wp:validation-api-example/album-card --></div>\n<!-- /wp:validation-api-example/card-grid -->\n\n<!-- wp:paragraph -->\n<p>As a new WordPress user, you should go to <a href=\"/wp-admin/\">your dashboard</a> to delete this page and create new pages for your content. Have fun!</p>\n<!-- /wp:paragraph -->\nHTML;\n$result = wp_insert_post(\n\tarray(\n\t\t'post_type'    => 'band',\n\t\t'post_status'  => 'publish',\n\t\t'post_title'   => 'The Midnight Ramblers',\n\t\t'post_content' => $content,\n\t),\n\ttrue\n);\nif ( is_wp_error( $result ) ) {\n\terror_log( 'Failed to create band post: ' . $result->get_error_message() );\n}\n",
+      "progress": {
+        "caption": "Creating sample Band post"
+      }
+    }
+  ]
+}
