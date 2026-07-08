@@ -13,14 +13,16 @@ Editor validation allows you to validate the entire editor state, including bloc
 Use the `ba11yc_editor_checks_ready` action to register your check:
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check(
-        'post',              // Post type
-        'first_block_heading', // Check name
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check(
+        'post',
         array(
-            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
-            'type'        => 'error',
-            'description' => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'namespace'    => 'my-plugin',
+            'name'         => 'first_block_heading',
+            'error_msg'    => __( 'The first block must be a Heading.', 'text-domain' ),
+            'description'  => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'level'        => 'error',
+            'configurable' => false,
         )
     );
 } );
@@ -62,10 +64,10 @@ Your validation logic must be loaded in the block editor:
 ```php
 function my_plugin_enqueue_editor_validation() {
     $asset_file = include plugin_dir_path( __FILE__ ) . 'build/editor-validation.asset.php';
-    
+
     // Start with base dependencies
     $dependencies = $asset_file['dependencies'];
-    
+
     // Only add Block Accessibility Checks plugin as a dependency if it's active.
     if ( wp_script_is( 'block-accessibility-script', 'registered' ) ) {
         $dependencies[] = 'block-accessibility-script';
@@ -97,4 +99,3 @@ add_action( 'enqueue_block_editor_assets', 'my_plugin_enqueue_editor_validation'
 - **[JavaScript Integration →](./javascript.md)** - Detailed JavaScript validation guide
 - **[API Reference →](../reference/api.md)** - Complete API documentation
 - **[Hooks Reference →](../reference/hooks.md)** - All available hooks
-

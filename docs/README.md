@@ -45,6 +45,7 @@ Choose the validation type you need:
 
 ### Additional Resources
 
+- **[Upgrading to v4.0](./upgrade-to-v4.md)** - Breaking changes and migration guide for integrations built against v3
 - **[External Plugin Integration](./integration/external-plugins.md)** - Integrating your plugin with Block Accessibility Checks
 - **[Advanced Usage](./advanced.md)** - Advanced patterns and techniques
 - **[Examples](./examples.md)** - Real-world code examples
@@ -54,7 +55,7 @@ Choose the validation type you need:
 
 - **Extensible Check Registration** - Register custom checks for any block type or post meta field
 - **Real-Time JavaScript Validation** - Instant feedback in the block editor
-- **Configurable Severity Levels** - Error, Warning, or Settings-driven (admin configurable)
+- **Configurable Severity Levels** - Error, Warning, or Disabled, with optional admin control per check
 - **Automatic UI Components** - Drop-in components for displaying validation feedback
 - **Settings Integration** - Checks automatically appear in admin settings UI
 - **Post Locking** - Prevent saving when required fields are missing

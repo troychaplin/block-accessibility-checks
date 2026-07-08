@@ -6,7 +6,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core\Files.ileList;
+namespace PHP_CodeSniffer\Tests\Core.iles.ileList;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Files\FileList;

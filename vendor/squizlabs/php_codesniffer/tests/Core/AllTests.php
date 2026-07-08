@@ -8,7 +8,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests.ore;
+namespace PHP_CodeSniffer.ests.ore;
 
 use PHP_CodeSniffer\Tests\FileList;
 use PHPUnit\Framework\TestSuite;

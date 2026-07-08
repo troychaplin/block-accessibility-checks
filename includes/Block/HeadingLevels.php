@@ -31,13 +31,6 @@ class HeadingLevels {
 	use Logger;
 	use EditorDetection;
 
-	/**
-	 * Allowed heading levels that can be restricted.
-	 * Only H1, H5, and H6 are permitted to be restricted.
-	 *
-	 * @var array
-	 */
-	private const ALLOWED_RESTRICTED_LEVELS = array( 'h1', 'h5', 'h6' );
 
 	/**
 	 * Cached options to avoid repeated database calls.
@@ -59,23 +52,28 @@ class HeadingLevels {
 	}
 
 	/**
-	 * Get the cached options or retrieve them from database.
+	 * Get the restricted heading levels from the consolidated settings option.
 	 *
-	 * @return array The plugin options.
+	 * Reads ba11yc_settings['general']['headingLevels'].
+	 *
+	 * @return array The plugin general settings (with a 'core_heading_levels' key for back-compat callers).
 	 */
 	private function get_options(): array {
 		if ( null === $this->cached_options ) {
 			try {
-				$this->cached_options = \get_option( 'block_checks_options', array() );
+				$settings = \get_option( 'ba11yc_settings', array() );
 
-				// Validate the options structure.
-				if ( ! is_array( $this->cached_options ) ) {
-					$this->log_error( 'Plugin options are not in expected array format. Resetting to defaults.' );
-					$this->cached_options = array();
+				if ( ! is_array( $settings ) ) {
+					$this->log_error( 'Plugin settings are not in expected array format. Resetting to defaults.' );
+					$settings = array();
 				}
+
+				$heading_levels = $settings['general']['headingLevels'] ?? array( 'h1' );
+
+				$this->cached_options = array( 'core_heading_levels' => is_array( $heading_levels ) ? $heading_levels : array() );
 			} catch ( \Exception $e ) {
-				$this->log_error( 'Failed to retrieve plugin options: ' . $e->getMessage() );
-				$this->cached_options = array();
+				$this->log_error( 'Failed to retrieve plugin settings: ' . $e->getMessage() );
+				$this->cached_options = array( 'core_heading_levels' => array() );
 			}
 		}
 		return $this->cached_options;
@@ -123,17 +121,10 @@ class HeadingLevels {
 			// Create array of available levels (1-6).
 			$available_levels = range( 1, 6 );
 
-			// Remove restricted levels with validation.
-			// Only allow removal of H1, H5, and H6 levels.
+			// Remove restricted levels.
 			foreach ( $restricted_levels as $level ) {
 				if ( ! is_string( $level ) || ! preg_match( '/^h[1-6]$/', $level ) ) {
 					$this->log_error( "Invalid heading level format: {$level}. Expected format: h1-h6." );
-					continue;
-				}
-
-				// Only allow restriction of H1, H5, and H6.
-				if ( ! in_array( $level, self::ALLOWED_RESTRICTED_LEVELS, true ) ) {
-					$this->log_debug( "Skipping restriction of {$level}. Only H1, H5, and H6 can be restricted." );
 					continue;
 				}
 

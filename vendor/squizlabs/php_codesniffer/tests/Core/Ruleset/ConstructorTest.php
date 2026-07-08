@@ -7,7 +7,7 @@
  * @license   https://github.com/PHPCSStandards/PHP_CodeSniffer/blob/HEAD/licence.txt BSD Licence
  */
 
-namespace PHP_CodeSniffer\Tests\Core.uleset;
+namespace PHP_CodeSniffer\Tests.ore.uleset;
 
 use PHP_CodeSniffer\Autoload;
 use PHP_CodeSniffer\Ruleset;

@@ -1,326 +1,299 @@
 # API Reference
 
-This document provides comprehensive API documentation for all registry methods available in the Block Accessibility Checks plugin.
+This document provides comprehensive API documentation for all registration functions and registry methods available in the Block Accessibility Checks plugin.
 
-## BlockChecksRegistry
+## Global Registration Functions
 
-Use `BlockChecksRegistry::get_instance()` to access the block checks registry.
+These are the primary public API. Call them inside `ba11yc_ready` (or `ba11yc_register_checks` / `ba11yc_editor_checks_ready`).
 
-### `register_check( $block_type, $check_name, $check_args, $plugin_info = [] )`
+### `ba11yc_register_block_check( $block_type, $args )`
 
-Register a new accessibility check for a block type with optional manual plugin information.
-
-**Parameters:**
-- `$block_type` (string): Block type (e.g., 'core/image', 'my-plugin/custom-block')
-- `$check_name` (string): Unique check name within the block type
-- `$check_args` (array): Check configuration
-- `$plugin_info` (array): Optional plugin information for manual grouping
-
-**Returns:**
-- `bool`: True on success, false on failure
-
-**Check Configuration:**
-```php
-$check_args = array(
-    'error_msg'   => 'Error message shown in the block editor when check fails', // Required
-    'warning_msg' => 'Warning message shown in the block editor (optional)',     // Optional
-    'description' => 'Explanation shown in the settings/admin UI',               // Optional
-    'type'        => 'settings', // 'settings', 'error', 'warning', 'none'      // Optional
-    'category'    => 'accessibility', // 'accessibility' or 'validation'        // Optional
-    'priority'    => 10,         // Lower = earlier, default: 10                // Optional
-    'enabled'     => true,       // Whether check is enabled (default: true)     // Optional
-);
-```
-
-### `register_block_check( $block_type, $check_name, $check_args )`
-
-**Recommended for External Plugins** - Register a block accessibility check with automatic plugin detection.
-
-This is a convenience method that automatically detects your plugin's information (name, version, file path) and properly groups all your blocks together in the admin settings interface.
+Register a validation check for a block type.
 
 **Parameters:**
-- `$block_type` (string): Block type (e.g., 'my-plugin/card-block')
-- `$check_name` (string): Unique check name within the block type
-- `$check_args` (array): Check configuration (same as `register_check`)
+- `$block_type` (string): Block type (e.g., `'core/image'`, `'my-plugin/custom-block'`)
+- `$args` (array): Check configuration — see below
 
-**Returns:**
-- `bool`: True on success, false on failure
+**Returns:** `bool` — true on success, false on failure
+
+**Required keys in `$args`:**
+
+| Key | Type | Description |
+|---|---|---|
+| `namespace` | string | Plugin identifier for attribution in the settings table |
+| `name` | string | Unique check name within the block type |
+| `error_msg` | string | Message shown when the check fails |
+
+**Optional keys in `$args`:**
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `warning_msg` | string | `error_msg` | Warning message |
+| `description` | string | `''` | Description shown in the settings UI |
+| `level` | string | `'error'` | Default severity: `'error'`, `'warning'`, or `'none'` |
+| `configurable` | bool | `true` | Whether the admin can change the level in settings |
+| `category` | string | `'accessibility'` | `'accessibility'` or `'validation'` |
+| `priority` | int | `10` | Execution order (lower = earlier) |
+| `enabled` | bool | `true` | Whether the check is active |
 
 **Example:**
 ```php
-add_action( 'ba11yc_ready', function( $registry ) {
-    $registry->register_block_check(
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_block_check(
         'my-plugin/card-block',
-        'card_title_required',
         array(
-            'error_msg'   => __( 'Card title is required', 'my-plugin' ),
-            'warning_msg' => __( 'Card title is recommended', 'my-plugin' ),
-            'description' => __( 'Card title validation', 'my-plugin' ),
-            'type'        => 'settings',
-            'category'    => 'accessibility',
+            'namespace'    => 'my-plugin',
+            'name'         => 'card_title_required',
+            'error_msg'    => __( 'Card title is required', 'my-plugin' ),
+            'warning_msg'  => __( 'Card title is recommended', 'my-plugin' ),
+            'description'  => __( 'Card title validation', 'my-plugin' ),
+            'level'        => 'error',
+            'configurable' => true,
+            'category'     => 'accessibility',
         )
     );
-});
+} );
 ```
+
+---
+
+### `ba11yc_register_meta_check( $post_type, $args )`
+
+Register a validation check for a post meta field.
+
+**Parameters:**
+- `$post_type` (string): Post type (e.g., `'post'`, `'page'`, `'band'`)
+- `$args` (array): Check configuration
+
+**Required keys in `$args`:** `namespace`, `name`, `meta_key`, `error_msg`
+
+**Returns:** `bool`
+
+---
+
+### `ba11yc_register_editor_check( $post_type, $args )`
+
+Register a document-level validation check for a post type.
+
+**Parameters:**
+- `$post_type` (string): Post type
+- `$args` (array): Check configuration
+
+**Required keys in `$args`:** `namespace`, `name`, `error_msg`
+
+**Returns:** `bool`
+
+---
+
+## Block\Registry
+
+Direct registry access via `\BlockAccessibility\Block\Registry::get_instance()`. Most external integrations should use `ba11yc_register_block_check()` instead.
+
+### `register_check( $block_type, $check_name, $check_args )`
+
+Register a new accessibility check for a block type.
+
+**Parameters:**
+- `$block_type` (string)
+- `$check_name` (string)
+- `$check_args` (array): Same keys as `ba11yc_register_block_check()` minus `name`
+
+**Returns:** `bool`
 
 ### `unregister_check( $block_type, $check_name )`
 
 Remove a previously registered check.
 
-**Parameters:**
-- `$block_type` (string)
-- `$check_name` (string)
-
-**Returns:**
-- `bool`: True on success, false if check wasn't registered
+**Returns:** `bool` — true on success, false if check wasn't registered
 
 ### `set_check_enabled( $block_type, $check_name, $enabled )`
 
 Enable or disable a specific check.
 
-**Parameters:**
-- `$block_type` (string)
-- `$check_name` (string)
-- `$enabled` (bool)
+**Parameters:** `$block_type` (string), `$check_name` (string), `$enabled` (bool)
 
-**Returns:**
-- `bool`: True on success, false if check doesn't exist
+**Returns:** `bool`
 
 ### `is_check_registered( $block_type, $check_name )`
 
 Check if a specific check is registered.
 
-**Parameters:**
-- `$block_type` (string)
-- `$check_name` (string)
-
-**Returns:**
-- `bool`: True if registered, false otherwise
+**Returns:** `bool`
 
 ### `get_check_config( $block_type, $check_name )`
 
 Get configuration for a specific check.
 
-**Parameters:**
-- `$block_type` (string)
-- `$check_name` (string)
-
-**Returns:**
-- `array|null`: Check configuration array or null if not found
+**Returns:** `array|null`
 
 ### `get_checks( $block_type )`
 
 Get all checks for a block type.
 
-**Parameters:**
-- `$block_type` (string)
-
-**Returns:**
-- `array`: Array of checks for the block type
+**Returns:** `array`
 
 ### `get_all_checks()`
 
-Get all registered checks.
+Get all registered checks organized by block type.
 
-**Returns:**
-- `array`: Complete checks registry organized by block type
+**Returns:** `array`
 
 ### `get_registered_block_types()`
 
 Get all block types that have checks registered.
 
-**Returns:**
-- `array`: Array of block type names
+**Returns:** `array`
 
 ### `get_effective_check_level( $block_type, $check_name )`
 
-Get the effective check level for a specific check, considering settings.
+Get the effective check level, considering any admin overrides from `ba11yc_settings`.
 
-**Parameters:**
-- `$block_type` (string)
-- `$check_name` (string)
+**Returns:** `string` — `'error'`, `'warning'`, or `'none'`
 
-**Returns:**
-- `string`: The effective check level ('error', 'warning', 'none')
+---
 
-## MetaChecksRegistry
+## Meta\Registry
 
-Use `MetaChecksRegistry::get_instance()` to access the meta checks registry.
+Access via `\BlockAccessibility\Meta\Registry::get_instance()`.
 
 ### `register_meta_check( $post_type, $meta_key, $check_name, $check_args )`
 
 Register a validation check for a post meta field.
 
-**Parameters:**
-- `$post_type` (string): Post type (e.g., 'post', 'band')
-- `$meta_key` (string): Meta key being validated
-- `$check_name` (string): Unique check name
-- `$check_args` (array): Check configuration (same structure as block checks)
-
-**Returns:**
-- `bool`: True on success, false on failure
-
-**Note:** Most users don't need to call this directly - use `MetaValidation::required()` instead, which handles registration automatically.
+**Returns:** `bool`
 
 ### `get_meta_checks( $post_type )`
 
-Get all meta checks for a specific post type.
+Get all meta checks for a specific post type, organized by meta key.
 
-**Parameters:**
-- `$post_type` (string): Post type
-
-**Returns:**
-- `array`: Array of meta checks organized by meta key
+**Returns:** `array`
 
 ### `get_all_meta_checks()`
 
-Get all registered meta checks.
+Get all registered meta checks organized by post type.
 
-**Returns:**
-- `array`: Complete meta checks registry organized by post type
+**Returns:** `array`
 
 ### `get_meta_check_config( $post_type, $meta_key, $check_name )`
 
 Get configuration for a specific meta check.
 
-**Parameters:**
-- `$post_type` (string): Post type
-- `$meta_key` (string): Meta key
-- `$check_name` (string): Check name
-
-**Returns:**
-- `array|null`: Check configuration array or null if not found
+**Returns:** `array|null`
 
 ### `get_effective_meta_check_level( $post_type, $meta_key, $check_name )`
 
-Get the effective check level for a specific meta check, considering settings.
+Get the effective meta check level considering admin overrides.
 
-**Parameters:**
-- `$post_type` (string): Post type
-- `$meta_key` (string): Meta key
-- `$check_name` (string): Check name
+**Returns:** `string`
 
-**Returns:**
-- `string`: The effective check level ('error', 'warning', 'none')
+---
 
-## EditorChecksRegistry
+## Editor\Registry
 
-Use `EditorChecksRegistry::get_instance()` to access the editor checks registry.
+Access via `\BlockAccessibility\Editor\Registry::get_instance()`.
 
 ### `register_editor_check( $post_type, $check_name, $check_args )`
 
-Register an editor validation check for a post type.
+Register an editor-level validation check for a post type.
 
-**Parameters:**
-- `$post_type` (string): Post type (e.g., 'post', 'page')
-- `$check_name` (string): Unique check name
-- `$check_args` (array): Check configuration
-
-**Returns:**
-- `bool`: True on success, false on failure
-
-**Check Configuration:**
+**Check configuration:**
 ```php
 $check_args = array(
-    'error_msg'   => 'Error message shown when validation fails', // Required
-    'warning_msg' => 'Warning message (optional)',                 // Optional
-    'description' => 'Description shown in settings UI',          // Optional
-    'type'        => 'settings', // 'settings', 'error', 'warning', 'none' // Optional
-    'priority'    => 10,         // Lower = earlier, default: 10            // Optional
-    'enabled'     => true,       // Whether check is enabled (default: true) // Optional
+    'namespace'    => 'my-plugin',   // Required
+    'error_msg'    => '...',         // Required
+    'warning_msg'  => '...',         // Optional
+    'description'  => '...',         // Optional
+    'level'        => 'error',       // Optional
+    'configurable' => true,          // Optional
+    'priority'     => 10,            // Optional
+    'enabled'      => true,          // Optional
 );
 ```
+
+**Returns:** `bool`
 
 ### `register_editor_check_for_post_types( $post_types, $check_name, $check_args )`
 
 Register the same check for multiple post types at once.
 
 **Parameters:**
-- `$post_types` (array): Array of post types (e.g., ['post', 'page', 'custom_type'])
-- `$check_name` (string): Unique check name
-- `$check_args` (array): Check configuration (same as `register_editor_check`)
+- `$post_types` (array): e.g., `['post', 'page', 'custom_type']`
+- `$check_name` (string)
+- `$check_args` (array)
 
-**Returns:**
-- `array`: Array of results, keyed by post type. Each value is `true` on success, `false` on failure
+**Returns:** `array` — keyed by post type, each value is `true`/`false`
 
 ### `get_editor_checks( $post_type )`
 
 Get all editor checks for a specific post type.
 
-**Parameters:**
-- `$post_type` (string): Post type
-
-**Returns:**
-- `array`: Array of editor checks for the post type
+**Returns:** `array`
 
 ### `get_all_editor_checks()`
 
-Get all registered editor checks.
+Get all registered editor checks organized by post type.
 
-**Returns:**
-- `array`: Complete editor checks registry organized by post type
+**Returns:** `array`
 
 ### `get_editor_check_config( $post_type, $check_name )`
 
 Get configuration for a specific editor check.
 
-**Parameters:**
-- `$post_type` (string): Post type
-- `$check_name` (string): Check name
-
-**Returns:**
-- `array|null`: Check configuration array or null if not found
+**Returns:** `array|null`
 
 ### `get_effective_editor_check_level( $post_type, $check_name )`
 
-Get the effective check level for a specific editor check, considering settings.
+Get the effective editor check level considering admin overrides.
 
-**Parameters:**
-- `$post_type` (string): Post type
-- `$check_name` (string): Check name
+**Returns:** `string`
 
-**Returns:**
-- `string`: The effective check level ('error', 'warning', 'none')
+---
 
-## MetaValidation Helper Class
+## MetaValidation Helper
 
 ### `MetaValidation::required( $post_type, $meta_key, $args )`
 
-Create a required field validator for post meta. This method registers the check and returns a validation callback.
+Create a required-field validator for post meta. Registers the check and returns a `validate_callback` for use with `register_post_meta()`.
 
 **Parameters:**
-- `$post_type` (string): Post type (e.g., 'band', 'post')
-- `$meta_key` (string): Meta key being validated
-- `$args` (array): Configuration arguments
+- `$post_type` (string)
+- `$meta_key` (string)
+- `$args` (array): Check configuration — must include `namespace`, `error_msg`
 
-**Returns:**
-- `callable`: Validation callback for use with `register_post_meta()`
+**Returns:** `callable`
 
 **Example:**
 ```php
-use BlockAccessibility\MetaValidation;
+use BlockAccessibility\Meta\Validator as MetaValidation;
 
-register_post_meta( 'band', 'band_origin', [
-    'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
+register_post_meta( 'band', 'band_origin', array(
+    'validate_callback' => MetaValidation::required( 'band', 'band_origin', array(
+        'namespace' => 'my-plugin',
         'error_msg' => 'City of Origin is required.',
-        'type'      => 'settings',
-    ]),
-] );
+        'level'     => 'error',
+    ) ),
+) );
 ```
+
+---
 
 ## Usage Examples
 
 ### Block Checks
 
 ```php
-add_action( 'ba11yc_ready', function( $registry ) {
+add_action( 'ba11yc_ready', function() {
     // Register a check
-    $registry->register_check( 'my-plugin/card-block', 'card_title_required', [
-        'error_msg'   => __( 'Card title is required.', 'my-plugin' ),
-        'type'        => 'error',
-    ] );
+    ba11yc_register_block_check( 'my-plugin/card-block', array(
+        'namespace'    => 'my-plugin',
+        'name'         => 'card_title_required',
+        'error_msg'    => __( 'Card title is required.', 'my-plugin' ),
+        'level'        => 'error',
+        'configurable' => false,
+    ) );
 
-    // Disable a check
+    // Disable or re-enable via the registry directly
+    $registry = \BlockAccessibility\Block\Registry::get_instance();
     $registry->set_check_enabled( 'my-plugin/card-block', 'card_title_required', false );
 
     // Query all checks for a block type
@@ -331,30 +304,32 @@ add_action( 'ba11yc_ready', function( $registry ) {
 ### Meta Checks
 
 ```php
-use BlockAccessibility\MetaValidation;
+use BlockAccessibility\Meta\Validator as MetaValidation;
 
-register_post_meta( 'band', 'band_origin', [
-    'validate_callback' => MetaValidation::required( 'band', 'band_origin', [
+register_post_meta( 'band', 'band_origin', array(
+    'validate_callback' => MetaValidation::required( 'band', 'band_origin', array(
+        'namespace' => 'my-plugin',
         'error_msg' => 'City of Origin is required.',
-        'type'      => 'settings',
-    ]),
-] );
+        'level'     => 'error',
+    ) ),
+) );
 ```
 
 ### Editor Checks
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check_for_post_types(
-        array( 'post', 'page' ),
-        'first_block_heading',
-        array(
-            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
-            'type'        => 'error',
-        )
-    );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace'    => 'my-plugin',
+        'name'         => 'first_block_heading',
+        'error_msg'    => __( 'The first block must be a Heading.', 'my-plugin' ),
+        'level'        => 'error',
+        'configurable' => false,
+    ) );
 } );
 ```
+
+---
 
 ## See Also
 
@@ -362,4 +337,3 @@ add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
 - [Post Meta Validation](../meta-validation/php.md)
 - [Editor Validation](../editor-validation/php.md)
 - [Hooks Reference](./hooks.md)
-

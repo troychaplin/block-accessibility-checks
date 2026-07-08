@@ -1,12 +1,11 @@
 <?php
 /**
- * Namespace declaration for the BlockAccessibility plugin.
+ * Assets
  *
- * This namespace is used to encapsulate all functionality related to
- * the Block Accessibility Checks plugin, ensuring that classes, functions,
- * and constants do not conflict with other plugins or themes.
+ * Manages registration and enqueueing of scripts and styles, and injects
+ * validation configuration into the block editor settings.
  *
- * @package BlockAccessibility
+ * @package BlockAccessibilityChecks
  */
 
 namespace BlockAccessibility\Core;
@@ -15,14 +14,18 @@ use BlockAccessibility\Core\Traits\EditorDetection;
 use BlockAccessibility\Block\Registry as BlockChecksRegistry;
 use BlockAccessibility\Meta\Registry as MetaChecksRegistry;
 use BlockAccessibility\Editor\Registry as EditorChecksRegistry;
+use BlockAccessibility\Rest\SettingsController;
+
+// Prevent direct access to the file.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Class Assets
  *
- * This class is responsible for managing the registration and enqueueing
- * of scripts and styles within the Block Accessibility Checks plugin.
- *
- * @package BlockAccessibilityChecks
+ * Responsible for managing the registration and enqueueing of scripts and
+ * styles within the Block Accessibility Checks plugin.
  */
 class Assets {
 
@@ -34,6 +37,13 @@ class Assets {
 	 * @var string
 	 */
 	private const SCRIPT_HANDLE = 'block-accessibility-script';
+
+	/**
+	 * Settings page script/style handle.
+	 *
+	 * @var string
+	 */
+	private const SETTINGS_HANDLE = 'block-accessibility-settings';
 
 	/**
 	 * Path to the main block checks JavaScript file.
@@ -50,11 +60,18 @@ class Assets {
 	private const BLOCK_STYLE_PATH = 'build/block-checks.css';
 
 	/**
-	 * Path to the admin stylesheet.
+	 * Path to the settings app JavaScript file.
 	 *
 	 * @var string
 	 */
-	private const ADMIN_STYLE_PATH = 'build/block-admin.css';
+	private const SETTINGS_SCRIPT_PATH = 'build/settings.js';
+
+	/**
+	 * Path to the settings app stylesheet.
+	 *
+	 * @var string
+	 */
+	private const SETTINGS_STYLE_PATH = 'build/settings.css';
 
 	/**
 	 * The path to the plugin file.
@@ -71,6 +88,13 @@ class Assets {
 	private $translations;
 
 	/**
+	 * Cached settings option.
+	 *
+	 * @var array|null
+	 */
+	private $settings = null;
+
+	/**
 	 * Constructs a new instance of the Assets class.
 	 *
 	 * @param string $plugin_file The path to the plugin file.
@@ -79,25 +103,20 @@ class Assets {
 	public function __construct( string $plugin_file, I18n $translations ) {
 		$this->plugin_file  = $plugin_file;
 		$this->translations = $translations;
+
+		// Inject validation config into editor settings instead of wp_localize_script.
+		add_filter( 'block_editor_settings_all', array( $this, 'inject_editor_settings' ) );
 	}
 
 	/**
-	 * Enqueues the assets for the block.
+	 * Enqueues the editor assets (script + styles).
 	 *
-	 * This method is responsible for enqueueing the necessary scripts and styles for the block.
-	 * It sets up script translations and then calls the methods to enqueue the block scripts and styles.
-	 *
-	 * Runs in both editor contexts:
-	 * - enqueue_block_editor_assets: Main editor window
-	 * - enqueue_block_assets: Editor iframe (site editor) and frontend
-	 *
-	 * We only want to load in admin/editor contexts, not on the frontend.
+	 * Runs in both post editor and site editor contexts. Not on the frontend.
 	 *
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
-		// Only load in admin/editor contexts, not on frontend.
-		if ( ! \is_admin() ) {
+		if ( ! \is_admin() || ! $this->should_load_validation() ) {
 			return;
 		}
 
@@ -110,74 +129,88 @@ class Assets {
 	/**
 	 * Enqueues the admin assets.
 	 *
-	 * This method is responsible for enqueueing the necessary scripts and styles for the admin area.
-	 * It sets up script translations and enqueues admin styles.
+	 * Loads the DataViews settings app only on the plugin's settings page.
 	 *
+	 * @param string $hook_suffix The current admin page hook suffix.
 	 * @return void
 	 */
-	public function enqueue_admin_assets() {
-		$this->translations->setup_script_translations( self::SCRIPT_HANDLE );
+	public function enqueue_admin_assets( $hook_suffix = '' ) {
+		// The settings page hook for a top-level menu with slug 'block-a11y-checks'.
+		if ( 'toplevel_page_block-a11y-checks' !== $hook_suffix ) {
+			return;
+		}
 
-		$this->enqueue_admin_styles();
-	}
+		$asset_file   = \plugin_dir_path( $this->plugin_file ) . 'build/settings.asset.php';
+		$dependencies = array( 'wp-components', 'wp-element', 'wp-i18n', 'wp-api-fetch' );
+		$version      = BA11YC_VERSION;
 
-	/**
-	 * Enqueues the block scripts for the plugin.
-	 *
-	 * This function is responsible for enqueueing the necessary JavaScript scripts for the plugin's blocks.
-	 * It registers the script handle, script path, dependencies, version, and localization data.
-	 *
-	 * @access private
-	 * @return void
-	 */
-	private function enqueue_block_scripts() {
-		wp_enqueue_script(
-			self::SCRIPT_HANDLE,
-			plugins_url( self::BLOCK_SCRIPT_PATH, $this->plugin_file ),
-			array( 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-data', 'wp-edit-post', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-plugins' ),
-			BA11YC_VERSION,
+		if ( file_exists( $asset_file ) ) {
+			$asset        = require $asset_file;
+			$dependencies = $asset['dependencies'] ?? $dependencies;
+			$version      = $asset['version'] ?? $version;
+		}
+
+		\wp_enqueue_script(
+			self::SETTINGS_HANDLE,
+			plugins_url( self::SETTINGS_SCRIPT_PATH, $this->plugin_file ),
+			$dependencies,
+			$version,
 			true
 		);
 
-		// Get block checks options for JavaScript.
-		$block_checks_options = get_option( 'block_checks_options', array() );
-		$site_editor_options  = get_option( 'block_checks_site_editor_options', array( 'enabled' => true ) );
+		\wp_enqueue_style(
+			self::SETTINGS_HANDLE,
+			plugins_url( self::SETTINGS_STYLE_PATH, $this->plugin_file ),
+			array( 'wp-components' ),
+			$version
+		);
 
-		// Get the block checks registry to expose validation rules to JavaScript.
-		$registry                = BlockChecksRegistry::get_instance();
-		$meta_registry           = MetaChecksRegistry::get_instance();
-		$editor_registry         = EditorChecksRegistry::get_instance();
-		$validation_rules        = $this->prepare_validation_rules_for_js( $registry );
-		$meta_validation_rules   = $this->prepare_meta_validation_rules_for_js( $meta_registry );
-		$editor_validation_rules = $this->prepare_editor_validation_rules_for_js( $editor_registry );
-		$registered_block_types  = $registry->get_registered_block_types();
+		$this->translations->setup_script_translations( self::SETTINGS_HANDLE );
 
-		\wp_localize_script(
-			self::SCRIPT_HANDLE,
-			'BlockAccessibilityChecks',
-			array(
-				'editorContext'         => $this->get_editor_context(),
-				'blockChecksOptions'    => $block_checks_options,
-				'siteEditorOptions'     => $site_editor_options,
-				'validationRules'       => $validation_rules,
-				'metaValidationRules'   => $meta_validation_rules,
-				'editorValidationRules' => $editor_validation_rules,
-				'registeredBlockTypes'  => $registered_block_types,
-			)
+		// Display-name maps for the settings UI (block titles + post type labels).
+		\wp_add_inline_script(
+			self::SETTINGS_HANDLE,
+			'window.ba11ycSettings = ' . \wp_json_encode(
+				array(
+					'blockTitles'    => $this->get_block_titles(),
+					'postTypeLabels' => $this->get_post_type_labels(),
+				)
+			) . ';',
+			'before'
 		);
 	}
 
 	/**
-	 * Enqueues the block styles.
+	 * Enqueues the editor block script.
 	 *
-	 * This function is responsible for enqueueing the block styles for the plugin.
-	 * It uses the `wp_enqueue_style` function to enqueue the styles.
+	 * @return void
+	 */
+	private function enqueue_block_scripts() {
+		$asset_file   = \plugin_dir_path( $this->plugin_file ) . 'build/block-checks.asset.php';
+		$dependencies = array( 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-data', 'wp-edit-post', 'wp-element', 'wp-hooks', 'wp-i18n', 'wp-plugins' );
+		$version      = BA11YC_VERSION;
+
+		if ( file_exists( $asset_file ) ) {
+			$asset        = require $asset_file;
+			$dependencies = $asset['dependencies'] ?? $dependencies;
+			$version      = $asset['version'] ?? $version;
+		}
+
+		wp_enqueue_script(
+			self::SCRIPT_HANDLE,
+			plugins_url( self::BLOCK_SCRIPT_PATH, $this->plugin_file ),
+			$dependencies,
+			$version,
+			true
+		);
+	}
+
+	/**
+	 * Enqueues the editor block styles (icons + color variables).
 	 *
-	 * @access private
 	 * @return void
 	 */
 	private function enqueue_block_styles() {
-		// Enqueue the main stylesheet.
 		wp_enqueue_style(
 			'block-checks-style',
 			plugins_url( self::BLOCK_STYLE_PATH, $this->plugin_file ),
@@ -185,12 +218,9 @@ class Assets {
 			BA11YC_VERSION
 		);
 
-		// Dynamically generate the SVG URLs.
 		$warning_icon_url = plugins_url( 'src/assets/universal-access-warning.svg', $this->plugin_file );
 		$error_icon_url   = plugins_url( 'src/assets/universal-access-error.svg', $this->plugin_file );
 
-		// Add the SVG URLs and color variables for the editor.
-		// Color variables are duplicated here to ensure they load in the site editor iframe.
 		$inline_css = sprintf(
 			":root {
 				--a11y-red: #d82000;
@@ -211,57 +241,101 @@ class Assets {
 	}
 
 	/**
-	 * Enqueues the admin styles for the block accessibility checks.
+	 * Inject validation configuration into the block editor settings.
 	 *
-	 * This function is responsible for enqueueing the admin styles for the block accessibility checks.
-	 * It uses the `wp_enqueue_style` function to enqueue the 'block-checks-admin' style.
+	 * Available in JS via `getEditorSettings().blockA11yChecks`.
 	 *
-	 * @access private
+	 * @param array $settings The editor settings array.
+	 * @return array Modified editor settings with validation config.
 	 */
-	private function enqueue_admin_styles() {
-		wp_enqueue_style(
-			'block-checks-admin',
-			plugins_url( self::ADMIN_STYLE_PATH, $this->plugin_file ),
-			array(),
-			BA11YC_VERSION
+	public function inject_editor_settings( array $settings ): array {
+		if ( ! $this->should_load_validation() ) {
+			return $settings;
+		}
+
+		$editor_context  = $this->get_editor_context();
+		$is_site_editor  = 'site-editor' === $editor_context;
+		$registry        = BlockChecksRegistry::get_instance();
+		$meta_registry   = MetaChecksRegistry::get_instance();
+		$editor_registry = EditorChecksRegistry::get_instance();
+
+		$settings['blockA11yChecks'] = array(
+			'editorContext'         => $editor_context,
+			'validationRules'       => $this->prepare_block_rules( $registry, $is_site_editor ),
+			'metaValidationRules'   => $this->prepare_meta_rules( $meta_registry, $is_site_editor ),
+			'editorValidationRules' => $this->prepare_editor_rules( $editor_registry, $is_site_editor ),
+			'registeredBlockTypes'  => $registry->get_registered_block_types(),
 		);
+
+		return $settings;
 	}
 
 	/**
-	 * Prepare validation rules from PHP registry for JavaScript consumption
+	 * Get the cached settings option.
 	 *
-	 * Converts the PHP BlockChecksRegistry data into a format that JavaScript
-	 * can use for client-side validation, excluding server-side callbacks.
-	 *
-	 * @param BlockChecksRegistry $registry The block checks registry instance.
-	 * @return array Prepared validation rules for JavaScript.
+	 * @return array
 	 */
-	private function prepare_validation_rules_for_js( BlockChecksRegistry $registry ): array {
-		$all_checks = $registry->get_all_checks();
-		$js_rules   = array();
+	private function get_settings(): array {
+		if ( null === $this->settings ) {
+			$settings       = get_option( SettingsController::OPTION_KEY, array() );
+			$this->settings = is_array( $settings ) ? $settings : array();
+		}
+		return $this->settings;
+	}
 
-		foreach ( $all_checks as $block_type => $checks ) {
+	/**
+	 * Resolve whether a check is active given site-editor gating.
+	 *
+	 * Returns 'none' when not in the site editor or when the per-check
+	 * site-editor flag is absent (default disabled) or explicitly false.
+	 *
+	 * @param string $effective_level The effective level after overrides.
+	 * @param bool   $is_site_editor  Whether the current context is the site editor.
+	 * @param string $flag_path_a     First key into the siteEditor flag tree (scope).
+	 * @param array  $flag_keys       The remaining keys into the siteEditor flag tree.
+	 * @return string The level, or 'none' if gated off.
+	 */
+	private function gate_site_editor( string $effective_level, bool $is_site_editor, string $flag_path_a, array $flag_keys ): string {
+		if ( ! $is_site_editor ) {
+			return $effective_level;
+		}
+
+		$settings = $this->get_settings();
+		$node     = $settings['siteEditor'][ $flag_path_a ] ?? null;
+
+		foreach ( $flag_keys as $key ) {
+			if ( ! is_array( $node ) || ! array_key_exists( $key, $node ) ) {
+				return 'none'; // No explicit flag: default disabled.
+			}
+			$node = $node[ $key ];
+		}
+
+		// $node is now the boolean flag (true = explicitly enabled).
+		return ( true === $node ) ? $effective_level : 'none';
+	}
+
+	/**
+	 * Prepare block validation rules for JS.
+	 *
+	 * @param BlockChecksRegistry $registry       The block checks registry.
+	 * @param bool                $is_site_editor Whether the current context is the site editor.
+	 * @return array
+	 */
+	private function prepare_block_rules( BlockChecksRegistry $registry, bool $is_site_editor ): array {
+		$js_rules = array();
+
+		foreach ( $registry->get_all_checks() as $block_type => $checks ) {
 			$js_rules[ $block_type ] = array();
 
 			foreach ( $checks as $check_name => $check_config ) {
-				// Get the effective check level (considering settings).
-				$effective_type = $registry->get_effective_check_level( $block_type, $check_name );
+				$level = $registry->get_effective_check_level( $block_type, $check_name );
+				$level = $this->gate_site_editor( $level, $is_site_editor, 'block', array( $block_type, $check_name ) );
 
-				// Skip checks set to 'none'.
-				if ( 'none' === $effective_type ) {
+				if ( 'none' === $level ) {
 					continue;
 				}
 
-				// Only include configuration that JavaScript needs.
-				$js_rules[ $block_type ][ $check_name ] = array(
-					'error_msg'   => $check_config['error_msg'],
-					'warning_msg' => $check_config['warning_msg'],
-					'type'        => $effective_type, // Use effective type instead of config type.
-					'category'    => $check_config['category'] ?? 'accessibility', // Include category field.
-					'priority'    => $check_config['priority'],
-					'enabled'     => $check_config['enabled'],
-					'description' => $check_config['description'],
-				);
+				$js_rules[ $block_type ][ $check_name ] = $this->format_rule( $check_config, $level );
 			}
 		}
 
@@ -269,42 +343,30 @@ class Assets {
 	}
 
 	/**
-	 * Prepare meta validation rules for JavaScript
+	 * Prepare meta validation rules for JS.
 	 *
-	 * Formats the meta validation rules from the registry into a structure
-	 * that can be consumed by JavaScript.
-	 *
-	 * @param MetaChecksRegistry $meta_registry The meta checks registry instance.
-	 * @return array Formatted meta validation rules for JavaScript.
+	 * @param MetaChecksRegistry $registry       The meta checks registry.
+	 * @param bool               $is_site_editor Whether the current context is the site editor.
+	 * @return array
 	 */
-	private function prepare_meta_validation_rules_for_js( MetaChecksRegistry $meta_registry ): array {
-		$all_meta_checks = $meta_registry->get_all_meta_checks();
-		$js_rules        = array();
+	private function prepare_meta_rules( MetaChecksRegistry $registry, bool $is_site_editor ): array {
+		$js_rules = array();
 
-		foreach ( $all_meta_checks as $post_type => $meta_fields ) {
+		foreach ( $registry->get_all_meta_checks() as $post_type => $meta_fields ) {
 			$js_rules[ $post_type ] = array();
 
 			foreach ( $meta_fields as $meta_key => $checks ) {
 				$js_rules[ $post_type ][ $meta_key ] = array();
 
 				foreach ( $checks as $check_name => $check_config ) {
-					// Get the effective check level (considering settings).
-					$effective_type = $meta_registry->get_effective_meta_check_level( $post_type, $meta_key, $check_name );
+					$level = $registry->get_effective_meta_check_level( $post_type, $meta_key, $check_name );
+					$level = $this->gate_site_editor( $level, $is_site_editor, 'meta', array( $post_type, $meta_key, $check_name ) );
 
-					// Skip checks set to 'none'.
-					if ( 'none' === $effective_type ) {
+					if ( 'none' === $level ) {
 						continue;
 					}
 
-					// Only include configuration that JavaScript needs.
-					$js_rules[ $post_type ][ $meta_key ][ $check_name ] = array(
-						'error_msg'   => $check_config['error_msg'],
-						'warning_msg' => $check_config['warning_msg'],
-						'type'        => $effective_type,
-						'priority'    => $check_config['priority'],
-						'enabled'     => $check_config['enabled'],
-						'description' => $check_config['description'],
-					);
+					$js_rules[ $post_type ][ $meta_key ][ $check_name ] = $this->format_rule( $check_config, $level );
 				}
 			}
 		}
@@ -313,42 +375,95 @@ class Assets {
 	}
 
 	/**
-	 * Prepare editor validation rules for JavaScript
+	 * Prepare editor validation rules for JS.
 	 *
-	 * Formats the editor validation rules from the registry into a structure
-	 * that can be consumed by JavaScript.
-	 *
-	 * @param EditorChecksRegistry $editor_registry The editor checks registry instance.
-	 * @return array Formatted editor validation rules for JavaScript.
+	 * @param EditorChecksRegistry $registry       The editor checks registry.
+	 * @param bool                 $is_site_editor Whether the current context is the site editor.
+	 * @return array
 	 */
-	private function prepare_editor_validation_rules_for_js( EditorChecksRegistry $editor_registry ): array {
-		$all_editor_checks = $editor_registry->get_all_editor_checks();
-		$js_rules          = array();
+	private function prepare_editor_rules( EditorChecksRegistry $registry, bool $is_site_editor ): array {
+		$js_rules = array();
 
-		foreach ( $all_editor_checks as $post_type => $checks ) {
+		foreach ( $registry->get_all_editor_checks() as $post_type => $checks ) {
 			$js_rules[ $post_type ] = array();
 
 			foreach ( $checks as $check_name => $check_config ) {
-				// Get the effective check level (considering settings).
-				$effective_type = $editor_registry->get_effective_editor_check_level( $post_type, $check_name );
+				$level = $registry->get_effective_editor_check_level( $post_type, $check_name );
+				$level = $this->gate_site_editor( $level, $is_site_editor, 'editor', array( $post_type, $check_name ) );
 
-				// Skip checks set to 'none'.
-				if ( 'none' === $effective_type ) {
+				if ( 'none' === $level ) {
 					continue;
 				}
 
-				// Only include configuration that JavaScript needs.
-				$js_rules[ $post_type ][ $check_name ] = array(
-					'error_msg'   => $check_config['error_msg'],
-					'warning_msg' => $check_config['warning_msg'],
-					'type'        => $effective_type,
-					'priority'    => $check_config['priority'],
-					'enabled'     => $check_config['enabled'],
-					'description' => $check_config['description'],
-				);
+				$js_rules[ $post_type ][ $check_name ] = $this->format_rule( $check_config, $level );
 			}
 		}
 
 		return $js_rules;
+	}
+
+	/**
+	 * Format a single rule for JS consumption.
+	 *
+	 * @param array  $check_config The raw check config.
+	 * @param string $level        The effective level.
+	 * @return array
+	 */
+	private function format_rule( array $check_config, string $level ): array {
+		return array(
+			'error_msg'   => $check_config['error_msg'],
+			'warning_msg' => $check_config['warning_msg'],
+			'level'       => $level,
+			'category'    => $check_config['category'] ?? 'accessibility',
+			'priority'    => $check_config['priority'],
+			'enabled'     => $check_config['enabled'],
+			'description' => $check_config['description'],
+		);
+	}
+
+	/**
+	 * Build a map of registered block types to their human-readable titles.
+	 *
+	 * @return array
+	 */
+	private function get_block_titles(): array {
+		$titles         = array();
+		$block_registry = \WP_Block_Type_Registry::get_instance();
+
+		foreach ( BlockChecksRegistry::get_instance()->get_registered_block_types() as $block_type ) {
+			$block                 = $block_registry->get_registered( $block_type );
+			$titles[ $block_type ] = ( $block && ! empty( $block->title ) )
+				? $block->title
+				: ucwords( str_replace( array( '-', '_' ), ' ', explode( '/', $block_type )[1] ?? $block_type ) );
+		}
+
+		return $titles;
+	}
+
+	/**
+	 * Build a map of post types to their singular labels.
+	 *
+	 * @return array
+	 */
+	private function get_post_type_labels(): array {
+		$labels     = array();
+		$registries = array(
+			EditorChecksRegistry::get_instance()->get_all_editor_checks(),
+			MetaChecksRegistry::get_instance()->get_all_meta_checks(),
+		);
+
+		foreach ( $registries as $by_post_type ) {
+			foreach ( array_keys( $by_post_type ) as $post_type ) {
+				if ( isset( $labels[ $post_type ] ) ) {
+					continue;
+				}
+				$obj                  = \get_post_type_object( $post_type );
+				$labels[ $post_type ] = ( $obj && ! empty( $obj->labels->singular_name ) )
+					? $obj->labels->singular_name
+					: ucwords( str_replace( array( '-', '_' ), ' ', $post_type ) );
+			}
+		}
+
+		return $labels;
 	}
 }

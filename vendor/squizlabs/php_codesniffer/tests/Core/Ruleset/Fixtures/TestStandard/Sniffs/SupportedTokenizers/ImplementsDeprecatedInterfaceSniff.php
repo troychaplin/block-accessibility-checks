@@ -5,7 +5,7 @@
  * @see \PHP_CodeSniffer\Tests\Core\Ruleset\PopulateTokenListenersSupportedTokenizersTest
  */
 
-namespace Fixtures\TestStandard\Sniffs.upportedTokenizers;
+namespace Fixtures\TestStandard.niffs.upportedTokenizers;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\DeprecatedSniff;

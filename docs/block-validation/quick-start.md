@@ -18,17 +18,19 @@ Use the `ba11yc_ready` action to register your check:
 ```php
 add_action( 'ba11yc_ready', 'my_plugin_register_checks' );
 
-function my_plugin_register_checks( $registry ) {
-    $registry->register_check(
-        'my-plugin/custom-block', // Block type
-        'content_length',         // Check name
+function my_plugin_register_checks() {
+    ba11yc_register_block_check(
+        'my-plugin/custom-block',
         array(
-            'error_msg'   => __( 'Content is too long for optimal readability', 'my-plugin' ),
-            'warning_msg' => __( 'Content is long but still allowed (warning)', 'my-plugin' ),
-            'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
-            'type'        => 'settings', // 'error', 'warning', or 'settings'
-            'category'    => 'validation', // 'accessibility' or 'validation'
-            'priority'    => 10,
+            'namespace'    => 'my-plugin',
+            'name'         => 'content_length',
+            'error_msg'    => __( 'Content is too long for optimal readability', 'my-plugin' ),
+            'warning_msg'  => __( 'Content is long but still allowed (warning)', 'my-plugin' ),
+            'description'  => __( 'Long content can be difficult to read', 'my-plugin' ),
+            'level'        => 'error',     // 'error', 'warning', or 'none'
+            'configurable' => true,        // admin can change the level in settings
+            'category'     => 'validation', // 'accessibility' or 'validation'
+            'priority'     => 10,
         )
     );
 }
@@ -43,7 +45,7 @@ All validation logic runs in JavaScript for real-time feedback. Create a `valida
 import { addFilter } from '@wordpress/hooks';
 
 addFilter(
-    'ba11yc_validate_block',
+    'ba11yc.validateBlock',
     'my-plugin/validation',
     (isValid, blockType, attributes, checkName) => {
         if (blockType !== 'my-plugin/custom-block') {

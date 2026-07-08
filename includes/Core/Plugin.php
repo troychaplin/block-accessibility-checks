@@ -15,6 +15,10 @@ use BlockAccessibility\Block\Registry as BlockChecksRegistry;
 use BlockAccessibility\Block\HeadingLevels;
 use BlockAccessibility\Editor\Registry as EditorChecksRegistry;
 use BlockAccessibility\Editor\CoreChecks as EditorCoreChecks;
+use BlockAccessibility\Rest\ChecksController;
+use BlockAccessibility\Rest\SettingsController;
+use BlockAccessibility\Filter\LevelOverride;
+use BlockAccessibility\Upgrade\Migrator;
 
 /**
  * Plugin Initializer Class
@@ -103,6 +107,7 @@ class Plugin {
 			$this->init_settings_page();
 			$this->init_block_checks_registry();
 			$this->init_editor_checks_registry();
+			$this->init_rest_and_filters();
 
 			// Setup hooks.
 			$this->setup_hooks();
@@ -173,13 +178,42 @@ class Plugin {
 			$settings_page                   = new Settings();
 			$this->services['settings_page'] = $settings_page;
 			$this->log_debug( 'Settings page service initialized.' );
-
-			// Initialize Settings REST API.
-			$settings_api                   = new SettingsAPI();
-			$this->services['settings_api'] = $settings_api;
-			$this->log_debug( 'Settings API service initialized.' );
 		} catch ( \Exception $e ) {
 			$this->log_error( 'Failed to initialize settings page: ' . $e->getMessage() );
+			throw $e;
+		}
+	}
+
+	/**
+	 * Initialize REST controllers, the level-override filter, and the data migrator.
+	 *
+	 * @return void
+	 * @throws \Exception If initialization fails.
+	 */
+	private function init_rest_and_filters(): void {
+		try {
+			// Apply saved severity overrides at runtime.
+			$level_override = new LevelOverride();
+			$level_override->register();
+			$this->services['level_override'] = $level_override;
+
+			// Register REST routes for the settings UI.
+			\add_action(
+				'rest_api_init',
+				static function () {
+					( new ChecksController() )->register_routes();
+					( new SettingsController() )->register_routes();
+				}
+			);
+
+			// Run the one-time v3 -> v4 data migration on a late init.
+			$migrator = new Migrator();
+			$migrator->register();
+			$this->services['migrator'] = $migrator;
+
+			$this->log_debug( 'REST controllers, level override, and migrator initialized.' );
+		} catch ( \Exception $e ) {
+			$this->log_error( 'Failed to initialize REST and filters: ' . $e->getMessage() );
 			throw $e;
 		}
 	}

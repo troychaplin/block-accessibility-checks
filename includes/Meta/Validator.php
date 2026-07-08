@@ -31,8 +31,9 @@ class Validator {
 	 *
 	 * register_post_meta('band', 'band_origin', [
 	 *     'validate_callback' => Validator::required('band', 'band_origin', [
+	 *         'namespace' => 'my-plugin',
 	 *         'error_msg' => 'Field is required',
-	 *         'type' => 'settings',
+	 *         'level'     => 'error',
 	 *     ]),
 	 * ]);
 	 *
@@ -43,11 +44,13 @@ class Validator {
 	 */
 	public static function required( string $post_type, string $meta_key, array $args = array() ): callable {
 		$defaults = array(
-			'error_msg'   => 'This field is required.',
-			'warning_msg' => 'This field is recommended.',
-			'type'        => 'settings',
-			'check_name'  => 'required',
-			'description' => '',
+			'error_msg'    => 'This field is required.',
+			'warning_msg'  => 'This field is recommended.',
+			'level'        => 'error',
+			'category'     => 'validation',
+			'configurable' => true,
+			'check_name'   => 'required',
+			'description'  => '',
 		);
 
 		$config = \wp_parse_args( $args, $defaults );

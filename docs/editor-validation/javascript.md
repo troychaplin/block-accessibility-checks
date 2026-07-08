@@ -51,16 +51,18 @@ Return `true` if the check passes, `false` if it fails. The validation system wi
 
 ## Accessing Validation Rules
 
-The PHP registry exposes check configurations to JavaScript via a global object:
+Check configurations are available via the editor settings object:
 
 ```javascript
-const editorRules = window.BlockAccessibilityChecks?.editorValidationRules || {};
-const postRules = editorRules.post || {};
+import { select } from '@wordpress/data';
+
+const { blockA11yChecks } = select( 'core/editor' ).getEditorSettings();
+const postRules = blockA11yChecks?.editor?.post || {};
 const firstBlockRule = postRules.first_block_heading;
 
 console.log(firstBlockRule.error_msg);   // Error message
 console.log(firstBlockRule.warning_msg); // Warning message
-console.log(firstBlockRule.type);        // 'error', 'warning', or 'none'
+console.log(firstBlockRule.level);       // 'error', 'warning', or 'none'
 ```
 
 ## Working with Blocks Array
@@ -236,7 +238,7 @@ add_action( 'enqueue_block_editor_assets', 'my_plugin_enqueue_editor_validation'
 3. **Validation** - When blocks change, `validateEditor()` is called
 4. **Filter Application** - The `ba11yc_validate_editor` filter is applied for each registered check
 5. **Result Collection** - Validation results are collected
-6. **Post Locking** - If any checks fail with `type: 'error'`, post saving is locked
+6. **Post Locking** - If any checks resolve to level `'error'`, post saving is locked
 
 ## Best Practices
 
@@ -297,10 +299,6 @@ if ( ! block.name ) {
 ### Filter Hook
 
 - **`ba11yc_validate_editor`** - Main validation filter for editor state
-
-### Global Object
-
-- **`window.BlockAccessibilityChecks.editorValidationRules`** - All registered editor checks
 
 ### Filter Signature
 

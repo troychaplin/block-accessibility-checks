@@ -1,0 +1,48 @@
+.ba11yc-indicator-errors .ba11yc-indicator-section-title-circle,
+.ba11yc-indicator-warnings .ba11yc-indicator-section-title-circle {
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+	display: inline-block;
+	margin-right: 8px;
+	vertical-align: middle;
+	margin-bottom: 2px;
+}
+
+.ba11yc-indicator-errors .ba11yc-indicator-section-title-circle {
+	background-color: var(--ba11yc-red);
+}
+
+.ba11yc-indicator-warnings .ba11yc-indicator-section-title-circle {
+	background-color: var(--ba11yc-yellow);
+}
+
+.ba11yc-indicator-section + .ba11yc-indicator-section {
+	margin-top: 20px;
+}
+
+h2.ba11yc-indicator-section-title {
+	font-size: 14px;
+	line-height: 1.3;
+	margin: 0 0 10px 0;
+}
+
+.ba11yc-indicator-modal-content .ba11yc-indicator-errors,
+.ba11yc-indicator-modal-content .ba11yc-indicator-warnings {
+	ul {
+		font-size: 12px;
+		margin: 0;
+		margin-left: 3px;
+		padding: 0 0 0 28px;
+	}
+
+	li {
+		padding: 0 0 4px 0;
+		margin: 0;
+		list-style-type: disc;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+}

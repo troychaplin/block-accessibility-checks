@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
 Tested up to: 6.9
-Stable tag: 3.0.2
+Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,10 +34,12 @@ Whether you're a content creator ensuring your posts are accessible, a developer
 
 * **Three-Tier Validation API** - Register custom checks for block attributes, post meta fields, and editor-level validation using comprehensive hooks and filters
 * **JavaScript-Only Validation** - All validation logic runs in JavaScript for real-time editor feedback without server round-trips
-* **Automatic Settings Integration** - External plugins automatically get their own settings pages under the Block Checks menu
+* **Automatic Settings Integration** - Checks from external plugins automatically appear in the unified settings table, attributed and filterable by plugin
 * **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes
 * **Extensive Hook System** - 20+ action and filter hooks for complete customization of registration, validation, and display behavior
 * **Well-Documented API** - Complete developer documentation with quick start guides and working code examples
+
+**Upgrading an integration from v3?** Version 4.0.0 introduced breaking changes to the developer API — registration functions, argument keys, and JavaScript filter names all changed, and v3 integrations stop validating silently rather than erroring. See the <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/upgrade-to-v4.md">v4 upgrade guide</a> for a complete migration reference.
 
 **How It Works:**
 
@@ -166,4 +168,24 @@ Simply deactivate and delete the plugin through the WordPress admin interface.
  
 == Changelog ==
 
-View the <a href="https://blockaccessibilitychecks.com/changelog/">changelog</a> on the plugin website.
+= 4.0.0 =
+
+Major release. All admin settings move to a single unified settings page, and the developer API is overhauled with **breaking changes** — see the upgrade notice below and the <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/upgrade-to-v4.md">v4 upgrade guide</a>.
+
+* New: single settings page listing every registered check from every plugin in one filterable, sortable table
+* New: global registration functions `ba11yc_register_block_check()`, `ba11yc_register_meta_check()`, `ba11yc_register_editor_check()`
+* New: `ba11yc_check_level` filter for runtime severity overrides
+* New: REST API at `block-accessibility-checks/v1` (`/checks`, `/settings`)
+* Changed (breaking): check severity is now `level` + `configurable` (replaces `type`); a `namespace` argument is required
+* Changed (breaking): JavaScript validation filters renamed to `ba11yc.validateBlock`, `ba11yc.validateEditor`, `ba11yc.validateMeta`
+* Changed (breaking): `window.BlockAccessibilityChecks` removed; configuration now available via `getEditorSettings().blockA11yChecks` and the `block-accessibility-checks` data store
+* Removed: per-plugin settings submenu pages (old links redirect to the unified page)
+* Migration: all saved v3 settings are migrated automatically; no user action needed
+
+View the full <a href="https://blockaccessibilitychecks.com/changelog/">changelog</a> on the plugin website.
+
+== Upgrade Notice ==
+
+= 4.0.0 =
+
+Major update. End-user settings migrate automatically. Developers integrating custom checks MUST update to the new registration API and renamed JavaScript filters — v3 integrations stop validating silently. See docs/upgrade-to-v4.md.

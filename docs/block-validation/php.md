@@ -1,6 +1,6 @@
 # Block Attributes Validation - PHP Integration
 
-This guide explains how to register block attribute checks and interact with the `BlockChecksRegistry` API in PHP.
+This guide explains how to register block attribute checks using the `ba11yc_register_block_check()` API.
 
 ## Overview
 
@@ -8,89 +8,83 @@ PHP is used to register checks, configure metadata, and expose settings to the b
 
 ## Registering Checks
 
-### Using Action Hooks
+### Using the Global Registration Function
 
-Use the `ba11yc_ready` or `ba11yc_register_checks` action to register your checks:
+Use `ba11yc_register_block_check()` inside the `ba11yc_ready` action. The `namespace`, `name`, and `error_msg` keys are required:
 
 ```php
 add_action( 'ba11yc_ready', 'my_plugin_register_checks' );
 
-function my_plugin_register_checks( $registry ) {
-    $registry->register_check(
+function my_plugin_register_checks() {
+    ba11yc_register_block_check(
         'my-plugin/custom-block',
-        'content_length',
         array(
-            'error_msg'   => __( 'Content is too long for optimal readability', 'my-plugin' ),
-            'warning_msg' => __( 'Content is long but still allowed (warning)', 'my-plugin' ),
-            'description' => __( 'Long content can be difficult to read', 'my-plugin' ),
-            'type'        => 'settings',
-            'category'    => 'validation',
-            'priority'    => 10,
+            'namespace'    => 'my-plugin',
+            'name'         => 'content_length',
+            'error_msg'    => __( 'Content is too long for optimal readability', 'my-plugin' ),
+            'warning_msg'  => __( 'Content is long but still allowed (warning)', 'my-plugin' ),
+            'description'  => __( 'Long content can be difficult to read', 'my-plugin' ),
+            'level'        => 'error',
+            'configurable' => true,
+            'category'     => 'validation',
+            'priority'     => 10,
         )
     );
 }
 ```
 
-### Accessing the Registry Directly
-
-You can access the registry instance directly if needed:
-
-```php
-$registry = \BlockAccessibility\BlockChecksRegistry::get_instance();
-$registry->register_check( 'my-block/type', 'check_name', $args );
-```
-
 ## Configuration Options
 
-### Required Parameters
+### Required Keys
 
-- **`error_msg`** (string) - Error message shown when validation fails
+- **`namespace`** (string) — Your plugin's identifier for attribution in the settings table.
+- **`name`** (string) — Unique check name within the block type.
+- **`error_msg`** (string) — Error message shown when validation fails.
 
-### Optional Parameters
+### Optional Keys
 
-- **`warning_msg`** (string) - Warning message (defaults to `error_msg` if not provided)
-- **`description`** (string) - Description shown in settings UI
-- **`type`** (string) - Severity level:
-  - `'settings'` - Configurable in admin settings (error/warning/disabled)
-  - `'error'` - Always treated as an error
-  - `'warning'` - Always treated as a warning
-  - `'none'` - Check is disabled
-- **`category`** (string) - Issue category:
-  - `'accessibility'` - WCAG compliance and accessibility standards
-  - `'validation'` - Content validation and quality checks
-- **`priority`** (int) - Order of execution (lower = earlier, default: 10)
+- **`warning_msg`** (string) — Warning message (defaults to `error_msg` if not provided).
+- **`description`** (string) — Description shown in the settings UI.
+- **`level`** (string) — Default severity: `'error'`, `'warning'`, or `'none'`. Default: `'error'`.
+- **`configurable`** (bool) — Whether the admin can change the level in settings. Default: `true`. Checks with `configurable: false` are excluded from the settings table.
+- **`category`** (string) — `'accessibility'` or `'validation'`. Used as a filter in the settings table.
+- **`priority`** (int) — Execution order (lower = earlier). Default: `10`.
+- **`enabled`** (bool) — Whether the check is active. Default: `true`.
 
 ## Settings Integration
 
-Checks registered with `'type' => 'settings'` automatically appear in the admin settings UI, allowing site admins to configure severity levels and enable/disable checks.
+Checks with `'configurable' => true` appear in the unified DataViews settings table, allowing site admins to change the severity level (error / warning / disabled) per check.
 
-The settings are stored in the `block_checks_options` option and can be accessed via:
+Settings are stored in the `ba11yc_settings` option under the `block` key:
 
 ```php
-$options = get_option( 'block_checks_options', array() );
-$check_level = $options['my-block/type']['check_name'] ?? 'settings';
+$settings = get_option( 'ba11yc_settings', array() );
+$level    = $settings['block']['my-plugin/custom-block']['content_length'] ?? 'error';
 ```
 
 ## Advanced Patterns
 
 ### Conditional Registration
 
-Register checks only for specific scenarios:
+Register checks only under specific conditions:
 
 ```php
-add_action( 'ba11yc_register_checks', function( $registry ) {
-    if ( get_post_type() === 'product' ) {
-        $registry->register_check( 'core/image', 'product_image_requirements', [
-            'error_msg' => __( 'Product images must have descriptive alt text.', 'my-plugin' ),
-            'type'      => 'error',
-        ] );
+add_action( 'ba11yc_register_checks', function() {
+    if ( post_type_exists( 'product' ) ) {
+        ba11yc_register_block_check( 'core/image', array(
+            'namespace'    => 'my-plugin',
+            'name'         => 'product_image_requirements',
+            'error_msg'    => __( 'Product images must have descriptive alt text.', 'my-plugin' ),
+            'level'        => 'error',
+            'configurable' => false,
+        ) );
     }
 } );
 ```
 
 ### Modifying Check Configuration
 
-Use filters to modify check configuration:
+Use the `ba11yc_check_args` filter to modify check configuration before it is stored:
 
 ```php
 add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name ) {
@@ -103,8 +97,6 @@ add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name
 
 ### Preventing Check Registration
 
-Conditionally prevent checks from being registered:
-
 ```php
 add_filter( 'ba11yc_should_register_check', function( $should_register, $block_type, $check_name, $check_args ) {
     if ( $check_name === 'optional_check' && ! current_user_can( 'manage_options' ) ) {
@@ -114,39 +106,24 @@ add_filter( 'ba11yc_should_register_check', function( $should_register, $block_t
 }, 10, 4 );
 ```
 
-## API Methods
-
-### Quick Reference
-
-- **`register_check( $block_type, $check_name, $check_args )`** - Register a new check
-- **`unregister_check( $block_type, $check_name )`** - Remove a check
-- **`set_check_enabled( $block_type, $check_name, $enabled )`** - Enable/disable a check
-- **`is_check_registered( $block_type, $check_name )`** - Check if a check is registered
-- **`get_check_config( $block_type, $check_name )`** - Get check configuration
-- **`get_checks( $block_type )`** - Get all checks for a block type
-- **`get_all_checks()`** - Get all registered checks
-- **`get_effective_check_level( $block_type, $check_name )`** - Get effective severity level
-
-For complete API documentation, see the [API Reference](../reference/api.md).
-
 ## Action Hooks
 
 ### `ba11yc_ready`
 
-Fired when the plugin is ready for developer interaction. Provides access to the `BlockChecksRegistry` instance.
+Fired when the plugin is ready for developer interaction.
 
 ```php
-add_action( 'ba11yc_ready', function( $registry, $plugin_initializer ) {
+add_action( 'ba11yc_ready', function() {
     // Register your checks here
 } );
 ```
 
 ### `ba11yc_register_checks`
 
-Fired during check registration phase. Use this to register custom checks.
+Alternative hook fired during the check registration phase.
 
 ```php
-add_action( 'ba11yc_register_checks', function( $registry ) {
+add_action( 'ba11yc_register_checks', function() {
     // Register your checks here
 } );
 ```
@@ -184,4 +161,3 @@ For complete hooks documentation, see the [Hooks Reference](../reference/hooks.m
 - [API Reference](../reference/api.md)
 - [Hooks Reference](../reference/hooks.md)
 - [Architecture](../architecture.md)
-

@@ -1,6 +1,6 @@
 # Editor Validation - PHP Integration
 
-This guide explains how to register editor validation checks and interact with the `EditorChecksRegistry` API in PHP.
+This guide explains how to register editor validation checks using the `ba11yc_register_editor_check()` API.
 
 ## Overview
 
@@ -8,21 +8,23 @@ PHP is used to register editor checks, configure metadata, and expose settings t
 
 ## Registering Checks
 
-### Using Action Hooks
+### Using the Global Registration Function
 
-Use the `ba11yc_editor_checks_ready` action to register your checks:
+Use `ba11yc_register_editor_check()` inside the `ba11yc_editor_checks_ready` action:
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check(
-        'post',              // Post type
-        'first_block_heading', // Check name
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check(
+        'post',
         array(
-            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
-            'warning_msg' => __( 'Consider starting with a heading.', 'text-domain' ),
-            'description' => __( 'Ensures content starts with a heading.', 'text-domain' ),
-            'type'        => 'settings',
-            'priority'    => 10,
+            'namespace'    => 'my-plugin',
+            'name'         => 'first_block_heading',
+            'error_msg'    => __( 'The first block must be a Heading.', 'text-domain' ),
+            'warning_msg'  => __( 'Consider starting with a heading.', 'text-domain' ),
+            'description'  => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'level'        => 'error',
+            'configurable' => true,
+            'priority'     => 10,
         )
     );
 } );
@@ -30,89 +32,74 @@ add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
 
 ### Registering for Multiple Post Types
 
-Use the convenience method to register the same check for multiple post types:
+Use `register_editor_check_for_post_types()` on the registry directly to register the same check for multiple post types:
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check_for_post_types(
+add_action( 'ba11yc_editor_checks_ready', function() {
+    \BlockAccessibility\Editor\Registry::get_instance()->register_editor_check_for_post_types(
         array( 'post', 'page', 'custom_post_type' ),
         'first_block_heading',
         array(
-            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
-            'type'        => 'error',
-            'description' => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'namespace'    => 'my-plugin',
+            'error_msg'    => __( 'The first block must be a Heading.', 'text-domain' ),
+            'description'  => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'level'        => 'error',
+            'configurable' => false,
         )
     );
 } );
 ```
 
-### Accessing the Registry Directly
-
-You can access the registry instance directly if needed:
-
-```php
-$registry = \BlockAccessibility\EditorChecksRegistry::get_instance();
-$registry->register_editor_check( 'post', 'check_name', $args );
-```
-
 ## Configuration Options
 
-### Required Parameters
+### Required Keys
 
-- **`error_msg`** (string) - Error message shown when validation fails
+- **`namespace`** (string) — Plugin identifier for attribution in the settings table.
+- **`name`** (string) — Unique check name within the post type.
+- **`error_msg`** (string) — Message shown when validation fails.
 
-### Optional Parameters
+### Optional Keys
 
-- **`warning_msg`** (string) - Warning message (defaults to `error_msg` if not provided)
-- **`description`** (string) - Description shown in settings UI
-- **`type`** (string) - Severity level:
-  - `'settings'` - Configurable in admin settings (error/warning/disabled)
-  - `'error'` - Always treated as an error
-  - `'warning'` - Always treated as a warning
-  - `'none'` - Check is disabled
-- **`priority`** (int) - Order of execution (lower = earlier, default: 10)
-- **`enabled`** (bool) - Whether check is enabled (default: true)
+- **`warning_msg`** (string) — Warning message (defaults to `error_msg`).
+- **`description`** (string) — Description shown in the settings UI.
+- **`level`** (string) — Default severity: `'error'`, `'warning'`, or `'none'`. Default: `'error'`.
+- **`configurable`** (bool) — Whether the admin can change the level in settings. Default: `true`.
+- **`priority`** (int) — Execution order (lower = earlier). Default: `10`.
+- **`enabled`** (bool) — Whether the check is active. Default: `true`.
 
 ## Settings Integration
 
-Checks registered with `'type' => 'settings'` automatically appear in the admin settings UI, allowing site admins to configure severity levels and enable/disable checks.
+Checks with `'configurable' => true` appear in the unified DataViews settings table, allowing site admins to change the severity level per check.
 
 ## Advanced Patterns
 
 ### Conditional Registration
 
-Register checks only for specific scenarios:
-
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    if ( get_post_type() === 'product' ) {
-        $registry->register_editor_check( 'product', 'has_product_image', [
-            'error_msg' => __( 'Product posts must include an image block.', 'my-plugin' ),
-            'type'      => 'error',
-        ] );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    if ( post_type_exists( 'product' ) ) {
+        ba11yc_register_editor_check( 'product', array(
+            'namespace'    => 'my-plugin',
+            'name'         => 'has_product_image',
+            'error_msg'    => __( 'Product posts must include an image block.', 'my-plugin' ),
+            'level'        => 'error',
+            'configurable' => false,
+        ) );
     }
 } );
-```
-
-### Modifying Check Configuration
-
-Use filters to modify check configuration (if available):
-
-```php
-// Note: Editor checks may not have all the same filters as block checks
-// Check the hooks reference for available filters
 ```
 
 ## API Methods
 
 ### Quick Reference
 
-- **`register_editor_check( $post_type, $check_name, $check_args )`** - Register a check for a post type
-- **`register_editor_check_for_post_types( $post_types, $check_name, $check_args )`** - Register for multiple post types
-- **`get_editor_checks( $post_type )`** - Get all checks for a post type
-- **`get_all_editor_checks()`** - Get all registered editor checks
-- **`get_editor_check_config( $post_type, $check_name )`** - Get check configuration
-- **`get_effective_editor_check_level( $post_type, $check_name )`** - Get effective severity level
+- **`ba11yc_register_editor_check( $post_type, $args )`** — Global function for registration
+- **`register_editor_check( $post_type, $check_name, $check_args )`** — Registry method
+- **`register_editor_check_for_post_types( $post_types, $check_name, $check_args )`** — Register for multiple post types
+- **`get_editor_checks( $post_type )`** — Get all checks for a post type
+- **`get_all_editor_checks()`** — Get all registered editor checks
+- **`get_editor_check_config( $post_type, $check_name )`** — Get check configuration
+- **`get_effective_editor_check_level( $post_type, $check_name )`** — Get effective severity level
 
 For complete API documentation, see the [API Reference](../reference/api.md).
 
@@ -120,10 +107,10 @@ For complete API documentation, see the [API Reference](../reference/api.md).
 
 ### `ba11yc_editor_checks_ready`
 
-Fired when the editor checks registry is ready for developer interaction. Provides access to the `EditorChecksRegistry` instance.
+Fired when the editor checks registry is ready for developer interaction.
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry, $plugin_initializer ) {
+add_action( 'ba11yc_editor_checks_ready', function() {
     // Register your editor checks here
 } );
 ```
@@ -133,47 +120,47 @@ add_action( 'ba11yc_editor_checks_ready', function( $registry, $plugin_initializ
 ### Enforce First Block is a Heading
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check_for_post_types(
+add_action( 'ba11yc_editor_checks_ready', function() {
+    \BlockAccessibility\Editor\Registry::get_instance()->register_editor_check_for_post_types(
         array( 'post', 'page' ),
         'first_block_heading',
         array(
-            'error_msg'   => __( 'The first block must be a Heading.', 'text-domain' ),
-            'type'        => 'error',
-            'description' => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'namespace'    => 'my-plugin',
+            'error_msg'    => __( 'The first block must be a Heading.', 'text-domain' ),
+            'description'  => __( 'Ensures content starts with a heading.', 'text-domain' ),
+            'level'        => 'error',
+            'configurable' => false,
         )
     );
 } );
 ```
 
-### Limit Paragraph Count
+### Limit Paragraph Count (Warning)
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check(
-        'post',
-        'max_paragraphs',
-        array(
-            'warning_msg' => __( 'Consider using fewer paragraphs for brevity.', 'text-domain' ),
-            'type'        => 'warning',
-            'description' => __( 'Warns if there are more than 3 paragraphs.', 'text-domain' ),
-        )
-    );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'post', array(
+        'namespace'    => 'my-plugin',
+        'name'         => 'max_paragraphs',
+        'warning_msg'  => __( 'Consider using fewer paragraphs for brevity.', 'text-domain' ),
+        'description'  => __( 'Warns if there are more than 3 paragraphs.', 'text-domain' ),
+        'level'        => 'warning',
+        'configurable' => true,
+    ) );
 } );
 ```
 
 ### Ensure Specific Block Exists
 
 ```php
-add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
-    $registry->register_editor_check(
-        'page',
-        'has_copyright',
-        array(
-            'error_msg'   => __( 'A Copyright block is required.', 'text-domain' ),
-            'type'        => 'error',
-        )
-    );
+add_action( 'ba11yc_editor_checks_ready', function() {
+    ba11yc_register_editor_check( 'page', array(
+        'namespace'    => 'my-plugin',
+        'name'         => 'has_copyright',
+        'error_msg'    => __( 'A Copyright block is required.', 'text-domain' ),
+        'level'        => 'error',
+        'configurable' => false,
+    ) );
 } );
 ```
 
@@ -184,4 +171,3 @@ add_action( 'ba11yc_editor_checks_ready', function( $registry ) {
 - [API Reference](../reference/api.md)
 - [Hooks Reference](../reference/hooks.md)
 - [Architecture](../architecture.md)
-
