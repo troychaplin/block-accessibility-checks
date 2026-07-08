@@ -1,5 +1,5 @@
-const defaultConfig = require( '@wordpress/scripts/config/eslint.config.cjs' );
-const prettierConfig = require( 'eslint-config-prettier' );
+const defaultConfig = require('@wordpress/scripts/config/eslint.config.cjs');
+const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
 	...defaultConfig,
@@ -12,7 +12,7 @@ module.exports = [
 			'@wordpress/no-unsafe-wp-apis': 'off',
 			// @wordpress/* packages are WordPress externals — available at runtime but not all
 			// installed on disk. Suppress the unresolved-import error for this namespace.
-			'import/no-unresolved': [ 'error', { ignore: [ '^@wordpress/' ] } ],
+			'import/no-unresolved': ['error', { ignore: ['^@wordpress/'] }],
 		},
 	},
 ];

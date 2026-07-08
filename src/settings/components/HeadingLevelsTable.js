@@ -24,9 +24,7 @@ export function HeadingLevelsTable({ headingLevels = ['h1'], onChange }) {
 	const isEnabled = level => !headingLevels.includes(level);
 
 	const toggle = (level, enabled) => {
-		const next = enabled
-			? headingLevels.filter(l => l !== level)
-			: [...headingLevels, level];
+		const next = enabled ? headingLevels.filter(l => l !== level) : [...headingLevels, level];
 		onChange(next);
 	};
 
@@ -44,12 +42,8 @@ export function HeadingLevelsTable({ headingLevels = ['h1'], onChange }) {
 			<table className="ba11yc-heading-levels__table">
 				<thead>
 					<tr>
-						<th scope="col">
-							{__('Level', 'block-accessibility-checks')}
-						</th>
-						<th scope="col">
-							{__('Enable in editor', 'block-accessibility-checks')}
-						</th>
+						<th scope="col">{__('Level', 'block-accessibility-checks')}</th>
+						<th scope="col">{__('Enable in editor', 'block-accessibility-checks')}</th>
 					</tr>
 				</thead>
 				<tbody>

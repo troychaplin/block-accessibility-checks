@@ -46,7 +46,8 @@ export function App() {
 			} catch (error) {
 				setNotice({
 					status: 'error',
-					message: error.message || __('Failed to load checks.', 'block-accessibility-checks'),
+					message:
+						error.message || __('Failed to load checks.', 'block-accessibility-checks'),
 				});
 			} finally {
 				setIsLoading(false);
@@ -123,7 +124,8 @@ export function App() {
 		} catch (error) {
 			setNotice({
 				status: 'error',
-				message: error.message || __('Failed to save settings.', 'block-accessibility-checks'),
+				message:
+					error.message || __('Failed to save settings.', 'block-accessibility-checks'),
 			});
 		} finally {
 			setIsSaving(false);
@@ -249,7 +251,9 @@ export function App() {
 	return (
 		<div className="ba11yc-page">
 			<div className="ba11yc-page__header">
-				<h1>{__('Block Accessibility Checks & Validation', 'block-accessibility-checks')}</h1>
+				<h1>
+					{__('Block Accessibility Checks & Validation', 'block-accessibility-checks')}
+				</h1>
 				<Button
 					variant="primary"
 					onClick={handleSave}

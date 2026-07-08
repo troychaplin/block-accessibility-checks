@@ -20,9 +20,7 @@ export function GeneralPanel({ general, onChange }) {
 	const siteEditorEnabled = general?.siteEditorEnabled !== false;
 
 	const toggleHeading = (level, isChecked) => {
-		const next = isChecked
-			? [...headingLevels, level]
-			: headingLevels.filter(l => l !== level);
+		const next = isChecked ? [...headingLevels, level] : headingLevels.filter(l => l !== level);
 		onChange({ ...general, headingLevels: next });
 	};
 
