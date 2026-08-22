@@ -261,10 +261,10 @@ You can spin up a local demo environment using the included blueprint — no Doc
 
 ```bash
 # Production blueprint (installs BAC from wordpress.org — requires v4 to be released)
-npx @wp-playground/cli server --blueprint=./assets/blueprints/blueprint.json
+pnpm dlx @wp-playground/cli server --blueprint=./assets/blueprints/blueprint.json
 
 # Local testing blueprint (installs BAC from GitHub main — use this before v4 ships)
-npx @wp-playground/cli server --blueprint=./assets/blueprints/blueprint-local.json
+pnpm dlx @wp-playground/cli server --blueprint=./assets/blueprints/blueprint-local.json
 ```
 
 The server prints a localhost URL. Open it in your browser to explore the demo environment, then press `Ctrl+C` to shut it down.
@@ -277,21 +277,21 @@ To get started do the following:
 - Create a branch off of `main`
 - Open a terminal window and clone your fork
 - Using a terminal run the following inside the forked repo
-    - `npm -g i @wordpress/env` -- installs wp-env if you don't already have it
-    - `npm install` -- installs dependencies for this project
+    - `corepack enable` -- activates pnpm using the version pinned in `package.json`
+    - `pnpm install` -- installs dependencies for this project (this also installs `wp-env` locally)
 
 ### Start Developing
 
 This repo uses [@wordpress/env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme) that setups up a local WordPress environment using Docker.
 
 - Make sure `Docker Desktop` is running
-- Start WordPress: `wp-env start`
+- Start WordPress: `pnpm wp-env start`
 
 #### Other Commands
 
-- Stop WordPress: `wp-env stop`
-- Start watch task: `npm run start`
-- Build assets: `npm run build`
+- Stop WordPress: `pnpm wp-env stop`
+- Start watch task: `pnpm start`
+- Build assets: `pnpm build`
 
 ## Finishing a Branch
 
@@ -306,14 +306,14 @@ When you are done developing a feature or a fix:
 - User: `admin`
 - Password: `password`
 
-**Important:** when you're done working don't forget to stop the WordPress docker environment by running `wp-env stop`
+**Important:** when you're done working don't forget to stop the WordPress docker environment by running `pnpm wp-env stop`
 
 ## Contributing Guidelines
 
 When you are done developing a feature or fix:
 
 1. Ensure your code follows WordPress coding standards
-2. Run `npm run build` to build production assets
+2. Run `pnpm build` to build production assets
 3. Test with both core WordPress blocks and custom blocks
 4. Create a PR from your branch into the primary repo
 5. Fill out relevant info in as much detail as possible in the PR template

@@ -19,11 +19,15 @@ Prefix the change with one of these keywords:
 
 ### Changed
 
-- Option to enable valdiation for Site Editor in Settings UI updated for improved clarity
+- Image alt text error now reads "Images are required to have alternative text or be marked as decorative", surfacing the native decorative-image option that WordPress 7.1 adds to `core/image`; on WordPress 6.7–7.0 no decorative control exists, so alt text remains the only available fix there
+- Site Editor toggles in the settings table now announce "Enable in Site Editor" rather than "Enable"; the label is hidden from vision, so screen reader users heard a context-free "Enable" on every row with no indication of which column it controlled
+- Editor sidebar retitled "Accessibility & Validation" (previously "Validation")
+- Build tooling migrated from npm to pnpm — `pnpm-lock.yaml` replaces `package-lock.json`; run `corepack enable && pnpm install` after pulling
+- Updated `@wordpress/*` packages, most notably `components` 35 → 39 and `dataviews` 16 → 18, which back the settings UI
 
 ## [4.0.0]
 
-> **Developer note:** This release contains breaking changes to the registration API and JavaScript filter hooks. End users are not affected — settings migrate automatically on first load after upgrading. See [docs/upgrade-to-v4.md](docs/upgrade-to-v4.md) for a full migration checklist.
+> **Developer note:** This release contains breaking changes to the registration API and JavaScript filter hooks. Settings migrate automatically on first load after upgrading, so admins need take no action — but see **Decorative Images** below for the one change that does affect existing post content. See [docs/upgrade-to-v4.md](docs/upgrade-to-v4.md) for a full migration checklist.
 
 ### Breaking Changes
 
@@ -67,6 +71,17 @@ const invalidBlocks = useSelect(
 );
 ```
 
+#### Decorative Images
+
+The plugin no longer registers its own `isDecorative` attribute or the "Accessibility Settings" inspector panel on `core/image`. Marking an image decorative is now WordPress core's feature, added in **WordPress 7.1**.
+
+The attribute name is unchanged, so the saved value carries forward — but core's version writes `role="none"` onto the `<img>` in the block's save output, where the plugin's never altered the markup at all. Existing content therefore behaves differently depending on the WordPress version:
+
+| WordPress | Effect on images marked decorative in v3 |
+|---|---|
+| 7.1+ | Block validation fails on first edit ("this block contains unexpected or invalid content") because the stored markup lacks the `role="none"` core now generates. Attempting recovery re-saves the block correctly and the decorative flag is kept. |
+| 6.7 – 7.0 | Nothing registers `isDecorative`, so the flag is ignored: affected images are reported as missing alt text, and the value is dropped from post content on the next save. |
+
 #### REST API Namespace
 
 Changed from `block-accessibility/v1` to `block-accessibility-checks/v1`. The new namespace exposes `GET /checks` and `GET|POST /settings`. The v3 routes no longer exist.
@@ -99,6 +114,7 @@ External plugins no longer receive their own submenu page. All configurable chec
 - `includes/Core/SettingsAPI.php` — replaced by `Rest/ChecksController.php` and `Rest/SettingsController.php`
 - Separate per-page settings JavaScript bundles — replaced by a single unified `settings.js`
 - Automatic external plugin detection (`$plugin_info` parameter) — replaced by the required `namespace` key in `$args`
+- Custom `isDecorative` attribute and the "Accessibility Settings" inspector panel on `core/image` — superseded by the native decorative-image option in WordPress 7.1 (see **Decorative Images** above)
 
 ## [3.0.2]
 

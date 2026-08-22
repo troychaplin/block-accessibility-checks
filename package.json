@@ -5,6 +5,7 @@
 	"author": "Troy Chaplin",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
+	"packageManager": "pnpm@10.34.2",
 	"lint-staged": {
 		"*.{css,scss}": [
 			"stylelint --fix",
@@ -26,42 +27,51 @@
 	"scripts": {
 		"build": "wp-scripts build",
 		"start": "wp-scripts start",
-		"format": "npm run format:js && npm run format:php && npm run format:css",
+		"format": "pnpm format:js && pnpm format:php && pnpm format:css",
 		"format:js": "wp-scripts lint-js --fix",
 		"format:php": "composer run format",
 		"format:css": "stylelint \"**/*.scss\" --fix",
-		"lint": "npm run lint:js && npm run lint:php && npm run lint:css",
+		"lint": "pnpm lint:js && pnpm lint:php && pnpm lint:css",
 		"lint:js": "wp-scripts lint-js",
 		"lint:php": "composer run lint",
 		"lint:css": "stylelint \"**/*.scss\"",
-		"clean": "rm -rf node_modules ; rm package-lock.json ; npm install ; npm run build",
+		"clean": "rm -rf node_modules pnpm-lock.yaml && pnpm install && pnpm build",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@wordpress/compose": "^7.0.0",
-		"@wordpress/data": "10.48.0",
-		"@wordpress/element": "8.0.0",
-		"@wordpress/env": "11.8.0",
-		"@wordpress/eslint-plugin": "25.4.0",
-		"@wordpress/hooks": "^4.0.0",
-		"@wordpress/i18n": "6.21.0",
-		"@wordpress/plugins": "7.48.0",
-		"@wordpress/prettier-config": "4.48.0",
-		"@wordpress/scripts": "32.4.0",
-		"@wordpress/stylelint-config": "23.40.0",
-		"eslint": "^10.0.0",
+		"@wordpress/compose": "^8.6.0",
+		"@wordpress/data": "10.53.0",
+		"@wordpress/element": "8.5.0",
+		"@wordpress/env": "11.13.0",
+		"@wordpress/eslint-plugin": "25.9.0",
+		"@wordpress/hooks": "^4.53.0",
+		"@wordpress/i18n": "6.26.0",
+		"@wordpress/plugins": "7.53.0",
+		"@wordpress/prettier-config": "4.53.0",
+		"@wordpress/scripts": "34.1.0",
+		"@wordpress/stylelint-config": "24.2.0",
+		"eslint": "^10.9.0",
 		"eslint-config-prettier": "10.1.8",
 		"husky": "9.1.7",
-		"stylelint": "16.26.1",
-		"stylelint-scss": "6.14.0"
+		"stylelint": "17.14.1",
+		"stylelint-scss": "7.2.0"
 	},
 	"dependencies": {
-		"@wordpress/api-fetch": "^7.48.0",
-		"@wordpress/components": "^35.0.0",
-		"@wordpress/dataviews": "^16.0.1",
-		"@wordpress/icons": "^14.0.0",
-		"tldts": "^7.4.2"
+		"@wordpress/api-fetch": "^7.53.0",
+		"@wordpress/components": "^39.0.0",
+		"@wordpress/dataviews": "^18.0.0",
+		"@wordpress/icons": "^15.4.0",
+		"tldts": "^7.4.10"
+	},
+	"pnpm": {
+		"ignoredBuiltDependencies": [
+			"@parcel/watcher",
+			"core-js",
+			"core-js-pure",
+			"fs-ext-extra-prebuilt",
+			"unrs-resolver"
+		]
 	}
 }
