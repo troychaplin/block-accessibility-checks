@@ -23,6 +23,8 @@ Prefix the change with one of these keywords:
 - Site Editor toggles in the settings table now announce "Enable in Site Editor" rather than "Enable"; the label is hidden from vision, so screen reader users heard a context-free "Enable" on every row with no indication of which column it controlled
 - Editor sidebar retitled "Accessibility & Validation" (previously "Validation")
 - Blocks with accessibility issues are now marked with a 2px outline around the whole block (red for errors, yellow for warnings), replacing the small triangle in the block's top-left corner; the outline identifies the affected block at a glance instead of relying on a 15px corner marker that was easy to overlook
+- Outline colors switched to the darker `--ba11yc-dark-red` / `--ba11yc-dark-yellow` tokens; the previous bright yellow (`#f0dc00`) had only ~1.4:1 contrast against a white canvas, well under the 3:1 minimum for non-text UI indicators (WCAG 1.4.11), so warning outlines were nearly invisible on most blocks
+- Editor header sidebar icon now shows a light-red/light-yellow chip with a dark-red/dark-yellow glyph when errors or warnings are present (previously a plain currentColor icon with ad hoc red/yellow fill); the pressed state is untouched, so core's default dark background and white icon still apply when the sidebar is open
 - Build tooling migrated from npm to pnpm — `pnpm-lock.yaml` replaces `package-lock.json`; run `corepack enable && pnpm install` after pulling
 - Updated `@wordpress/*` packages, most notably `components` 35 → 39 and `dataviews` 16 → 18, which back the settings UI
 

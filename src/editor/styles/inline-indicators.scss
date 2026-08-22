@@ -1,4 +1,4 @@
-// Block validation indicator — CSS-only colored corner triangle.
+// Block validation indicator — solid outline around the block, colored by severity.
 // Classes are applied to the block's own element via editor.BlockListBlock wrapperProps.
 .ba11yc-block-error {
     outline: 2px solid var(--ba11yc-red);

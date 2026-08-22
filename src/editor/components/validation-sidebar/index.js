@@ -160,14 +160,14 @@ export function ValidationSidebar() {
 		deduplicatedMetaWarnings.length +
 		deduplicatedEditorWarnings.length;
 
-	let iconColor = 'currentColor';
+	let severityClass = '';
 	if (totalErrors > 0) {
-		iconColor = '#d82000';
+		severityClass = 'ba11yc-sidebar-icon-error';
 	} else if (totalWarnings > 0) {
-		iconColor = '#dbc900';
+		severityClass = 'ba11yc-sidebar-icon-warning';
 	}
 
-	const sidebarIcon = <ValidationIcon fill={iconColor} />;
+	const sidebarIcon = <ValidationIcon className={severityClass} />;
 
 	/**
 	 * Handle clicking on a block validation issue.
