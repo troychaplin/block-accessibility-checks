@@ -22,6 +22,7 @@ Prefix the change with one of these keywords:
 - Image alt text error now reads "Images are required to have alternative text or be marked as decorative", surfacing the native decorative-image option that WordPress 7.1 adds to `core/image`; on WordPress 6.7–7.0 no decorative control exists, so alt text remains the only available fix there
 - Site Editor toggles in the settings table now announce "Enable in Site Editor" rather than "Enable"; the label is hidden from vision, so screen reader users heard a context-free "Enable" on every row with no indication of which column it controlled
 - Editor sidebar retitled "Accessibility & Validation" (previously "Validation")
+- Blocks with accessibility issues are now marked with a 2px outline around the whole block (red for errors, yellow for warnings), replacing the small triangle in the block's top-left corner; the outline identifies the affected block at a glance instead of relying on a 15px corner marker that was easy to overlook
 - Build tooling migrated from npm to pnpm — `pnpm-lock.yaml` replaces `package-lock.json`; run `corepack enable && pnpm install` after pulling
 - Updated `@wordpress/*` packages, most notably `components` 35 → 39 and `dataviews` 16 → 18, which back the settings UI
 
