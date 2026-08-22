@@ -115,7 +115,7 @@ class CoreChecks {
 			'core/image'   => array(
 				'check_image_alt_text'          => array(
 					'namespace'    => $namespace,
-					'error_msg'    => \__( 'Images are required to have alternative text', 'block-accessibility-checks' ),
+					'error_msg'    => \__( 'Images are required to have alternative text or be marked as decorative', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Using alt text is highly recommended', 'block-accessibility-checks' ),
 					'description'  => \__( 'Images require alternative text', 'block-accessibility-checks' ),
 					'level'        => 'error',
