@@ -167,13 +167,15 @@ class Assets {
 
 		$this->translations->setup_script_translations( self::SETTINGS_HANDLE );
 
-		// Display-name maps for the settings UI (block titles + post type labels).
+		// Display-name maps for the settings UI (block titles, post type labels,
+		// and namespace -> plugin name).
 		\wp_add_inline_script(
 			self::SETTINGS_HANDLE,
 			'window.ba11ycSettings = ' . \wp_json_encode(
 				array(
 					'blockTitles'    => $this->get_block_titles(),
 					'postTypeLabels' => $this->get_post_type_labels(),
+					'pluginNames'    => $this->get_plugin_names(),
 				)
 			) . ';',
 			'before'
@@ -438,6 +440,40 @@ class Assets {
 		}
 
 		return $titles;
+	}
+
+	/**
+	 * Build a map of plugin namespace slugs to their human-readable plugin names.
+	 *
+	 * Checks are registered with a `namespace` slug and nothing else identifying —
+	 * there is no display name in the registry — so the name is resolved by matching
+	 * the namespace against installed plugin directory slugs, which is the
+	 * convention integrations follow. Namespaces that match no installed plugin are
+	 * simply omitted; the client falls back to title-casing the slug.
+	 *
+	 * @return array
+	 */
+	private function get_plugin_names(): array {
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$names = array();
+
+		foreach ( \get_plugins() as $plugin_file => $plugin_data ) {
+			if ( empty( $plugin_data['Name'] ) ) {
+				continue;
+			}
+
+			$slug = dirname( $plugin_file );
+			if ( '.' === $slug ) {
+				continue; // Single-file plugin, no directory to match a namespace against.
+			}
+
+			$names[ $slug ] = $plugin_data['Name'];
+		}
+
+		return $names;
 	}
 
 	/**

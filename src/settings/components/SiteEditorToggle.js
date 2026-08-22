@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 export function SiteEditorToggle({ value, onChange }) {
 	return (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			label={__('Enable in Site Editor', 'block-accessibility-checks')}
 			hideLabelFromVision
 			checked={value}

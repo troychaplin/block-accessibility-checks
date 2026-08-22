@@ -42,6 +42,7 @@ abstract class AbstractRegistry {
 	 * @var array
 	 */
 	const DEFAULTS = array(
+		'title'        => '',
 		'error_msg'    => '',
 		'warning_msg'  => '',
 		'level'        => 'error',
@@ -51,6 +52,56 @@ abstract class AbstractRegistry {
 		'description'  => '',
 		'configurable' => true,
 	);
+
+	/**
+	 * Display names declared for check namespaces, keyed by namespace slug.
+	 *
+	 * Static so the three scope registries (Block, Meta, Editor) share one map:
+	 * a plugin declares its name once and every check it registers is credited
+	 * to it, whichever scope those checks belong to.
+	 *
+	 * @var array
+	 */
+	private static $namespace_titles = array();
+
+	/**
+	 * Declare the display name for a check namespace.
+	 *
+	 * Lets a plugin name itself once instead of repeating the name on every
+	 * check it registers.
+	 *
+	 * @param string $namespace_slug Namespace slug used by the plugin's checks.
+	 * @param array  $args           Accepts a 'title' key.
+	 * @return bool True when a title was stored.
+	 */
+	public static function register_namespace( string $namespace_slug, array $args ): bool {
+		if ( '' === $namespace_slug ) {
+			return false;
+		}
+
+		$title = isset( $args['title'] ) ? (string) $args['title'] : '';
+		if ( '' === $title ) {
+			return false;
+		}
+
+		self::$namespace_titles[ $namespace_slug ] = $title;
+
+		return true;
+	}
+
+	/**
+	 * Resolve the display name for a namespace.
+	 *
+	 * Deliberately resolved on read rather than stamped at registration time:
+	 * a plugin's namespace declaration and its checks are both registered on
+	 * `ba11yc_ready`, and callers cannot be expected to order the two.
+	 *
+	 * @param string $namespace_slug Namespace slug.
+	 * @return string The declared title, or an empty string when none was declared.
+	 */
+	public static function get_namespace_title( string $namespace_slug ): string {
+		return self::$namespace_titles[ $namespace_slug ] ?? '';
+	}
 
 	/**
 	 * Severity levels accepted by the framework.
