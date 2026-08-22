@@ -2,11 +2,16 @@ import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { Button, Notice, Spinner, VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { transformChecksToRows, rowsToSettings } from './utils/transform';
-import { SeveritySelect } from './components/SeveritySelect';
+import { DataViews, DataForm, filterSortAndPaginate } from '@wordpress/dataviews';
+import {
+	transformChecksToRows,
+	rowsToSettings,
+	collectNonConfigurableSettings,
+	reapplySettingsToRows,
+} from './utils/transform';
+import { SeveritySelect, LEVEL_OPTIONS } from './components/SeveritySelect';
 import { SiteEditorToggle } from './components/SiteEditorToggle';
-import { HeadingLevelsTable } from './components/HeadingLevelsTable';
+import { HEADING_LEVEL_FIELDS, HEADING_LEVEL_FORM } from './components/HeadingLevelsField';
 
 const CHECKS_PATH = '/block-accessibility-checks/v1/checks';
 const SETTINGS_PATH = '/block-accessibility-checks/v1/settings';
@@ -28,6 +33,9 @@ const DEFAULT_GENERAL = { headingLevels: [] };
 export function App() {
 	const [rows, setRows] = useState([]);
 	const [general, setGeneral] = useState(DEFAULT_GENERAL);
+	// Saved settings for checks the table never lists (`configurable: false`).
+	// Carried through every save so the full-replace POST cannot drop them.
+	const [preservedSettings, setPreservedSettings] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isDirty, setIsDirty] = useState(false);
@@ -42,6 +50,7 @@ export function App() {
 					apiFetch({ path: SETTINGS_PATH }),
 				]);
 				setRows(transformChecksToRows(checks, settings));
+				setPreservedSettings(collectNonConfigurableSettings(checks, settings));
 				setGeneral({ ...DEFAULT_GENERAL, ...(settings?.general || {}) });
 			} catch (error) {
 				setNotice({
@@ -89,8 +98,10 @@ export function App() {
 		setIsDirty(true);
 	}, []);
 
-	const handleGeneralChange = useCallback(headingLevels => {
-		setGeneral({ headingLevels });
+	// DataForm hands back a partial patch of the form data, so merge rather than
+	// replace — that also keeps any general setting this form does not cover.
+	const handleGeneralChange = useCallback(patch => {
+		setGeneral(prev => ({ ...prev, ...patch }));
 		setIsDirty(true);
 	}, []);
 
@@ -110,12 +121,18 @@ export function App() {
 		setIsSaving(true);
 		setNotice(null);
 		try {
-			const settings = rowsToSettings(rows, general);
-			await apiFetch({
+			const settings = rowsToSettings(rows, general, preservedSettings);
+			const saved = await apiFetch({
 				path: SETTINGS_PATH,
 				method: 'POST',
 				data: settings,
 			});
+
+			// Re-derive from the server's sanitized echo rather than trusting local
+			// state, so anything PHP rejected shows up immediately instead of
+			// silently diverging until the next reload.
+			setRows(prevRows => reapplySettingsToRows(prevRows, saved));
+			setGeneral({ ...DEFAULT_GENERAL, ...(saved?.general || {}) });
 			setIsDirty(false);
 			setNotice({
 				status: 'success',
@@ -130,7 +147,7 @@ export function App() {
 		} finally {
 			setIsSaving(false);
 		}
-	}, [rows, general]);
+	}, [rows, general, preservedSettings]);
 
 	const pluginElements = useMemo(() => {
 		const plugins = [...new Set(rows.map(r => r.plugin_name))].sort();
@@ -190,11 +207,7 @@ export function App() {
 			{
 				id: 'level',
 				label: __('Level', 'block-accessibility-checks'),
-				elements: [
-					{ value: 'error', label: __('Error', 'block-accessibility-checks') },
-					{ value: 'warning', label: __('Warning', 'block-accessibility-checks') },
-					{ value: 'none', label: __('Disabled', 'block-accessibility-checks') },
-				],
+				elements: LEVEL_OPTIONS,
 				filterBy: { isPrimary: true, operators: ['is'] },
 				render: ({ item }) => (
 					<div className="ba11yc-level-cell">
@@ -225,6 +238,11 @@ export function App() {
 			{
 				id: 'reset-to-default',
 				label: __('Reset to default', 'block-accessibility-checks'),
+				// `supportsBulk` is what renders the selection checkbox column and the
+				// bulk toolbar; DataViews owns the selection state itself, so no
+				// `selection`/`onChangeSelection` props are needed. Rows failing
+				// `isEligible` get a disabled checkbox rather than none at all.
+				supportsBulk: true,
 				isEligible: item => item.has_override || item.site_editor === true,
 				callback: items => handleResetToDefault(items),
 			},
@@ -289,10 +307,14 @@ export function App() {
 				/>
 			)}
 
-			<HeadingLevelsTable
-				headingLevels={general.headingLevels}
-				onChange={handleGeneralChange}
-			/>
+			<div className="ba11yc-page__general">
+				<DataForm
+					data={general}
+					fields={HEADING_LEVEL_FIELDS}
+					form={HEADING_LEVEL_FORM}
+					onChange={handleGeneralChange}
+				/>
+			</div>
 		</div>
 	);
 }

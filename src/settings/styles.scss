@@ -1,15 +1,22 @@
 @import "@wordpress/dataviews/build-style/style.css";
 
-// Page wrapper — sits outside the white card.
+// Full-bleed page. The admin chrome that normally constrains this (the `.wrap`
+// container and #wpcontent's padding) is stripped in Settings::render_page(),
+// so the app owns the full viewport and supplies its own edge padding.
 .ba11yc-page {
-	max-width: 1400px;
-	margin: 20px 20px 20px 0;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: none;
+	min-height: calc(100vh - 32px); // 32px = admin bar.
+	background: #fff;
 
 	&__header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 12px;
+		gap: 16px;
+		padding: 16px 24px;
+		border-bottom: 1px solid #e0e0e0;
 
 		h1 {
 			margin: 0;
@@ -20,7 +27,7 @@
 	}
 
 	.components-notice {
-		margin: 0 0 12px;
+		margin: 12px 24px;
 	}
 }
 
@@ -35,52 +42,21 @@
 	min-width: 120px;
 }
 
+.ba11yc-page__general {
+	padding: 20px 24px;
+}
+
 .ba11yc-heading-levels {
-	margin-top: 20px;
-	padding-top: 20px;
-	border-top: 1px solid #ddd;
-
-	&__title {
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0 0 4px;
-	}
-
 	&__description {
 		margin: 0 0 16px;
 		color: #646970;
 		font-size: 13px;
 	}
 
-	&__table {
-		border-collapse: collapse;
-
-		th {
-			text-align: left;
-			padding: 0 32px 8px 0;
-			font-size: 11px;
-			font-weight: 600;
-			color: #646970;
-			text-transform: uppercase;
-			letter-spacing: 0.05em;
-			border-bottom: 1px solid #ddd;
-		}
-
-		td {
-			padding: 8px 32px 8px 0;
-			border-bottom: 1px solid #f0f0f0;
-			vertical-align: middle;
-
-			code {
-				font-size: 13px;
-				font-weight: 600;
-				background: none;
-				padding: 0;
-			}
-		}
-
-		tr:last-child td {
-			border-bottom: none;
-		}
+	// Six short toggles read better as a wrapping row than a stacked column.
+	&__grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px 32px;
 	}
 }

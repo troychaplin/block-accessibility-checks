@@ -20,7 +20,7 @@ function namespaceToPluginName(namespace) {
 /**
  * Read a per-check site-editor flag from the settings tree.
  *
- * Defaults to true (enabled) when no explicit flag is stored.
+ * Defaults to false (disabled) when no explicit flag is stored.
  *
  * @param {Object} settings The saved settings object.
  * @param {Array}  path     The keys into settings.siteEditor (e.g. ['block', blockType, checkName]).
@@ -168,26 +168,146 @@ function setDeep(obj, path, value) {
 }
 
 /**
+ * Read a deeply-nested value, returning undefined if any segment is missing.
+ *
+ * @param {Object} obj  The source object.
+ * @param {Array}  path The key path.
+ * @return {*} The value, or undefined when the path does not resolve.
+ */
+function getDeep(obj, path) {
+	let node = obj;
+	for (const key of path) {
+		if (!node || typeof node !== 'object' || !(key in node)) {
+			return undefined;
+		}
+		node = node[key];
+	}
+	return node;
+}
+
+/**
+ * Build the settings path for a row, matching the layout of the settings tree.
+ *
+ * @param {Object} row A row object.
+ * @return {Array} The key path into the settings object.
+ */
+function rowSettingsPath(row) {
+	if (row.scope === 'meta') {
+		return ['meta', row.post_type, row.meta_key, row.check_name];
+	}
+	if (row.scope === 'editor') {
+		return ['editor', row.post_type, row.check_name];
+	}
+	return ['block', row.block_type, row.check_name];
+}
+
+/**
+ * Re-derive each row's editable state from a settings tree.
+ *
+ * Used after saving to rebuild rows from the server's sanitized response, so any
+ * value PHP rejected is reflected in the table rather than lingering in local
+ * state until the next reload. Display-only columns are left untouched.
+ *
+ * @param {Array}  rows     The current rows.
+ * @param {Object} settings The settings object returned by the server.
+ * @return {Array} Rows with level, has_override and site_editor re-derived.
+ */
+export function reapplySettingsToRows(rows, settings) {
+	return rows.map(row => {
+		const path = rowSettingsPath(row);
+		const override = getDeep(settings, path) ?? null;
+
+		return {
+			...row,
+			level: override ?? row.default_level,
+			has_override: override !== null,
+			site_editor: readSiteEditorFlag(settings, path),
+		};
+	});
+}
+
+/**
+ * Collect the saved settings belonging to checks the settings table never shows.
+ *
+ * Checks registered `configurable: false` are skipped by `transformChecksToRows`,
+ * so they never become rows. Because POST replaces the settings option wholesale,
+ * anything stored for them would be erased on the next save unless it is carried
+ * through explicitly. This returns just their stored level overrides and
+ * site-editor flags, ready to seed `rowsToSettings`.
+ *
+ * @param {Object} checks   The response from GET .../v1/checks.
+ * @param {Object} settings The response from GET .../v1/settings.
+ * @return {Object} Partial settings tree covering only non-configurable checks.
+ */
+export function collectNonConfigurableSettings(checks, settings) {
+	const preserved = {};
+
+	const preserve = path => {
+		const level = getDeep(settings, path);
+		if (level !== undefined) {
+			setDeep(preserved, path, level);
+		}
+
+		const siteEditorPath = ['siteEditor', ...path];
+		const flag = getDeep(settings, siteEditorPath);
+		if (flag !== undefined) {
+			setDeep(preserved, siteEditorPath, flag);
+		}
+	};
+
+	if (checks.block) {
+		for (const [blockType, blockChecks] of Object.entries(checks.block)) {
+			for (const [checkName, check] of Object.entries(blockChecks)) {
+				if (check.configurable === false) {
+					preserve(['block', blockType, checkName]);
+				}
+			}
+		}
+	}
+
+	if (checks.meta) {
+		for (const [postType, metaKeys] of Object.entries(checks.meta)) {
+			for (const [metaKey, metaChecks] of Object.entries(metaKeys)) {
+				for (const [checkName, check] of Object.entries(metaChecks)) {
+					if (check.configurable === false) {
+						preserve(['meta', postType, metaKey, checkName]);
+					}
+				}
+			}
+		}
+	}
+
+	if (checks.editor) {
+		for (const [postType, editorChecks] of Object.entries(checks.editor)) {
+			for (const [checkName, check] of Object.entries(editorChecks)) {
+				if (check.configurable === false) {
+					preserve(['editor', postType, checkName]);
+				}
+			}
+		}
+	}
+
+	return preserved;
+}
+
+/**
  * Convert flat rows + general settings back into the nested settings structure.
  *
- * Only overridden levels and disabled site-editor flags are persisted.
+ * Only overridden levels and enabled site-editor flags are persisted.
  *
- * @param {Array}  rows    The flat array of row objects.
- * @param {Object} general The general settings ({ headingLevels, siteEditorEnabled }).
+ * @param {Array}  rows      The flat array of row objects.
+ * @param {Object} general   The general settings ({ headingLevels }).
+ * @param {Object} preserved Settings for non-configurable checks, from
+ *                           `collectNonConfigurableSettings`. Seeded first so the
+ *                           full-replace POST does not drop them; paths are
+ *                           disjoint from the rows', so nothing is overwritten.
  * @return {Object} Nested settings object for POST .../v1/settings.
  */
-export function rowsToSettings(rows, general) {
-	const settings = {};
+export function rowsToSettings(rows, general, preserved = {}) {
+	const settings = structuredClone(preserved);
 
 	for (const row of rows) {
-		let levelPath;
-		if (row.scope === 'meta') {
-			levelPath = ['meta', row.post_type, row.meta_key, row.check_name];
-		} else if (row.scope === 'editor') {
-			levelPath = ['editor', row.post_type, row.check_name];
-		} else {
-			levelPath = ['block', row.block_type, row.check_name];
-		}
+		const levelPath = rowSettingsPath(row);
 
 		if (row.has_override) {
 			setDeep(settings, levelPath, row.level);
