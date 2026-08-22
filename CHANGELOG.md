@@ -17,6 +17,8 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+## [4.1.0]
+
 ### Added
 
 - Post/page title now gets the same red/yellow outline as invalid blocks when the "title required" check fails, so the missing-title issue is visible on the title itself instead of only inside the sidebar panel

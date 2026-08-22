@@ -4,7 +4,7 @@
  * Description:       Add plugin that add errors and warnings to core blocks to meet WCAG (Web Content Accessibility Guidelines) requirements.
  * Requires at least: 6.7
  * Requires PHP:      7.0
- * Version:           4.0.0
+ * Version:           4.1.0
  * Author:            Troy Chaplin
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Defines the version of the Block Accessibility Checks plugin.
-define( 'BA11YC_VERSION', '4.0.0' );
+define( 'BA11YC_VERSION', '4.1.0' );
 
 // This file is responsible for including the necessary autoload file.
 require_once __DIR__ . '/vendor/autoload.php';
@@ -107,12 +107,12 @@ function ba11yc_register_namespace( string $namespace_slug, array $args ): bool 
  */
 function ba11yc_register_block_check( string $block_type, array $args ): bool {
 	if ( empty( $args['namespace'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "namespace" key for plugin attribution.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "namespace" key for plugin attribution.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
 	if ( empty( $args['name'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "name" key.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "name" key.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
@@ -133,17 +133,17 @@ function ba11yc_register_block_check( string $block_type, array $args ): bool {
  */
 function ba11yc_register_meta_check( string $post_type, array $args ): bool {
 	if ( empty( $args['namespace'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "namespace" key for plugin attribution.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "namespace" key for plugin attribution.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
 	if ( empty( $args['name'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "name" key.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "name" key.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
 	if ( empty( $args['meta_key'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "meta_key" key.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "meta_key" key.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
@@ -165,12 +165,12 @@ function ba11yc_register_meta_check( string $post_type, array $args ): bool {
  */
 function ba11yc_register_editor_check( string $post_type, array $args ): bool {
 	if ( empty( $args['namespace'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "namespace" key for plugin attribution.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "namespace" key for plugin attribution.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
 	if ( empty( $args['name'] ) ) {
-		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "name" key.', 'block-accessibility-checks' ), '4.0.0' );
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "name" key.', 'block-accessibility-checks' ), '4.1.0' );
 		return false;
 	}
 
