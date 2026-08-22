@@ -1,5 +1,25 @@
+// Idle-state chip: light severity background, dark icon fill for contrast.
+.components-button:has(.ba11yc-sidebar-icon-error):not(.is-pressed) {
+	background-color: var(--ba11yc-red);
+
+	path {
+		fill: #fff;
+	}
+}
+
+.components-button:has(.ba11yc-sidebar-icon-warning):not(.is-pressed) {
+	background-color: var(--ba11yc-light-yellow);
+	border: 1px solid var(--ba11yc-yellow);
+
+	path {
+		fill: var(--ba11yc-dark-yellow);
+	}
+}
+
+// Pressed state is excluded above so core's default pressed button styling
+// (dark background) applies; only the icon fill is overridden to stay white.
 .components-button.is-pressed .ba11yc-sidebar-icon path {
-	fill: #fff;
+	fill: var(--ba11yc-white);
 }
 
 .ba11yc-sidebar-icon {

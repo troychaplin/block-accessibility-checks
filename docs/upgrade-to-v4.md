@@ -2,7 +2,9 @@
 
 Block Accessibility Checks 4.0 is a major release with **breaking changes to the developer API**. There are no compatibility shims: integrations written against the v3 API must be updated to keep working.
 
-**End users do not need to do anything.** All saved settings (check severity levels, heading level restrictions, site editor options, and external plugin overrides) are migrated automatically to the new storage format on the first page load after updating. The old options are left in place, so downgrading to v3 is safe.
+**Settings migrate themselves.** All saved settings (check severity levels, heading level restrictions, site editor options, and external plugin overrides) are migrated automatically to the new storage format on the first page load after updating. The old options are left in place, so downgrading to v3 is safe.
+
+One change does reach existing post content: images marked decorative in v3 need attention, because the decorative option now belongs to WordPress core. See [section 5](#5-decorative-images-affects-existing-content).
 
 > **⚠️ v3 integrations fail silently in v4.** An un-updated integration will not throw errors or crash the editor — its checks simply stop flagging anything. PHP-side registration mostly still succeeds, so your checks may even appear in the settings table, but the renamed JavaScript filters mean your validation logic never runs and every check passes. If your integration "still works" after updating, verify that it actually flags invalid content.
 
@@ -132,6 +134,22 @@ The global object is gone. Its replacements:
 - The REST namespace changed from `block-accessibility/v1` (with per-purpose settings routes) to `block-accessibility-checks/v1`, exposing `GET /checks` (all registered checks, with plugin attribution) and `GET|POST /settings`. The v3 routes were internal to the old settings pages and no longer exist.
 - External plugins **no longer get their own settings submenu page**. All configurable checks from all plugins now appear in the single Block Checks settings table, filterable by plugin — you get settings UI for free with no extra code. Bookmarks and links to any old `block-a11y-checks-*` submenu slug (including external plugin pages) are redirected to the unified page, but you should still update any hardcoded links in your plugin to point at `admin.php?page=block-a11y-checks`.
 
+## 5. Decorative images (affects existing content)
+
+v3 shipped its own `isDecorative` attribute on `core/image`, together with an "Accessibility Settings" panel in the block inspector holding a "Please confirm this image is decorative" toggle. Both are gone in v4: **WordPress 7.1 added a native decorative-image option**, and the plugin now defers to it rather than registering a competing attribute.
+
+Core uses the same attribute name, so the stored value is not lost. The difference is in the markup: core's implementation writes `role="none"` onto the `<img>` element in the block's save output, while the plugin's version only ever set the attribute and left the HTML untouched.
+
+**On WordPress 7.1 and later,** images marked decorative under v3 will fail block validation the first time they are edited — the editor shows "this block contains unexpected or invalid content", because the saved HTML has no `role="none"` but core now expects one. Choosing **Attempt recovery** regenerates the markup and preserves the decorative flag; the content is not lost.
+
+**On WordPress 6.7 through 7.0,** no decorative control exists at all — neither core's nor the plugin's. The stored `isDecorative` value is ignored, so those images are reported as missing alt text, and the value is stripped from post content the next time the post is saved. If you support sites on these versions, either add real alt text or hold off on upgrading those sites until they are on 7.1.
+
+To find affected content ahead of time, search post content for the attribute (adjust `wp_` if your install uses a custom table prefix):
+
+```bash
+wp db query "SELECT ID, post_title FROM wp_posts WHERE post_content LIKE '%\"isDecorative\":true%' AND post_status = 'publish';"
+```
+
 ## Migration checklist
 
 - [ ] Replace `$registry->register_check()` / `register_meta_check()` / `register_editor_check()` calls with the `ba11yc_register_*` functions
@@ -141,4 +159,5 @@ The global object is gone. Its replacements:
 - [ ] Rename JS filters: `ba11yc_validate_block` → `ba11yc.validateBlock`, `ba11yc_validate_editor` → `ba11yc.validateEditor`, `ba11yc_validate_meta` → `ba11yc.validateMeta`
 - [ ] Replace `window.BlockAccessibilityChecks` reads with `getEditorSettings().blockA11yChecks` and the `block-accessibility-checks` store
 - [ ] Update any hardcoded REST routes or settings page links
+- [ ] Audit existing posts for images marked decorative in v3, and confirm the target sites are on WordPress 7.1 (see section 5)
 - [ ] **Verify in the editor that invalid content is actually flagged** — a silently dead integration looks identical to a passing one

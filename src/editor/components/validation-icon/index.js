@@ -5,15 +5,16 @@
  *
  * @param {Object} props
  * @param {string} [props.fill='currentColor'] - Fill colour for the icon paths.
+ * @param {string} [props.className='']        - Extra class(es) merged onto the base icon class, e.g. a severity modifier.
  */
-export function ValidationIcon({ fill = 'currentColor' }) {
+export function ValidationIcon({ fill = 'currentColor', className = '' }) {
 	return (
 		<svg
 			width="22"
 			height="22"
 			viewBox="0 0 16 16"
 			xmlns="http://www.w3.org/2000/svg"
-			className="ba11yc-sidebar-icon"
+			className={['ba11yc-sidebar-icon', className].filter(Boolean).join(' ')}
 		>
 			<path
 				fill={fill}

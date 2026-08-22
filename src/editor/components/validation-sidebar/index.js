@@ -160,14 +160,14 @@ export function ValidationSidebar() {
 		deduplicatedMetaWarnings.length +
 		deduplicatedEditorWarnings.length;
 
-	let iconColor = 'currentColor';
+	let severityClass = '';
 	if (totalErrors > 0) {
-		iconColor = '#d82000';
+		severityClass = 'ba11yc-sidebar-icon-error';
 	} else if (totalWarnings > 0) {
-		iconColor = '#dbc900';
+		severityClass = 'ba11yc-sidebar-icon-warning';
 	}
 
-	const sidebarIcon = <ValidationIcon fill={iconColor} />;
+	const sidebarIcon = <ValidationIcon className={severityClass} />;
 
 	/**
 	 * Handle clicking on a block validation issue.
@@ -220,7 +220,7 @@ export function ValidationSidebar() {
 	return (
 		<PluginSidebar
 			name="block-a11y-checks-sidebar"
-			title={__('Validation', 'block-accessibility-checks')}
+			title={__('Accessibility & Validation', 'block-accessibility-checks')}
 			icon={sidebarIcon}
 			className="ba11yc-validation-sidebar"
 		>
