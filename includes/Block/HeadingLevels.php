@@ -54,7 +54,9 @@ class HeadingLevels {
 	/**
 	 * Get the restricted heading levels from the consolidated settings option.
 	 *
-	 * Reads ba11yc_settings['general']['headingLevels'].
+	 * Reads ba11yc_settings['general']['headingLevels']. Defaults to no
+	 * restrictions: an admin must explicitly disable a level in settings
+	 * before it's removed from the heading block.
 	 *
 	 * @return array The plugin general settings (with a 'core_heading_levels' key for back-compat callers).
 	 */
@@ -68,7 +70,7 @@ class HeadingLevels {
 					$settings = array();
 				}
 
-				$heading_levels = $settings['general']['headingLevels'] ?? array( 'h1' );
+				$heading_levels = $settings['general']['headingLevels'] ?? array();
 
 				$this->cached_options = array( 'core_heading_levels' => is_array( $heading_levels ) ? $heading_levels : array() );
 			} catch ( \Exception $e ) {

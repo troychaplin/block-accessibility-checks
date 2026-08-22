@@ -9,11 +9,11 @@
 .ba11yc-block-error,
 html.ba11yc-title-error .editor-post-title__input {
     outline: 2px solid var(--ba11yc-red);
-    outline-offset: 2px;
+    outline-offset: 4px;
 }
 
 .ba11yc-block-warning,
 html.ba11yc-title-warning .editor-post-title__input {
     outline: 2px solid var(--ba11yc-yellow);
-    outline-offset: 2px;
+    outline-offset: 4px;
 }

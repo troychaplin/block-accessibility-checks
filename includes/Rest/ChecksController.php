@@ -10,6 +10,7 @@
 
 namespace BlockAccessibility\Rest;
 
+use BlockAccessibility\AbstractRegistry;
 use BlockAccessibility\Block\Registry as BlockRegistry;
 use BlockAccessibility\Meta\Registry as MetaRegistry;
 use BlockAccessibility\Editor\Registry as EditorRegistry;
@@ -172,7 +173,10 @@ class ChecksController extends WP_REST_Controller {
 	 * @return array The formatted check data.
 	 */
 	private function format_check( array $check_args ): array {
+		$namespace = $check_args['_namespace'] ?? null;
+
 		return array(
+			'title'        => $check_args['title'] ?? '',
 			'level'        => $check_args['level'] ?? 'error',
 			'category'     => $check_args['category'] ?? 'accessibility',
 			'description'  => $check_args['description'] ?? '',
@@ -181,7 +185,10 @@ class ChecksController extends WP_REST_Controller {
 			'priority'     => $check_args['priority'] ?? 10,
 			'enabled'      => $check_args['enabled'] ?? true,
 			'configurable' => $check_args['configurable'] ?? true,
-			'_namespace'   => $check_args['_namespace'] ?? null,
+			'_namespace'   => $namespace,
+			// Resolved here rather than at registration: a plugin may declare its
+			// namespace title before or after registering its checks.
+			'plugin_title' => is_string( $namespace ) ? AbstractRegistry::get_namespace_title( $namespace ) : '',
 		);
 	}
 }

@@ -20,6 +20,9 @@ Prefix the change with one of these keywords:
 ### Added
 
 - Post/page title now gets the same red/yellow outline as invalid blocks when the "title required" check fails, so the missing-title issue is visible on the title itself instead of only inside the sidebar panel
+- Checks can be reset in bulk: the settings table now has a selection column, and "Reset to default" applies to every selected row at once. Rows already at their default get a disabled checkbox, so select-all only picks up checks that actually have an override
+- Checks accept an optional `title` — a human-readable label shown as the check's name in the settings table, separate from the `name` slug used for storage keys and JavaScript filters. Falls back to the slug when omitted, so existing integrations are unaffected
+- New `ba11yc_register_namespace( $namespace_slug, array( 'title' => … ) )` lets a plugin declare its display name once instead of being credited by a name guessed from its namespace slug. Order-independent: it can be called before or after the checks themselves
 
 ### Changed
 
@@ -31,6 +34,16 @@ Prefix the change with one of these keywords:
 - Editor header sidebar icon now shows a light-red/light-yellow chip with a dark-red/dark-yellow glyph when errors or warnings are present (previously a plain currentColor icon with ad hoc red/yellow fill); the pressed state is untouched, so core's default dark background and white icon still apply when the sidebar is open
 - Build tooling migrated from npm to pnpm — `pnpm-lock.yaml` replaces `package-lock.json`; run `corepack enable && pnpm install` after pulling
 - Updated `@wordpress/*` packages, most notably `components` 35 → 39 and `dataviews` 16 → 18, which back the settings UI
+- Settings page now runs the full width of the screen instead of sitting in a 1400px column with the admin's grey background around it
+- Settings table's first column is now the check's own name rather than the block or post type it targets, so several checks on the same block are no longer all labelled identically; the target moved to its own sortable column
+- Heading level restrictions moved from a standalone table into a collapsible card below the checks table, so the page no longer mixes two different table styles
+
+### Fixed
+
+- Heading 1 was silently removed from the heading block's level options by default, with no visible setting to change it — the "Heading Level Restrictions" table that controls this existed but was shipped hidden (`display: none`) pending unrelated layout work. Nothing is restricted by default now, and the table is visible in settings for admins who want to disable specific levels
+- Checks registered as non-configurable lost their stored severity and Site Editor settings on every save: they are excluded from the settings table, and because saving replaces the whole option, anything stored for them was silently erased. Their settings are now carried through untouched
+- The Plugin column showed a guessed name built by title-casing the namespace slug, because the display-name map it reads was never actually provided by PHP. Real plugin names are now resolved from the installed plugin list, with the old guess kept as a fallback
+- Saving now re-reads the server's sanitized response instead of assuming the request was stored verbatim, so any value the server rejects is reflected in the table immediately rather than after a reload
 
 ## [4.0.0]
 

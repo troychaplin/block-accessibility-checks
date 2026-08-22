@@ -71,6 +71,16 @@ class Settings {
 	/**
 	 * Render the settings page mount point.
 	 *
+	 * Deliberately omits the usual `.wrap` container: the React app draws its own
+	 * page chrome edge to edge, and `.wrap`'s margins would leave the admin's grey
+	 * background showing around it.
+	 *
+	 * The chrome overrides are inlined here rather than shipped in the bundled
+	 * stylesheet so they apply on first paint, before the CSS file loads — otherwise
+	 * the page renders at default admin width and then visibly snaps to full bleed.
+	 * They are scoped to `body.js` so a browser without JavaScript keeps the normal
+	 * admin layout instead of a broken blank page.
+	 *
 	 * @return void
 	 */
 	public function render_page(): void {
@@ -78,7 +88,22 @@ class Settings {
 			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'block-accessibility-checks' ) );
 		}
 
-		echo '<div class="wrap"><div id="ba11yc-settings-root"></div></div>';
+		?>
+		<style>
+			#wpwrap { overflow-y: auto; }
+			body.js #wpcontent { padding-inline-start: 0; }
+			body.js #wpbody-content { padding-bottom: 0; }
+			body.js #wpfooter { display: none; }
+
+			@media (min-width: 782px) {
+				#wpwrap { overflow-y: initial; }
+			}
+		</style>
+		<?php
+		// Gives WordPress a defined anchor for admin notices; without it they are
+		// injected at an arbitrary point relative to the React root.
+		echo '<hr class="wp-header-end">';
+		echo '<div id="ba11yc-settings-root"></div>';
 	}
 
 	/**
