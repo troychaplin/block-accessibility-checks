@@ -23,7 +23,7 @@ const DEFAULT_VIEW = {
 	fields: ['check_type', 'category', 'plugin_name', 'level', 'site_editor'],
 };
 
-const DEFAULT_GENERAL = { headingLevels: ['h1'] };
+const DEFAULT_GENERAL = { headingLevels: [] };
 
 export function App() {
 	const [rows, setRows] = useState([]);
@@ -289,12 +289,10 @@ export function App() {
 				/>
 			)}
 
-			<div hidden>
-				<HeadingLevelsTable
-					headingLevels={general.headingLevels}
-					onChange={handleGeneralChange}
-				/>
-			</div>
+			<HeadingLevelsTable
+				headingLevels={general.headingLevels}
+				onChange={handleGeneralChange}
+			/>
 		</div>
 	);
 }

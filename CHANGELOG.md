@@ -32,6 +32,10 @@ Prefix the change with one of these keywords:
 - Build tooling migrated from npm to pnpm — `pnpm-lock.yaml` replaces `package-lock.json`; run `corepack enable && pnpm install` after pulling
 - Updated `@wordpress/*` packages, most notably `components` 35 → 39 and `dataviews` 16 → 18, which back the settings UI
 
+### Fixed
+
+- Heading 1 was silently removed from the heading block's level options by default, with no visible setting to change it — the "Heading Level Restrictions" table that controls this existed but was shipped hidden (`display: none`) pending unrelated layout work. Nothing is restricted by default now, and the table is visible in settings for admins who want to disable specific levels
+
 ## [4.0.0]
 
 > **Developer note:** This release contains breaking changes to the registration API and JavaScript filter hooks. Settings migrate automatically on first load after upgrading, so admins need take no action — but see **Decorative Images** below for the one change that does affect existing post content. See [docs/upgrade-to-v4.md](docs/upgrade-to-v4.md) for a full migration checklist.

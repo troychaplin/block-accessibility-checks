@@ -20,7 +20,7 @@ const HEADING_LEVELS = [
  * @param {string[]} props.headingLevels - Array of currently restricted levels (e.g. ['h1']).
  * @param {Function} props.onChange      - Called with the updated restricted-levels array.
  */
-export function HeadingLevelsTable({ headingLevels = ['h1'], onChange }) {
+export function HeadingLevelsTable({ headingLevels = [], onChange }) {
 	const isEnabled = level => !headingLevels.includes(level);
 
 	const toggle = (level, enabled) => {
