@@ -1,11 +1,19 @@
 // Block validation indicator — solid outline around the block, colored by severity.
 // Classes are applied to the block's own element via editor.BlockListBlock wrapperProps.
-.ba11yc-block-error {
+// The title versions (html.ba11yc-title-* .editor-post-title__input) exist because the
+// title has no equivalent wrapperProps filter to hook into, and its element is re-rendered
+// by Gutenberg with a computed className, so a class added directly to it gets wiped on
+// the next render. The marker class instead goes on the canvas <html> element (safe to
+// mutate imperatively — see use-title-validation.js) and this compound selector reaches
+// the title through it.
+.ba11yc-block-error,
+html.ba11yc-title-error .editor-post-title__input {
     outline: 2px solid var(--ba11yc-red);
     outline-offset: 2px;
 }
 
-.ba11yc-block-warning {
+.ba11yc-block-warning,
+html.ba11yc-title-warning .editor-post-title__input {
     outline: 2px solid var(--ba11yc-yellow);
     outline-offset: 2px;
 }

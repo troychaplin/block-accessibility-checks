@@ -17,6 +17,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- Post/page title now gets the same red/yellow outline as invalid blocks when the "title required" check fails, so the missing-title issue is visible on the title itself instead of only inside the sidebar panel
+
 ### Changed
 
 - Image alt text error now reads "Images are required to have alternative text or be marked as decorative", surfacing the native decorative-image option that WordPress 7.1 adds to `core/image`; on WordPress 6.7–7.0 no decorative control exists, so alt text remains the only available fix there
