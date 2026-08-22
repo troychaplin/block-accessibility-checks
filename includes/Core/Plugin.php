@@ -105,6 +105,13 @@ class Plugin {
 			$this->init_translations();
 			$this->init_scripts_styles();
 			$this->init_settings_page();
+
+			// Credit this plugin's own checks by name in the settings UI.
+			\BlockAccessibility\AbstractRegistry::register_namespace(
+				'block-accessibility-checks',
+				array( 'title' => \__( 'Block Accessibility Checks', 'block-accessibility-checks' ) )
+			);
+
 			$this->init_block_checks_registry();
 			$this->init_editor_checks_registry();
 			$this->init_rest_and_filters();

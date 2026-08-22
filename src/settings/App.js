@@ -22,10 +22,10 @@ const DEFAULT_VIEW = {
 	filters: [],
 	page: 1,
 	perPage: 25,
-	sort: { field: 'target', direction: 'asc' },
-	titleField: 'target',
+	sort: { field: 'title', direction: 'asc' },
+	titleField: 'title',
 	descriptionField: 'description',
-	fields: ['check_type', 'category', 'plugin_name', 'level', 'site_editor'],
+	fields: ['target', 'check_type', 'category', 'plugin_name', 'level', 'site_editor'],
 };
 
 const DEFAULT_GENERAL = { headingLevels: [] };
@@ -156,6 +156,25 @@ export function App() {
 
 	const fields = useMemo(
 		() => [
+			{
+				id: 'title',
+				label: __('Check', 'block-accessibility-checks'),
+				enableGlobalSearch: true,
+				enableSorting: true,
+				// The title column carries the row's identity; hiding it would
+				// leave nothing to identify the check by.
+				enableHiding: false,
+				filterBy: false,
+			},
+			{
+				// The check name slug is what a developer greps for, so keep it
+				// searchable even though it never gets a column of its own.
+				id: 'check_name',
+				label: __('Check slug', 'block-accessibility-checks'),
+				enableGlobalSearch: true,
+				enableSorting: false,
+				filterBy: false,
+			},
 			{
 				id: 'description',
 				label: __('Description', 'block-accessibility-checks'),

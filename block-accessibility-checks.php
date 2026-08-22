@@ -66,6 +66,32 @@ ba11yc_plugin();
 add_action( 'init', 'ba11yc_init_plugin' );
 
 /**
+ * Declare the display name for a check namespace.
+ *
+ * Call this once and every check registered under the namespace is credited to
+ * it in the settings UI. Without it, checks fall back to the plugin name looked
+ * up from the namespace slug. Order does not matter — this may run before or
+ * after the checks themselves.
+ *
+ * @param string $namespace_slug Namespace slug used by this plugin's checks.
+ * @param array  $args           Accepts a 'title' key.
+ * @return bool True on success, false on failure.
+ */
+function ba11yc_register_namespace( string $namespace_slug, array $args ): bool {
+	if ( empty( $namespace_slug ) ) {
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'A namespace slug is required.', 'block-accessibility-checks' ), '4.1.0' );
+		return false;
+	}
+
+	if ( empty( $args['title'] ) ) {
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'The $args array must include a "title" key.', 'block-accessibility-checks' ), '4.1.0' );
+		return false;
+	}
+
+	return \BlockAccessibility\AbstractRegistry::register_namespace( $namespace_slug, $args );
+}
+
+/**
  * Register a validation check for a block type.
  *
  * Public registration API. Extracts 'name' from $args and delegates to the
@@ -73,8 +99,10 @@ add_action( 'init', 'ba11yc_init_plugin' );
  *
  * @param string $block_type Block type name (e.g., 'core/image').
  * @param array  $args       Check configuration. Required keys: 'namespace', 'name', 'error_msg'.
- *                           Optional: 'warning_msg', 'level' (error|warning|none), 'category',
- *                           'priority', 'enabled', 'description', 'configurable'.
+ *                           Optional: 'title' (human-readable label shown in the settings
+ *                           table; defaults to 'name'), 'warning_msg', 'level'
+ *                           (error|warning|none), 'category', 'priority', 'enabled',
+ *                           'description', 'configurable'.
  * @return bool True on success, false on failure.
  */
 function ba11yc_register_block_check( string $block_type, array $args ): bool {
@@ -99,6 +127,8 @@ function ba11yc_register_block_check( string $block_type, array $args ): bool {
  *
  * @param string $post_type Post type (e.g., 'post', 'page').
  * @param array  $args      Check configuration. Required keys: 'namespace', 'name', 'meta_key', 'error_msg'.
+ *                          Optional: 'title' (human-readable label; defaults to 'name'),
+ *                          plus the same optional keys as ba11yc_register_block_check().
  * @return bool True on success, false on failure.
  */
 function ba11yc_register_meta_check( string $post_type, array $args ): bool {
@@ -129,6 +159,8 @@ function ba11yc_register_meta_check( string $post_type, array $args ): bool {
  *
  * @param string $post_type Post type (e.g., 'post', 'page').
  * @param array  $args      Check configuration. Required keys: 'namespace', 'name', 'error_msg'.
+ *                          Optional: 'title' (human-readable label; defaults to 'name'),
+ *                          plus the same optional keys as ba11yc_register_block_check().
  * @return bool True on success, false on failure.
  */
 function ba11yc_register_editor_check( string $post_type, array $args ): bool {

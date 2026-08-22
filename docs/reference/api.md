@@ -6,6 +6,28 @@ This document provides comprehensive API documentation for all registration func
 
 These are the primary public API. Call them inside `ba11yc_ready` (or `ba11yc_register_checks` / `ba11yc_editor_checks_ready`).
 
+### `ba11yc_register_namespace( $namespace_slug, $args )`
+
+Declare the display name for a check namespace. Call it once and every check registered under that namespace is credited to it in the settings table, instead of a name guessed from the namespace slug.
+
+**Parameters:**
+- `$namespace_slug` (string): The namespace slug used by your checks
+- `$args` (array): Accepts a `title` key (required)
+
+**Returns:** `bool` — true on success, false on failure
+
+Order does not matter — this may run before or after the checks themselves, because the title is resolved when the settings table is read rather than at registration time.
+
+```php
+add_action( 'ba11yc_ready', function() {
+    ba11yc_register_namespace( 'my-plugin', array(
+        'title' => __( 'My Plugin', 'my-plugin' ),
+    ) );
+} );
+```
+
+---
+
 ### `ba11yc_register_block_check( $block_type, $args )`
 
 Register a validation check for a block type.
@@ -28,6 +50,7 @@ Register a validation check for a block type.
 
 | Key | Type | Default | Description |
 |---|---|---|---|
+| `title` | string | `name` | Human-readable label shown as the check's name in the settings table |
 | `warning_msg` | string | `error_msg` | Warning message |
 | `description` | string | `''` | Description shown in the settings UI |
 | `level` | string | `'error'` | Default severity: `'error'`, `'warning'`, or `'none'` |
@@ -35,6 +58,8 @@ Register a validation check for a block type.
 | `category` | string | `'accessibility'` | `'accessibility'` or `'validation'` |
 | `priority` | int | `10` | Execution order (lower = earlier) |
 | `enabled` | bool | `true` | Whether the check is active |
+
+`name` is the slug used for storage keys and JavaScript filters and should not change once released; `title` is what admins read, and can be reworded freely. Without a `title`, the settings table falls back to showing the slug.
 
 **Example:**
 ```php
@@ -44,6 +69,7 @@ add_action( 'ba11yc_ready', function() {
         array(
             'namespace'    => 'my-plugin',
             'name'         => 'card_title_required',
+            'title'        => __( 'Card title required', 'my-plugin' ),
             'error_msg'    => __( 'Card title is required', 'my-plugin' ),
             'warning_msg'  => __( 'Card title is recommended', 'my-plugin' ),
             'description'  => __( 'Card title validation', 'my-plugin' ),

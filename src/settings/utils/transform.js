@@ -18,6 +18,20 @@ function namespaceToPluginName(namespace) {
 }
 
 /**
+ * Resolve the plugin name to credit a check to.
+ *
+ * Prefers the title a plugin declared for its namespace via
+ * `ba11yc_register_namespace()`, then the name of the installed plugin whose
+ * directory matches the namespace, and finally a title-cased slug.
+ *
+ * @param {Object} check A check object from the checks REST response.
+ * @return {string} Display name.
+ */
+function resolvePluginName(check) {
+	return check.plugin_title || namespaceToPluginName(check._namespace);
+}
+
+/**
  * Read a per-check site-editor flag from the settings tree.
  *
  * Defaults to false (disabled) when no explicit flag is stored.
@@ -64,11 +78,12 @@ export function transformChecksToRows(checks, settings) {
 					scope: 'block',
 					block_type: blockType,
 					check_name: checkName,
+					title: check.title || checkName,
 					description: check.description || '',
 					check_type: 'Block',
 					category: categoryLabel(check.category),
 					target: blockTitles[blockType] || blockType,
-					plugin_name: namespaceToPluginName(check._namespace),
+					plugin_name: resolvePluginName(check),
 					level: override ?? check.level,
 					default_level: check.level,
 					has_override: override !== null,
@@ -101,11 +116,12 @@ export function transformChecksToRows(checks, settings) {
 						post_type: postType,
 						meta_key: metaKey,
 						check_name: checkName,
+						title: check.title || checkName,
 						description: check.description || '',
 						check_type: 'Meta',
 						category: categoryLabel(check.category),
 						target: `${metaKey} (${postTypeLabels[postType] || postType})`,
-						plugin_name: namespaceToPluginName(check._namespace),
+						plugin_name: resolvePluginName(check),
 						level: override ?? check.level,
 						default_level: check.level,
 						has_override: override !== null,
@@ -132,11 +148,12 @@ export function transformChecksToRows(checks, settings) {
 					scope: 'editor',
 					post_type: postType,
 					check_name: checkName,
+					title: check.title || checkName,
 					description: check.description || '',
 					check_type: 'Editor',
 					category: categoryLabel(check.category),
 					target: postTypeLabels[postType] || postType,
-					plugin_name: namespaceToPluginName(check._namespace),
+					plugin_name: resolvePluginName(check),
 					level: override ?? check.level,
 					default_level: check.level,
 					has_override: override !== null,

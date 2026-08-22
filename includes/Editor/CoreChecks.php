@@ -63,6 +63,7 @@ class CoreChecks {
 			'post_title_required',
 			array(
 				'namespace'    => 'block-accessibility-checks',
+				'title'        => \__( 'Title required', 'block-accessibility-checks' ),
 				'error_msg'    => \__( 'A post title is required for accessibility and SEO.', 'block-accessibility-checks' ),
 				'warning_msg'  => \__( 'Consider adding a post title for better accessibility and SEO.', 'block-accessibility-checks' ),
 				'description'  => \__( 'Ensures posts have a descriptive title.', 'block-accessibility-checks' ),
@@ -79,6 +80,7 @@ class CoreChecks {
 			'post_title_required',
 			array(
 				'namespace'    => 'block-accessibility-checks',
+				'title'        => \__( 'Title required', 'block-accessibility-checks' ),
 				'error_msg'    => \__( 'A page title is required for accessibility and SEO.', 'block-accessibility-checks' ),
 				'warning_msg'  => \__( 'Consider adding a page title for better accessibility and SEO.', 'block-accessibility-checks' ),
 				'description'  => \__( 'Ensures pages have a descriptive title.', 'block-accessibility-checks' ),

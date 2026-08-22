@@ -21,6 +21,8 @@ Prefix the change with one of these keywords:
 
 - Post/page title now gets the same red/yellow outline as invalid blocks when the "title required" check fails, so the missing-title issue is visible on the title itself instead of only inside the sidebar panel
 - Checks can be reset in bulk: the settings table now has a selection column, and "Reset to default" applies to every selected row at once. Rows already at their default get a disabled checkbox, so select-all only picks up checks that actually have an override
+- Checks accept an optional `title` — a human-readable label shown as the check's name in the settings table, separate from the `name` slug used for storage keys and JavaScript filters. Falls back to the slug when omitted, so existing integrations are unaffected
+- New `ba11yc_register_namespace( $namespace_slug, array( 'title' => … ) )` lets a plugin declare its display name once instead of being credited by a name guessed from its namespace slug. Order-independent: it can be called before or after the checks themselves
 
 ### Changed
 
@@ -33,6 +35,7 @@ Prefix the change with one of these keywords:
 - Build tooling migrated from npm to pnpm — `pnpm-lock.yaml` replaces `package-lock.json`; run `corepack enable && pnpm install` after pulling
 - Updated `@wordpress/*` packages, most notably `components` 35 → 39 and `dataviews` 16 → 18, which back the settings UI
 - Settings page now runs the full width of the screen instead of sitting in a 1400px column with the admin's grey background around it
+- Settings table's first column is now the check's own name rather than the block or post type it targets, so several checks on the same block are no longer all labelled identically; the target moved to its own sortable column
 - Heading level restrictions moved from a standalone table into a collapsible card below the checks table, so the page no longer mixes two different table styles
 
 ### Fixed

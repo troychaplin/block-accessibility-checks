@@ -93,6 +93,7 @@ class CoreChecks {
 			'core/button'  => array(
 				'check_button_link' => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Link required', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Buttons are required to have a valid link', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Adding a link to a button is highly recommended', 'block-accessibility-checks' ),
 					'description'  => \__( 'Buttons require a link', 'block-accessibility-checks' ),
@@ -103,6 +104,7 @@ class CoreChecks {
 				),
 				'check_button_text' => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Text required', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Button text is required and should be descriptive and meaningful', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Adding text to a button is highly recommended', 'block-accessibility-checks' ),
 					'description'  => \__( 'Buttons require descriptive text', 'block-accessibility-checks' ),
@@ -115,6 +117,7 @@ class CoreChecks {
 			'core/image'   => array(
 				'check_image_alt_text'          => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Alt text required', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Images are required to have alternative text or be marked as decorative', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Using alt text is highly recommended', 'block-accessibility-checks' ),
 					'description'  => \__( 'Images require alternative text', 'block-accessibility-checks' ),
@@ -125,6 +128,7 @@ class CoreChecks {
 				),
 				'check_image_alt_text_length'   => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Alt text length', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Image alt text cannot be longer than 125 characters', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Image alt text is recommended to be less than 125 characters', 'block-accessibility-checks' ),
 					'description'  => \__( 'Length of alt text should not exceed 125 characters', 'block-accessibility-checks' ),
@@ -135,6 +139,7 @@ class CoreChecks {
 				),
 				'check_image_alt_caption_match' => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Alt text matches caption', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Image caption cannot be the same as the alternative text', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Using different alt and caption text is highly recommended', 'block-accessibility-checks' ),
 					'description'  => \__( 'Alt text and caption text must not match', 'block-accessibility-checks' ),
@@ -145,6 +150,7 @@ class CoreChecks {
 				),
 				'check_image_alt_text_patterns' => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Descriptive alt text', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Alt text contains non-descriptive single words or patterns like "image of", "picture of", or "photo of"', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Consider using more descriptive alt text instead of generic terms', 'block-accessibility-checks' ),
 					'description'  => \__( 'Alt text should avoid generic patterns and be descriptive', 'block-accessibility-checks' ),
@@ -157,6 +163,7 @@ class CoreChecks {
 			'core/table'   => array(
 				'check_table_headers' => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Header row required', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Tables are required to use a header row', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Using headers in tables is highly recommended', 'block-accessibility-checks' ),
 					'description'  => \__( 'Tables are required to use a header row', 'block-accessibility-checks' ),
@@ -169,6 +176,7 @@ class CoreChecks {
 			'core/heading' => array(
 				'check_heading_rank' => array(
 					'namespace'    => $namespace,
+					'title'        => \__( 'Heading level order', 'block-accessibility-checks' ),
 					'error_msg'    => \__( 'Heading levels should not skip ranks (e.g., H2 followed by H4), and the first heading should be H1 or H2', 'block-accessibility-checks' ),
 					'warning_msg'  => \__( 'Maintaining proper heading hierarchy improves document structure', 'block-accessibility-checks' ),
 					'description'  => \__( 'Headings should follow a logical hierarchy without skipping levels, and the first heading should be H1 or H2', 'block-accessibility-checks' ),
