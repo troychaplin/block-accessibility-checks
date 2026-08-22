@@ -17,6 +17,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Changed
+
+- Option to enable valdiation for Site Editor in Settings UI updated for improved clarity
+
 ## [4.0.0]
 
 > **Developer note:** This release contains breaking changes to the registration API and JavaScript filter hooks. End users are not affected — settings migrate automatically on first load after upgrading. See [docs/upgrade-to-v4.md](docs/upgrade-to-v4.md) for a full migration checklist.
