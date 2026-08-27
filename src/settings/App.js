@@ -28,7 +28,10 @@ const DEFAULT_VIEW = {
 	fields: ['target', 'check_type', 'category', 'plugin_name', 'level', 'site_editor'],
 };
 
-const DEFAULT_GENERAL = { headingLevels: [] };
+// Mirrors SettingsController::DEFAULT_HEADING_LEVELS. The REST response already
+// carries the default, so this only covers a response with no `general` key —
+// but a JS default that contradicts PHP is what made the H1 restriction invisible before.
+const DEFAULT_GENERAL = { headingLevels: ['h1'] };
 
 export function App() {
 	const [rows, setRows] = useState([]);

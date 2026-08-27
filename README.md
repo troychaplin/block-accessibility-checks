@@ -187,7 +187,7 @@ The plugin provides granular control over accessibility checks for each core blo
 - **Button Block:** Configure text and link validation requirements (error/warning/disabled)
 - **Image Block:** Set alt text requirements and validation rules (length, patterns, caption duplication)
 - **Table Block:** Control header and caption requirements
-- **Heading Block:** Select which heading levels to restrict in the editor (H1, H5, H6 can be disabled)
+- **Heading Block:** Select which heading levels to restrict in the editor (any of H1–H6 can be disabled; H1 is disabled by default)
 
 ### Post & Page Validation Settings
 

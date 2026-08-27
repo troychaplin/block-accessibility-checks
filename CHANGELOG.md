@@ -17,6 +17,10 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Changed
+
+- Heading 1 is now restricted by default: a site that has never saved a heading level choice gets H2–H6 in the heading block, and the "Heading Level Restrictions" card in settings shows the H1 toggle off so an admin can turn it back on. Sites that already saved a choice keep exactly what they saved. This reverses the 4.1.0 default — that release turned every level on because the toggles controlling them had shipped hidden, which is no longer the case
+
 ## [4.1.0]
 
 ### Added

@@ -56,7 +56,7 @@ When accessibility issues are detected, they are highlighted with visual indicat
 * **Button Blocks** - Ensures buttons have descriptive text content and validates link destinations using real TLD validation (Public Suffix List)
 * **Image Blocks** - Requires alt text (unless marked decorative), validates alt text length (warns if exceeding 125 characters), prevents caption duplication, and detects non-descriptive patterns like "image of" or "photo123"
 * **Table Blocks** - Requires proper headers or captions for screen reader navigation
-* **Heading Blocks** - Validates proper heading hierarchy across entire document (prevents skipped levels), ensures appropriate first heading level (H2 recommended, H1 allowed with warnings), and provides configurable heading level restrictions (H1, H5, H6 can be disabled)
+* **Heading Blocks** - Validates proper heading hierarchy across entire document (prevents skipped levels), ensures appropriate first heading level (H2 recommended, H1 allowed with warnings), and provides configurable heading level restrictions (any of H1–H6 can be disabled; H1 is disabled by default)
 * **Gallery Blocks** - Applies comprehensive image accessibility checks to all gallery items (alt text, length, patterns, caption duplication)
 * **Post & Page Title Validation** - Ensures posts and pages have a title set for accessibility and SEO, validates in real-time as users type, prevents publishing content without a title, configurable independently for posts and pages
 * **Post Meta Fields** - Validate required custom fields with real-time validation, automatic post locking for errors, and seamless integration with block validation system
