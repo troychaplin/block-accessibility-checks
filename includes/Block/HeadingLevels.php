@@ -12,6 +12,7 @@ namespace BlockAccessibility\Block;
 
 use BlockAccessibility\Core\Traits\Logger;
 use BlockAccessibility\Core\Traits\EditorDetection;
+use BlockAccessibility\Rest\SettingsController;
 
 /**
  * Class HeadingLevels
@@ -54,9 +55,11 @@ class HeadingLevels {
 	/**
 	 * Get the restricted heading levels from the consolidated settings option.
 	 *
-	 * Reads ba11yc_settings['general']['headingLevels']. Defaults to no
-	 * restrictions: an admin must explicitly disable a level in settings
-	 * before it's removed from the heading block.
+	 * Reads ba11yc_settings['general']['headingLevels']. When the admin has
+	 * never saved a choice, falls back to SettingsController::DEFAULT_HEADING_LEVELS
+	 * (H1 restricted). Saving the settings page always writes the key, so an
+	 * admin who enables every level stores an explicit empty array and the
+	 * default no longer applies.
 	 *
 	 * @return array The plugin general settings (with a 'core_heading_levels' key for back-compat callers).
 	 */
@@ -70,11 +73,12 @@ class HeadingLevels {
 					$settings = array();
 				}
 
-				$heading_levels = $settings['general']['headingLevels'] ?? array();
+				$heading_levels = $settings['general']['headingLevels'] ?? SettingsController::DEFAULT_HEADING_LEVELS;
 
 				$this->cached_options = array( 'core_heading_levels' => is_array( $heading_levels ) ? $heading_levels : array() );
 			} catch ( \Exception $e ) {
 				$this->log_error( 'Failed to retrieve plugin settings: ' . $e->getMessage() );
+				// No restrictions on failure: a settings read error shouldn't silently remove levels.
 				$this->cached_options = array( 'core_heading_levels' => array() );
 			}
 		}

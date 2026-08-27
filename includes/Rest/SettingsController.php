@@ -62,6 +62,16 @@ class SettingsController extends WP_REST_Controller {
 	const REMOVABLE_HEADING_LEVELS = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
 
 	/**
+	 * Heading levels restricted when an admin has not saved a choice.
+	 *
+	 * H1 is reserved for the post title in most themes, so it is off by
+	 * default; an admin can re-enable it in settings.
+	 *
+	 * @var array
+	 */
+	const DEFAULT_HEADING_LEVELS = array( 'h1' );
+
+	/**
 	 * Register REST routes.
 	 *
 	 * @return void
@@ -106,11 +116,23 @@ class SettingsController extends WP_REST_Controller {
 	/**
 	 * Get current settings.
 	 *
+	 * General settings that have never been saved are filled in with their
+	 * defaults, so the settings UI shows what PHP will actually enforce
+	 * rather than an empty option that reads as "nothing restricted".
+	 *
 	 * @param \WP_REST_Request $request The request object.
 	 * @return WP_REST_Response
 	 */
 	public function get_items( $request ): WP_REST_Response {
 		$settings = get_option( self::OPTION_KEY, array() );
+
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		if ( ! isset( $settings['general']['headingLevels'] ) ) {
+			$settings['general']['headingLevels'] = self::DEFAULT_HEADING_LEVELS;
+		}
 
 		return new WP_REST_Response( $settings, 200 );
 	}
