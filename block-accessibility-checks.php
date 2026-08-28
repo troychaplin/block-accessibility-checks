@@ -214,23 +214,38 @@ function ba11yc_register_editor_check( string $post_type, array $args ): bool {
  *         'requires' => 'title',
  *     ) );
  *
+ *     // Several blocks that share the same heading shape.
+ *     ba11yc_register_heading_source(
+ *         array( 'acme/hero', 'acme/card-list' ),
+ *         array(
+ *             'attribute' => 'headingLevel',
+ *             'level'     => 2,
+ *         )
+ *     );
+ *
  * @since 4.2.0
  *
- * @param string $block_type Block type name (e.g. 'acme/section').
- * @param array  $args       Heading spec. Optional keys: 'level' (0-6, where 0
- *                           means the block renders no heading), 'attribute'
- *                           (attribute holding the level), 'map' (translates
- *                           attribute values to levels), 'requires' (attribute
- *                           that must have content for the heading to exist).
- *                           Pass a list under 'headings' for a block that
- *                           renders more than one.
- * @return bool True on success, false on failure.
+ * @param string|array $block_types Block type name (e.g. 'acme/section'), or an
+ *                                  array of block type names sharing one spec.
+ * @param array        $args        Heading spec. Optional keys: 'level' (0-6, where 0
+ *                                  means the block renders no heading), 'attribute'
+ *                                  (attribute holding the level), 'map' (translates
+ *                                  attribute values to levels), 'requires' (attribute
+ *                                  that must have content for the heading to exist).
+ *                                  Pass a list under 'headings' for a block that
+ *                                  renders more than one.
+ * @return bool True on success, false if any block type failed to register.
  */
-function ba11yc_register_heading_source( string $block_type, array $args ): bool {
-	if ( empty( $block_type ) ) {
+function ba11yc_register_heading_source( $block_types, array $args ): bool {
+	if ( ! is_string( $block_types ) && ! is_array( $block_types ) ) {
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'A block type string or array of block types is required.', 'block-accessibility-checks' ), '4.2.0' );
+		return false;
+	}
+
+	if ( empty( $block_types ) ) {
 		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'A block type is required.', 'block-accessibility-checks' ), '4.2.0' );
 		return false;
 	}
 
-	return \BlockAccessibility\Block\HeadingSources::get_instance()->register_source( $block_type, $args );
+	return \BlockAccessibility\Block\HeadingSources::get_instance()->register_source( $block_types, $args );
 }
