@@ -89,6 +89,111 @@ addFilter(
 
 Checks with `configurable: false` are omitted from the settings table (they cannot be changed).
 
+## Declaring Heading Sources
+
+The heading order check (`check_heading_rank`) compares every heading in the document, not just
+`core/heading` blocks. For it to see a heading your block renders, it has to know the level.
+
+### Most blocks need nothing
+
+Two kinds of block are recognized automatically:
+
+- **Core's heading blocks** — `core/post-title`, `core/site-title`, `core/query-title`,
+  `core/comments-title`, `core/site-tagline`, `core/term-name`, `core/widget-group`, and
+  `core/accordion-heading`.
+- **Any block storing its heading level in a numeric `level` attribute.** This is the convention
+  core itself uses, where `0` means the block renders a paragraph rather than a heading. If your
+  block already offers a heading level control that way, it works with no registration.
+
+Check what was detected from the browser console in the editor:
+
+```javascript
+wp.data.select( 'core/editor' ).getEditorSettings().blockA11yChecks.headingSources;
+```
+
+### Declaring the rest
+
+For a block that renders a heading some other way, register it on `ba11yc_ready`:
+
+```php
+add_action( 'ba11yc_ready', function () {
+
+    // A fixed level.
+    ba11yc_register_heading_source( 'my-plugin/section', array( 'level' => 2 ) );
+
+    // The level is chosen by the user, stored under a different attribute name.
+    ba11yc_register_heading_source( 'my-plugin/hero', array(
+        'attribute' => 'headingLevel',
+        'level'     => 2,               // used when the attribute is unset
+    ) );
+
+    // The attribute holds a token rather than a number.
+    ba11yc_register_heading_source( 'my-plugin/callout', array(
+        'attribute' => 'size',
+        'map'       => array( 'large' => 2, 'medium' => 3, 'small' => 4 ),
+        'level'     => 3,
+    ) );
+
+    // The heading only exists when an optional field has content. Without this,
+    // an empty block would still be counted as rendering a heading.
+    ba11yc_register_heading_source( 'my-plugin/panel', array(
+        'level'    => 2,
+        'requires' => 'title',
+    ) );
+
+    // The block renders no heading. Also useful to exclude a block that would
+    // otherwise be detected.
+    ba11yc_register_heading_source( 'my-plugin/quiet', array( 'level' => 0 ) );
+} );
+```
+
+This works for any block, including ones belonging to another plugin, which is why it is the
+recommended surface.
+
+### Declaring in `block.json`
+
+If you own the block and would rather keep the declaration with it:
+
+```json
+{
+    "supports": {
+        "ba11yc": {
+            "headingLevel": { "level": 2, "requires": "title" }
+        }
+    }
+}
+```
+
+A bare number works as shorthand (`"headingLevel": 2`), and `false` means the block renders no
+heading. PHP registration overrides anything declared here.
+
+### Computed levels
+
+When the level cannot be expressed as data — it depends on nesting depth, on sibling state, or on
+several attributes at once — use the JavaScript filter, which overrides everything above:
+
+```javascript
+addFilter(
+    'ba11yc.blockHeadingLevels',
+    'my-plugin/heading-levels',
+    ( levels, block ) => {
+        if ( block.name !== 'my-plugin/section' ) {
+            return levels;
+        }
+        return [ block.attributes.depth + 1 ];
+    }
+);
+```
+
+Return `[]` for no heading, or several entries for a block that renders more than one.
+
+### Notes
+
+- A declared block is also **flagged** when it is the block that skips a level, not just counted as
+  context for the headings around it.
+- No settings row is created. Severity follows the single **Heading level order** row, so turning
+  that off turns it off everywhere.
+
 ## Settings Integration
 
 Checks with `'configurable' => true` appear in the unified DataViews settings table under **Block Accessibility Checks**. Admins can filter by your `namespace` to see only your plugin's checks. There are no per-plugin submenus — all plugins share the single table.

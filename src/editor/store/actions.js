@@ -7,6 +7,8 @@ import {
 	SET_INVALID_EDITOR_CHECKS,
 	SET_BLOCK_VALIDATION,
 	CLEAR_BLOCK_VALIDATION,
+	SET_HEADING_SIGNATURE,
+	INVALIDATE_HEADING_OUTLINE,
 } from './constants';
 
 /**
@@ -58,4 +60,31 @@ export function setBlockValidation(clientId, result) {
  */
 export function clearBlockValidation(clientId) {
 	return { type: CLEAR_BLOCK_VALIDATION, clientId };
+}
+
+/**
+ * Record a value that changes whenever the document heading outline changes.
+ *
+ * Blocks depend on this to know when to re-check their heading level, since one
+ * block's heading can change the verdict on another's.
+ *
+ * @param {string} signature A value that changes whenever the outline does.
+ * @return {Object} Action object.
+ */
+export function setHeadingSignature(signature) {
+	return { type: SET_HEADING_SIGNATURE, signature };
+}
+
+/**
+ * Force the heading outline to be recomputed.
+ *
+ * The heading level a block contributes is normally derived from its own
+ * attributes, so a block editor change is enough to trigger a recompute. Code
+ * that resolves levels from anywhere else - an asynchronous lookup, or state
+ * outside the block - calls this when its answer changes.
+ *
+ * @return {Object} Action object.
+ */
+export function invalidateHeadingOutline() {
+	return { type: INVALIDATE_HEADING_OUTLINE };
 }

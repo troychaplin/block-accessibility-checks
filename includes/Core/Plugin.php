@@ -13,6 +13,7 @@ namespace BlockAccessibility\Core;
 use BlockAccessibility\Core\Traits\Logger;
 use BlockAccessibility\Block\Registry as BlockChecksRegistry;
 use BlockAccessibility\Block\HeadingLevels;
+use BlockAccessibility\Block\HeadingSources;
 use BlockAccessibility\Editor\Registry as EditorChecksRegistry;
 use BlockAccessibility\Editor\CoreChecks as EditorCoreChecks;
 use BlockAccessibility\Rest\ChecksController;
@@ -113,6 +114,7 @@ class Plugin {
 			);
 
 			$this->init_block_checks_registry();
+			$this->init_heading_sources();
 			$this->init_editor_checks_registry();
 			$this->init_rest_and_filters();
 
@@ -243,6 +245,26 @@ class Plugin {
 	}
 
 	/**
+	 * Initialize the heading sources registry
+	 *
+	 * Must run before the 'ba11yc_ready' action so integrators can register
+	 * heading sources from inside it.
+	 *
+	 * @return void
+	 * @throws \Exception If heading sources service initialization fails.
+	 */
+	private function init_heading_sources(): void {
+		try {
+			$heading_sources                   = HeadingSources::get_instance();
+			$this->services['heading_sources'] = $heading_sources;
+			$this->log_debug( 'Heading sources service initialized.' );
+		} catch ( \Exception $e ) {
+			$this->log_error( 'Failed to initialize heading sources: ' . $e->getMessage() );
+			throw $e;
+		}
+	}
+
+	/**
 	 * Initialize editor checks registry
 	 *
 	 * @return void
@@ -352,6 +374,15 @@ class Plugin {
 	 */
 	public function get_heading_levels(): ?HeadingLevels {
 		return $this->get_service( 'heading_levels' );
+	}
+
+	/**
+	 * Get the heading sources registry
+	 *
+	 * @return HeadingSources|null The heading sources instance or null if not initialized.
+	 */
+	public function get_heading_sources(): ?HeadingSources {
+		return $this->get_service( 'heading_sources' );
 	}
 
 	/**

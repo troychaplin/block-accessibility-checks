@@ -41,29 +41,29 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@wordpress/compose": "^8.6.0",
-		"@wordpress/data": "10.53.0",
-		"@wordpress/element": "8.5.0",
-		"@wordpress/env": "11.13.0",
-		"@wordpress/eslint-plugin": "25.9.0",
-		"@wordpress/hooks": "^4.53.0",
-		"@wordpress/i18n": "6.26.0",
-		"@wordpress/plugins": "7.53.0",
-		"@wordpress/prettier-config": "4.53.0",
-		"@wordpress/scripts": "34.1.0",
-		"@wordpress/stylelint-config": "24.2.0",
-		"eslint": "^10.9.0",
+		"@wordpress/compose": "^8.7.0",
+		"@wordpress/data": "10.54.0",
+		"@wordpress/element": "8.6.0",
+		"@wordpress/env": "11.14.0",
+		"@wordpress/eslint-plugin": "25.10.0",
+		"@wordpress/hooks": "^4.54.0",
+		"@wordpress/i18n": "6.27.0",
+		"@wordpress/plugins": "7.54.0",
+		"@wordpress/prettier-config": "4.54.0",
+		"@wordpress/scripts": "34.2.0",
+		"@wordpress/stylelint-config": "24.3.0",
+		"eslint": "^10.9.1",
 		"eslint-config-prettier": "10.1.8",
 		"husky": "9.1.7",
 		"stylelint": "17.14.1",
 		"stylelint-scss": "7.2.0"
 	},
 	"dependencies": {
-		"@wordpress/api-fetch": "^7.53.0",
-		"@wordpress/components": "^39.0.0",
-		"@wordpress/dataviews": "^18.0.0",
-		"@wordpress/icons": "^15.4.0",
-		"tldts": "^7.4.10"
+		"@wordpress/api-fetch": "^7.54.0",
+		"@wordpress/components": "^40.0.0",
+		"@wordpress/dataviews": "^18.1.0",
+		"@wordpress/icons": "^15.5.0",
+		"tldts": "^7.4.11"
 	},
 	"pnpm": {
 		"ignoredBuiltDependencies": [

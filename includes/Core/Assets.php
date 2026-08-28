@@ -12,6 +12,7 @@ namespace BlockAccessibility\Core;
 
 use BlockAccessibility\Core\Traits\EditorDetection;
 use BlockAccessibility\Block\Registry as BlockChecksRegistry;
+use BlockAccessibility\Block\HeadingSources;
 use BlockAccessibility\Meta\Registry as MetaChecksRegistry;
 use BlockAccessibility\Editor\Registry as EditorChecksRegistry;
 use BlockAccessibility\Rest\SettingsController;
@@ -267,6 +268,7 @@ class Assets {
 			'metaValidationRules'   => $this->prepare_meta_rules( $meta_registry, $is_site_editor ),
 			'editorValidationRules' => $this->prepare_editor_rules( $editor_registry, $is_site_editor ),
 			'registeredBlockTypes'  => $registry->get_registered_block_types(),
+			'headingSources'        => HeadingSources::get_instance()->get_resolved_sources(),
 		);
 
 		return $settings;
