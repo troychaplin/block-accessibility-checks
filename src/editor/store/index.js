@@ -33,12 +33,16 @@ export {
 	setInvalidEditorChecks,
 	setBlockValidation,
 	clearBlockValidation,
+	setHeadingSignature,
+	invalidateHeadingOutline,
 } from './actions';
 export {
 	getInvalidBlocks,
 	getInvalidMeta,
 	getInvalidEditorChecks,
 	getBlockValidation,
+	getHeadingSignature,
+	getHeadingInvalidation,
 	hasErrors,
 	hasWarnings,
 } from './selectors';

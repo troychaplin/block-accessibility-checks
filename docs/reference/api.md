@@ -111,6 +111,62 @@ Register a document-level validation check for a post type.
 
 ---
 
+### `ba11yc_register_heading_source( $block_type, $args )`
+
+Declares that a block type renders a heading, so the heading order check counts it.
+
+Most blocks need no registration. Core's heading blocks, and any block storing its level in a
+numeric `level` attribute, are recognized automatically. Use this for blocks that do something
+else — including blocks whose `block.json` you do not control.
+
+**Parameters**
+
+| Key         | Type     | Description                                                                                       |
+| ----------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `level`     | int      | The heading level, 0-6. `0` means the block renders no heading. Defaults to `2`.                   |
+| `attribute` | string   | Name of the attribute holding the level. Falls back to `level` when unset or unreadable.           |
+| `map`       | array    | Translates attribute values to levels, for attributes holding a token rather than a number.        |
+| `requires`  | string   | Attribute that must have content for the heading to exist at all.                                  |
+| `headings`  | array    | A list of the above, for a block that renders more than one heading.                               |
+
+Returns `true` on success, `false` on failure.
+
+**Examples**
+
+```php
+add_action( 'ba11yc_ready', function () {
+
+    // A fixed level.
+    ba11yc_register_heading_source( 'acme/section', array( 'level' => 2 ) );
+
+    // The level is chosen by the user and stored in an attribute.
+    ba11yc_register_heading_source( 'acme/hero', array(
+        'attribute' => 'headingLevel',
+        'level'     => 2,
+    ) );
+
+    // The attribute holds a token rather than a number.
+    ba11yc_register_heading_source( 'acme/callout', array(
+        'attribute' => 'size',
+        'map'       => array( 'large' => 2, 'medium' => 3, 'small' => 4 ),
+        'level'     => 3,
+    ) );
+
+    // The heading only exists when an optional field has content.
+    ba11yc_register_heading_source( 'acme/panel', array(
+        'level'    => 2,
+        'requires' => 'title',
+    ) );
+
+    // The block renders no heading at all.
+    ba11yc_register_heading_source( 'acme/quiet', array( 'level' => 0 ) );
+} );
+```
+
+The spec is data rather than a callback because the check runs live in the editor, in JavaScript.
+For a level that cannot be expressed this way — derived from nesting depth, from sibling state, or
+from several attributes at once — use the `ba11yc.blockHeadingLevels` JavaScript filter instead.
+
 ## Block\Registry
 
 Direct registry access via `\BlockAccessibility\Block\Registry::get_instance()`. Most external integrations should use `ba11yc_register_block_check()` instead.

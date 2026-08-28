@@ -9,7 +9,18 @@ export {
 	getEditorValidationRules,
 	getEditorContext,
 	getRegisteredBlockTypes,
+	getHeadingSources,
 } from './get-validation-config';
+
+export { getValidationRootClientIds } from './get-validation-root';
+export {
+	computeHeadingOutline,
+	computeHeadingViolations,
+	getHeadingViolations,
+	headingOutlineSignature,
+	resolveBlockHeadingLevels,
+	isHeadingRankEnabled,
+} from './heading-outline';
 
 export { validateBlock } from './validate-block';
 export { validateMetaField, validateAllMetaChecks } from './validate-meta';

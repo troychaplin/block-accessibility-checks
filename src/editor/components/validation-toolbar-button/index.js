@@ -31,10 +31,14 @@ export function ValidationToolbarButton({ issues }) {
 	const errors = getErrors(issues);
 	const warnings = getWarnings(issues);
 
-	const icon = hasBlockErrors ? (
-		<ValidationIcon fill="#d82000" />
-	) : (
-		<ValidationIcon fill="#dbc900" />
+	// Severity is expressed as a class rather than a fill so the whole button
+	// picks up the chip treatment, the same way the sidebar icon does. The
+	// rules live in validation-sidebar.scss and key off .components-button,
+	// which is what ToolbarButton renders.
+	const icon = (
+		<ValidationIcon
+			className={hasBlockErrors ? 'ba11yc-sidebar-icon-error' : 'ba11yc-sidebar-icon-warning'}
+		/>
 	);
 
 	const openModal = () => setIsModalOpen(true);

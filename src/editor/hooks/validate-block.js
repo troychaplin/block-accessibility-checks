@@ -32,6 +32,11 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 			[clientId]
 		);
 
+		// Heading order depends on the whole document, so editing one block can
+		// change another block's verdict. This signature changes whenever the
+		// outline does, which brings every block back through validation.
+		const headingSignature = useSelect(select => select(STORE_NAME).getHeadingSignature(), []);
+
 		const { setBlockValidation, clearBlockValidation } = useDispatch(STORE_NAME);
 
 		const validationResult = useDebouncedValidation(
@@ -45,7 +50,7 @@ const withErrorHandling = createHigherOrderComponent(BlockEdit => {
 				};
 				return validateBlock(blockToValidate);
 			},
-			[block, attributes],
+			[block, attributes, headingSignature],
 			{ delay: 300 }
 		);
 

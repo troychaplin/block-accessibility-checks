@@ -64,3 +64,15 @@ export function getEditorContext() {
 export function getRegisteredBlockTypes() {
 	return getConfig().registeredBlockTypes || [];
 }
+
+/**
+ * Get the heading sources map, keyed by block type.
+ *
+ * Describes how to resolve the heading level each block type renders. See
+ * heading-outline.js for how a spec is applied to a block's attributes.
+ *
+ * @return {Object} Heading specs keyed by block type name.
+ */
+export function getHeadingSources() {
+	return getConfig().headingSources || {};
+}

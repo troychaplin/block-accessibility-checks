@@ -5,5 +5,5 @@
 import './core-image';
 import './core-button';
 import './core-table';
-import './core-heading';
+import './heading-rank';
 import './editor-checks';

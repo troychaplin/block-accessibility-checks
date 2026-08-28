@@ -8,6 +8,8 @@ import {
 	SET_INVALID_EDITOR_CHECKS,
 	SET_BLOCK_VALIDATION,
 	CLEAR_BLOCK_VALIDATION,
+	SET_HEADING_SIGNATURE,
+	INVALIDATE_HEADING_OUTLINE,
 } from './constants';
 
 /**
@@ -41,6 +43,15 @@ export function reducer(state = DEFAULT_STATE, action) {
 			const { [action.clientId]: _removed, ...remaining } = state.blockValidation;
 			return { ...state, blockValidation: remaining };
 		}
+
+		case SET_HEADING_SIGNATURE:
+			if (action.signature === state.headingSignature) {
+				return state;
+			}
+			return { ...state, headingSignature: action.signature };
+
+		case INVALIDATE_HEADING_OUTLINE:
+			return { ...state, headingInvalidation: state.headingInvalidation + 1 };
 
 		default:
 			return state;

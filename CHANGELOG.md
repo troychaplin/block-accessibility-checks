@@ -17,6 +17,19 @@ Prefix the change with one of these keywords:
 
 ## [Unreleased]
 
+### Added
+
+- Heading order now counts headings rendered by blocks other than `core/heading`. Core's own heading blocks — post title, site title, query title, comments title, site tagline, term name, widget group, and accordion heading — take part in the outline, as does any block that stores its heading level in a numeric `level` attribute, which is the convention core uses. A block that skips a level is flagged on the block itself, not only on the `core/heading` after it
+- `ba11yc_register_heading_source( $block_type, $args )` declares that a block renders a heading, for blocks that do not follow that convention. Accepts a fixed `level`, an `attribute` holding the level, a `map` translating attribute values to levels, and `requires` for a heading that only exists when a field has content. Works on any block, including one belonging to another plugin
+- Blocks can declare the same thing in their own `block.json` via `supports.ba11yc.headingLevel`, and the `ba11yc.blockHeadingLevels` JavaScript filter overrides both for levels that have to be computed
+- `ba11yc_core_heading_sources` filter, for adjusting the built-in list of core blocks that render a heading without using a `level` attribute
+
+### Fixed
+
+- Heading order no longer walks the entire block tree once per heading. The outline is now built once per editor change and every block reads its verdict from it, which removes work that grew with the square of the document size
+- Editing one heading now updates the outlines on the others straight away. Previously a block's error highlight only refreshed when that block itself changed, so fixing one heading could leave a stale error on another until it was clicked
+- Heading order now ignores template blocks in the post editor, matching the rest of validation and the sidebar. A theme's site title no longer counts as the document's first heading, which had quietly disabled the "first heading should be H1 or H2" rule whenever the template was shown
+
 ### Changed
 
 - Heading 1 is now restricted by default: a site that has never saved a heading level choice gets H2–H6 in the heading block, and the "Heading Level Restrictions" card in settings shows the H1 toggle off so an admin can turn it back on. Sites that already saved a choice keep exactly what they saved. This reverses the 4.1.0 default — that release turned every level on because the toggles controlling them had shipped hidden, which is no longer the case

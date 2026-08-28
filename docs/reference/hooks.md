@@ -230,6 +230,25 @@ add_filter( 'ba11yc_check_args', function( $check_args, $block_type, $check_name
 }, 10, 3 );
 ```
 
+#### `ba11yc_core_heading_sources`
+
+Adjust the built-in list of core blocks that render a heading without using a numeric `level`
+attribute. Blocks that follow that convention are detected automatically and are not in this list.
+
+**Parameters:**
+- `$exceptions` (array) - Heading specs keyed by block type, in the same shape as
+  `ba11yc_register_heading_source()`.
+
+**Example:**
+```php
+add_filter( 'ba11yc_core_heading_sources', function ( $exceptions ) {
+    $exceptions['core/some-block'] = array( 'level' => 2 );
+    unset( $exceptions['core/widget-group'] );
+
+    return $exceptions;
+} );
+```
+
 ### Meta Checks
 
 #### `ba11yc_should_register_meta_check`
@@ -365,8 +384,7 @@ Implement validation logic for block attributes.
 - `blockType` (string) - Block type being validated
 - `attributes` (object) - Block attributes
 - `checkName` (string) - Check name being run
-- `rule` (object) - Check configuration from PHP
-- `block` (object) - Full block object (optional)
+- `block` (object) - Full block object, including `clientId` and `innerBlocks`
 
 **Returns:**
 - `boolean` - `true` if valid, `false` if invalid
@@ -389,6 +407,54 @@ addFilter(
         return isValid;
     }
 );
+```
+
+### Heading Sources
+
+#### `ba11yc.blockHeadingLevels`
+
+Declare the heading levels a block renders, for the heading order check.
+
+Runs for every block, after the sources declared in PHP have been resolved, and overrides them. Use
+it when the level cannot be expressed as data — derived from nesting depth, from sibling state, or
+from several attributes at once. For a fixed level, a level held in an attribute, or a heading that
+only exists when a field is filled in, `ba11yc_register_heading_source()` is simpler and needs no
+build step.
+
+**Parameters:**
+- `levels` (number[]) - Levels resolved so far. Empty when the block declares no heading.
+- `block` (object) - `{ name, attributes, clientId }`
+
+**Returns:**
+- `number[]` - The levels this block renders, in document order. Return `[]` for no heading; return
+  more than one entry for a block that renders several.
+
+**Example:**
+```javascript
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+    'ba11yc.blockHeadingLevels',
+    'my-plugin/heading-levels',
+    (levels, block) => {
+        if (block.name !== 'my-plugin/section') {
+            return levels;
+        }
+        if (block.attributes.mode === 'compact') {
+            return [];
+        }
+        return [block.attributes.depth + 1];
+    }
+);
+```
+
+Levels are memoized per block against its attributes. A filter deriving levels from anything else
+must tell the editor when that changes:
+
+```javascript
+import { dispatch } from '@wordpress/data';
+
+dispatch('block-accessibility-checks').invalidateHeadingOutline();
 ```
 
 ### Meta Validation

@@ -179,3 +179,58 @@ function ba11yc_register_editor_check( string $post_type, array $args ): bool {
 
 	return \BlockAccessibility\Editor\Registry::get_instance()->register_editor_check( $post_type, $check_name, $args );
 }
+
+/**
+ * Declare that a block type renders a heading.
+ *
+ * Lets the heading order check see headings that are not core/heading blocks.
+ * Core blocks, and any block using a numeric `level` attribute, are recognized
+ * without this; use it for blocks that do something else, including ones whose
+ * block.json you do not control.
+ *
+ * The spec is data rather than a callback because the check runs live in the
+ * editor, in JavaScript. For a level that cannot be expressed this way, use the
+ * `ba11yc.blockHeadingLevels` JavaScript filter instead.
+ *
+ *     // A fixed level.
+ *     ba11yc_register_heading_source( 'acme/section', array( 'level' => 2 ) );
+ *
+ *     // The level is chosen by the user and stored in an attribute.
+ *     ba11yc_register_heading_source( 'acme/hero', array(
+ *         'attribute' => 'headingLevel',
+ *         'level'     => 2,
+ *     ) );
+ *
+ *     // The attribute holds a token rather than a number.
+ *     ba11yc_register_heading_source( 'acme/callout', array(
+ *         'attribute' => 'size',
+ *         'map'       => array( 'large' => 2, 'medium' => 3 ),
+ *         'level'     => 3,
+ *     ) );
+ *
+ *     // The heading only exists when an optional field has content.
+ *     ba11yc_register_heading_source( 'acme/panel', array(
+ *         'level'    => 2,
+ *         'requires' => 'title',
+ *     ) );
+ *
+ * @since 4.2.0
+ *
+ * @param string $block_type Block type name (e.g. 'acme/section').
+ * @param array  $args       Heading spec. Optional keys: 'level' (0-6, where 0
+ *                           means the block renders no heading), 'attribute'
+ *                           (attribute holding the level), 'map' (translates
+ *                           attribute values to levels), 'requires' (attribute
+ *                           that must have content for the heading to exist).
+ *                           Pass a list under 'headings' for a block that
+ *                           renders more than one.
+ * @return bool True on success, false on failure.
+ */
+function ba11yc_register_heading_source( string $block_type, array $args ): bool {
+	if ( empty( $block_type ) ) {
+		\_doing_it_wrong( __FUNCTION__, \esc_html__( 'A block type is required.', 'block-accessibility-checks' ), '4.2.0' );
+		return false;
+	}
+
+	return \BlockAccessibility\Block\HeadingSources::get_instance()->register_source( $block_type, $args );
+}
