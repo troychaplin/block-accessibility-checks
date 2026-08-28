@@ -15,6 +15,12 @@ Prefix the change with one of these keywords:
 - _Fixed_: for any bug fixes.
 - _Security_: in case of vulnerabilities.
 
+## [Unreleased]
+
+### Added
+
+- `ba11yc_register_heading_source()` accepts an array of block types as its first argument, applying one spec to every block in the list. A block library where many blocks share the same heading shape no longer needs a separate call per block. Passing a single block type string still works, and every spec shape — `level`, `attribute`, `map`, `requires`, and a `headings` list — behaves the same either way
+
 ## [4.2.1]
 
 ### Changed

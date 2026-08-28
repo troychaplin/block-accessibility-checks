@@ -144,6 +144,15 @@ add_action( 'ba11yc_ready', function () {
     // The block renders no heading. Also useful to exclude a block that would
     // otherwise be detected.
     ba11yc_register_heading_source( 'my-plugin/quiet', array( 'level' => 0 ) );
+
+    // Several blocks sharing one shape — the common case in a block library.
+    ba11yc_register_heading_source(
+        array( 'my-plugin/hero', 'my-plugin/card-list' ),
+        array(
+            'attribute' => 'headingLevel',
+            'level'     => 2,
+        )
+    );
 } );
 ```
 

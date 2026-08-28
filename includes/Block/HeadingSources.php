@@ -107,49 +107,83 @@ class HeadingSources {
 	}
 
 	/**
-	 * Register a heading source for a block type.
+	 * Register a heading source for one or more block types.
 	 *
-	 * @param string $block_type Block type name (e.g. 'acme/section').
-	 * @param array  $args       Heading spec, or a list of specs under 'headings'.
-	 * @return bool True when the source was stored.
+	 * Passing several block types applies the same spec to each, which is the
+	 * common case in a block library where many blocks share a heading shape.
+	 *
+	 * @param string|array $block_types Block type name, or a list of them.
+	 * @param array        $args        Heading spec, or a list of specs under 'headings'.
+	 * @return bool True when every block type was stored.
 	 */
-	public function register_source( string $block_type, array $args ): bool {
-		if ( '' === $block_type ) {
-			$this->log_error( 'A block type is required to register a heading source.' );
+	public function register_source( $block_types, array $args ): bool {
+		$requested = is_array( $block_types ) ? $block_types : array( $block_types );
+		$valid     = array();
+
+		foreach ( $requested as $block_type ) {
+			if ( ! is_string( $block_type ) || '' === $block_type ) {
+				$this->log_error( 'A block type must be a non-empty string to register a heading source.' );
+				continue;
+			}
+
+			$valid[] = $block_type;
+		}
+
+		if ( empty( $valid ) ) {
 			return false;
 		}
 
 		$raw = isset( $args['headings'] ) ? $args['headings'] : $args;
 
-		$spec = $this->normalize( $raw, $block_type );
+		// Normalized once and shared. Passing every block type as the log
+		// context means a malformed spec is reported once, naming all of the
+		// blocks it would have affected, rather than once per block.
+		$spec = $this->normalize( $raw, implode( ', ', $valid ) );
 
 		if ( null === $spec ) {
 			return false;
 		}
 
-		$this->registered[ $block_type ] = $spec;
+		// Arrays are copied on assignment, so the blocks cannot end up sharing
+		// a mutable spec.
+		foreach ( $valid as $block_type ) {
+			$this->registered[ $block_type ] = $spec;
+		}
 
 		// Sources may be registered after a read in long-running requests.
 		$this->resolved = null;
 
-		return true;
+		// Anything skipped above was logged; report it rather than swallowing
+		// a typo in one entry of an otherwise good list.
+		return count( $valid ) === count( $requested );
 	}
 
 	/**
-	 * Remove a registered heading source.
+	 * Remove one or more registered heading sources.
 	 *
-	 * @param string $block_type Block type name.
-	 * @return bool True when a source was removed.
+	 * @param string|array $block_types Block type name, or a list of them.
+	 * @return bool True when every named source was found and removed.
 	 */
-	public function unregister_source( string $block_type ): bool {
-		if ( ! isset( $this->registered[ $block_type ] ) ) {
+	public function unregister_source( $block_types ): bool {
+		$requested = is_array( $block_types ) ? $block_types : array( $block_types );
+		$removed   = 0;
+
+		foreach ( $requested as $block_type ) {
+			if ( ! is_string( $block_type ) || ! isset( $this->registered[ $block_type ] ) ) {
+				continue;
+			}
+
+			unset( $this->registered[ $block_type ] );
+			++$removed;
+		}
+
+		if ( 0 === $removed ) {
 			return false;
 		}
 
-		unset( $this->registered[ $block_type ] );
 		$this->resolved = null;
 
-		return true;
+		return count( $requested ) === $removed;
 	}
 
 	/**
