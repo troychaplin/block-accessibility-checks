@@ -15,7 +15,7 @@ Prefix the change with one of these keywords:
 - _Fixed_: for any bug fixes.
 - _Security_: in case of vulnerabilities.
 
-## [Unreleased]
+## [4.2.0]
 
 ### Added
 

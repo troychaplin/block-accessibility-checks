@@ -4,7 +4,7 @@ Contributors: areziaal, mikecorkum
 Tags: accessibility, wcag, gutenberg, blocks, validation
 Requires at least: 6.7
 Tested up to: 7.1
-Stable tag: 4.1.0
+Stable tag: 4.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,7 @@ Whether you're a content creator ensuring your posts are accessible, a developer
 * **JavaScript-Only Validation** - All validation logic runs in JavaScript for real-time editor feedback without server round-trips
 * **Automatic Settings Integration** - Checks from external plugins automatically appear in the unified settings table, attributed and filterable by plugin
 * **External Plugin Support** - Works seamlessly with custom blocks from third-party plugins and themes
+* **Heading Source Declaration** - Blocks that render their own headings count toward heading order validation, automatically or via `ba11yc_register_heading_source()`
 * **Extensive Hook System** - 20+ action and filter hooks for complete customization of registration, validation, and display behavior
 * **Well-Documented API** - Complete developer documentation with quick start guides and working code examples
 
@@ -56,7 +57,7 @@ When accessibility issues are detected, they are highlighted with visual indicat
 * **Button Blocks** - Ensures buttons have descriptive text content and validates link destinations using real TLD validation (Public Suffix List)
 * **Image Blocks** - Requires alt text (unless marked decorative), validates alt text length (warns if exceeding 125 characters), prevents caption duplication, and detects non-descriptive patterns like "image of" or "photo123"
 * **Table Blocks** - Requires proper headers or captions for screen reader navigation
-* **Heading Blocks** - Validates proper heading hierarchy across entire document (prevents skipped levels), ensures appropriate first heading level (H2 recommended, H1 allowed with warnings), and provides configurable heading level restrictions (any of H1–H6 can be disabled; H1 is disabled by default)
+* **Heading Blocks** - Validates heading hierarchy across the whole document, including headings rendered by other blocks. Requires the first heading to be H1 or H2, and any of H1–H6 can be disabled (H1 by default)
 * **Gallery Blocks** - Applies comprehensive image accessibility checks to all gallery items (alt text, length, patterns, caption duplication)
 * **Post & Page Title Validation** - Ensures posts and pages have a title set for accessibility and SEO, validates in real-time as users type, prevents publishing content without a title, configurable independently for posts and pages
 * **Post Meta Fields** - Validate required custom fields with real-time validation, automatic post locking for errors, and seamless integration with block validation system
@@ -123,15 +124,16 @@ The plugin provides immediate visual feedback through its three-tier validation 
 
 Yes! The plugin includes a comprehensive <a href="https://github.com/troychaplin/block-accessibility-checks/blob/main/docs/">developer API</a> with extensive hooks and filters. You can register custom accessibility checks for:
 
-* **Block validation** - Any block type using the `ba11yc_register_checks` action
-* **Meta field validation** - Post meta fields using the `ba11yc_register_meta_checks` action
-* **Editor-level validation** - Document-wide checks using the `ba11yc_register_editor_checks` action
+* **Block validation** - `ba11yc_register_block_check()`
+* **Meta field validation** - `ba11yc_register_meta_check()`
+* **Editor-level validation** - `ba11yc_register_editor_check()`
+* **Heading sources** - `ba11yc_register_heading_source()`
 
-See the developer documentation for complete examples and quick start guides.
+Register these on the `ba11yc_ready` action. See the developer documentation for complete examples and quick start guides.
 
 = Does this work with blocks from other plugins? =
 
-Absolutely! The plugin's architecture supports any WordPress block, whether from core, themes, or third-party plugins. External plugins automatically get their own settings page under the Block Checks menu, allowing administrators to configure validation levels for each check independently.
+Absolutely! Any WordPress block works, whether from core, themes, or third-party plugins. Their checks appear in the single Block Checks settings table, attributed and filterable by plugin, and headings they render count toward heading order validation.
 
 = Can I configure which checks are errors vs warnings? =
 
@@ -144,7 +146,7 @@ Yes, all checks can be configured as errors (prevent publishing), warnings (allo
 
 = Can I validate required post meta fields? =
 
-Yes! The plugin includes a comprehensive meta field validation system. Register required meta fields using the `ba11yc_register_meta_checks` action hook, implement JavaScript validation using the `ba11yc_validate_meta` filter, and the plugin will automatically lock post saving when validation fails, provide visual feedback, and integrate seamlessly with block validation.
+Yes! Register required meta fields with `ba11yc_register_meta_check()` and implement the validation in JavaScript with the `ba11yc.validateMeta` filter. The plugin locks post saving when validation fails and surfaces the issues alongside block validation.
 
 = Does this work in the site editor? =
 
