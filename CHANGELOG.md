@@ -15,6 +15,12 @@ Prefix the change with one of these keywords:
 - _Fixed_: for any bug fixes.
 - _Security_: in case of vulnerabilities.
 
+## [4.2.1]
+
+### Changed
+
+- Toolbar style changes that were being tested accidentally went into 4.2.0 and have been removed
+
 ## [4.2.0]
 
 ### Added
